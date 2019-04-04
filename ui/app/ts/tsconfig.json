@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        // this aligns with Vue's browser support
+        "target": "es5",
+        // this enables stricter inference for data properties on `this`
+        "strict": true,
+        "outDir": "../buildjs",
+        "module": "none",
+    },
+    "include": [
+        "types/vue/global.d.ts",
+        "*.ts",
+    ]
+}

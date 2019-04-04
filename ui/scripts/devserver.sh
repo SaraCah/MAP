@@ -13,6 +13,6 @@ cd "`dirname "$0"`/../"
 
 trap "exit" INT TERM
 trap "kill 0" EXIT
-(tsc --watch app/ts/main.ts --outDir app/buildjs | strings) &
+(tsc --build --watch app/ts/tsconfig.json | strings) &
 
 scripts/start.sh
