@@ -1,8 +1,4 @@
-class Greeter {
-    greet() {
-        console.log("Hello from JS too!");
-    }
-}
+/// <reference path="greeter">
 
 new Greeter().greet();
 

@@ -4,7 +4,7 @@
         "target": "es5",
         // this enables stricter inference for data properties on `this`
         "strict": true,
-        "outDir": "../buildjs",
+        "outFile": "../buildjs/main.js",
         "module": "none",
     },
     "include": [
