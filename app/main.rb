@@ -23,4 +23,8 @@ class MAPTheApp < Sinatra::Base
     Templates.emit(:hello, :name => "<b>World</b>")
   end
 
+  get '/js/*' do
+    send_file 'js/main.js'
+  end
+
 end

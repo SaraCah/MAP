@@ -1,4 +1,15 @@
-<p>Hello, <%= name %>!</p>
+<!doctype html>
+<html>
+    <head>
+        <title>MAP</title>
+        <meta charset="utf-8" />
+    </head>
+    <body>
+        <p>Hello, <%= name %>!</p>
 
-<%# Double equals to emit the partial without escaping %>
-<%== Templates.emit(:example_partial) %>
+        <%# Double equals to emit the partial without escaping %>
+        <%== Templates.emit(:example_partial) %>
+
+        <script type="text/javascript" src="/js/main.js"></script>
+    </body>
+</html>
