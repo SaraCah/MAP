@@ -1,8 +1,13 @@
 #!/bin/bash
 
-set -eou pipefail
+function fail() {
+    echo "ERROR: $*"
+    exit 1
+}
 
-which tsc >/dev/null
+which tsc >/dev/null || fail "Need Typescript installed"
+
+set -eou pipefail
 
 cd "`dirname "$0"`/../"
 
