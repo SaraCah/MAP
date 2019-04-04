@@ -24,7 +24,23 @@ class MAPTheApp < Sinatra::Base
   end
 
   get '/js/*' do
-    send_file 'js/main.js'
+    filename = request.path.split('/').last
+    if File.exist?(file = File.join('js', filename))
+      send_file file
+    elsif File.exist?(file = File.join('buildjs', filename))
+      send_file file
+    else
+      [404]
+    end
+  end
+
+  get '/css/*' do
+    filename = request.path.split('/').last
+    if File.exist?(file = File.join('css', filename))
+      send_file file
+    else
+      [404]
+    end
   end
 
 end
