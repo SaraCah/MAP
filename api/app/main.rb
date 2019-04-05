@@ -2,6 +2,7 @@ require 'bundler/setup'
 Bundler.require
 
 require_relative 'common/bootstrap'
+require_relative 'storage/db'
 
 Dir.chdir(File.dirname(__FILE__))
 
@@ -14,10 +15,16 @@ class MAPTheAPI < Sinatra::Base
     config.also_reload File.join('**', '*.rb')
   end
 
+  DB.connect
+
   get '/' do
+    messages = DB.open do |db|
+                 db[:hello].select(:message).all.collect{|row| row[:message]}
+               end
+
     json_response({
-      hello: 'world'
-    })
+       hello: messages.join('; ')
+     })
   end
 
   private
