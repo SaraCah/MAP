@@ -1,6 +1,8 @@
 require 'bundler/setup'
 Bundler.require
 
+require_relative 'common/bootstrap'
+
 Dir.chdir(File.dirname(__FILE__))
 
 $LOAD_PATH << Dir.pwd
