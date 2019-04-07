@@ -1,6 +1,8 @@
 require 'bundler/setup'
 Bundler.require
 
+require 'securerandom'
+
 require_relative 'common/bootstrap'
 require_relative 'storage/db'
 
@@ -15,15 +17,32 @@ class MAPTheAPI < Sinatra::Base
     config.also_reload File.join('**', '*.rb')
   end
 
-  DB.connect
+  configure do
+    DB.connect
+
+    DB.open do |db|
+      # Bootstrap an admin user if we need one
+      unless db[:user][:username => 'admin']
+        admin_id = db[:user].insert(:username => 'admin',
+                                    :name => 'Admin User',
+                                    :create_time => java.lang.System.currentTimeMillis,
+                                    :modified_time => java.lang.System.currentTimeMillis)
+
+        admin_password = SecureRandom.hex
+
+        db[:dbauth].insert(:user_id => admin_id,
+                           :pwhash => BCrypt::Password.create(admin_password))
+
+        # FIXME: logging
+        $stderr.puts("The admin password has been set to: #{admin_password}")
+      end
+    end
+
+  end
 
   get '/' do
-    messages = DB.open do |db|
-                 db[:hello].select(:message).all.collect{|row| row[:message]}
-               end
-
     json_response({
-       hello: messages.join('; ')
+       hello: "GREETINGS"
      })
   end
 
