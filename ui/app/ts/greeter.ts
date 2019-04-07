@@ -1,5 +1,5 @@
 class Greeter {
-    greet() {
-        console.log("Hello from JS too!");
+    greet(msg: string) {
+        console.log(`Hello from JS too! ${msg}`);
     }
 }

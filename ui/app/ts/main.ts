@@ -1,6 +1,6 @@
 /// <reference path="greeter">
 
-new Greeter().greet();
+new Greeter().greet("Hello world");
 
 const Component = Vue.extend({
     el: '#vuething',

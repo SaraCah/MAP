@@ -4,6 +4,9 @@
         "target": "es5",
         // this enables stricter inference for data properties on `this`
         "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
         "outFile": "../buildjs/main.js",
         "module": "none",
     },
