@@ -11,11 +11,17 @@
         <%# Double equals to emit the partial without escaping %>
         <%== Templates.emit(:example_partial) %>
 
-        <div id="vuething"></div>
+        <div id="vueapp">
+            <linker name="agency"></linker>
+        </div>
 
         <script type="text/javascript" src="/js/vue.min.js"></script>
         <script type="text/javascript" src="/js/materialize.min.js"></script>
 
         <script type="" src="/js/main.js"></script>
+
+        <script>
+            new Vue({el: '#vueapp'});
+        </script>
     </body>
 </html>
