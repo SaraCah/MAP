@@ -37,8 +37,9 @@ class Indexer
   end
 
   def save_last_mtime(ms_since_epoch)
-    File.write("#{@state_file}.tmp", ms_since_epoch.to_s)
-    File.rename("#{@state_file}.tmp", @state_file)
+    tmp = "#{@state_file}.tmp.#{SecureRandom.hex}"
+    File.write(tmp, ms_since_epoch.to_s)
+    File.rename(tmp, @state_file)
   end
 
   def prepare_agent_corporate(row)
