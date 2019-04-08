@@ -1,0 +1,37 @@
+class Ctx
+
+  def self.open(opts = {})
+    raise "Already got a context" if Thread.current[:context]
+
+    Thread.current[:context] = Context.new
+
+    begin
+      yield
+    ensure
+      Thread.current[:context] = nil
+    end
+  end
+
+  def self.session
+    get.session
+  end
+
+  def self.username
+    get.session.username
+  end
+
+  def self.get
+    ctx = Thread.current[:context]
+    raise "No context active" unless ctx
+    ctx
+  end
+
+  class Context
+    attr_accessor :session
+
+    def initialize
+      @session = nil
+    end
+  end
+
+end
