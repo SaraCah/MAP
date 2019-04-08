@@ -10,6 +10,7 @@ require 'views/templates'
 
 require_relative 'lib/ctx'
 require_relative 'lib/endpoint'
+require_relative 'lib/map_api_client'
 
 require_relative 'endpoints'
 
