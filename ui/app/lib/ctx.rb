@@ -20,6 +20,10 @@ class Ctx
     get.session.username
   end
 
+  def self.client
+    get.client
+  end
+
   def self.get
     ctx = Thread.current[:context]
     raise "No context active" unless ctx
@@ -31,6 +35,10 @@ class Ctx
 
     def initialize
       @session = nil
+    end
+
+    def client
+      MAPAPIClient.new(session)
     end
   end
 

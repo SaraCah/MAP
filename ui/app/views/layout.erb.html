@@ -8,6 +8,10 @@
     <body>
         <h2><%= title %></h2>
 
+        <% if message %>
+            <%== Templates.emit(:flash_message, message: message) %>
+        <% end %>
+
         <%== Templates.emit(template, template_args) %>
 
         <script type="text/javascript" src="/js/vue.min.js"></script>

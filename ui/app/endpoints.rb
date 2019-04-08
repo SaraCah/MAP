@@ -1,9 +1,9 @@
 class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/') do
-    if Ctx.session
+    if Ctx.session[:username]
       # These tags get escaped...
-      Templates.emit(:hello, :name => "<b>World</b>")
+      Templates.emit(:hello, :name => "<b>#{Ctx.session[:username]}</b>")
     else
       Templates.emit_with_layout(:login, {},
                                  :layout, title: "Please log in")
@@ -28,6 +28,20 @@ class MAPTheApp < Sinatra::Base
     else
       [404]
     end
+  end
+
+  Endpoint.post('/authenticate')
+   .param(:username, String, "Username to authenticate")
+   .param(:password, String, "Password") do 
+     begin
+       session[:session_id] = Ctx.client.authenticate(params[:username], params[:password])
+       session[:username] = params[:username]
+
+       redirect '/'
+     rescue MAPAPIClient::AuthenticationFailed
+       Templates.emit_with_layout(:login, {username: params[:username]},
+                                  :layout, title: "Please log in", message: "Login failed")
+     end
   end
 
 end

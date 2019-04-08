@@ -24,4 +24,7 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  use Rack::Session::Cookie, :key => 'map.session',
+                             :path => '/',
+                             :secret => 'FIXME'
 end

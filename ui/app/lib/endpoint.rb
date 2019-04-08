@@ -101,10 +101,7 @@ class Endpoint
               app_instance.instance_eval(&block)
             else
               Ctx.open do
-                if env["HTTP_X_MAP_SESSION"]
-                  Ctx.get.session = Sessions.get_session(env["HTTP_X_MAP_SESSION"])
-                end
-                # Sessions.get_session()
+                Ctx.get.session = session || {}
 
                 app_instance.instance_eval(&block)
               end
