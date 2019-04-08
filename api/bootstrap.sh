@@ -3,6 +3,9 @@
 JRUBY_VERSION="https://repo1.maven.org/maven2/org/jruby/jruby-complete/9.2.6.0/jruby-complete-9.2.6.0.jar"
 JRUBY_SHA256="602e6b2ace6cd18e33b02a41b3a2e188fcdcacc35856df2c76afea6908b8c8c5"
 
+SOLR_VERSION="http://apache.mirror.amaze.com.au/lucene/solr/8.0.0/solr-8.0.0.tgz"
+SOLR_SHA256="0e6392d3b980ab917c731b054101aafcebceacc0e5063cb1e305aeeaec911d12"
+
 function fail() {
     echo "ERROR: $*"
     echo "Aborting"
@@ -50,3 +53,20 @@ fi
 echo "Installing gems"
 scripts/jruby.sh distlibs/gems/bin/bundle install
 
+if [ ! -d "solr_dist" ]; then
+    echo "Downloading Solr distribution"
+
+    rm -rf solr_dist.tmp
+    mkdir solr_dist.tmp
+
+    (
+        cd solr_dist.tmp
+        curl -L -s "$SOLR_VERSION" > solr.tgz
+
+        tar xzf solr.tgz
+        mv solr-*/* .
+        rmdir * 2>/dev/null
+    )
+
+    mv solr_dist.tmp solr_dist
+fi

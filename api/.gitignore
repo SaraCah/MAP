@@ -1,2 +1,5 @@
 .DS_Store
 /distlibs/
+/solr_dist.tmp
+/solr_dist
+/data
