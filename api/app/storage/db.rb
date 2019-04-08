@@ -1,3 +1,5 @@
+require 'logger'
+
 class DB
 
   def self.connect
@@ -29,20 +31,20 @@ class DB
               return yield @pool.pool
             rescue Sequel::Rollback
               # If we're not in a transaction we can't roll back, but no need to blow up.
-              Log.warn("Sequel::Rollback caught but we're not inside of a transaction")
+              $stderr.puts("Sequel::Rollback caught but we're not inside of a transaction")
               return nil
             end
           end
         rescue Sequel::DatabaseDisconnectError => e
           # MySQL might have been restarted.
           last_err = e
-          Log.info("Connecting to the database failed.  Retrying...")
+          $stderr.puts("Connecting to the database failed.  Retrying...")
           sleep(opts[:db_failed_retry_delay] || 3)
 
 
         rescue Sequel::NoExistingObject, Sequel::DatabaseError => e
           if (attempt + 1) < retries && is_retriable_exception(e, opts) && transaction
-            Log.info("Retrying transaction after retriable exception (#{e})")
+            $stderr.puts("Retrying transaction after retriable exception (#{e})")
             sleep(opts[:retry_delay] || 1)
           else
             raise e
@@ -51,8 +53,7 @@ class DB
       end
 
       if last_err
-        Log.error("Failed to connect to the database")
-        Log.exception(last_err)
+        $stderr.puts("Failed to connect to the database")
 
         raise "Failed to connect to the database: #{last_err}"
       end
@@ -73,51 +74,7 @@ class DB
   end
 
 
-  class MarkTheBastard
-
-    def info(msg)
-      if Thread.current[:db_query_excluded]
-        return
-      end
-
-      Thread.current[:db_query_count] ||= 0
-      Thread.current[:db_query_time] ||= 0.0
-
-      if msg =~ /SELECT|UPDATE|INSERT|DELETE/
-        Thread.current[:db_query_count] += 1
-        Thread.current[:db_query_time] += Float(msg[1..msg.index("s") - 1])
-      end
-    end
-
-    def self.with_exclusion
-      excl = Thread.current[:db_query_excluded]
-      Thread.current[:db_query_excluded] = true
-      begin
-        yield
-      ensure
-        Thread.current[:db_query_excluded] = excl
-      end
-    end
-
-    def self.query_count
-      result = Thread.current[:db_query_count] || 0
-      Thread.current[:db_query_count] = 0
-      result
-    end
-
-    def self.query_time
-      result = Thread.current[:db_query_time] || 0.0
-      Thread.current[:db_query_time] = 0.0
-      (result * 1000).to_i
-    end
-
-    def method_missing(*)
-    end
-
-  end
-
-
-  class DBPool
+    class DBPool
 
     attr_reader :pool
 
@@ -134,11 +91,11 @@ class DB
         @pool = Sequel.connect(AppConfig[:db_url],
                                max_connections: @pool_size,
                                test: true,
-                               loggers: (AppConfig[:db_debug_log] ? [Logger.new($stderr), MarkTheBastard.new] : [MarkTheBastard.new]))
+                               loggers: Logger.new($stderr))
 
         self
       rescue
-        Log.error("DB connection failed: #{$!}")
+        $stderr.puts("DB connection failed: #{$!}")
       end
     end
 
