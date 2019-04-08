@@ -18,7 +18,15 @@ class Ctx
     get.db
   end
 
+  def self.user_logged_in?
+    get.session && get.session.username
+  end
+
   def self.username
+    if get.session.nil?
+      raise "User not currently logged in"
+    end
+
     get.session.username
   end
 

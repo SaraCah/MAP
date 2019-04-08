@@ -3,3 +3,4 @@
 /solr_dist.tmp
 /solr_dist
 /data
+/config/config.local.rb

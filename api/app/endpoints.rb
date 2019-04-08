@@ -1,9 +1,11 @@
 class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/') do
-    json_response({
-                    hello: "GREETINGS #{Ctx.username}"
-                  })
+    if Ctx.user_logged_in?
+      json_response(hello: "GREETINGS #{Ctx.username}")
+    else
+      json_response(hello: "GREETINGS")
+    end
   end
 
   Endpoint.post('/logout') do

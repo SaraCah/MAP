@@ -56,17 +56,6 @@ class AppConfig
     @@parameters.has_key?(resolve_alias(parameter))
   end
 
-
-  def self.load_overrides_from_properties
-    # Override defaults from the command-line if specified
-    java.lang.System.get_properties.each do |property, value|
-      if property =~ /aspace.config.(.*)/
-        @@parameters[resolve_alias($1.intern)] = value
-      end
-    end
-  end
-
-
   def self.load_into(obj)
     @@parameters.each do |config, value|
       obj.send(:"#{config}=", value)
@@ -88,34 +77,12 @@ class AppConfig
   end
 
 
-  def self.get_preferred_config_path
-
-    if java.lang.System.getProperty("aspace.config")
-      # Explicit Java property
-      java.lang.System.getProperty("aspace.config")
-    elsif ENV['ASPACE_CONFIG'] && File.exist?(ENV['ASPACE_CONFIG'])
-      # Setting a system config 
-      ENV['ASPACE_CONFIG']
-    elsif ENV['ASPACE_LAUNCHER_BASE'] && File.exist?(File.join(ENV['ASPACE_LAUNCHER_BASE'], "config", "config.rb"))
-      File.join(ENV['ASPACE_LAUNCHER_BASE'], "config", "config.rb")
-    elsif java.lang.System.getProperty("catalina.base")
-      # Tomcat users
-      File.join(java.lang.System.getProperty("catalina.base"), "conf", "config.rb")
-    elsif __FILE__.index(java.lang.System.getProperty("java.io.tmpdir")) != 0
-      File.join(get_devserver_base, "config", "config.rb")
-    else
-      File.join(Dir.home, ".aspace_config.rb")
-    end
-
-  end
-
   def self.get_devserver_base
     File.join(ENV.fetch("GEM_HOME"), "..", "..")
   end
 
   def self.find_user_config
     possible_locations = [
-      get_preferred_config_path,
       File.join(File.dirname(__FILE__), "config.rb"),
       File.join(File.dirname(__FILE__), "..", "..", "config", "config.rb"),
     ]
@@ -137,8 +104,6 @@ class AppConfig
       puts "Loading configuration file from path: #{config}"
       load config
     end
-
-    self.load_overrides_from_properties
   end
 
 

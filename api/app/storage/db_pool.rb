@@ -21,6 +21,7 @@ class DBPool
       self
     rescue
       $stderr.puts("DB connection failed: #{$!}")
+      raise
     end
   end
 

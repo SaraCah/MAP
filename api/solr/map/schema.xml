@@ -4,12 +4,12 @@
   <field name="_version_" type="plong" indexed="true" stored="true" multiValued="false"/>
 
   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  <field name="aspace_id" type="string" indexed="false" stored="true" multiValued="false"/>
 
   <field name="keywords" type="text_general" indexed="true" stored="false" multiValued="true"/>
-
   <field name="display_string" type="text_general" indexed="false" stored="true" multiValued="false"/>
   <field name="record_type" type="string" indexed="false" stored="true" multiValued="false"/>
-  <field name="uri" type="string" indexed="false" stored="true" multiValued="false"/>
+
 
   <uniqueKey>id</uniqueKey>
 

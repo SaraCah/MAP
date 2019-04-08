@@ -2,6 +2,8 @@ require 'bundler/setup'
 Bundler.require
 
 require 'securerandom'
+require 'fileutils'
+require 'net/http'
 
 require_relative 'common/bootstrap'
 require_relative 'storage/db_pool'
@@ -9,11 +11,14 @@ require_relative 'storage/db'
 require_relative 'storage/aspace_db'
 require_relative 'lib/endpoint'
 require_relative 'lib/ctx'
+require_relative 'lib/watch_dir_reloader'
 
 require_relative 'storage/base_storage'
 require_relative 'storage/db_auth.rb'
 require_relative 'storage/users.rb'
 require_relative 'storage/sessions.rb'
+
+require_relative 'indexer/indexer'
 
 require_relative 'endpoints.rb'
 
@@ -30,9 +35,14 @@ class MAPTheAPI < Sinatra::Base
     config.after_reload do
       load File.join(Dir.pwd, 'endpoints.rb')
     end
+
+    WatchDirReloader.new(["indexer"]).start
   end
 
   configure do
+    Sequel.database_timezone = :utc
+    Sequel.typecast_timezone = :utc
+
     DB.connect
     AspaceDB.connect
 
@@ -49,6 +59,7 @@ class MAPTheAPI < Sinatra::Base
       end
     end
 
+    Indexer.start(AppConfig[:solr_url], MapAPI.base_dir(File.join('data', 'indexer', 'indexer.state')))
   end
 
   private
