@@ -1,3 +1,4 @@
 /distlibs/
 /app/buildjs
 .DS_Store
+/config/config.local.rb
