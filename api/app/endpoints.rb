@@ -18,6 +18,7 @@ class MAPTheAPI < Sinatra::Base
     .param(:password, String, "Password") do
     if DBAuth.authenticate(params[:username], params[:password])
       json_response(authenticated: true,
+                    permissions: Users.permissions_for(params[:username]),
                     session: Sessions.create_session(params[:username]))
     else
       json_response(authenticated: false)

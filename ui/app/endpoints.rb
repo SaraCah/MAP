@@ -33,15 +33,18 @@ class MAPTheApp < Sinatra::Base
   Endpoint.post('/authenticate')
    .param(:username, String, "Username to authenticate")
    .param(:password, String, "Password") do 
-     begin
-       session[:session_id] = Ctx.client.authenticate(params[:username], params[:password])
-       session[:username] = params[:username]
+    authentication = Ctx.client.authenticate(params[:username], params[:password])
 
-       redirect '/'
-     rescue MAPAPIClient::AuthenticationFailed
-       Templates.emit_with_layout(:login, {username: params[:username]},
-                                  :layout, title: "Please log in", message: "Login failed")
-     end
+    if authentication.successful?
+      session[:session_id] = authentication.session_id
+      session[:username] = params[:username]
+      session[:permissions] = authentication.permissions
+
+      redirect '/'
+    else
+      Templates.emit_with_layout(:login, {username: params[:username]},
+                                 :layout, title: "Please log in", message: "Login failed")
+    end
   end
 
 end

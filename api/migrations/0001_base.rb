@@ -5,6 +5,8 @@ Sequel.migration do
       String :username, null: false, unique: true, size: 64
       String :name, null: false
 
+      Integer :admin, null: false, default: 0
+
       Bignum :create_time, null: false
       Bignum :modified_time, null: false
     end

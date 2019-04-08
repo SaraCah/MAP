@@ -5,15 +5,21 @@ class MAPAPIClient
     @session = session
   end
 
+  Authentication = Struct.new(:successful, :session_id, :permissions) do
+    def successful?
+      self.successful
+    end
+  end
+
   def authenticate(username, password)
     response = post('/authenticate', username: username, password: password)
 
-    return response['session_id'] if response['authenticated']
-
-    raise AuthenticationFailed.new
+    if response['authenticated']
+      Authentication.new(true, response['session_id'], response['permissions'])
+    else
+      Authentication.new(false)
+    end
   end
-
-  class AuthenticationFailed < StandardError; end
 
   private
 
