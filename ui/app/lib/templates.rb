@@ -14,6 +14,10 @@ class Templates
     }.emit(args)
   end
 
+  def self.emit_with_layout(template, template_args, layout, layout_args = {})
+    @templates.fetch(layout).emit(layout_args.merge(template: template, template_args: template_args))
+  end
+
   class TemplateDef
     def initialize(name, argspecs, erb_file)
       @name = name

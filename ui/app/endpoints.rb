@@ -5,7 +5,8 @@ class MAPTheApp < Sinatra::Base
       # These tags get escaped...
       Templates.emit(:hello, :name => "<b>World</b>")
     else
-      Templates.emit_with_layout(:login, 'layout')
+      Templates.emit_with_layout(:login, {},
+                                 :layout, title: "Please log in")
     end
   end
 

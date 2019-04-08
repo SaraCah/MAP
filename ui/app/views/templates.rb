@@ -11,3 +11,6 @@
 
 Templates.define(:hello, [:name], "views/hello.erb.html")
 Templates.define(:example_partial, [], "views/_partial.erb.html")
+
+Templates.define(:layout, [:title, :template, :template_args], "views/layout.erb.html")
+Templates.define(:login, [], "views/login.erb.html")

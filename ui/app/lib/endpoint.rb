@@ -5,7 +5,7 @@ class Endpoint
   def initialize(method, uri, opts)
     @method = method
     @uri = uri
-    @valid_params = {}
+    @valid_params = {'splat' => ParamDef.new(String, 'Rest of URL', {:optional => true})}
     @opts = opts
   end
 
