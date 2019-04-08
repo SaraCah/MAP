@@ -65,7 +65,7 @@ if [ ! -d "solr_dist" ]; then
 
         tar xzf solr.tgz
         mv solr-*/* .
-        rmdir * 2>/dev/null
+        rmdir * 2>/dev/null || true
     )
 
     mv solr_dist.tmp solr_dist

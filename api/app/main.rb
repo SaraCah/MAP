@@ -4,7 +4,9 @@ Bundler.require
 require 'securerandom'
 
 require_relative 'common/bootstrap'
+require_relative 'storage/db_pool'
 require_relative 'storage/db'
+require_relative 'storage/aspace_db'
 require_relative 'lib/endpoint'
 require_relative 'lib/ctx'
 
@@ -32,6 +34,7 @@ class MAPTheAPI < Sinatra::Base
 
   configure do
     DB.connect
+    AspaceDB.connect
 
     Ctx.open do
       # Bootstrap an admin user if we need one

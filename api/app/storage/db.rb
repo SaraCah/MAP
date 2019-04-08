@@ -3,7 +3,7 @@ require 'logger'
 class DB
 
   def self.connect
-    @pool = DBPool.new.connect
+    @pool = DBPool.new(AppConfig[:db_url]).connect
     @connected = true
   end
 
@@ -71,38 +71,5 @@ class DB
     ((opts[:retry_on_optimistic_locking_fail] &&
       exception.instance_of?(Sequel::Plugins::OptimisticLocking::Error)) ||
      (exception.wrapped_exception && ( exception.wrapped_exception.cause or exception.wrapped_exception).getSQLState() =~ /^(40|41)/) )
-  end
-
-
-    class DBPool
-
-    attr_reader :pool
-
-    def initialize(pool_size = AppConfig[:db_max_connections], opts = {})
-      @pool_size = pool_size
-      @opts = opts
-      @pool = nil
-    end
-
-    def connect
-      return if @pool
-
-      begin
-        @pool = Sequel.connect(AppConfig[:db_url],
-                               max_connections: @pool_size,
-                               test: true,
-                               loggers: Logger.new($stderr))
-
-        self
-      rescue
-        $stderr.puts("DB connection failed: #{$!}")
-      end
-    end
-
-    def transaction(*args)
-      @pool.transaction(*args) do
-        yield(@pool)
-      end
-    end
   end
 end
