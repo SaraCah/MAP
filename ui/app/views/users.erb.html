@@ -1,0 +1,26 @@
+<a href="/users/new">Add User</a>
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Permissions</th>
+            <th>Date Created</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <% users.each do |user| %>
+            <tr>
+                <td><%= user.username %></td>
+                <td><%= user.name %></td>
+                <td><%= user.permissions %></td>
+                <td><%= user.create_time %></td>
+                <td>
+                    <button>Edit</button>
+                    <button>Delete</button>
+                </td>
+            </tr>
+        <% end %>
+    </tbody>
+</table>

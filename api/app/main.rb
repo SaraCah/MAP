@@ -20,6 +20,8 @@ require_relative 'storage/sessions.rb'
 
 require_relative 'indexer/indexer'
 
+require_relative 'dto/user_request'
+
 require_relative 'endpoints.rb'
 
 Dir.chdir(File.dirname(__FILE__))

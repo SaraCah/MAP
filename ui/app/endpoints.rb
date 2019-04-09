@@ -36,7 +36,7 @@ class MAPTheApp < Sinatra::Base
     authentication = Ctx.client.authenticate(params[:username], params[:password])
 
     if authentication.successful?
-      session[:session_id] = authentication.session_id
+      session[:api_session_id] = authentication.session_id or raise "WOOT"
       session[:username] = params[:username]
       session[:permissions] = authentication.permissions
 
@@ -45,6 +45,38 @@ class MAPTheApp < Sinatra::Base
       Templates.emit_with_layout(:login, {username: params[:username]},
                                  :layout, title: "Please log in", message: "Login failed")
     end
+  end
+
+  Endpoint.get('/users')
+    .param(:page, Integer, "Page to return", optional: true) do
+      Templates.emit_with_layout(:users, {users: Ctx.client.users(params[:page] || 0)},
+                                 :layout, title: "Users")
+  end
+
+  Endpoint.get('/users/new') do
+    Templates.emit_with_layout(:user_new, {user: UserForm.new},
+                               :layout, title: "New User")
+  end
+
+  Endpoint.post('/users/create')
+    .param(:user, UserForm, "The user to create") do
+    
+    Ctx.client.create_user(params[:user])
+
+    if params[:user].has_errors?
+      Templates.emit_with_layout(:user_new, {user: params[:user]},
+                                   :layout, title: "New User")
+    else
+      redirect '/users'
+    end
+  end
+
+  Endpoint.get('/logout') do
+    session[:api_session_id] = nil
+    session[:username] = nil
+
+    # [200, "Woot"]
+    redirect '/'
   end
 
 end

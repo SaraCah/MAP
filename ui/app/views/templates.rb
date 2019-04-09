@@ -14,4 +14,6 @@ Templates.define(:example_partial, [], "views/_partial.erb.html")
 
 Templates.define(:layout, [:title, :template, :template_args, :message?], "views/layout.erb.html")
 Templates.define(:login, [:username?], "views/login.erb.html")
+Templates.define(:users, [:users], "views/users.erb.html")
+Templates.define(:user_new, [:user], "views/user_form.erb.html")
 Templates.define(:flash_message, [:message], "views/_message.erb.html")

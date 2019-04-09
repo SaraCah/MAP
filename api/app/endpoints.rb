@@ -25,4 +25,23 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.get('/users')
+    .param(:page, Integer, "Page to return") do
+    if Ctx.user_logged_in?
+      json_response(Users.page(params[:page], 10))
+    else
+      json_response([])
+    end
+  end
+
+  Endpoint.post('/users/create')
+    .param(:user, UserRequest, "User") do
+    Users.create_from_dto(params[:user])
+
+    if params[:user].valid?
+      json_response(status: 'created')
+    else
+      json_response(errors: params[:user].errors)
+    end
+  end
 end

@@ -1,0 +1,40 @@
+<div class="row">
+    <% if user.has_errors? %>
+    <pre><%= user.errors %></pre>
+    <% end %>
+    <form class="col s12" action="/users/create" method="post">
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="username" name="user[username]" type="text" value="<%= user.username %>" required>
+                <label for="username">Username</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="name" name="user[name]" type="text" required>
+                <label for="name">Name</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="password" name="user[password]" type="password" required>
+                <label for="password">Password</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <label>
+                    <input type="checkbox" name="user[is_admin]" value="true" <% if user.is_admin == 'true' %> checked="checked" <% end %> />
+                    <span>Administrator?</span>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <br>
+            <br>
+            <div class="col s12">
+                <button class="btn">Save User</button>
+            </div>
+        </div>
+    </form>
+</div>

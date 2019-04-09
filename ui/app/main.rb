@@ -12,6 +12,7 @@ require 'views/templates'
 require 'lib/ctx'
 require 'lib/endpoint'
 require 'lib/map_api_client'
+require 'forms/user_form'
 
 require_relative 'endpoints'
 

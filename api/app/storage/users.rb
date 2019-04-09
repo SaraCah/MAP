@@ -1,5 +1,26 @@
 class Users < BaseStorage
 
+  User = Struct.new(:username, :name, :create_time, :permissions) do
+    def self.from_row(row)
+      User.new(row[:username],
+               row[:name],
+               row[:create_time],
+               {
+                'is_admin' => (row[:admin] == 1)
+               })
+    end
+
+    def to_json(*args)
+      to_h.to_json
+    end
+  end
+
+  def self.page(page, page_size)
+    db[:user].limit(page_size, page * page_size).map do |row|
+      User.from_row(row)
+    end
+  end
+
   def self.user_exists?(username)
     !!db[:user][:username => username]
   end
@@ -26,5 +47,21 @@ class Users < BaseStorage
     {'is_admin' => (user[:admin] == 1)}
   end
 
+  def self.create_from_dto(user)
+    if user.valid?
+      # check for uniqueness
+      if db[:user][:username => user.username].nil?
+        user_id = if user.is_admin?
+                    self.create_admin_user(user.username, user.name)
+                  else
+                    self.create_user(user.username, user.name)
+                  end
+
+        DBAuth.set_user_password(user_id, user.password)
+      else
+        user.add_error('username', 'already in use')
+      end
+    end
+  end
 
 end
