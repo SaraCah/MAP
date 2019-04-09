@@ -3,7 +3,8 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/') do
     if Ctx.session[:username]
       # These tags get escaped...
-      Templates.emit(:hello, :name => "<b>#{Ctx.session[:username]}</b>")
+      Templates.emit_with_layout(:hello, {:name => "<b>#{Ctx.session[:username]}</b>"},
+                                 :layout, title: "Welcome")
     else
       Templates.emit_with_layout(:login, {},
                                  :layout, title: "Please log in")
