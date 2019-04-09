@@ -11,7 +11,7 @@
         "module": "none",
     },
     "include": [
-        "types/vue/global.d.ts",
+        "types/global.d.ts",
         "*.ts",
     ]
 }
