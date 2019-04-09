@@ -19,17 +19,26 @@ Vue.component('agency-linker', {
         return {
             selectedAgencyId: null,
             displayString: '',
-            matches: [{id: 123, label: "Trousers"}],
+            matches: [],
         }
     },
     methods: {
-        handleInput(this: any, _event: any) {
-            console.log(this.$http.get('/hi'));
-            // if (event.target.value.length > 3) {
-            //     console.log(this.$http);
-            //     // Fire AJAX
-            //     console.log(event.target.value);
-            // }
+        handleInput(this: any, event: any) {
+            if (event.target.value.length > 3) {
+                this.$http.get('/search/agencies', {
+                    method: 'GET',
+                    params: {
+                        q: event.target.value,
+                    }
+                }).then((response: any) => {
+                    return response.json();
+                }, () => {
+                    console.log("FAIL");
+                    this.matches = [];
+                }).then((json: any) => {
+                    this.matches = json;
+                });
+            }
         },
 
     }

@@ -61,7 +61,7 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.post('/users/create')
     .param(:user, UserForm, "The user to create") do
-    
+
     Ctx.client.create_user(params[:user])
 
     if params[:user].has_errors?
@@ -78,6 +78,16 @@ class MAPTheApp < Sinatra::Base
 
     # [200, "Woot"]
     redirect '/'
+  end
+
+  Endpoint.get('/search/agencies')
+    .param(:q, String, "Search string") do
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      [{id: 123, label: "A great agency"},
+       {id: 456, label: "Another corker"}].to_json
+    ]
   end
 
 end

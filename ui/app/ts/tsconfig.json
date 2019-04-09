@@ -7,8 +7,9 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noImplicitReturns": true,
-        "outFile": "../buildjs/main.js",
-        "module": "none",
+        "module": "amd",
+        "sourceMap": true,
+        "outDir": "../buildjs",
     },
     "include": [
         "types/global.d.ts",

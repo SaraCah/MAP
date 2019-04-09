@@ -4,6 +4,7 @@
         <title><%= title %></title>
         <meta charset="utf-8" />
         <link rel="stylesheet" type="text/css" href="/css/materialize.min.css">
+
     </head>
     <body>
         <h2><%= title %></h2>
@@ -18,10 +19,6 @@
         <script type="text/javascript" src="/js/vue-resource-1.5.1.js"></script>
         <script type="text/javascript" src="/js/materialize.min.js"></script>
 
-        <script type="text/javascript" src="/js/main.js"></script>
-
-        <script>
-         new Vue({el: '#vueapp'});
-        </script>
+        <script data-main="/js/main" src="js/require.js"></script>
     </body>
 </html>
