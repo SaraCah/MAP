@@ -44,4 +44,9 @@ class MAPTheAPI < Sinatra::Base
       json_response(errors: params[:user].errors)
     end
   end
+
+  Endpoint.get('/search/agencies')
+    .param(:q, String, "Search string") do
+    json_response(Search.agency_typeahead(params[:q]))
+  end
 end

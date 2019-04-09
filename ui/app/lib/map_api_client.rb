@@ -43,6 +43,10 @@ class MAPAPIClient
     end
   end
 
+  def agency_typeahead(q)
+    get('/search/agencies', q: q)
+  end
+
   private
 
   def post(url, params = {})

@@ -85,8 +85,7 @@ class MAPTheApp < Sinatra::Base
     [
       200,
       {'Content-type' => 'text/json'},
-      [{id: 123, label: "A great agency"},
-       {id: 456, label: "Another corker"}].to_json
+      Ctx.client.agency_typeahead(params[:q]).to_json
     ]
   end
 

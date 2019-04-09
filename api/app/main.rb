@@ -12,6 +12,7 @@ require_relative 'storage/aspace_db'
 require_relative 'lib/endpoint'
 require_relative 'lib/ctx'
 require_relative 'lib/watch_dir_reloader'
+require_relative 'lib/search'
 
 require_relative 'storage/base_storage'
 require_relative 'storage/db_auth.rb'
