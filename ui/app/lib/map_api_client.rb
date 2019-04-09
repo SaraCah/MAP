@@ -56,6 +56,8 @@ class MAPAPIClient
       http.request(request)
     }
 
+    check_errors!(response)
+
     JSON.parse(response.body)
   end
 
@@ -68,8 +70,16 @@ class MAPAPIClient
     response = Net::HTTP.start(uri.hostname, uri.port) {|http|
       http.request(request)
     }
-    
+
+    check_errors!(response)
+
     JSON.parse(response.body)
+  end
+
+  def check_errors!(response)
+    if !response.code.start_with?('2')
+      raise ClientError.new(JSON.parse(response.body))
+    end
   end
 
   def build_url(url, params = nil)
@@ -78,5 +88,13 @@ class MAPAPIClient
       uri.query = URI.encode_www_form(params)
     end
     uri
+  end
+
+
+  class ClientError < StandardError
+    def initialize(json)
+      @json = json
+      super
+    end
   end
 end

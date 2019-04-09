@@ -13,7 +13,7 @@ class MAPTheAPI < Sinatra::Base
     json_response({ bye: "Bye!" })
   end
 
-  Endpoint.post('/authenticate')
+  Endpoint.post('/authenticate', needs_session: false)
     .param(:username, String, "Username to authenticate")
     .param(:password, String, "Password") do
     if DBAuth.authenticate(params[:username], params[:password])

@@ -45,6 +45,8 @@ class MAPTheAPI < Sinatra::Base
     Sequel.database_timezone = :utc
     Sequel.typecast_timezone = :utc
 
+    set :show_exceptions, false
+
     DB.connect
     AspaceDB.connect
 
@@ -62,6 +64,13 @@ class MAPTheAPI < Sinatra::Base
     end
 
     Indexer.start(AppConfig[:solr_url], MapAPI.base_dir(File.join('data', 'indexer', 'indexer.state')))
+  end
+
+  error do
+    $stderr.puts("*** Caught unexpected exception: #{$!}")
+    $stderr.puts($@.join("\n"))
+    $stderr.puts("=" * 80)
+    return [500, {}, {"SERVER_ERROR" => $!.to_s}.to_json]
   end
 
   private

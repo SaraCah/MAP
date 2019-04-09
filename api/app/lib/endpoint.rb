@@ -7,6 +7,7 @@ class Endpoint
     @uri = uri
     @valid_params = {}
     @opts = opts
+    @needs_session = opts.fetch(:needs_session, true)
   end
 
   def self.post(uri, opts = {}, &block)
@@ -20,6 +21,10 @@ class Endpoint
   end
 
   ParamDef ||= Struct.new(:type, :description, :options)
+
+  def needs_session?
+    @needs_session
+  end
 
   def param(name, type, description, opts = {}, &block)
     name = name.to_s
@@ -104,7 +109,10 @@ class Endpoint
                 if env["HTTP_X_MAP_SESSION"]
                   Ctx.get.session = Sessions.get_session(env["HTTP_X_MAP_SESSION"])
                 end
-                # Sessions.get_session()
+
+                if endpoint.needs_session? && Ctx.get.session.nil?
+                  raise "A session is required to access this endpoint"
+                end
 
                 app_instance.instance_eval(&block)
               end
