@@ -7,10 +7,10 @@ class MAPTheApp < Sinatra::Base
                                    :name => "<b>#{Ctx.session[:username]}</b>",
                                    :agencies => Ctx.client.get_my_agencies,
                                  },
-                                 :layout, title: "Welcome")
+                                 :layout, title: "Welcome", context: 'home')
     else
       Templates.emit_with_layout(:login, {},
-                                 :layout, title: "Please log in")
+                                 :layout_blank, title: "Please log in")
     end
   end
 
@@ -53,20 +53,20 @@ class MAPTheApp < Sinatra::Base
 
       redirect '/'
     else
-      Templates.emit_with_layout(:login, {username: params[:username]},
-                                 :layout, title: "Please log in", message: "Login failed")
+      Templates.emit_with_layout(:login, {username: params[:username], message: "Login failed"},
+                                 :layout_blank, title: "Please log in")
     end
   end
 
   Endpoint.get('/users')
     .param(:page, Integer, "Page to return", optional: true) do
       Templates.emit_with_layout(:users, {users: Ctx.client.users(params[:page] || 0)},
-                                 :layout, title: "Users")
+                                 :layout, title: "Users", context: 'users')
   end
 
   Endpoint.get('/users/new') do
     Templates.emit_with_layout(:user_new, {user: UserForm.new},
-                               :layout, title: "New User")
+                               :layout, title: "New User", context: 'users')
   end
 
   Endpoint.post('/users/create')
@@ -76,7 +76,7 @@ class MAPTheApp < Sinatra::Base
 
     if params[:user].has_errors?
       Templates.emit_with_layout(:user_new, {user: params[:user]},
-                                   :layout, title: "New User")
+                                   :layout, title: "New User", context: 'users')
     else
       redirect '/users'
     end

@@ -4,16 +4,24 @@
         <title><%= title %></title>
         <meta charset="utf-8" />
         <link rel="stylesheet" type="text/css" href="/css/materialize.min.css">
-
+        <link rel="stylesheet" type="text/css" href="/css/map.css">
     </head>
     <body>
-        <h2><%= title %></h2>
+        <header>
+            <%== Templates.emit(:header, title: title, context: context) %>
+        </header>
 
-        <% if message %>
-            <%== Templates.emit(:flash_message, message: message) %>
-        <% end %>
-
-        <%== Templates.emit(template, template_args) %>
+        <main>
+            <div class="row">
+                <div class="col s12">
+                    <% if message %>
+                        <%== Templates.emit(:flash_message, message: message) %>
+                    <% end %>
+    
+                    <%== Templates.emit(template, template_args) %>
+                </div>
+            </div>
+        </main>
 
         <script src="/js/require.js"></script>
 

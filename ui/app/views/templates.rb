@@ -12,8 +12,10 @@
 Templates.define(:hello, [:name, :agencies], "views/hello.erb.html")
 Templates.define(:example_partial, [], "views/_partial.erb.html")
 
-Templates.define(:layout, [:title, :template, :template_args, :message?], "views/layout.erb.html")
-Templates.define(:login, [:username?], "views/login.erb.html")
+Templates.define(:layout, [:title, :template, :template_args, :message?, :context?], "views/layout.erb.html")
+Templates.define(:layout_blank, [:title, :template, :template_args, :message?], "views/layout_blank.erb.html")
+Templates.define(:login, [:username?, :message?], "views/login.erb.html")
 Templates.define(:users, [:users], "views/users.erb.html")
 Templates.define(:user_new, [:user], "views/user_form.erb.html")
 Templates.define(:flash_message, [:message], "views/_message.erb.html")
+Templates.define(:header, [:title, :context?], "views/header.erb.html")
