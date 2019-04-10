@@ -4,5 +4,8 @@ import 'greeter';
 import 'linker';
 
 new Greeter().greet("Hello world");
-new Vue({el: '#vueapp'});
 
+
+document.querySelectorAll('.vue-widget').forEach(function(elt:Element) {
+    new Vue({el: '#' + elt.id});
+});

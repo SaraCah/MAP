@@ -14,17 +14,39 @@ Vue.component('agency-linker', {
 <div>
 <input v-on:keyup="handleInput" type="text"></input>
 <ul>
-<li v-for="agency in matches">
+<li v-for="agency in matches" v-on:click="addSelected({{agency.id}})">
   {{ agency.label }}
 </li>
 </ul>
+<table>
+<thead><tr><th>Agency</th><th></th></tr></thead>
+<tbody>
+<tr v-for="agency in selected">
+    <td>
+        {{agency.label}}
+        <input type="hidden" name="user[agency][]" value="{{ agency.id }}"/>
+    </td>
+    <td>
+        <button v-on:click="removeSelected({{ agency.id }})"></button>
+    </td>
+</tr>
+</tbody>
+</table>
 </div>
 `,
-    data: function (): { selectedAgencyId: number | null, displayString: string, matches: agency[] } {
+    data: function ():
+        {
+            selectedAgencyId: number | null,
+            displayString: string,
+            matches: agency[],
+            selected: agency[]
+        }
+    {
         return {
             selectedAgencyId: null,
             displayString: '',
             matches: [],
+            selected: [],
         }
     },
     methods: {
@@ -45,7 +67,12 @@ Vue.component('agency-linker', {
                 });
             }
         },
-
+        removeSelected(agency_id: number) {
+            alert(agency_id);
+        },
+        addSelected(agency_id: number) {
+            alert(agency_id);
+        }
     }
 });
 

@@ -18,6 +18,11 @@ class Templates
     @templates.fetch(layout).emit(layout_args.merge(template: template, template_args: template_args))
   end
 
+  def self.append_script(&block)
+    Thread.current[:append_scripts] ||= []
+    Thread.current[:append_scripts]
+  end
+
   class TemplateDef
     def initialize(name, argspecs, erb_file)
       @name = name
