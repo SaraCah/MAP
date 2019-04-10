@@ -1,6 +1,19 @@
 <p>Hello, <%= name %>!</p>
 
 My Agencies:
+<table>
+<thead>
+    <tr>
+        <th>Agency</th>
+        <th>Number of Controlled Records</th>
+    </tr>
+</thead>
+<tbody>
 <% agencies.each do |agency| %>
-    <li><%= agency.label %></li>
+    <tr>
+        <td><%= agency.label %></td>
+        <td><%= agency.series_count %></td>
+    </tr>
 <% end %>
+</tbody>
+</table>

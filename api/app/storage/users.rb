@@ -15,10 +15,10 @@ class Users < BaseStorage
     end
   end
 
-  Agency = Struct.new(:id, :label) do
+  Agency = Struct.new(:id, :label, :series_count) do
     def self.from_row(row)
       Agency.new("agent_corporate_entity:#{row[:id]}",
-                 row[:sort_name])
+                 row[:sort_name], 0)
     end
 
     def to_json(*args)
@@ -90,7 +90,7 @@ class Users < BaseStorage
                   .filter(Sequel[:user][:username] => username)
                   .map(:agency_id)
 
-    result = []
+    result = {}
 
     AspaceDB.open do |aspace_db|
       aspace_db[:agent_corporate_entity]
@@ -99,11 +99,18 @@ class Users < BaseStorage
         .filter(Sequel[:agent_corporate_entity][:id] => agency_ids)
         .select(Sequel[:agent_corporate_entity][:id],
                 Sequel[:name_corporate_entity][:sort_name]).each do |row|
-        result << Agency.from_row(row)
+        result[row[:id]] = Agency.from_row(row)
+      end
+
+      aspace_db[:series_system_rlshp]
+        .filter(:agent_corporate_entity_id_0 => agency_ids)
+        .filter(:jsonmodel_type => 'series_system_agent_record_ownership_relationship')
+        .group_and_count(:agent_corporate_entity_id_0).map do |row|
+        result[row[:agent_corporate_entity_id_0]].series_count = row[:count]
       end
     end
 
-    result
+    result.values
   end
 
 end
