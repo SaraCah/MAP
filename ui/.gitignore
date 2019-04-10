@@ -2,3 +2,4 @@
 /app/buildjs
 .DS_Store
 /config/config.local.rb
+/app/ts/node_modules

@@ -50,3 +50,8 @@ fi
 echo "Installing gems"
 scripts/jruby.sh distlibs/gems/bin/bundle install
 
+echo "Installing JS libs"
+(
+    cd "app/ts"
+    npm install
+)

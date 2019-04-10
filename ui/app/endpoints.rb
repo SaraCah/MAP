@@ -13,12 +13,19 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/js/*') do
     filename = request.path.split('/').last
-    if File.exist?(file = File.join('js', filename))
-      send_file file
-    elsif File.exist?(file = File.join('buildjs', filename))
-      send_file file
+
+    if filename == 'vue.js'
+      send_file File.join('ts/node_modules/vue/dist/vue.min.js')
+    elsif filename == 'vue-resource.js'
+      send_file File.join('ts/node_modules/vue-resource/dist/vue-resource.min.js')
     else
-      [404]
+      if File.exist?(file = File.join('js', filename))
+        send_file file
+      elsif File.exist?(file = File.join('buildjs', filename))
+        send_file file
+      else
+        [404]
+      end
     end
   end
 
