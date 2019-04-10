@@ -92,7 +92,7 @@ Vue.component('agency-linker', {
 
             this.matches = [];
             this.text = '';
-            // this.$refs.text.focus();
+            (this.$refs.text as HTMLElement).focus();
         }
     }
 });
