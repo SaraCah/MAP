@@ -13,27 +13,27 @@ interface agency {
 Vue.component('agency-linker', {
     template: `
 <div>
-<input v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
-<ul>
-<li v-for="agency in matches">
-  <a href="javascript:void(0);" v-on:click="addSelected(agency.id)">{{ agency.label }}</a>
-</li>
-</ul>
-<table>
-<thead><tr><th>Agency</th><th></th></tr></thead>
-<tbody>
-<tr v-for="agency in selected">
-    <td>
-        {{agency.label}}
-        <input type="hidden" name="user[agency][][id]" v-bind:value="agency.id"/>
-        <input type="hidden" name="user[agency][][label]" v-bind:value="agency.label"/>
-    </td>
-    <td>
-        <button v-on:click="removeSelected(agency.id)">Remove</button>
-    </td>
-</tr>
-</tbody>
-</table>
+  <input v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
+  <ul>
+    <li v-for="agency in matches">
+      <a href="javascript:void(0);" v-on:click="addSelected(agency.id)">{{ agency.label }}</a>
+    </li>
+  </ul>
+  <table>
+    <thead><tr><th>Agency</th><th></th></tr></thead>
+    <tbody>
+      <tr v-for="agency in selected">
+        <td>
+          {{agency.label}}
+          <input type="hidden" name="user[agency][][id]" v-bind:value="agency.id"/>
+          <input type="hidden" name="user[agency][][label]" v-bind:value="agency.label"/>
+        </td>
+        <td>
+          <button v-on:click="removeSelected(agency.id)">Remove</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 `,
     data: function ():
