@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueResource from "vue-resource";
 Vue.use(VueResource);
+import Utils from "./utils";
 
 
 interface agency {
@@ -12,10 +13,10 @@ interface agency {
 Vue.component('agency-linker', {
     template: `
 <div>
-<input v-on:keyup="handleInput" type="text"></input>
+<input v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
 <ul>
-<li v-for="agency in matches" v-on:click="addSelected(agency.id)">
-  {{ agency.label }}
+<li v-for="agency in matches">
+  <a href="javascript:void(0);" v-on:click="addSelected(agency.id)">{{ agency.label }}</a>
 </li>
 </ul>
 <table>
@@ -27,7 +28,7 @@ Vue.component('agency-linker', {
         <input type="hidden" name="user[agency][]" v-bind:value="agency.id"/>
     </td>
     <td>
-        <button v-on:click="removeSelected(agency.id)"></button>
+        <button v-on:click="removeSelected(agency.id)">Remove</button>
     </td>
 </tr>
 </tbody>
@@ -39,7 +40,8 @@ Vue.component('agency-linker', {
             selectedAgencyId: number | null,
             displayString: string,
             matches: agency[],
-            selected: agency[]
+            selected: agency[],
+            text: string,
         }
     {
         return {
@@ -47,15 +49,16 @@ Vue.component('agency-linker', {
             displayString: '',
             matches: [],
             selected: [],
+            text: '',
         }
     },
     methods: {
-        handleInput(event: any) {
-            if (event.target.value.length > 3) {
+        handleInput() {
+            if (this.text.length > 3) {
                 this.$http.get('/search/agencies', {
                     method: 'GET',
                     params: {
-                        q: event.target.value,
+                        q: this.text,
                     }
                 }).then((response: any) => {
                     return response.json();
@@ -63,15 +66,33 @@ Vue.component('agency-linker', {
                     console.log("FAIL");
                     this.matches = [];
                 }).then((json: any) => {
-                    this.matches = json;
+                    this.matches = Utils.filter(json, (agency:agency) => {
+                        return !Utils.find(this.selected, (target:agency) => {
+                            return target.id == agency.id;
+                        });
+                    });
                 });
             }
         },
         removeSelected(agency_id: number) {
-            alert(agency_id);
+            this.selected = Utils.filter(this.selected, (agency:agency) => {
+                return agency.id != agency_id;
+            });
         },
         addSelected(agency_id: number) {
-            alert(agency_id);
+            let selected_agency = null;
+            this.matches.forEach((agency:agency) => {
+                if (agency.id == agency_id) {
+                    selected_agency = agency;
+                }
+            });
+            if (selected_agency != null) {
+                this.selected.push(selected_agency);
+            }
+
+            this.matches = [];
+            this.text = '';
+            // this.$refs.text.focus();
         }
     }
 });
