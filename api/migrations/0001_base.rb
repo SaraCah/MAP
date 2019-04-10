@@ -25,7 +25,7 @@ Sequel.migration do
 
     create_table(:dbauth) do
       primary_key :id
-      foreign_key :user_id, :user
+      foreign_key :user_id, :user, :unique => true
       String :pwhash, null: false
     end
 

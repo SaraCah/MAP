@@ -53,6 +53,10 @@ class Users < BaseStorage
                      :modified_time => java.lang.System.currentTimeMillis)
   end
 
+  def self.id_for_username(username)
+    db[:user][:username => username][:id]
+  end
+
   def self.permissions_for(username)
     user = db[:user][:username => username]
     {'is_admin' => (user[:admin] == 1)}

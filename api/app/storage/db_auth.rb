@@ -1,6 +1,7 @@
 class DBAuth < BaseStorage
 
   def self.set_user_password(user_id, password)
+    db[:dbauth].filter(:user_id => user_id).delete
     db[:dbauth].insert(:user_id => user_id,
                        :pwhash => BCrypt::Password.create(password))
   end

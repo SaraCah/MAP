@@ -54,7 +54,7 @@ class MAPTheAPI < Sinatra::Base
     Ctx.open do
       # Bootstrap an admin user if we need one
       unless Users.user_exists?('admin')
-        admin_id = Users.create_admin_user('admin', 'Admin User')
+ 
 
         admin_password = SecureRandom.hex
         DBAuth.set_user_password(admin_id, admin_password)
@@ -65,6 +65,17 @@ class MAPTheAPI < Sinatra::Base
     end
 
     Indexer.start(AppConfig[:solr_url], MapAPI.base_dir(File.join('data', 'indexer', 'indexer.state')))
+  end
+
+  configure :development do
+    if AppConfig.has_key?(:development_admin_password)
+      Ctx.open do
+        DBAuth.set_user_password(Users.id_for_username('admin'),
+                                 AppConfig[:development_admin_password])
+
+        $stderr.puts("Set admin password to '#{AppConfig[:development_admin_password]}' for development mode")
+      end
+    end
   end
 
   error do
