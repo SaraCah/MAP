@@ -25,7 +25,7 @@ class WatchDirReloader
           begin
             load path_to_reload
           rescue
-            $stderr.puts("Failed to reload path: #{path_to_reload}")
+            $LOG.info("Failed to reload path: #{path_to_reload}")
           end
         end
 

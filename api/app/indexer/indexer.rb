@@ -56,7 +56,7 @@ class Indexer
     if batch.length > 0
       uri = URI.join(@solr_url, 'update')
 
-      $stderr.puts("Sending #{batch.length} documents to #{uri}")
+      $LOG.info("Sending #{batch.length} documents to #{uri}")
 
       request = Net::HTTP::Post.new(uri)
 
@@ -72,7 +72,7 @@ class Indexer
 
       true
     else
-      $stderr.puts("Sending nothing...")
+      $LOG.info("Sending nothing...")
 
       false
     end
@@ -122,8 +122,8 @@ class Indexer
       save_last_mtime(now)
     rescue
       # FIXME: Logging
-      $stderr.puts("Error in indexer: #{$!}")
-      $stderr.puts($@.join("\n"))
+      $LOG.info("Error in indexer: #{$!}")
+      $LOG.info($@.join("\n"))
     end
 
     sleep INDEX_DELAY_SECONDS

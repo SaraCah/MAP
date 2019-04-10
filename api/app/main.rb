@@ -1,6 +1,10 @@
 require 'bundler/setup'
 Bundler.require
 
+require 'rjack-slf4j'
+
+$LOG = RJack::SLF4J["map.api"]
+
 require 'securerandom'
 require 'fileutils'
 require 'net/http'
@@ -60,7 +64,7 @@ class MAPTheAPI < Sinatra::Base
         DBAuth.set_user_password(admin_id, admin_password)
 
         # FIXME: logging
-        $stderr.puts("The admin password has been set to: #{admin_password}")
+        $LOG.info("The admin password has been set to: #{admin_password}")
       end
     end
 
@@ -73,15 +77,15 @@ class MAPTheAPI < Sinatra::Base
         DBAuth.set_user_password(Users.id_for_username('admin'),
                                  AppConfig[:development_admin_password])
 
-        $stderr.puts("Set admin password to '#{AppConfig[:development_admin_password]}' for development mode")
+        $LOG.info("Set admin password to '#{AppConfig[:development_admin_password]}' for development mode")
       end
     end
   end
 
   error do
-    $stderr.puts("*** Caught unexpected exception: #{$!}")
-    $stderr.puts($@.join("\n"))
-    $stderr.puts("=" * 80)
+    $LOG.info("*** Caught unexpected exception: #{$!}")
+    $LOG.info($@.join("\n"))
+    $LOG.info("=" * 80)
     return [500, {}, {"SERVER_ERROR" => $!.to_s}.to_json]
   end
 

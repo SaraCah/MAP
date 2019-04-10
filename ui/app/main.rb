@@ -1,6 +1,8 @@
 require 'bundler/setup'
 Bundler.require
 
+$LOG = RJack::SLF4J["map.ui"]
+
 Dir.chdir(File.dirname(__FILE__))
 
 $LOAD_PATH << Dir.pwd

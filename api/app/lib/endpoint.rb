@@ -117,7 +117,7 @@ class Endpoint
                 app_instance.instance_eval(&block)
               end
             end
-      $stderr.puts("Response time: #{((Time.now - in_time)*1000).round}ms")
+      $LOG.info("Response time: #{((Time.now - in_time)*1000).round}ms")
       out
     end
   end

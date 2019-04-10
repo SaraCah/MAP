@@ -22,7 +22,7 @@ class AppConfig
     parameter = resolve_alias(parameter)
 
     if changed?(parameter)
-      $stderr.puts("WARNING: The parameter '#{parameter}' was already set")
+      $LOG.info("WARNING: The parameter '#{parameter}' was already set")
     end
 
     @@changed_from_default[parameter] = true
@@ -34,7 +34,7 @@ class AppConfig
     if aliases[parameter]
 
       if deprecated_parameters[parameter]
-        $stderr.puts("WARNING: The parameter '#{parameter}' is now deprecated.  Please use '#{aliases[parameter]}' instead.")
+        $LOG.info("WARNING: The parameter '#{parameter}' is now deprecated.  Please use '#{aliases[parameter]}' instead.")
       end
 
       aliases[parameter]

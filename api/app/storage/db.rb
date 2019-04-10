@@ -31,20 +31,20 @@ class DB
               return yield @pool.pool
             rescue Sequel::Rollback
               # If we're not in a transaction we can't roll back, but no need to blow up.
-              $stderr.puts("Sequel::Rollback caught but we're not inside of a transaction")
+              $LOG.info("Sequel::Rollback caught but we're not inside of a transaction")
               return nil
             end
           end
         rescue Sequel::DatabaseDisconnectError => e
           # MySQL might have been restarted.
           last_err = e
-          $stderr.puts("Connecting to the database failed.  Retrying...")
+          $LOG.info("Connecting to the database failed.  Retrying...")
           sleep(opts[:db_failed_retry_delay] || 3)
 
 
         rescue Sequel::NoExistingObject, Sequel::DatabaseError => e
           if (attempt + 1) < retries && is_retriable_exception(e, opts) && transaction
-            $stderr.puts("Retrying transaction after retriable exception (#{e})")
+            $LOG.info("Retrying transaction after retriable exception (#{e})")
             sleep(opts[:retry_delay] || 1)
           else
             raise e
@@ -53,7 +53,7 @@ class DB
       end
 
       if last_err
-        $stderr.puts("Failed to connect to the database")
+        $LOG.info("Failed to connect to the database")
 
         raise "Failed to connect to the database: #{last_err}"
       end

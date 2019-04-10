@@ -16,11 +16,11 @@ class DBPool
       @pool = Sequel.connect(@db_url,
                              max_connections: @pool_size,
                              test: true,
-                             loggers: Logger.new($stderr))
+                             loggers: $LOG)
 
       self
     rescue
-      $stderr.puts("DB connection failed: #{$!}")
+      $LOG.info("DB connection failed: #{$!}")
       raise
     end
   end
