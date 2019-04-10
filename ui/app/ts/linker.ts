@@ -25,7 +25,8 @@ Vue.component('agency-linker', {
 <tr v-for="agency in selected">
     <td>
         {{agency.label}}
-        <input type="hidden" name="user[agency][]" v-bind:value="agency.id"/>
+        <input type="hidden" name="user[agency][][id]" v-bind:value="agency.id"/>
+        <input type="hidden" name="user[agency][][label]" v-bind:value="agency.label"/>
     </td>
     <td>
         <button v-on:click="removeSelected(agency.id)">Remove</button>
@@ -48,10 +49,11 @@ Vue.component('agency-linker', {
             selectedAgencyId: null,
             displayString: '',
             matches: [],
-            selected: [],
+            selected: JSON.parse(this.agencies),
             text: '',
         }
     },
+    props: ['agencies'],
     methods: {
         handleInput() {
             if (this.text.length > 3) {

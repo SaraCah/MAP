@@ -57,6 +57,15 @@ class Users < BaseStorage
                     self.create_user(user.username, user.name)
                   end
 
+        user.agencies.each do |agency_ref|
+          (agency_type, agency_id) = agency_ref.split(':')
+          db[:user_agency].insert(user_id: user_id,
+                                  agency_type: agency_type,
+                                  agency_id: Integer(agency_id),
+                                  :create_time => java.lang.System.currentTimeMillis,
+                                  :modified_time => java.lang.System.currentTimeMillis)
+        end
+
         DBAuth.set_user_password(user_id, user.password)
       else
         user.add_error('username', 'already in use')

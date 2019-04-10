@@ -1,11 +1,12 @@
 class UserForm
-  attr_accessor :username, :name, :password, :is_admin, :errors
+  attr_accessor :username, :name, :password, :is_admin, :errors, :agencies
 
   def initialize(hash = {})
     @username = hash.fetch('username', '')
     @name = hash.fetch('name', '')
     @password = hash.fetch('password', '')
-    @is_admin = !!hash.fetch('is_admin', false)
+    @is_admin = hash.fetch('is_admin', 'false') == 'true'
+    @agencies = hash.fetch('agency', [])
     @errors = []
   end
 
@@ -27,6 +28,7 @@ class UserForm
       'user[name]' => @name,
       'user[password]' => @password,
       'user[is_admin]' => @is_admin,
+      'user[agency][]' => @agencies.map{|hash| hash.fetch('id')}  
     }
   end
 

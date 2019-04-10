@@ -1,11 +1,12 @@
 class UserRequest
-  attr_accessor :username, :name, :password, :errors
+  attr_accessor :username, :name, :password, :errors, :agencies
 
   def initialize(hash)
     @username = hash.fetch('username', '')
     @name = hash.fetch('name', '')
     @password = hash.fetch('password', '')
     @is_admin = hash.fetch('is_admin', 'false') == 'true'
+    @agencies = hash.fetch('agency', [])
 
     validate!
   end
@@ -27,6 +28,7 @@ class UserRequest
     @errors << ['username', 'required'] if @username.empty?
     @errors << ['name', 'required'] if @name.empty?
     @errors << ['password', 'required'] if @password.empty?
+    @errrors << ['agency', 'required'] if @agencies.empty? && !@is_admin
   end
 
   def add_error(field, message)

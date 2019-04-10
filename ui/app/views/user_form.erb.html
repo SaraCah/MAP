@@ -11,7 +11,7 @@
         </div>
         <div class="row">
             <div class="input-field col s12">
-                <input id="name" name="user[name]" type="text" required>
+                <input id="name" name="user[name]" type="text" value="<%= user.name %>" required>
                 <label for="name">Name</label>
             </div>
         </div>
@@ -24,7 +24,7 @@
         <div class="row">
             <div class="input-field col s12">
                 <label>
-                    <input type="checkbox" name="user[is_admin]" value="true" <% if user.is_admin == 'true' %> checked="checked" <% end %> />
+                    <input type="checkbox" name="user[is_admin]" value="true" <% if user.is_admin %> checked="checked" <% end %> />
                     <span>Administrator?</span>
                 </label>
             </div>
@@ -34,7 +34,7 @@
         <br>
         <div class="row">
             <div class="col s12">
-                <agency-linker></agency-linker>
+                <agency-linker agencies='<%= user.agencies.to_json %>'></agency-linker>
             </div>
         </div>
         <div class="row">

@@ -11,6 +11,18 @@ Sequel.migration do
       Bignum :modified_time, null: false
     end
 
+    create_table(:user_agency) do
+      primary_key :id
+
+      foreign_key :user_id, :user
+
+      Integer :agency_id, null: false
+      String :agency_type, null: false
+
+      Bignum :create_time, null: false
+      Bignum :modified_time, null: false
+    end
+
     create_table(:dbauth) do
       primary_key :id
       foreign_key :user_id, :user
