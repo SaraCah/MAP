@@ -105,6 +105,7 @@ class Users < BaseStorage
       aspace_db[:series_system_rlshp]
         .filter(:agent_corporate_entity_id_0 => agency_ids)
         .filter(:jsonmodel_type => 'series_system_agent_record_ownership_relationship')
+        .filter(:end_date => nil)
         .group_and_count(:agent_corporate_entity_id_0).map do |row|
         result[row[:agent_corporate_entity_id_0]].series_count = row[:count]
       end
