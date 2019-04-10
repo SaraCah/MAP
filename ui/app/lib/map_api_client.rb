@@ -30,6 +30,13 @@ class MAPAPIClient
     end
   end
 
+  Agency = Struct.new(:id, :label) do
+    def self.from_json(json)
+      Agency.new(json.fetch('id'),
+                 json.fetch('label'))
+    end
+  end
+
   def users(page = 0)
     get('/users', page: page).map do |json|
       User.from_json(json)
@@ -45,6 +52,12 @@ class MAPAPIClient
 
   def agency_typeahead(q)
     get('/search/agencies', q: q)
+  end
+
+  def get_my_agencies
+    get('/my-agencies', {}).map do |json|
+      Agency.from_json(json)
+    end
   end
 
   private

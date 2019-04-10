@@ -15,6 +15,17 @@ class Users < BaseStorage
     end
   end
 
+  Agency = Struct.new(:id, :label) do
+    def self.from_row(row)
+      Agency.new("agent_corporate_entity:#{row[:id]}",
+                 row[:sort_name])
+    end
+
+    def to_json(*args)
+      to_h.to_json
+    end
+  end
+
   def self.page(page, page_size)
     db[:user].limit(page_size, page * page_size).map do |row|
       User.from_row(row)
@@ -71,6 +82,28 @@ class Users < BaseStorage
         user.add_error('username', 'already in use')
       end
     end
+  end
+
+  def self.agencies_for_user(username)
+    agency_ids = db[:user]
+                  .join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
+                  .filter(Sequel[:user][:username] => username)
+                  .map(:agency_id)
+
+    result = []
+
+    AspaceDB.open do |aspace_db|
+      aspace_db[:agent_corporate_entity]
+        .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
+        .filter(Sequel[:name_corporate_entity][:authorized] => 1)
+        .filter(Sequel[:agent_corporate_entity][:id] => agency_ids)
+        .select(Sequel[:agent_corporate_entity][:id],
+                Sequel[:name_corporate_entity][:sort_name]).each do |row|
+        result << Agency.from_row(row)
+      end
+    end
+
+    result
   end
 
 end

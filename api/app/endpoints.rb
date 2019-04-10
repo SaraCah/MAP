@@ -49,4 +49,12 @@ class MAPTheAPI < Sinatra::Base
     .param(:q, String, "Search string") do
     json_response(Search.agency_typeahead(params[:q]))
   end
+
+  Endpoint.get('/my-agencies') do
+    if Ctx.user_logged_in?
+      json_response(Users.agencies_for_user(Ctx.username))
+    else
+      json_response([])
+    end
+  end
 end
