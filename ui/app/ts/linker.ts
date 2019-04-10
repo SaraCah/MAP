@@ -14,7 +14,7 @@ Vue.component('agency-linker', {
 <div>
 <input v-on:keyup="handleInput" type="text"></input>
 <ul>
-<li v-for="agency in matches" v-on:click="addSelected({{agency.id}})">
+<li v-for="agency in matches" v-on:click="addSelected(agency.id)">
   {{ agency.label }}
 </li>
 </ul>
@@ -24,10 +24,10 @@ Vue.component('agency-linker', {
 <tr v-for="agency in selected">
     <td>
         {{agency.label}}
-        <input type="hidden" name="user[agency][]" value="{{ agency.id }}"/>
+        <input type="hidden" name="user[agency][]" v-bind:value="agency.id"/>
     </td>
     <td>
-        <button v-on:click="removeSelected({{ agency.id }})"></button>
+        <button v-on:click="removeSelected(agency.id)"></button>
     </td>
 </tr>
 </tbody>
