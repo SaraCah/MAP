@@ -3,5 +3,5 @@
 
 begin
   load "config/config.local.rb"
-rescue
+rescue LoadError
 end

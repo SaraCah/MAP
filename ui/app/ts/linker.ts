@@ -28,7 +28,7 @@ Vue.component('agency-linker', {
         }
     },
     methods: {
-        handleInput(this: any, event: any) {
+        handleInput(event: any) {
             if (event.target.value.length > 3) {
                 this.$http.get('/search/agencies', {
                     method: 'GET',
