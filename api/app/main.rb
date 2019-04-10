@@ -5,6 +5,18 @@ require 'rjack-slf4j'
 
 $LOG = RJack::SLF4J["map.api"]
 
+RJack::Logback.configure do
+  console = RJack::Logback::ConsoleAppender.new do |a|
+    a.target = "System.err"
+    a.layout = RJack::Logback::PatternLayout.new do |p|
+      p.pattern = "%date [%thread] %-5level %logger{35} - %msg %ex%n"
+    end
+  end
+  RJack::Logback.root.add_appender( console )
+  RJack::Logback.root.level = RJack::Logback::INFO
+end
+
+
 require 'securerandom'
 require 'fileutils'
 require 'net/http'
