@@ -36,7 +36,7 @@ Vue.component('agency-linker', {
           </select>
         </td>
         <td>
-          <button v-on:click="removeSelected(agency.id)">Remove</button>
+          <button class="btn" v-on:click="removeSelected(agency.id)">Remove</button>
         </td>
       </tr>
     </tbody>
