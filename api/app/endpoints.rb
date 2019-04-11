@@ -28,7 +28,12 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/users')
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in?
-      json_response(Users.page(params[:page], 10))
+      if Ctx.get.permissions.is_admin
+        json_response(Users.page('ANY', params[:page], 10))
+      else
+        admin_agencies = Ctx.get.permissions.agencies.select{|_, role| role == 'ADMIN'}.keys
+        json_response(Users.page(admin_agencies, params[:page], 10))
+      end
     else
       json_response([])
     end

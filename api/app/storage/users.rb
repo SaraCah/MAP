@@ -54,10 +54,17 @@ class Users < BaseStorage
     end
   end
 
-  def self.page(page, page_size)
-    PagedUsers.new(db[:user].limit(page_size, page * page_size).map {|r| User.from_row(r)},
+  def self.page(agency_refs, page, page_size)
+    dataset = db[:user]
+
+    unless agency_refs == 'ANY'
+      dataset = dataset.join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
+                       .filter(Sequel[:user_agency][:agency_ref] => agency_refs)
+    end
+    
+    PagedUsers.new(dataset.limit(page_size, page * page_size).map {|r| User.from_row(r)},
                    page,
-                   (db[:user].count / page_size.to_f).ceil)
+                   (dataset.count / page_size.to_f).ceil)
   end
 
   def self.user_exists?(username)
@@ -85,6 +92,7 @@ class Users < BaseStorage
     db[:user][:username => username][:id]
   end
 
+  # FIXME replaced with permissions_for_user 
   def self.permissions_for(username)
     user = db[:user][:username => username]
     {'is_admin' => (user[:admin] == 1)}
@@ -111,6 +119,7 @@ class Users < BaseStorage
           db[:user_agency].insert(user_id: user_id,
                                   agency_type: agency_type,
                                   agency_id: Integer(agency_id),
+                                  agency_ref: agency_ref,
                                   agency_admin: (is_admin ? 1 : 0),
                                   :create_time => java.lang.System.currentTimeMillis,
                                   :modified_time => java.lang.System.currentTimeMillis)

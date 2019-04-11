@@ -18,6 +18,7 @@ Sequel.migration do
 
       Integer :agency_id, null: false
       String :agency_type, null: false
+      String :agency_ref, null: false
       Integer :agency_admin, null: false, default: 0
 
       Bignum :create_time, null: false

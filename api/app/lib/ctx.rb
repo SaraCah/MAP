@@ -44,6 +44,10 @@ class Ctx
       @db = db
       @session = nil
     end
+
+    def permissions
+      @permissions ||= Users.permissions_for_user(session.username)
+    end
   end
 
 end
