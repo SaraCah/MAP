@@ -4,3 +4,9 @@
 - When editing a user, can only drop agency roles that logged in user is ADMIN for
 - user persistent HTTP client
 - add a URI helper for CSS/JS includes & thwart browser caching in dev mode
+- agencies have sub-agencies
+ -- a user can be assigned as an admin at any level in this hierarchy
+ -- update indexer to be agency hierarchy aware
+ -- ensure indexing is eager to changes up the hierarchy
+ -- update user form and validations to be hierarchy aware
+ -- update controlling relationship counts to be hierarchy aware
