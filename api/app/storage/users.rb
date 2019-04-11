@@ -48,10 +48,16 @@ class Users < BaseStorage
     end
   end
 
-  def self.page(page, page_size)
-    db[:user].limit(page_size, page * page_size).map do |row|
-      User.from_row(row)
+  PagedUsers = Struct.new(:users, :current_page, :max_page) do
+    def to_json(*args)
+      to_h.to_json
     end
+  end
+
+  def self.page(page, page_size)
+    PagedUsers.new(db[:user].limit(page_size, page * page_size).map {|r| User.from_row(r)},
+                   page,
+                   (db[:user].count / page_size.to_f).ceil)
   end
 
   def self.user_exists?(username)

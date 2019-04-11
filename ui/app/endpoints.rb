@@ -41,6 +41,16 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  Endpoint.get('/webfonts/*') do
+    filename = request.path.split('/').last
+    if File.exist?(file = File.join('webfonts', filename))
+      send_file file
+    else
+      [404]
+    end
+  end
+
+
   Endpoint.post('/authenticate')
    .param(:username, String, "Username to authenticate")
    .param(:password, String, "Password") do 
@@ -60,7 +70,7 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/users')
     .param(:page, Integer, "Page to return", optional: true) do
-      Templates.emit_with_layout(:users, {users: Ctx.client.users(params[:page] || 0)},
+      Templates.emit_with_layout(:users, {paged_users: Ctx.client.users(params[:page] || 0)},
                                  :layout, title: "Users", context: 'users')
   end
 

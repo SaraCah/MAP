@@ -54,10 +54,17 @@ class MAPAPIClient
     end
   end
 
-  def users(page = 0)
-    get('/users', page: page).map do |json|
-      User.from_json(json)
+  PagedUsers = Struct.new(:users, :current_page, :max_page) do
+    def self.from_json(json)
+      PagedUsers.new(json.fetch('users', []).map{|user_json| User.from_json(user_json)},
+                     json.fetch('current_page'),
+                     json.fetch('max_page'))
     end
+  end
+
+
+  def users(page = 0)
+    PagedUsers.from_json(get('/users', page: page))
   end
 
   def create_user(user)

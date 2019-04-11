@@ -1,26 +1,40 @@
-<a class="btn waves-effect" href="/users/new">Add User</a>
-<table>
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Name</th>
-            <th>Permissions</th>
-            <th>Date Created</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        <% users.each do |user| %>
-            <tr>
-                <td><%= user.username %></td>
-                <td><%= user.name %></td>
-                <td><%= user.permissions %></td>
-                <td><%= user.create_time %></td>
-                <td>
-                    <button>Edit</button>
-                    <button>Delete</button>
-                </td>
-            </tr>
-        <% end %>
-    </tbody>
-</table>
+<div class="row">
+    <div class="col s12">
+        <a class="btn waves-effect" href="/users/new">Add User</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Permissions</th>
+                    <th>Date Created</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% paged_users.users.each do |user| %>
+                    <tr>
+                        <td><%= user.username %></td>
+                        <td><%= user.name %></td>
+                        <td><%= user.permissions %></td>
+                        <td><%= user.create_time %></td>
+                        <td>
+                            <button>Edit</button>
+                            <button>Delete</button>
+                        </td>
+                    </tr>
+                <% end %>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12 center-align">
+        <% if paged_users.current_page > 0 %><a href="?page=<%= paged_users.current_page - 1 %>"><i class="fa fa-chevron-left"></i> Previous</a><% end %>
+        <% if paged_users.current_page < paged_users.max_page - 1 %><a href="?page=<%= paged_users.current_page + 1 %>">Next <i class="fa fa-chevron-right"></i></a><% end %>
+    </div>
+</div>
