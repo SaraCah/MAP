@@ -75,12 +75,12 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/users/new') do
-    Templates.emit_with_layout(:user_new, {user: UserForm.new},
+    Templates.emit_with_layout(:user_new, {user: UserUpdateRequest.new},
                                :layout, title: "New User", context: 'users')
   end
 
   Endpoint.post('/users/create')
-    .param(:user, UserForm, "The user to create") do
+    .param(:user, UserUpdateRequest, "The user to create") do
 
     unless Ctx.permissions.is_admin?
       params[:user].is_admin = false

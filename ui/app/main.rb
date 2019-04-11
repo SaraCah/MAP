@@ -26,7 +26,9 @@ require 'views/templates'
 require 'lib/ctx'
 require 'lib/endpoint'
 require 'lib/map_api_client'
-require 'forms/user_form'
+
+# FIXME
+require_relative '../../maplib/dto/user_update_request'
 
 require_relative 'endpoints'
 
@@ -35,6 +37,7 @@ class MAPTheApp < Sinatra::Base
   configure :development do |config|
     register Sinatra::Reloader
     config.also_reload File.join('**', '*.rb')
+    config.also_reload File.join('../../maplib', '*.rb')
     config.after_reload do
       load File.join(Dir.pwd, 'views/templates.rb')
       load File.join(Dir.pwd, 'endpoints.rb')

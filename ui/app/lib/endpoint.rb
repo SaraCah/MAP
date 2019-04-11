@@ -97,17 +97,20 @@ class Endpoint
       # So, use instance_eval to evaluate the block in the right context.
       app_instance = self
 
-      out = if opts[:skip_context]
-              app_instance.instance_eval(&block)
-            else
-              Ctx.open do
-                Ctx.get.session = session || {}
+      Ctx.open do
+        Ctx.get.session = session || {}
+        begin
+          return app_instance.instance_eval(&block)
+        rescue MAPAPIClient::SessionGoneError
+          # The backend session gone dropped.  You're logged out now.
+          session[:api_session_id] = nil
+          session[:username] = nil
 
-                app_instance.instance_eval(&block)
-              end
-            end
-      $LOG.info("Response time: #{((Time.now - in_time)*1000).round}ms")
-      out
+          redirect '/'
+        ensure
+          $LOG.info("Response time: #{((Time.now - in_time)*1000).round}ms")
+        end
+      end
     end
   end
 

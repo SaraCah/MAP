@@ -1,5 +1,5 @@
-class UserForm
-  attr_accessor :username, :name, :password, :is_admin, :errors, :agencies
+class UserUpdateRequest
+  attr_accessor :username, :name, :password, :errors, :agencies
 
   def initialize(hash = {})
     @username = hash.fetch('username', '')
@@ -14,12 +14,28 @@ class UserForm
     self.new(hash)
   end
 
-  def add_errors(errors)
-    @errors = errors
+  def is_admin?
+    @is_admin
   end
 
   def has_errors?
     !@errors.empty?
+  end
+
+  def validate!
+    @errors = []
+    @errors << ['username', 'required'] if @username.empty?
+    @errors << ['name', 'required'] if @name.empty?
+    @errors << ['password', 'required'] if @password.empty?
+    @errors << ['agency', 'required'] if @agencies.empty? && !@is_admin
+  end
+
+  def add_error(field, message)
+    @errors << [field, message]
+  end
+
+  def add_errors(errors)
+    @errors.concat(errors)
   end
 
   def to_hash

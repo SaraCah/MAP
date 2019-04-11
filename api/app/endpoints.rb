@@ -40,13 +40,13 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.post('/users/create')
-    .param(:user, UserRequest, "User") do
+    .param(:user, UserUpdateRequest, "User") do
     Users.create_from_dto(params[:user])
 
-    if params[:user].valid?
-      json_response(status: 'created')
-    else
+    if params[:user].has_errors?
       json_response(errors: params[:user].errors)
+    else
+      json_response(status: 'created')
     end
   end
 

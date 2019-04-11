@@ -21,6 +21,9 @@ require 'securerandom'
 require 'fileutils'
 require 'net/http'
 
+# FIXME: don't want require_relative... just use the load path?
+require_relative '../../maplib/dto/user_update_request'
+
 require_relative 'common/bootstrap'
 require_relative 'storage/db_pool'
 require_relative 'storage/db'
@@ -37,8 +40,6 @@ require_relative 'storage/sessions.rb'
 
 require_relative 'indexer/indexer'
 
-require_relative 'dto/user_request'
-
 require_relative 'endpoints.rb'
 
 Dir.chdir(File.dirname(__FILE__))
@@ -50,6 +51,7 @@ class MAPTheAPI < Sinatra::Base
   configure :development do |config|
     register Sinatra::Reloader
     config.also_reload File.join('**', '*.rb')
+    config.also_reload File.join('../../maplib', '*.rb')
 
     config.after_reload do
       load File.join(Dir.pwd, 'endpoints.rb')

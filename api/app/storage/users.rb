@@ -79,7 +79,7 @@ class Users < BaseStorage
               Sequel[:user_agency][:agency_id])
       .each do |row|
       agency_permissions_by_user_id[row[:user_id]] ||= []
-      agency_permissions_by_user_id[row[:user_id]] << [row[:agency_ref], (row[:agency_admin] == 1)?'ADMIN':'MEMBER']
+      agency_permissions_by_user_id[row[:user_id]] << [row[:agency_ref], (row[:agency_admin] == 1) ? 'ADMIN' : 'MEMBER']
       agency_ids << row[:agency_id]
     end
 
@@ -128,43 +128,40 @@ class Users < BaseStorage
     db[:user][:username => username][:id]
   end
 
-  # FIXME replaced with permissions_for_user 
+  # FIXME replaced with permissions_for_user
   def self.permissions_for(username)
     user = db[:user][:username => username]
     {'is_admin' => (user[:admin] == 1)}
   end
 
   def self.create_from_dto(user)
-    if user.valid?
-      # check for uniqueness
-      if db[:user][:username => user.username].nil?
-        user_id = if user.is_admin?
-                    self.create_admin_user(user.username, user.name)
-                  else
-                    self.create_user(user.username, user.name)
-                  end
+    return if user.has_errors?
 
-        # user.agencies
-        require 'pp';$stderr.puts("\n*** DEBUG #{(Time.now.to_f * 1000).to_i} [users.rb:98 4e5f65]: " + {%Q^user.agencies^ => user.agencies}.pretty_inspect + "\n")
+    # check for uniqueness
+    if db[:user][:username => user.username].nil?
+      user_id = if user.is_admin?
+                  self.create_admin_user(user.username, user.name)
+                else
+                  self.create_user(user.username, user.name)
+                end
 
-        user.agencies.each do |agency|
-          agency_ref = agency.fetch('id')
-          is_admin = agency.fetch('role') == 'ADMIN'
+      user.agencies.each do |agency|
+        agency_ref = agency.fetch('id')
+        is_admin = agency.fetch('role') == 'ADMIN'
 
-          (agency_type, agency_id) = agency_ref.split(':')
-          db[:user_agency].insert(user_id: user_id,
-                                  agency_type: agency_type,
-                                  agency_id: Integer(agency_id),
-                                  agency_ref: agency_ref,
-                                  agency_admin: (is_admin ? 1 : 0),
-                                  :create_time => java.lang.System.currentTimeMillis,
-                                  :modified_time => java.lang.System.currentTimeMillis)
-        end
-
-        DBAuth.set_user_password(user_id, user.password)
-      else
-        user.add_error('username', 'already in use')
+        (agency_type, agency_id) = agency_ref.split(':')
+        db[:user_agency].insert(user_id: user_id,
+                                agency_type: agency_type,
+                                agency_id: Integer(agency_id),
+                                agency_ref: agency_ref,
+                                agency_admin: (is_admin ? 1 : 0),
+                                :create_time => java.lang.System.currentTimeMillis,
+                                :modified_time => java.lang.System.currentTimeMillis)
       end
+
+      DBAuth.set_user_password(user_id, user.password)
+    else
+      user.add_error('username', 'already in use')
     end
   end
 
