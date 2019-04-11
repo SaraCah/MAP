@@ -1,4 +1,5 @@
 - what do we do about agency_refs
 - dtos?
+- permissions on UI/API endpoints?
 - When editing a user, can only drop agency roles that logged in user is ADMIN for
 - user persistent HTTP client
