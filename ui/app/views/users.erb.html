@@ -20,11 +20,19 @@
                     <tr>
                         <td><%= user.username %></td>
                         <td><%= user.name %></td>
-                        <td><%= user.permissions %></td>
-                        <td><%= user.create_time %></td>
                         <td>
-                            <button>Edit</button>
-                            <button>Delete</button>
+                            <% if user.is_admin %>
+                                Administrator
+                            <% else %>
+                                <% user.agency_permissions.each do |agency, role| %>
+                                    <%= agency.label %> <% if role == 'ADMIN' %><i class="fa fa-crown"></i><% end %><br/>
+                                <% end %>
+                            <% end %>
+                        </td>
+                        <td><%= Time.at(user.create_time / 1000)%></td>
+                        <td>
+                            <!--<button>Edit</button>-->
+                            <!--<button>Delete</button>-->
                         </td>
                     </tr>
                 <% end %>

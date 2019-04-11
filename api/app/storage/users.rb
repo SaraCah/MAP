@@ -2,15 +2,13 @@
 
 class Users < BaseStorage
 
-  # THINKME: drop permissions here?
-  User = Struct.new(:username, :name, :create_time, :permissions) do
-    def self.from_row(row)
+  User = Struct.new(:username, :name, :is_admin, :create_time, :agency_permissions) do
+    def self.from_row(row, agency_permissions)
       User.new(row[:username],
                row[:name],
+               (row[:admin] == 1),
                row[:create_time],
-               {
-                'is_admin' => (row[:admin] == 1)
-               })
+               agency_permissions)
     end
 
     def to_json(*args)
@@ -58,13 +56,51 @@ class Users < BaseStorage
     dataset = db[:user]
 
     unless agency_refs == 'ANY'
-      dataset = dataset.join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
-                       .filter(Sequel[:user_agency][:agency_ref] => agency_refs)
+      agency_user_ids = db[:user_agency].filter(Sequel[:user_agency][:agency_ref] => agency_refs).select(Sequel[:user_agency][:user_id])
+      dataset = dataset.filter(Sequel[:user][:id] => agency_user_ids)
     end
-    
-    PagedUsers.new(dataset.limit(page_size, page * page_size).map {|r| User.from_row(r)},
+
+    max_page = (dataset.count / page_size.to_f).ceil
+
+    dataset = dataset.limit(page_size, page * page_size)
+
+    agency_permissions_by_user_id = {}
+    agency_ids = []
+
+    permission_dataset = dataset.from_self(:alias => :user).join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
+    unless agency_refs == 'ANY'
+      permission_dataset = permission_dataset.filter(Sequel[:user_agency][:agency_ref] => agency_refs)
+    end
+
+    permission_dataset
+      .select(Sequel[:user_agency][:user_id],
+              Sequel[:user_agency][:agency_ref],
+              Sequel[:user_agency][:agency_admin],
+              Sequel[:user_agency][:agency_id])
+      .each do |row|
+      agency_permissions_by_user_id[row[:user_id]] ||= []
+      agency_permissions_by_user_id[row[:user_id]] << [row[:agency_ref], (row[:agency_admin] == 1)?'ADMIN':'MEMBER']
+      agency_ids << row[:agency_id]
+    end
+
+    agencies_by_agency_ref = {}
+
+    AspaceDB.open do |aspace_db|
+      aspace_db[:agent_corporate_entity]
+        .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
+        .filter(Sequel[:name_corporate_entity][:authorized] => 1)
+        .filter(Sequel[:agent_corporate_entity][:id] => agency_ids)
+        .select(Sequel[:agent_corporate_entity][:id],
+                Sequel[:name_corporate_entity][:sort_name]).each do |row|
+        # FIXME ref business
+        agencies_by_agency_ref['agent_corporate_entity' + ':' + row[:id].to_s] = Agency.from_row(row)
+      end
+    end
+
+
+    PagedUsers.new(dataset.map {|r| User.from_row(r, agency_permissions_by_user_id.fetch(r[:id], []).map {|agency_ref, role| [ agencies_by_agency_ref.fetch(agency_ref), role ]})},
                    page,
-                   (dataset.count / page_size.to_f).ceil)
+                   max_page)
   end
 
   def self.user_exists?(username)

@@ -1,0 +1,2 @@
+- When editing a user, can only drop agency roles that logged in user is ADMIN for
+- user persistent HTTP client
