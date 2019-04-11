@@ -47,7 +47,8 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/search/agencies')
     .param(:q, String, "Search string") do
-    json_response(Search.agency_typeahead(params[:q]))
+    permissions = Users.permissions_for_user(Ctx.username)
+    json_response(Search.agency_typeahead(params[:q], permissions))
   end
 
   Endpoint.get('/my-agencies') do
@@ -57,4 +58,13 @@ class MAPTheAPI < Sinatra::Base
       json_response([])
     end
   end
+
+  Endpoint.get('/my-permissions') do
+    if Ctx.user_logged_in?
+      json_response(Users.permissions_for_user(Ctx.username))
+    else
+      json_response([])
+    end
+  end
+
 end

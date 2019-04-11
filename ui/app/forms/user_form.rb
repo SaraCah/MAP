@@ -23,13 +23,17 @@ class UserForm
   end
 
   def to_hash
-    {
-      'user[username]' => @username,
-      'user[name]' => @name,
-      'user[password]' => @password,
-      'user[is_admin]' => @is_admin,
-      'user[agency][]' => @agencies.map{|hash| hash.fetch('id')}  
-    }
+    [
+      ['user[username]', @username],
+      ['user[name]', @name],
+      ['user[password]', @password],
+      ['user[is_admin]', @is_admin]
+    ] + @agencies.map {|agency|
+      [
+        ["user[agency][][id]", agency[:id]],
+        ["user[agency][][role]", agency[:role]]
+      ]
+    }.flatten(1)
   end
 
 end

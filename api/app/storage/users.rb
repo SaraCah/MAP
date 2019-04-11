@@ -1,5 +1,8 @@
+# THINKME: Want an agency ref type?  Type:ID sort of thing
+
 class Users < BaseStorage
 
+  # THINKME: drop permissions here?
   User = Struct.new(:username, :name, :create_time, :permissions) do
     def self.from_row(row)
       User.new(row[:username],
@@ -19,6 +22,25 @@ class Users < BaseStorage
     def self.from_row(row)
       Agency.new("agent_corporate_entity:#{row[:id]}",
                  row[:sort_name], 0)
+    end
+
+    def to_json(*args)
+      to_h.to_json
+    end
+  end
+
+  Permissions = Struct.new(:is_admin, :agencies) do
+    def initialize
+      self.is_admin = false
+      self.agencies = {}
+    end
+
+    def add_agency_admin(agency_id)
+      self.agencies[agency_id] = 'ADMIN'
+    end
+
+    def add_agency_member(agency_id)
+      self.agencies[agency_id] = 'MEMBER'
     end
 
     def to_json(*args)
@@ -72,11 +94,18 @@ class Users < BaseStorage
                     self.create_user(user.username, user.name)
                   end
 
-        user.agencies.each do |agency_ref|
+        # user.agencies
+        require 'pp';$stderr.puts("\n*** DEBUG #{(Time.now.to_f * 1000).to_i} [users.rb:98 4e5f65]: " + {%Q^user.agencies^ => user.agencies}.pretty_inspect + "\n")
+
+        user.agencies.each do |agency|
+          agency_ref = agency.fetch('id')
+          is_admin = agency.fetch('role') == 'ADMIN'
+
           (agency_type, agency_id) = agency_ref.split(':')
           db[:user_agency].insert(user_id: user_id,
                                   agency_type: agency_type,
                                   agency_id: Integer(agency_id),
+                                  agency_admin: (is_admin ? 1 : 0),
                                   :create_time => java.lang.System.currentTimeMillis,
                                   :modified_time => java.lang.System.currentTimeMillis)
         end
@@ -116,6 +145,31 @@ class Users < BaseStorage
     end
 
     result.values
+  end
+
+  def self.permissions_for_user(username)
+    result = Permissions.new
+
+    user = db[:user][:username => username]
+
+    # FIXME: we call this is_admin everywhere else...
+    result.is_admin = (user[:admin] == 1)
+
+    agency_permissions = db[:user]
+                  .join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
+                  .filter(Sequel[:user][:username] => username)
+                  .select(Sequel[:user_agency][:agency_type],
+                          Sequel[:user_agency][:agency_id],
+                          Sequel[:user_agency][:agency_admin])
+                  .each do |row|
+      if row[:agency_admin] == 1
+        result.add_agency_admin(row[:agency_type] + ":" + row[:agency_id].to_s)
+      else
+        result.add_agency_member(row[:agency_type] + ":" + row[:agency_id].to_s)
+      end
+    end
+
+    result
   end
 
 end

@@ -4,7 +4,7 @@ class MAPTheApp < Sinatra::Base
     if Ctx.session[:username]
       # These tags get escaped...
       Templates.emit_with_layout(:hello, {
-                                   :name => "<b>#{Ctx.session[:username]}</b>",
+                                   :name => Ctx.session[:username],
                                    :agencies => Ctx.client.get_my_agencies,
                                  },
                                  :layout, title: "Welcome", context: 'home')
@@ -71,6 +71,13 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.post('/users/create')
     .param(:user, UserForm, "The user to create") do
+
+    unless Ctx.permissions.is_admin?
+      params[:user].is_admin = false
+
+      managed_agency_refs = Ctx.permissions.agencies.select {|agency_ref, role| role == 'ADMIN'}.map(&:first)
+      params[:user].agencies.reject! {|agency| !managed_agency_refs.include?(agency[:id])}
+    end
 
     Ctx.client.create_user(params[:user])
 

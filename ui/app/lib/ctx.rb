@@ -30,6 +30,10 @@ class Ctx
     ctx
   end
 
+  def self.permissions
+    get.permissions
+  end
+
   class Context
     attr_accessor :session
 
@@ -39,6 +43,10 @@ class Ctx
 
     def client
       MAPAPIClient.new(session)
+    end
+
+    def permissions
+      @permissions ||= client.permissions_for_current_user
     end
   end
 

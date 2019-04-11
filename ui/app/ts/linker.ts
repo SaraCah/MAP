@@ -7,6 +7,7 @@ import Utils from "./utils";
 interface agency {
     id: number,
     label: string,
+    role: string,
 }
 
 
@@ -20,13 +21,19 @@ Vue.component('agency-linker', {
     </li>
   </ul>
   <table>
-    <thead><tr><th>Agency</th><th></th></tr></thead>
+    <thead><tr><th>Agency</th><th>Role</th><th></th></tr></thead>
     <tbody>
       <tr v-for="agency in selected">
         <td>
           {{agency.label}}
           <input type="hidden" name="user[agency][][id]" v-bind:value="agency.id"/>
           <input type="hidden" name="user[agency][][label]" v-bind:value="agency.label"/>
+        </td>
+        <td>
+          <select class="browser-default" name="user[agency][][role]" v-bind:value="agency.role">
+            <option value="MEMBER">Member</option>
+            <option value="ADMIN">Admin</option>
+          </select>
         </td>
         <td>
           <button v-on:click="removeSelected(agency.id)">Remove</button>
@@ -82,13 +89,13 @@ Vue.component('agency-linker', {
             });
         },
         addSelected(agency_id: number) {
-            let selected_agency = null;
-            this.matches.forEach((agency:agency) => {
-                if (agency.id == agency_id) {
-                    selected_agency = agency;
-                }
+            let selected_agency = Utils.find(this.matches, (agency) => {
+                return agency.id == agency_id;
             });
+
             if (selected_agency != null) {
+                selected_agency.role = 'MEMBER';
+                console.log(selected_agency);
                 this.selected.push(selected_agency);
             }
 

@@ -28,7 +28,7 @@ class UserRequest
     @errors << ['username', 'required'] if @username.empty?
     @errors << ['name', 'required'] if @name.empty?
     @errors << ['password', 'required'] if @password.empty?
-    @errrors << ['agency', 'required'] if @agencies.empty? && !@is_admin
+    @errors << ['agency', 'required'] if @agencies.empty? && !@is_admin
   end
 
   def add_error(field, message)

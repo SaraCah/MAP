@@ -11,6 +11,22 @@ class MAPAPIClient
     end
   end
 
+  Permissions = Struct.new(:is_admin, :agencies) do
+    def self.from_json(json)
+      new(json.fetch('is_admin'),
+          json.fetch('agencies'))
+    end
+
+    def allow_manage_users?
+      self.is_admin || self.agencies.any? {|agency_ref, role| role == 'ADMIN'}
+    end
+
+    def is_admin?
+      self.is_admin
+    end
+  end
+
+
   def authenticate(username, password)
     response = post('/authenticate', username: username, password: password)
 
@@ -59,6 +75,10 @@ class MAPAPIClient
     get('/my-agencies', {}).map do |json|
       Agency.from_json(json)
     end
+  end
+
+  def permissions_for_current_user
+    Permissions.from_json(get('/my-permissions', {}))
   end
 
   private

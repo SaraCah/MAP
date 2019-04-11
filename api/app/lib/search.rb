@@ -11,7 +11,15 @@ class Search
     s.split(' ').map {|subq| solr_escape(subq)}.join(' ')
   end
 
-  def self.agency_typeahead(q)
+  def self.build_permissions_filter(permissions)
+    return "*:*" if permissions.is_admin
+
+    admin_agency_ids = permissions.agencies.select {|agency_ref, role| role == 'ADMIN'}.map(&:first)
+
+    return "id:(%s)" % [admin_agency_ids.map {|s| solr_escape(s)}.join(' OR')]
+  end
+
+  def self.agency_typeahead(q, permissions)
     # FIXME: This sucks
     solr_url = AppConfig[:solr_url]
 
@@ -24,7 +32,7 @@ class Search
     solr_query = "keywords:(#{keyword_query})^3 OR ngrams:#{solr_escape(q)}^1 OR edge_ngrams:#{solr_escape(q)}^2"
 
     uri = URI.join(solr_url, 'select')
-    uri.query = URI.encode_www_form(q: solr_query, qt: 'json')
+    uri.query = URI.encode_www_form(q: solr_query, qt: 'json', fq: build_permissions_filter(permissions))
 
     request = Net::HTTP::Get.new(uri)
 
@@ -34,7 +42,8 @@ class Search
       # FIXME
       raise response.body unless response.code.start_with?('2')
 
-      JSON.parse(response.body).fetch('response').fetch('docs').map {|hit| {'id' => hit.fetch('id'), 'label' => hit.fetch('display_string')}}
+      JSON.parse(response.body).fetch('response').fetch('docs').map {|hit| {'id' => hit.fetch('id'),
+                                                                            'label' => hit.fetch('display_string')}}
     end
   end
 

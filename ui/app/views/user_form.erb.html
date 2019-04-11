@@ -1,3 +1,8 @@
+Hi
+
+<pre>
+<%= user.to_hash %>
+</pre>
 <div class="row vue-enabled">
     <% if user.has_errors? %>
     <pre><%= user.errors %></pre>
@@ -21,14 +26,16 @@
                 <label for="password">Password</label>
             </div>
         </div>
-        <div class="row">
-            <div class="input-field col s12">
-                <label>
-                    <input type="checkbox" name="user[is_admin]" value="true" <% if user.is_admin %> checked="checked" <% end %> />
-                    <span>Administrator?</span>
-                </label>
+        <% if Ctx.permissions.is_admin? %>
+            <div class="row">
+                <div class="input-field col s12">
+                    <label>
+                        <input type="checkbox" name="user[is_admin]" value="true" <% if user.is_admin %> checked="checked" <% end %> />
+                        <span>Administrator?</span>
+                    </label>
+                </div>
             </div>
-        </div>
+        <% end %>
         <br>
         <br>
         <br>
