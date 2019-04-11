@@ -1,3 +1,7 @@
+Dir.chdir(File.dirname(__FILE__))
+$LOAD_PATH << Dir.pwd
+$LOAD_PATH << File.join(Dir.pwd, '../../maplib')
+
 require 'bundler/setup'
 Bundler.require
 
@@ -14,11 +18,6 @@ RJack::Logback.configure do
   RJack::Logback.root.level = RJack::Logback::INFO
 end
 
-
-Dir.chdir(File.dirname(__FILE__))
-
-$LOAD_PATH << Dir.pwd
-
 require 'common/app_config'
 require 'lib/templates'
 require 'views/templates'
@@ -27,10 +26,9 @@ require 'lib/ctx'
 require 'lib/endpoint'
 require 'lib/map_api_client'
 
-# FIXME
-require_relative '../../maplib/dto/user_update_request'
+require 'dto/user_update_request'
 
-require_relative 'endpoints'
+require 'endpoints'
 
 class MAPTheApp < Sinatra::Base
 

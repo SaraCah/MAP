@@ -1,3 +1,7 @@
+Dir.chdir(File.dirname(__FILE__))
+$LOAD_PATH << Dir.pwd
+$LOAD_PATH << File.join(Dir.pwd, '../../maplib')
+
 require 'bundler/setup'
 Bundler.require
 
@@ -16,35 +20,29 @@ RJack::Logback.configure do
   RJack::Logback.root.level = RJack::Logback::INFO
 end
 
-
 require 'securerandom'
 require 'fileutils'
 require 'net/http'
 
-# FIXME: don't want require_relative... just use the load path?
-require_relative '../../maplib/dto/user_update_request'
+require 'dto/user_update_request'
 
-require_relative 'common/bootstrap'
-require_relative 'storage/db_pool'
-require_relative 'storage/db'
-require_relative 'storage/aspace_db'
-require_relative 'lib/endpoint'
-require_relative 'lib/ctx'
-require_relative 'lib/watch_dir_reloader'
-require_relative 'lib/search'
+require 'common/bootstrap'
+require 'storage/db_pool'
+require 'storage/db'
+require 'storage/aspace_db'
+require 'lib/endpoint'
+require 'lib/ctx'
+require 'lib/watch_dir_reloader'
+require 'lib/search'
 
-require_relative 'storage/base_storage'
-require_relative 'storage/db_auth.rb'
-require_relative 'storage/users.rb'
-require_relative 'storage/sessions.rb'
+require 'storage/base_storage'
+require 'storage/db_auth'
+require 'storage/users'
+require 'storage/sessions'
 
-require_relative 'indexer/indexer'
+require 'indexer/indexer'
 
-require_relative 'endpoints.rb'
-
-Dir.chdir(File.dirname(__FILE__))
-
-$LOAD_PATH << Dir.pwd
+require 'endpoints'
 
 class MAPTheAPI < Sinatra::Base
 
