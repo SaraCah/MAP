@@ -10,3 +10,4 @@
  -- ensure indexing is eager to changes up the hierarchy
  -- update user form and validations to be hierarchy aware
  -- update controlling relationship counts to be hierarchy aware
+ - pull map_api_client.rb structs out into classes
