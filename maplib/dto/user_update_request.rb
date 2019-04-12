@@ -1,5 +1,5 @@
 class UserUpdateRequest
-  attr_accessor :username, :name, :password, :errors, :agencies
+  attr_accessor :username, :name, :password, :errors, :agencies, :is_admin
 
   def initialize(hash = {})
     @username = hash.fetch('username', '')
