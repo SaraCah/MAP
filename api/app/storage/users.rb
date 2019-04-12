@@ -38,7 +38,7 @@ class Users < BaseStorage
     end
 
     def add_agency_member(agency_id)
-      self.agencies[agency_id] = 'MEMBER'
+      self.agencies[agency_id] ||= 'MEMBER'
     end
 
     def to_json(*args)
@@ -166,12 +166,11 @@ class Users < BaseStorage
   end
 
   def self.agencies_for_user(username)
-    agency_ids = db[:user]
-                  .join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
-                  .filter(Sequel[:user][:username] => username)
-                  .map(:agency_id)
-
+    permissions = Ctx.get.permissions
     result = {}
+
+    # FIXME: blegh
+    agency_ids = permissions.agencies.keys.map {|s| Integer(s.split(':').last)}
 
     AspaceDB.open do |aspace_db|
       aspace_db[:agent_corporate_entity]
@@ -203,6 +202,23 @@ class Users < BaseStorage
     # FIXME: we call this is_admin everywhere else...
     result.is_admin = (user[:admin] == 1)
 
+    member_agency_ids = db[:user]
+                          .join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
+                          .filter(Sequel[:user][:username] => username)
+                          .map(:agency_id)
+
+    descendant_agencies = {}
+    AspaceDB.open do |aspace_db|
+      aspace_db[:agency_descendant]
+        .filter(:agent_corporate_entity_id => member_agency_ids)
+        .select(Sequel[:agency_descendant][:agent_corporate_entity_id],
+                Sequel[:agency_descendant][:descendant_id])
+        .each do |row|
+        descendant_agencies[row[:agent_corporate_entity_id]] ||= []
+        descendant_agencies[row[:agent_corporate_entity_id]] << row[:descendant_id]
+      end
+    end
+
     agency_permissions = db[:user]
                   .join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
                   .filter(Sequel[:user][:username] => username)
@@ -212,8 +228,14 @@ class Users < BaseStorage
                   .each do |row|
       if row[:agency_admin] == 1
         result.add_agency_admin(row[:agency_type] + ":" + row[:agency_id].to_s)
+        descendant_agencies.fetch(row[:agency_id], []).each do |descendant_id|
+          result.add_agency_admin(row[:agency_type] + ":" + descendant_id.to_s)
+        end
       else
         result.add_agency_member(row[:agency_type] + ":" + row[:agency_id].to_s)
+        descendant_agencies.fetch(row[:agency_id], []).each do |descendant_id|
+          result.add_agency_member(row[:agency_type] + ":" + descendant_id.to_s)
+        end
       end
     end
 
