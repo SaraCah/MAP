@@ -7,7 +7,7 @@
 - agencies have sub-agencies
  -- a user can be assigned as an admin at any level in this hierarchy
  -- update indexer to be agency hierarchy aware
- -- ensure indexing is eager to changes up the hierarchy
+ -- DONE ensure indexing is eager to changes up the hierarchy
  -- update user form and validations to be hierarchy aware
  -- update controlling relationship counts to be hierarchy aware
  - pull map_api_client.rb structs out into classes

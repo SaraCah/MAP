@@ -101,13 +101,7 @@ class Indexer
       AspaceDB.open do |db|
         batch = []
 
-        db[:agent_corporate_entity]
-          .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
-          .filter(Sequel[:name_corporate_entity][:authorized] => 1)
-          .select(Sequel[:agent_corporate_entity][:id],
-                  Sequel[:name_corporate_entity][:sort_name])
-          .filter(Sequel[:agent_corporate_entity][:system_mtime] >= Time.at(last_mtime / 1000))
-          .each do |agent|
+        walk_agency_tree(db, last_mtime) do |agent|
           batch << prepare_agent_corporate(agent)
           if batch.length >= BATCH_SIZE
             needs_commit = send_batch(batch) || needs_commit
@@ -127,6 +121,71 @@ class Indexer
     end
 
     sleep INDEX_DELAY_SECONDS
+  end
+
+  def walk_agency_tree(db, last_mtime)
+    # calculate the root of each agency tree
+    paths_to_root = db[:agent_corporate_entity]
+                      .filter(Sequel[:agent_corporate_entity][:system_mtime] >= Time.at(last_mtime / 1000))
+                      .map{|row| [row[:id]]}
+
+    completed_paths = []
+
+    while(true) do
+      relns = db[:series_system_rlshp]
+                .filter(:jsonmodel_type => 'series_system_agent_agent_containment_relationship')
+                .filter(:agent_corporate_entity_id_1 => paths_to_root.map(&:last))
+                .filter(Sequel.~(:end_date => nil))
+                .select(Sequel.as(:agent_corporate_entity_id_0, :parent),
+                        Sequel.as(:agent_corporate_entity_id_1, :child))
+
+      break if relns.empty?
+
+      relns.each do |row|
+        paths_to_root.each do |path|
+          if path.last == row[:child]
+            if path.include?(row[:parent])
+              completed_paths << path
+            else
+              path << row[:parent]
+            end
+          end
+        end
+        paths_to_root -= completed_paths
+      end
+    end
+
+    completed_paths.concat(paths_to_root)
+
+    # walk all agency trees from the root agency
+    processed_ids = []
+    left_to_process = completed_paths.map(&:last)
+    while(!left_to_process.empty?) do
+      db[:agent_corporate_entity]
+        .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
+        .filter(Sequel[:name_corporate_entity][:authorized] => 1)
+        .filter(Sequel[:agent_corporate_entity][:id] => left_to_process)
+        .select(Sequel[:agent_corporate_entity][:id],
+                Sequel[:name_corporate_entity][:sort_name])
+        .each do |agent|
+
+        yield(agent)
+
+        processed_ids << agent[:id]
+      end
+
+      children_to_process = []
+      db[:series_system_rlshp]
+        .filter(:jsonmodel_type => 'series_system_agent_agent_containment_relationship')
+        .filter(:agent_corporate_entity_id_0 => left_to_process)
+        .filter(Sequel.~(:end_date => nil))
+        .select(Sequel.as(:agent_corporate_entity_id_1, :child))
+        .each do |row|
+        children_to_process << row[:child]
+      end
+
+      left_to_process = children_to_process - processed_ids
+    end
   end
 
   def call
