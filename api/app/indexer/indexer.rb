@@ -2,11 +2,10 @@ require 'set'
 
 class Indexer
 
-  # FIXME: AppConfig
-  INDEX_DELAY_SECONDS = 5
-  WINDOW_MS = 180000
+  INDEX_DELAY_SECONDS = AppConfig[:indexer_delay_seconds]
+  WINDOW_MS = AppConfig[:indexer_window_milliseconds]
 
-  BATCH_SIZE = 100
+  BATCH_SIZE = AppConfig[:indexer_batch_size]
 
   def self.start(solr_url, state_file)
     Thread.new do
