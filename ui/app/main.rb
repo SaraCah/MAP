@@ -18,6 +18,8 @@ RJack::Logback.configure do
   RJack::Logback.root.level = RJack::Logback::INFO
 end
 
+require 'rack/protection'
+
 require 'common/app_config'
 require 'lib/templates'
 require 'views/templates'
@@ -26,6 +28,7 @@ require 'lib/ctx'
 require 'lib/endpoint'
 require 'lib/map_api_client'
 require 'lib/url_helper'
+require 'lib/form_helper'
 
 require 'dto/user_update_request'
 
@@ -46,4 +49,8 @@ class MAPTheApp < Sinatra::Base
   use Rack::Session::Cookie, :key => 'map.session',
                              :path => '/',
                              :secret => AppConfig[:session_secret]
+
+  use Rack::Protection
+  use Rack::Protection::AuthenticityToken
+
 end

@@ -3,6 +3,7 @@
     <pre><%= user.errors %></pre>
     <% end %>
     <form class="col s12" action="/users/create" method="post">
+        <%== FormHelper.hidden_authenticity_token %>
         <div class="row">
             <div class="input-field col s12">
                 <input id="username" name="user[username]" type="text" value="<%= user.username %>" required>

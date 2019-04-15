@@ -5,7 +5,8 @@ class Endpoint
   def initialize(method, uri, opts)
     @method = method
     @uri = uri
-    @valid_params = {'splat' => ParamDef.new(String, 'Rest of URL', {:optional => true})}
+    @valid_params = {'splat' => ParamDef.new(String, 'Rest of URL', {:optional => true}),
+                     'authenticity_token' => ParamDef.new(String, 'CSRF token', {:optional => true})}
     @opts = opts
   end
 
