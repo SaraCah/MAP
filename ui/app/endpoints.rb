@@ -59,7 +59,6 @@ class MAPTheApp < Sinatra::Base
     if authentication.successful?
       session[:api_session_id] = authentication.session_id or raise "WOOT"
       session[:username] = params[:username]
-      session[:permissions] = authentication.permissions
 
       redirect '/'
     else

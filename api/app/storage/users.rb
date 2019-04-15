@@ -128,12 +128,6 @@ class Users < BaseStorage
     db[:user][:username => username][:id]
   end
 
-  # FIXME replaced with permissions_for_user
-  def self.permissions_for(username)
-    user = db[:user][:username => username]
-    {'is_admin' => (user[:admin] == 1)}
-  end
-
   def self.create_from_dto(user)
     return if user.has_errors?
 
@@ -219,13 +213,13 @@ class Users < BaseStorage
       end
     end
 
-    agency_permissions = db[:user]
-                  .join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
-                  .filter(Sequel[:user][:username] => username)
-                  .select(Sequel[:user_agency][:agency_type],
-                          Sequel[:user_agency][:agency_id],
-                          Sequel[:user_agency][:agency_admin])
-                  .each do |row|
+    db[:user]
+      .join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
+      .filter(Sequel[:user][:username] => username)
+      .select(Sequel[:user_agency][:agency_type],
+              Sequel[:user_agency][:agency_id],
+              Sequel[:user_agency][:agency_admin])
+      .each do |row|
       if row[:agency_admin] == 1
         result.add_agency_admin(row[:agency_type] + ":" + row[:agency_id].to_s)
         descendant_agencies.fetch(row[:agency_id], []).each do |descendant_id|
