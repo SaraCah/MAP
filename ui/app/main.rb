@@ -25,6 +25,7 @@ require 'views/templates'
 require 'lib/ctx'
 require 'lib/endpoint'
 require 'lib/map_api_client'
+require 'lib/url_helper'
 
 require 'dto/user_update_request'
 

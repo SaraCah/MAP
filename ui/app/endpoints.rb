@@ -14,9 +14,10 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
-  Endpoint.get('/js/*') do
-    filename = request.path.split('/').last
+  Endpoint.get('/js/*')
+    .param(:cb, String, "Cachebuster (ignored)", optional: true) do
 
+    filename = request.path.split('/').last
     if filename == 'vue.js'
       send_file File.join('ts/node_modules/vue/dist/vue.js')
     elsif filename == 'vue-resource.js'
@@ -32,7 +33,8 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
-  Endpoint.get('/css/*') do
+  Endpoint.get('/css/*')
+    .param(:cb, String, "Cachebuster (ignored)", optional: true) do
     filename = request.path.split('/').last
     if File.exist?(file = File.join('css', filename))
       send_file file
