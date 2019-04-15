@@ -203,13 +203,13 @@ class Users < BaseStorage
 
     descendant_agencies = {}
     AspaceDB.open do |aspace_db|
-      aspace_db[:agency_descendant]
-        .filter(:agent_corporate_entity_id => member_agency_ids)
-        .select(Sequel[:agency_descendant][:agent_corporate_entity_id],
-                Sequel[:agency_descendant][:descendant_id])
+      aspace_db[:agency_ancestor]
+        .filter(:ancestor_id => member_agency_ids)
+        .select(Sequel[:agency_ancestor][:ancestor_id],
+                Sequel[:agency_ancestor][:agent_corporate_entity_id])
         .each do |row|
-        descendant_agencies[row[:agent_corporate_entity_id]] ||= []
-        descendant_agencies[row[:agent_corporate_entity_id]] << row[:descendant_id]
+        descendant_agencies[row[:ancestor_id]] ||= []
+        descendant_agencies[row[:ancestor_id]] << row[:agent_corporate_entity_id]
       end
     end
 

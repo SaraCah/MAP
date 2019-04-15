@@ -169,10 +169,10 @@ class Indexer
                                .filter(Sequel[:agent_corporate_entity][:system_mtime] >= Time.at(last_mtime / 1000))
                                .map{|row| [row[:id]]})
 
-
-    ids_to_reindex += aspace_db[:agency_descendant]
-                        .filter(:agent_corporate_entity_id => ids_to_reindex.to_a)
-                        .map(:descendant_id)
+    # Reindex any descendant of our agencies too
+    ids_to_reindex += aspace_db[:agency_ancestor]
+                        .filter(:ancestor_id => ids_to_reindex.to_a)
+                        .map(:agent_corporate_entity_id)
 
     ids_to_reindex = ids_to_reindex.to_a
 
