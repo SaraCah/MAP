@@ -35,7 +35,7 @@ class MAPTheApp < Sinatra::Base
   configure :development do |config|
     register Sinatra::Reloader
     config.also_reload File.join('**', '*.rb')
-    config.also_reload File.join('../../maplib', '*.rb')
+    config.also_reload File.join('..', '..', 'maplib', '**', '*.rb')
     config.after_reload do
       load File.join(Dir.pwd, 'views/templates.rb')
       load File.join(Dir.pwd, 'endpoints.rb')
