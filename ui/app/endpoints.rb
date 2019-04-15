@@ -91,11 +91,18 @@ class MAPTheApp < Sinatra::Base
     unless Ctx.permissions.is_admin?
       params[:user].is_admin = false
 
-      managed_agency_refs = Ctx.permissions.agencies.select {|agency_ref, role| role == 'ADMIN'}.map(&:first)
-      params[:user].agencies.reject! {|agency| !managed_agency_refs.include?(agency[:id])}
+      params[:user].agencies.select! do |agency|
+        if agency['location_id'].empty?
+          Ctx.permissions.agency_admin?(agency['id'])
+        else
+          Ctx.permissions.location_admin?(agency['id'], Integer(agency['location_id']))
+        end
+      end
     end
 
-    Ctx.client.create_user(params[:user])
+    params[:user].validate!
+
+    Ctx.client.create_user(params[:user]) unless params[:user].has_errors?
 
     if params[:user].has_errors?
       Templates.emit_with_layout(:user_new, {user: params[:user]},
@@ -119,6 +126,42 @@ class MAPTheApp < Sinatra::Base
       200,
       {'Content-type' => 'text/json'},
       Ctx.client.agency_typeahead(params[:q]).to_json
+    ]
+  end
+
+  Endpoint.get('/locations') do
+    Templates.emit_with_layout(:locations, {locations: Ctx.client.get_my_locations},
+                               :layout, title: "Locations", context: 'locations')
+  end
+
+  Endpoint.get('/locations/new') do
+    Templates.emit_with_layout(:location_new, {location: AgencyLocationUpdateRequest.new, agencies: Ctx.client.get_my_agencies},
+                               :layout, title: "New Location", context: 'locations')
+  end
+
+  Endpoint.post('/locations/create')
+    .param(:location, AgencyLocationUpdateRequest, "The agency location to create") do
+
+    unless Ctx.permissions.is_admin?
+      # FIXME check agency_id against permissions
+    end
+
+    Ctx.client.create_location(params[:location])
+
+    if params[:location].has_errors?
+      Templates.emit_with_layout(:location_new, {location: params[:location]},
+                                 :layout, title: "New Location", context: 'locations')
+    else
+      redirect '/locations'
+    end
+  end
+
+  Endpoint.get('/locations_for_groups')
+    .param(:agency_ref, String, "Agency Ref") do
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      Ctx.client.get_my_locations(params[:agency_ref]).map(&:to_search_result).to_json
     ]
   end
 

@@ -8,20 +8,28 @@ interface agency {
     id: number,
     label: string,
     role: string,
+    location_id: number,
+    locations: location[],
+}
+
+interface location {
+    id: number,
+    label: string,
 }
 
 
 Vue.component('agency-linker', {
     template: `
-<div>
-  <input v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
+<div class="input-field col s12">
+  <input id="agency_id_linker" v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
+  <label for="agency_id_linker">Agency</label>
   <ul>
     <li v-for="agency in matches">
       <a href="javascript:void(0);" v-on:click="addSelected(agency.id)">{{ agency.label }}</a>
     </li>
   </ul>
   <table>
-    <thead><tr><th>Agency</th><th>Role</th><th></th></tr></thead>
+    <thead><tr><th>Agency</th><th>Location</th><th>Role</th><th></th></tr></thead>
     <tbody>
       <tr v-for="agency in selected">
         <td>
@@ -30,13 +38,19 @@ Vue.component('agency-linker', {
           <input type="hidden" name="user[agency][][label]" v-bind:value="agency.label"/>
         </td>
         <td>
-          <select class="browser-default" name="user[agency][][role]" v-bind:value="agency.role">
-            <option value="MEMBER">Member</option>
+          <select class="browser-default" name="user[agency][][location_id]" v-bind:value="agency.location_id" v-model="agency.location_id">
+            <option></option>
+            <option v-for="location in agency.locations" v-bind:value="location.id">{{ location.label }}</option>
+          </select>
+        </td>
+        <td>
+          <select class="browser-default" name="user[agency][][role]" v-bind:value="agency.role" v-model="agency.role">
+            <option value="MEMBER">Contact</option>
             <option value="ADMIN">Admin</option>
           </select>
         </td>
         <td>
-          <button class="btn" v-on:click="removeSelected(agency.id)">Remove</button>
+          <button class="btn" v-on:click="removeSelected(agency)">Remove</button>
         </td>
       </tr>
     </tbody>
@@ -45,16 +59,12 @@ Vue.component('agency-linker', {
 `,
     data: function ():
         {
-            selectedAgencyId: number | null,
-            displayString: string,
             matches: agency[],
             selected: agency[],
             text: string,
         }
     {
         return {
-            selectedAgencyId: null,
-            displayString: '',
             matches: [],
             selected: JSON.parse(this.agencies),
             text: '',
@@ -75,17 +85,13 @@ Vue.component('agency-linker', {
                     console.log("FAIL");
                     this.matches = [];
                 }).then((json: any) => {
-                    this.matches = Utils.filter(json, (agency:agency) => {
-                        return !Utils.find(this.selected, (target:agency) => {
-                            return target.id == agency.id;
-                        });
-                    });
+                    this.matches = json;
                 });
             }
         },
-        removeSelected(agency_id: number) {
+        removeSelected(agencyToRemove: agency) {
             this.selected = Utils.filter(this.selected, (agency:agency) => {
-                return agency.id != agency_id;
+                return agency != agencyToRemove;
             });
         },
         addSelected(agency_id: number) {
@@ -95,8 +101,25 @@ Vue.component('agency-linker', {
 
             if (selected_agency != null) {
                 selected_agency.role = 'MEMBER';
-                console.log(selected_agency);
-                this.selected.push(selected_agency);
+
+                this.$http.get('/locations_for_groups', {
+                    method: 'GET',
+                    params: {
+                        'agency_ref': selected_agency.id,
+                    }
+                }).then((response: any) => {
+                    return response.json();
+                }, () => {
+                    console.log("FAIL");
+                    if (selected_agency != null) {
+                        selected_agency.locations = [];
+                    }
+                }).then((json: any) => {
+                    if (selected_agency != null) {
+                        selected_agency.locations = json;
+                        this.selected.push(selected_agency);
+                    }
+                });
             }
 
             this.matches = [];

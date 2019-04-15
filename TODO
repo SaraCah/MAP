@@ -5,3 +5,5 @@
 - use a persistent HTTP client
 - add a URI helper for CSS/JS includes & thwart browser caching in dev mode
  - pull map_api_client.rb structs out into classes
+- clean up linker to use materialize dropdown w/ keyboard support
+- drop ancestor stuff

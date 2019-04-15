@@ -11,18 +11,51 @@ class MAPAPIClient
     end
   end
 
-  Permissions = Struct.new(:is_admin, :agencies) do
+  Group = Struct.new(:agency_id, :aspace_agency_id, :agency_location_id, :role) do
+    def self.from_json(json)
+      new(json.fetch('agency_id'),
+          json.fetch('aspace_agency_id'),
+          json.fetch('agency_location_id') || 'ANY',
+          json.fetch('role'))
+    end
+
+    def admin?
+      self.role == 'ADMIN'
+    end
+
+    def agency_ref
+      "agent_corporate_entity:#{self.aspace_agency_id}"
+    end
+  end
+
+  Permissions = Struct.new(:is_admin, :groups) do
     def self.from_json(json)
       new(json.fetch('is_admin'),
-          json.fetch('agencies'))
+          json.fetch('groups', []).map {|group_json| Group.from_json(group_json)})
     end
 
     def allow_manage_users?
-      self.is_admin || self.agencies.any? {|agency_ref, role| role == 'ADMIN'}
+      self.is_admin || self.groups.any? {|group| group.admin?}
     end
 
     def is_admin?
       self.is_admin
+    end
+
+    def allow_manage_locations?
+      self.is_admin || self.groups.any?{|group| group.admin?}
+    end
+
+    def allow_create_locations?
+      self.is_admin || self.groups.any?{|group| group.agency_location_id == 'ANY' && group.admin?}
+    end
+
+    def agency_admin?(agency_ref)
+      self.groups.any?{|group| group.agency_ref == agency_ref && group.agency_location_id == 'ANY' && group.admin?}
+    end
+
+    def location_admin?(agency_ref, location_id)
+      agency_admin?(agency_ref) || self.groups.any?{|group| group.agency_ref == agency_ref && group.agency_location_id == location_id && group.admin?}
     end
   end
 
@@ -43,8 +76,8 @@ class MAPAPIClient
                json.fetch('name'),
                json.fetch('is_admin'),
                json.fetch('create_time'),
-               json.fetch('agency_permissions').map do |agency, role|
-                 [Agency.from_json(agency), role]
+               json.fetch('agency_permissions').map do |agency, role, location_label|
+                 [Agency.from_json(agency), role, location_label]
                end)
     end
   end
@@ -57,9 +90,9 @@ class MAPAPIClient
     end
   end
 
-  PagedUsers = Struct.new(:users, :current_page, :max_page) do
-    def self.from_json(json)
-      PagedUsers.new(json.fetch('users', []).map{|user_json| User.from_json(user_json)},
+  PagedResults = Struct.new(:results, :current_page, :max_page) do
+    def self.from_json(json, type_class)
+      PagedResults.new(json.fetch('results', []).map{|user_json| type_class.from_json(user_json)},
                      json.fetch('current_page'),
                      json.fetch('max_page'))
     end
@@ -67,13 +100,24 @@ class MAPAPIClient
 
 
   def users(page = 0)
-    PagedUsers.from_json(get('/users', page: page))
+    PagedResults.from_json(get('/users', page: page), User)
+  end
+
+  def groups
+    get('/groups')
   end
 
   def create_user(user)
     response = post('/users/create', user.to_hash)
     if response['errors']
       user.add_errors(response['errors'])
+    end
+  end
+
+  def create_location(location)
+    response = post('/locations/create', location.to_hash)
+    if response['errors']
+      location.add_errors(response['errors'])
     end
   end
 
@@ -84,6 +128,31 @@ class MAPAPIClient
   def get_my_agencies
     get('/my-agencies', {}).map do |json|
       Agency.from_json(json)
+    end
+  end
+
+  AgencyLocation = Struct.new(:id, :name, :agency_id, :create_time, :agency) do
+    def self.from_json(json)
+      AgencyLocation.new(json.fetch('id'),
+                         json.fetch('name'),
+                         json.fetch('agency_id'),
+                         json.fetch('create_time'),
+                         Agency.from_json(json.fetch('agency')))
+    end
+
+    def to_search_result
+      {
+        'id' => id,
+        'label' => name
+      }
+    end
+  end
+
+  def get_my_locations(agency_ref = nil)
+    get('/my-agency-locations', {
+      'agency_ref' => agency_ref,
+    }).map do |json|
+      AgencyLocation.from_json(json)
     end
   end
 
@@ -109,7 +178,7 @@ class MAPAPIClient
     JSON.parse(response.body)
   end
 
-  def get(url, params)
+  def get(url, params = {})
     uri = build_url(url, params)
 
     request = Net::HTTP::Get.new(uri)

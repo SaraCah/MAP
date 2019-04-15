@@ -27,12 +27,7 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/users')
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in?
-      if Ctx.get.permissions.is_admin
-        json_response(Users.page('ANY', params[:page], 10))
-      else
-        admin_agencies = Ctx.get.permissions.agencies.select{|_, role| role == 'ADMIN'}.keys
-        json_response(Users.page(admin_agencies, params[:page], 10))
-      end
+      json_response(Users.page(params[:page], 10))
     else
       json_response([])
     end
@@ -57,7 +52,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/my-agencies') do
     if Ctx.user_logged_in?
-      json_response(Users.agencies_for_user(Ctx.username))
+      json_response(Agencies.agencies_for_user)
     else
       json_response([])
     end
@@ -68,6 +63,29 @@ class MAPTheAPI < Sinatra::Base
       json_response(Users.permissions_for_user(Ctx.username))
     else
       json_response([])
+    end
+  end
+
+  Endpoint.get('/my-agency-locations')
+    .param(:agency_ref, String, "Agency Ref", :optional => true) do
+    if Ctx.user_logged_in?
+      agency_id = nil
+      (_, agency_id) =  params[:agency_ref].split(':') if params[:agency_ref]
+
+      json_response(Agencies.locations_for_user(agency_id))
+    else
+      json_response([])
+    end
+  end
+
+  Endpoint.post('/locations/create')
+    .param(:location, AgencyLocationUpdateRequest, "Location") do
+    Agencies.create_location_from_dto(params[:location])
+
+    if params[:location].has_errors?
+      json_response(errors: params[:location].errors)
+    else
+      json_response(status: 'created')
     end
   end
 

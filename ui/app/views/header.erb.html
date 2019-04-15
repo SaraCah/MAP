@@ -2,7 +2,7 @@
     <div class="nav-wrapper blue-grey darken-1">
         <a href="/" class="brand-logo">Master Access Portal</a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="/logout">Logout</a></li>
+            <li><a href="/logout">Logout (<%= Ctx.username %>)</a></li>
         </ul>
     </div>
     <div class="nav-content blue-grey lighten-1">
@@ -10,6 +10,9 @@
             <li class="tab"><a href="/" <% if context == 'home' %> class='active'<% end %>>Home</a></li>
             <% if Ctx.permissions.allow_manage_users? %>
                 <li class="tab"><a href="/users" <% if context == 'users' %> class='active'<% end %>>My Users</a></li>
+            <% end %>
+            <% if Ctx.permissions.allow_manage_locations? %>
+                <li class="tab"><a href="/locations" <% if context == 'locations' %> class='active'<% end %>>My Locations</a></li>
             <% end %>
         </ul>
     </div>

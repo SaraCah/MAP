@@ -2,61 +2,26 @@
 
 class Users < BaseStorage
 
-  User = Struct.new(:username, :name, :is_admin, :create_time, :agency_permissions) do
-    def self.from_row(row, agency_permissions)
-      User.new(row[:username],
-               row[:name],
-               (row[:admin] == 1),
-               row[:create_time],
-               agency_permissions)
-    end
+  def self.page(page, page_size)
+    permissions = Ctx.get.permissions
 
-    def to_json(*args)
-      to_h.to_json
-    end
-  end
-
-  Agency = Struct.new(:id, :label, :series_count) do
-    def self.from_row(row)
-      Agency.new("agent_corporate_entity:#{row[:id]}",
-                 row[:sort_name], 0)
-    end
-
-    def to_json(*args)
-      to_h.to_json
-    end
-  end
-
-  Permissions = Struct.new(:is_admin, :agencies) do
-    def initialize
-      self.is_admin = false
-      self.agencies = {}
-    end
-
-    def add_agency_admin(agency_id)
-      self.agencies[agency_id] = 'ADMIN'
-    end
-
-    def add_agency_member(agency_id)
-      self.agencies[agency_id] ||= 'MEMBER'
-    end
-
-    def to_json(*args)
-      to_h.to_json
-    end
-  end
-
-  PagedUsers = Struct.new(:users, :current_page, :max_page) do
-    def to_json(*args)
-      to_h.to_json
-    end
-  end
-
-  def self.page(agency_refs, page, page_size)
     dataset = db[:user]
 
-    unless agency_refs == 'ANY'
-      agency_user_ids = db[:user_agency].filter(Sequel[:user_agency][:agency_ref] => agency_refs).select(Sequel[:user_agency][:user_id])
+    unless permissions.is_admin?
+      group_filters = permissions.admin_groups.map do |group|
+        if group.agency_location_id.nil?
+          Sequel.&(Sequel[:group][:agency_id] => group.agency_id)
+        else
+          Sequel.&(Sequel[:group][:agency_id] => group.agency_id,
+                   Sequel[:group][:agency_location_id] => group.agency_location_id)
+        end
+      end
+
+      agency_user_ids = Groups.group_user_dataset
+                        .filter(Sequel.|(group_filters))
+                        .distinct(Sequel[:group_user][:user_id])
+                        .select(Sequel[:group_user][:user_id])
+
       dataset = dataset.filter(Sequel[:user][:id] => agency_user_ids)
     end
 
@@ -65,22 +30,39 @@ class Users < BaseStorage
     dataset = dataset.limit(page_size, page * page_size)
 
     agency_permissions_by_user_id = {}
-    agency_ids = []
+    aspace_agency_ids_to_resolve = []
 
-    permission_dataset = dataset.from_self(:alias => :user).join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
-    unless agency_refs == 'ANY'
-      permission_dataset = permission_dataset.filter(Sequel[:user_agency][:agency_ref] => agency_refs)
+    permission_dataset = dataset.from_self(:alias => :user)
+                           .join(:group_user, Sequel[:group_user][:user_id] => Sequel[:user][:id])
+                           .join(:group, Sequel[:group][:id] => Sequel[:group_user][:group_id])
+                           .join(:agency, Sequel[:agency][:id] => Sequel[:group][:agency_id])
+                           .left_join(:agency_location, Sequel[:agency_location][:id] => Sequel[:group][:agency_location_id])
+
+    unless permissions.is_admin?
+      group_filters = permissions.admin_groups.map do |group|
+        if group.agency_location_id.nil?
+          Sequel.&(Sequel[:group][:agency_id] => group.agency_id)
+        else
+          Sequel.&(Sequel[:group][:agency_id] => group.agency_id,
+                   Sequel[:group][:agency_location_id] => group.agency_location_id)
+        end
+      end
+
+      permission_dataset = permission_dataset.filter(Sequel.|(group_filters))
     end
 
     permission_dataset
-      .select(Sequel[:user_agency][:user_id],
-              Sequel[:user_agency][:agency_ref],
-              Sequel[:user_agency][:agency_admin],
-              Sequel[:user_agency][:agency_id])
+      .select(Sequel[:group_user][:user_id],
+              Sequel.as(Sequel[:group][:role], :role),
+              Sequel.as(Sequel[:group][:agency_location_id], :agency_location_id),
+              Sequel.as(Sequel[:agency_location][:name], :agency_location_label),
+              Sequel[:agency][:aspace_agency_id])
       .each do |row|
+      # FIXME ref business
+      agency_ref = "agent_corporate_entity:#{row[:aspace_agency_id]}"
       agency_permissions_by_user_id[row[:user_id]] ||= []
-      agency_permissions_by_user_id[row[:user_id]] << [row[:agency_ref], (row[:agency_admin] == 1) ? 'ADMIN' : 'MEMBER']
-      agency_ids << row[:agency_id]
+      agency_permissions_by_user_id[row[:user_id]] << [agency_ref, row[:role], row[:agency_location_id], row[:agency_location_label]]
+      aspace_agency_ids_to_resolve << row[:aspace_agency_id]
     end
 
     agencies_by_agency_ref = {}
@@ -89,7 +71,7 @@ class Users < BaseStorage
       aspace_db[:agent_corporate_entity]
         .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
         .filter(Sequel[:name_corporate_entity][:authorized] => 1)
-        .filter(Sequel[:agent_corporate_entity][:id] => agency_ids)
+        .filter(Sequel[:agent_corporate_entity][:id] => aspace_agency_ids_to_resolve)
         .select(Sequel[:agent_corporate_entity][:id],
                 Sequel[:name_corporate_entity][:sort_name]).each do |row|
         # FIXME ref business
@@ -98,7 +80,7 @@ class Users < BaseStorage
     end
 
 
-    PagedUsers.new(dataset.map {|r| User.from_row(r, agency_permissions_by_user_id.fetch(r[:id], []).map {|agency_ref, role| [ agencies_by_agency_ref.fetch(agency_ref), role ]})},
+    PagedResults.new(dataset.map {|r| User.from_row(r, agency_permissions_by_user_id.fetch(r[:id], []).map {|agency_ref, role, location_id, location_label| [ agencies_by_agency_ref.fetch(agency_ref), role, location_label ]})},
                    page,
                    max_page)
   end
@@ -129,6 +111,7 @@ class Users < BaseStorage
   end
 
   def self.create_from_dto(user)
+    user.validate!
     return if user.has_errors?
 
     # check for uniqueness
@@ -139,53 +122,27 @@ class Users < BaseStorage
                   self.create_user(user.username, user.name)
                 end
 
-      user.agencies.each do |agency|
-        agency_ref = agency.fetch('id')
-        is_admin = agency.fetch('role') == 'ADMIN'
+      user.agencies.each do |user_agency|
+        agency_ref = user_agency.fetch('id')
+        role_code = user_agency.fetch('role')
+        location_id = user_agency['location_id']
 
-        (agency_type, agency_id) = agency_ref.split(':')
-        db[:user_agency].insert(user_id: user_id,
-                                agency_type: agency_type,
-                                agency_id: Integer(agency_id),
-                                agency_ref: agency_ref,
-                                agency_admin: (is_admin ? 1 : 0),
-                                :create_time => java.lang.System.currentTimeMillis,
-                                :modified_time => java.lang.System.currentTimeMillis)
+        # FIXME ref
+        (_, aspace_agency_id) = agency_ref.split(':')
+
+        agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
+
+        if location_id
+          Groups.add_user_to_agency_location(user_id, agency_id, location_id, role_code)
+        else
+          Groups.add_user_to_agency(user_id, agency_id, role_code)
+        end
       end
 
       DBAuth.set_user_password(user_id, user.password)
     else
       user.add_error('username', 'already in use')
     end
-  end
-
-  def self.agencies_for_user(username)
-    permissions = Ctx.get.permissions
-    result = {}
-
-    # FIXME: blegh
-    agency_ids = permissions.agencies.keys.map {|s| Integer(s.split(':').last)}
-
-    AspaceDB.open do |aspace_db|
-      aspace_db[:agent_corporate_entity]
-        .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
-        .filter(Sequel[:name_corporate_entity][:authorized] => 1)
-        .filter(Sequel[:agent_corporate_entity][:id] => agency_ids)
-        .select(Sequel[:agent_corporate_entity][:id],
-                Sequel[:name_corporate_entity][:sort_name]).each do |row|
-        result[row[:id]] = Agency.from_row(row)
-      end
-
-      aspace_db[:series_system_rlshp]
-        .filter(:agent_corporate_entity_id_0 => agency_ids)
-        .filter(:jsonmodel_type => 'series_system_agent_record_ownership_relationship')
-        .filter(:end_date => nil)
-        .group_and_count(:agent_corporate_entity_id_0).map do |row|
-        result[row[:agent_corporate_entity_id_0]].series_count = row[:count]
-      end
-    end
-
-    result.values
   end
 
   def self.permissions_for_user(username)
@@ -196,21 +153,10 @@ class Users < BaseStorage
     # FIXME: we call this is_admin everywhere else...
     result.is_admin = (user[:admin] == 1)
 
-    db[:user] 
-      .join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
-      .filter(Sequel[:user][:username] => username)
-      .select(Sequel[:user_agency][:agency_type],
-              Sequel[:user_agency][:agency_id],
-              Sequel[:user_agency][:agency_admin])
-      .each do |row|
-      if row[:agency_admin] == 1
-        result.add_agency_admin(row[:agency_type] + ":" + row[:agency_id].to_s)
-      else
-        result.add_agency_member(row[:agency_type] + ":" + row[:agency_id].to_s)
-      end
+    Groups.groups_for_user(user[:id]).each do |group|
+      result.add_group(group)
     end
 
     result
   end
-
 end

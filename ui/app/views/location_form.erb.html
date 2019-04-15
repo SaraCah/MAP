@@ -1,0 +1,31 @@
+<div class="row vue-enabled">
+    <% if location.has_errors? %>
+    <pre><%= location.errors %></pre>
+    <% end %>
+    <form class="col s12" action="/locations/create" method="post">
+        <%== FormHelper.hidden_authenticity_token %>
+        <div class="row">
+            <div class="input-field col s12">
+                <select class="browser-default" id="agency_id" name="location[agency_ref]" required>
+                    <option value="" disabled selected>Select an Agency</option>
+                    <% agencies.each do |agency| %>
+                        <option value="<%= agency.id %>" <% if location.agency_ref == agency.id %>selected<% end %>><%= agency.label %></option>
+                    <% end %>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="name" name="location[name]" type="text" value="<%= location.name %>" required>
+                <label for="name">Name</label>
+            </div>
+        </div>
+        <div class="row">
+            <br>
+            <br>
+            <div class="col s12">
+                <button class="btn">Save Location</button>
+            </div>
+        </div>
+    </form>
+</div>

@@ -17,7 +17,7 @@ class Ctx
   end
 
   def self.username
-    get.session.username
+    get.session[:username]
   end
 
   def self.client

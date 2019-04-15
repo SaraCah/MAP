@@ -1,0 +1,31 @@
+<% if Ctx.permissions.allow_create_locations? %>
+<div class="row">
+    <div class="col s12">
+        <a class="btn waves-effect" href="/locations/new">Add Location</a>
+    </div>
+</div>
+<% end %>
+<div class="row">
+    <div class="col s12">
+        <table class="highlight responsive-table">
+            <thead>
+            <tr>
+                <th>Agency</th>
+                <th>Location Name</th>
+                <th>Date Created</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <% locations.each do |location| %>
+            <tr>
+                <td><%= location.agency.label %></td>
+                <td><%= location.name %></td>
+                <td><%= Time.at(location.create_time / 1000)%></td>
+                <td></td>
+            </tr>
+            <% end %>
+            </tbody>
+        </table>
+    </div>
+</div>

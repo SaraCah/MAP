@@ -16,7 +16,7 @@
                 </tr>
             </thead>
             <tbody>
-                <% paged_users.users.each do |user| %>
+                <% paged_users.results.each do |user| %>
                     <tr>
                         <td><%= user.username %></td>
                         <td><%= user.name %></td>
@@ -24,8 +24,8 @@
                             <% if user.is_admin %>
                                 Administrator
                             <% else %>
-                                <% user.agency_permissions.each do |agency, role| %>
-                                    <%= agency.label %> <% if role == 'ADMIN' %><i class="fa fa-crown"></i><% end %><br/>
+                                <% user.agency_permissions.each do |agency, role, location_label| %>
+                                    <%= [agency.label, location_label].compact.join(' -- ') %> <% if role == 'ADMIN' %><i class="fa fa-crown"></i><% end %><br/>
                                 <% end %>
                             <% end %>
                         </td>

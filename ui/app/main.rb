@@ -38,6 +38,7 @@ require 'lib/url_helper'
 require 'lib/form_helper'
 
 require 'dto/user_update_request'
+require 'dto/agency_location_update_request'
 
 require 'endpoints'
 

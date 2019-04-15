@@ -11,20 +11,6 @@ Sequel.migration do
       Bignum :modified_time, null: false
     end
 
-    create_table(:user_agency) do
-      primary_key :id
-
-      foreign_key :user_id, :user
-
-      Integer :agency_id, null: false
-      String :agency_type, null: false
-      String :agency_ref, null: false
-      Integer :agency_admin, null: false, default: 0
-
-      Bignum :create_time, null: false
-      Bignum :modified_time, null: false
-    end
-
     create_table(:dbauth) do
       primary_key :id
       foreign_key :user_id, :user, :unique => true
@@ -41,5 +27,46 @@ Sequel.migration do
       String :session_data, :null => true, :text => true
     end
 
+    create_table(:agency) do
+      primary_key :id
+
+      Integer :aspace_agency_id, :unique => true, null: false
+
+      Bignum :create_time, null: false
+      Bignum :modified_time, null: false
+    end
+
+    create_table(:agency_location) do
+      primary_key :id
+
+      foreign_key :agency_id, :agency
+
+      String :name, null: false
+
+      Bignum :create_time, null: false
+      Bignum :modified_time, null: false
+    end
+
+    create_table(:group) do
+      primary_key :id
+
+      foreign_key :agency_id, :agency, null: false
+      foreign_key :agency_location_id, :agency_location
+
+      String :role, null: false
+
+      Bignum :create_time, null: false
+      Bignum :modified_time, null: false
+    end
+
+    create_table(:group_user) do
+      primary_key :id
+
+      foreign_key :user_id, :user, null: false
+      foreign_key :group_id, :group, null: false
+
+      Bignum :create_time, null: false
+      Bignum :modified_time, null: false
+    end
   end
 end

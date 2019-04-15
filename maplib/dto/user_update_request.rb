@@ -47,7 +47,8 @@ class UserUpdateRequest
     ] + @agencies.map {|agency|
       [
         ["user[agency][][id]", agency[:id]],
-        ["user[agency][][role]", agency[:role]]
+        ["user[agency][][role]", agency[:role]],
+        ["user[agency][][location_id]", agency[:location_id]],
       ]
     }.flatten(1)
   end

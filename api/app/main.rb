@@ -30,7 +30,10 @@ require 'securerandom'
 require 'fileutils'
 require 'net/http'
 
+Dir["models/*.rb"].sort.each {|file| require file }
+
 require 'dto/user_update_request'
+require 'dto/agency_location_update_request'
 
 require 'common/bootstrap'
 require 'storage/db_pool'
@@ -45,6 +48,8 @@ require 'storage/base_storage'
 require 'storage/db_auth'
 require 'storage/users'
 require 'storage/sessions'
+require 'storage/groups'
+require 'storage/agencies'
 
 require 'indexer/indexer'
 
