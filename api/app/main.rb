@@ -65,6 +65,10 @@ class MAPTheAPI < Sinatra::Base
   end
 
   configure do
+    $LOG.info("Starting application in #{MAPTheAPI.environment} mode")
+  end
+
+  configure do
     Sequel.database_timezone = :utc
     Sequel.typecast_timezone = :utc
 

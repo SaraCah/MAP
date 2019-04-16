@@ -12,6 +12,10 @@ listen_address="0.0.0.0"
 listen_port=5678
 solr_port=8984
 
+if [ "$MAP_ENV" = "" ]; then
+    MAP_ENV=production
+fi
+
 while [ "$#" -gt 0 ]; do
     param="$1"; shift
     value="${1:-}"
@@ -61,4 +65,4 @@ trap "stop_solr" INT TERM EXIT
 
 mkdir -p data/solr
 solr_dist/bin/solr start -p $solr_port -s solr -a "-Dsolr.data.home=$PWD/data/solr"
-scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --host $listen_address --port $listen_port
+scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --host $listen_address --port $listen_port -E "$MAP_ENV"

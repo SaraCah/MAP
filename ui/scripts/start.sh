@@ -11,6 +11,10 @@ cd "`dirname "$0"`/../"
 listen_address="0.0.0.0"
 listen_port=3456
 
+if [ "$MAP_ENV" = "" ]; then
+    MAP_ENV=production
+fi
+
 while [ "$#" -gt 0 ]; do
     param="$1"; shift
     value="${1:-}"
@@ -47,4 +51,4 @@ function fail() {
 
 lsof -i ":${listen_port}" && fail "Port $listen_port already in use"
 
-scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --host $listen_address --port $listen_port
+scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --host $listen_address --port $listen_port -E "$MAP_ENV"

@@ -51,6 +51,10 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  configure do
+    $LOG.info("Starting application in #{MAPTheApp.environment} mode")
+  end
+
   use Rack::Session::Cookie, :key => 'map.session',
                              :path => '/',
                              :secret => AppConfig[:session_secret]

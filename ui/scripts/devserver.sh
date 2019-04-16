@@ -15,4 +15,5 @@ trap "exit" INT TERM
 trap "kill 0" EXIT
 (tsc --build --watch app/ts/tsconfig.json --preserveWatchOutput) &
 
+export MAP_ENV=development
 scripts/start.sh
