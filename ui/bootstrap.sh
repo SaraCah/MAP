@@ -55,3 +55,6 @@ echo "Installing JS libs"
     cd "app/ts"
     npm install
 )
+
+echo "Building UI TypeScript code"
+tsc --build app/ts/tsconfig.json

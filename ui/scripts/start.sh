@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ "$MAP_ENV" = "" ]; then
+    MAP_ENV=production
+fi
+
 set -eou pipefail
 
 cd "`dirname "$0"`/../"

@@ -1,6 +1,12 @@
 Dir.chdir(File.dirname(__FILE__))
 $LOAD_PATH << Dir.pwd
+
+# Development
 $LOAD_PATH << File.join(Dir.pwd, '../../maplib')
+
+# Dist
+$LOAD_PATH << File.join(Dir.pwd, 'maplib')
+
 
 require 'bundler/setup'
 Bundler.require

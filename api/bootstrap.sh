@@ -64,6 +64,7 @@ if [ ! -d "solr_dist" ]; then
         curl -L -s "$SOLR_VERSION" > solr.tgz
 
         tar xzf solr.tgz
+        rm -f solr.tgz
         mv solr-*/* .
         rmdir * 2>/dev/null || true
     )
