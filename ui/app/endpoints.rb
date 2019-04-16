@@ -19,7 +19,11 @@ class MAPTheApp < Sinatra::Base
 
     filename = request.path.split('/').last
     if filename == 'vue.js'
-      send_file File.join('ts/node_modules/vue/dist/vue.js')
+      if MAPTheApp.production?
+        send_file File.join('ts/node_modules/vue/dist/vue.min.js')
+      else
+        send_file File.join('ts/node_modules/vue/dist/vue.js')
+      end
     elsif filename == 'vue-resource.js'
       send_file File.join('ts/node_modules/vue-resource/dist/vue-resource.min.js')
     else
