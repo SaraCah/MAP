@@ -12,6 +12,7 @@ function fail() {
 
 set -eou pipefail
 
+echo
 echo "Checking dependencies..."
 which java || fail "Need Java runtime installed"
 which curl || fail "Need curl installed"
@@ -32,6 +33,7 @@ if [ -e distlibs/jruby-complete.jar ]; then
 fi
 
 if [ "$have_jruby" != "1" ]; then
+    echo
     echo "Fetching JRuby..."
     curl -L -s "$JRUBY_VERSION" > distlibs/jruby-complete.jar
     checksum="`openssl dgst -sha256 -r distlibs/jruby-complete.jar | awk '{print $1}'`"
@@ -43,18 +45,22 @@ if [ "$have_jruby" != "1" ]; then
 fi
 
 if [ ! -e "distlibs/gems/bin/bundle" ]; then
+    echo
     echo "Installing bundler"
     scripts/jruby.sh -S gem install bundler
 fi
 
+echo
 echo "Installing gems"
 scripts/jruby.sh distlibs/gems/bin/bundle install
 
+echo
 echo "Installing JS libs"
 (
     cd "app/ts"
     npm install
 )
 
+echo
 echo "Building UI TypeScript code"
 tsc --build app/ts/tsconfig.json
