@@ -4,6 +4,9 @@ if [ "$MAP_ENV" = "" ]; then
     MAP_ENV=production
 fi
 
+# open files
+ulimit -n 65000
+
 set -eou pipefail
 
 cd "`dirname "$0"`/../"
