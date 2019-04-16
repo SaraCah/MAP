@@ -37,6 +37,9 @@ for module in $MODULES; do
     # Bundle our shared library with each app
     cp -a maplib $module/app
 
+    # And log rotation script
+    cp scripts/log-rotater.pl $module/scripts/
+
     # Write the version file
     echo "$version" > "$module/VERSION"
 

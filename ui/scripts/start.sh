@@ -10,6 +10,7 @@ cd "`dirname "$0"`/../"
 
 listen_address="0.0.0.0"
 listen_port=3456
+logging=0
 
 if [ "$MAP_ENV" = "" ]; then
     MAP_ENV=production
@@ -26,8 +27,11 @@ while [ "$#" -gt 0 ]; do
         --listen-port)
             listen_port="$value"
             ;;
+        --logging)
+            logging="$value"
+            ;;
         --help|-h)
-            echo "Usage: $0 [--listen-address $listen_address] [--listen-port $listen_port]"
+            echo "Usage: $0 [--listen-address $listen_address] [--listen-port $listen_port] [--logging 0/1]"
             exit 0
             ;;
         *)
@@ -51,4 +55,13 @@ function fail() {
 
 lsof -i ":${listen_port}" && fail "Port $listen_port already in use"
 
-scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --host $listen_address --port $listen_port -E "$MAP_ENV"
+function run() {
+    scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --host $listen_address --port $listen_port -E "$MAP_ENV"
+}
+
+if [ "$logging" = "0" ]; then
+    run
+else
+    mkdir -p "$PWD/logs"
+    run 2>&1 | scripts/log-rotater.pl "$PWD/logs/%a.log" "$PWD/logs/map.log"
+fi

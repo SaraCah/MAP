@@ -14,6 +14,7 @@ cd "`dirname "$0"`/../"
 listen_address="0.0.0.0"
 listen_port=5678
 solr_port=8984
+logging=0
 
 if [ "$MAP_ENV" = "" ]; then
     MAP_ENV=production
@@ -33,8 +34,11 @@ while [ "$#" -gt 0 ]; do
         --solr-port)
             solr_port="$value"
             ;;
+        --logging)
+            logging="$value"
+            ;;
         --help|-h)
-            echo "Usage: $0 [--listen-address $listen_address] [--listen-port $listen_port] [--solr-port $solr_port]"
+            echo "Usage: $0 [--listen-address $listen_address] [--listen-port $listen_port] [--solr-port $solr_port] [--logging 0/1]"
             exit 0
             ;;
         *)
@@ -66,6 +70,15 @@ lsof -i ":${solr_port}" && fail "Port $solr_port already in use"
 
 trap "stop_solr" INT TERM EXIT
 
-mkdir -p data/solr
-solr_dist/bin/solr start -p $solr_port -s solr -a "-Dsolr.data.home=$PWD/data/solr"
-scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --host $listen_address --port $listen_port -E "$MAP_ENV"
+function run() {
+    mkdir -p data/solr
+    solr_dist/bin/solr start -p $solr_port -s solr -a "-Dsolr.data.home=$PWD/data/solr"
+    scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --host $listen_address --port $listen_port -E "$MAP_ENV"
+}
+
+if [ "$logging" = "0" ]; then
+    run
+else
+    mkdir -p "$PWD/logs"
+    run 2>&1 | scripts/log-rotater.pl "$PWD/logs/%a.log" "$PWD/logs/map.log"
+fi
