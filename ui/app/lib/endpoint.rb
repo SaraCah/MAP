@@ -108,8 +108,6 @@ class Endpoint
           session[:username] = nil
 
           redirect '/'
-        ensure
-          $LOG.info("Response time: #{((Time.now - in_time)*1000).round}ms")
         end
       end
     end

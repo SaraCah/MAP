@@ -102,23 +102,17 @@ class Endpoint
       # So, use instance_eval to evaluate the block in the right context.
       app_instance = self
 
-      out = if opts[:skip_context]
-              app_instance.instance_eval(&block)
-            else
-              Ctx.open do
-                if env["HTTP_X_MAP_SESSION"]
-                  Ctx.get.session = Sessions.get_session(env["HTTP_X_MAP_SESSION"])
-                end
+      Ctx.open do
+        if env["HTTP_X_MAP_SESSION"]
+          Ctx.get.session = Sessions.get_session(env["HTTP_X_MAP_SESSION"])
+        end
 
-                if endpoint.needs_session? && Ctx.get.session.nil?
-                  raise "A session is required to access this endpoint"
-                end
+        if endpoint.needs_session? && Ctx.get.session.nil?
+          raise "A session is required to access this endpoint"
+        end
 
-                app_instance.instance_eval(&block)
-              end
-            end
-      $LOG.info("Response time: #{((Time.now - in_time)*1000).round}ms")
-      out
+        app_instance.instance_eval(&block)
+      end
     end
   end
 

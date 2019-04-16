@@ -69,6 +69,10 @@ class MAPTheAPI < Sinatra::Base
   end
 
   configure do
+    use Rack::CommonLogger, $LOG
+  end
+
+  configure do
     Sequel.database_timezone = :utc
     Sequel.typecast_timezone = :utc
 

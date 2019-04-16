@@ -57,6 +57,10 @@ class MAPTheApp < Sinatra::Base
     $LOG.info("Starting application in #{MAPTheApp.environment} mode")
   end
 
+  configure do
+    use Rack::CommonLogger, $LOG
+  end
+
   configure :production do
     # In production mode, we want assets to be cached persistently but cleared
     # across releases.
