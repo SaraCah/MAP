@@ -99,4 +99,6 @@ class MAPTheApp < Sinatra::Base
   use Rack::Protection
   use Rack::Protection::AuthenticityToken
 
+  use Rack::Deflater
+
 end
