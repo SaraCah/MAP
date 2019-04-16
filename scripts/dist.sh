@@ -15,12 +15,22 @@ if [ "`git status --porcelain`" != "" ] || [ "`git status --ignored --porcelain`
     exit
 fi
 
-for module in api ui; do
+MODULES="api ui"
+
+for module in $MODULES; do
     echo "================================================================================"
     echo "== Preparing $module"
     echo "================================================================================"
     (
         cd "$module"
+
+        if [ "$module" != "api" ]; then
+            # Save ourselves a bit of download time by pulling over the JRuby &
+            # gems we fetched previously
+            cp -a ../api/distlibs .
+        fi
+
+
         ./bootstrap.sh
     )
 
@@ -31,6 +41,9 @@ for module in api ui; do
     echo "$version" > "$module/VERSION"
 
     tar czf "$module.tgz" "$module"
+done
+
+for module in $MODULES; do
     (
         cd "$module"
         git clean -fdx
