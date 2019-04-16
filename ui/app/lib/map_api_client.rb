@@ -141,7 +141,7 @@ class MAPAPIClient
   end
 
   def build_url(url, params = nil)
-    uri = URI.join('http://localhost:5678', url)
+    uri = URI.join(AppConfig[:map_api_url], url)
     if params
       uri.query = URI.encode_www_form(params)
     end
