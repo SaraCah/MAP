@@ -16,7 +16,7 @@ class Search
 
     admin_agency_ids = permissions.agencies.select {|agency_ref, role| role == 'ADMIN'}.map(&:first)
 
-    return "ancestor_ids:(%s)" % [admin_agency_ids.map {|s| solr_escape(s)}.join(' OR')]
+    return "id:(%s)" % [admin_agency_ids.map {|s| solr_escape(s)}.join(' OR')]
   end
 
   def self.agency_typeahead(q, permissions)

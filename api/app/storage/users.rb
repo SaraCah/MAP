@@ -196,24 +196,7 @@ class Users < BaseStorage
     # FIXME: we call this is_admin everywhere else...
     result.is_admin = (user[:admin] == 1)
 
-    member_agency_ids = db[:user]
-                          .join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
-                          .filter(Sequel[:user][:username] => username)
-                          .map(:agency_id)
-
-    descendant_agencies = {}
-    AspaceDB.open do |aspace_db|
-      aspace_db[:agency_ancestor]
-        .filter(:ancestor_id => member_agency_ids)
-        .select(Sequel[:agency_ancestor][:ancestor_id],
-                Sequel[:agency_ancestor][:agent_corporate_entity_id])
-        .each do |row|
-        descendant_agencies[row[:ancestor_id]] ||= []
-        descendant_agencies[row[:ancestor_id]] << row[:agent_corporate_entity_id]
-      end
-    end
-
-    db[:user]
+    db[:user] 
       .join(:user_agency, Sequel[:user_agency][:user_id] => Sequel[:user][:id])
       .filter(Sequel[:user][:username] => username)
       .select(Sequel[:user_agency][:agency_type],
@@ -222,14 +205,8 @@ class Users < BaseStorage
       .each do |row|
       if row[:agency_admin] == 1
         result.add_agency_admin(row[:agency_type] + ":" + row[:agency_id].to_s)
-        descendant_agencies.fetch(row[:agency_id], []).each do |descendant_id|
-          result.add_agency_admin(row[:agency_type] + ":" + descendant_id.to_s)
-        end
       else
         result.add_agency_member(row[:agency_type] + ":" + row[:agency_id].to_s)
-        descendant_agencies.fetch(row[:agency_id], []).each do |descendant_id|
-          result.add_agency_member(row[:agency_type] + ":" + descendant_id.to_s)
-        end
       end
     end
 

@@ -5,7 +5,6 @@
 
   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="aspace_id" type="string" indexed="false" stored="true" multiValued="false"/>
-  <field name="ancestor_ids" type="string" indexed="true" stored="true" multiValued="true"/>
 
   <field name="keywords" type="text_general" indexed="true" stored="false" multiValued="true"/>
   <field name="ngrams" type="ngrams" indexed="true" stored="false" multiValued="true"/>

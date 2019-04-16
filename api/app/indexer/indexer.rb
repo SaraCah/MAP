@@ -43,14 +43,13 @@ class Indexer
     File.rename(tmp, @state_file)
   end
 
-  def prepare_agent_corporate(row, ancestor_ids)
+  def prepare_agent_corporate(row)
     {
       "id" => "agent_corporate_entity:#{row[:id]}",
       "aspace_id" => row[:id].to_s,
       "display_string" => row[:sort_name],
       "keywords" => row[:sort_name],
       "record_type" => "agent_corporate_entity",
-      "ancestor_ids" => ancestor_ids.map {|id| "agent_corporate_entity:#{id}"},
     }
   end
 
@@ -125,8 +124,8 @@ class Indexer
       AspaceDB.open do |db|
         batch = []
 
-        walk_agency_tree(db, last_mtime) do |agent, ancestor_ids|
-          batch << prepare_agent_corporate(agent, ancestor_ids)
+        agent_corporate_entities(db, last_mtime) do |agent|
+          batch << prepare_agent_corporate(agent)
           if batch.length >= BATCH_SIZE
             needs_commit |= send_batch(batch)
           end
@@ -164,34 +163,15 @@ class Indexer
     sleep INDEX_DELAY_SECONDS
   end
 
-  def walk_agency_tree(aspace_db, last_mtime)
-    ids_to_reindex = Set.new(aspace_db[:agent_corporate_entity]
-                               .filter(Sequel[:agent_corporate_entity][:system_mtime] >= Time.at(last_mtime / 1000))
-                               .map{|row| [row[:id]]})
-
-    # Reindex any descendant of our agencies too
-    ids_to_reindex += aspace_db[:agency_ancestor]
-                        .filter(:ancestor_id => ids_to_reindex.to_a)
-                        .map(:agent_corporate_entity_id)
-
-    ids_to_reindex = ids_to_reindex.to_a
-
-    ancestors = aspace_db[:agency_ancestor]
-                  .filter(:agent_corporate_entity_id => ids_to_reindex)
-                  .reduce({}) do |groups, row|
-      groups[row[:agent_corporate_entity_id]] ||= []
-      groups[row[:agent_corporate_entity_id]] << row[:ancestor_id]
-      groups
-    end
-
+  def agent_corporate_entities(aspace_db, last_mtime)
     aspace_db[:agent_corporate_entity]
       .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
       .filter(Sequel[:name_corporate_entity][:authorized] => 1)
-      .filter(Sequel[:agent_corporate_entity][:id] => ids_to_reindex)
+      .filter(Sequel[:agent_corporate_entity][:system_mtime] >= Time.at(last_mtime / 1000))
       .select(Sequel[:agent_corporate_entity][:id],
               Sequel[:name_corporate_entity][:sort_name])
       .each do |agent|
-      yield [agent, [agent[:id]] + ancestors.fetch(agent[:id], [])]
+      yield agent
     end
   end
 
