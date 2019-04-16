@@ -1,5 +1,11 @@
 #!/bin/bash
 
+version="$1"
+
+if [ "$version" = "" ]; then
+    version="v`date '+%Y%m%d%H%M%S'`"
+fi
+
 set -eou pipefail
 
 cd "`dirname "$0"`/../"
@@ -20,8 +26,11 @@ for module in api ui; do
 
     # Bundle our shared library with each app
     cp -a maplib $module/app
-    tar czf "$module.tgz" "$module"
 
+    # Write the version file
+    echo "$version" > "$module/VERSION"
+
+    tar czf "$module.tgz" "$module"
     (
         cd "$module"
         git clean -fdx

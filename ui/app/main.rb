@@ -23,6 +23,8 @@ RJack::Logback.configure do
   RJack::Logback.root.level = RJack::Logback::INFO
 end
 
+require 'digest/sha1'
+require 'securerandom'
 require 'rack/protection'
 
 require 'common/app_config'
@@ -55,9 +57,44 @@ class MAPTheApp < Sinatra::Base
     $LOG.info("Starting application in #{MAPTheApp.environment} mode")
   end
 
+  configure :production do
+    # In production mode, we want assets to be cached persistently but cleared
+    # across releases.
+    @cache_nonce = Digest::SHA1.hexdigest((File.read("../VERSION") rescue SecureRandom.hex))
+  end
+
+  def self.cache_nonce
+    @cache_nonce
+  end
+
+  class CacheControl
+    def initialize(app)
+      @app = app
+    end
+
+    def call(env)
+      response = @app.call(env)
+
+      if env.fetch('REQUEST_PATH', '') =~ %r{\A/(js|css|webfonts)/} && response[0] == 200
+        # Aggressive caching for static assets
+        response[1]['Cache-Control'] = "max-age=86400, public"
+        response[1]['Expires'] = (Time.now + 86400).utc.rfc2822
+      else
+        # No caching for anything else
+        response[1]['Cache-Control'] = "max-age=0, private"
+      end
+
+      response
+    end
+  end
+
+  use CacheControl
+
+
   use Rack::Session::Cookie, :key => 'map.session',
-                             :path => '/',
-                             :secret => AppConfig[:session_secret]
+
+      :path => '/',
+      :secret => AppConfig[:session_secret]
 
   use Rack::Protection
   use Rack::Protection::AuthenticityToken

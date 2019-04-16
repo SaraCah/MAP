@@ -1,8 +1,11 @@
 class URLHelper
 
-  # FIXME: We'll do something better than this in production mode
   def self.cache_buster
-    "?cb=#{SecureRandom.hex}"
+    if MAPTheApp.production?
+      "?cb=#{MAPTheApp.cache_nonce}"
+    else
+      "?cb=#{SecureRandom.hex}"
+    end
   end
 
   def self.css(file)
