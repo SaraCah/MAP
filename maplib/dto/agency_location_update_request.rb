@@ -1,5 +1,5 @@
 class AgencyLocationUpdateRequest
-  attr_accessor :name, :agency_ref
+  attr_accessor :name, :agency_ref, :errors
 
   def initialize(hash = {})
     @id = hash.fetch('id', nil)
