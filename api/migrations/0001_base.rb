@@ -43,27 +43,26 @@ Sequel.migration do
 
       String :name, null: false
 
-      Bignum :create_time, null: false
-      Bignum :modified_time, null: false
-    end
-
-    create_table(:group) do
-      primary_key :id
-
-      foreign_key :agency_id, :agency, null: false
-      foreign_key :agency_location_id, :agency_location
-
-      String :role, null: false
+      Integer :top_level_location, null: false, default: 0
 
       Bignum :create_time, null: false
       Bignum :modified_time, null: false
     end
 
-    create_table(:group_user) do
+    create_table(:agency_user) do
       primary_key :id
 
       foreign_key :user_id, :user, null: false
-      foreign_key :group_id, :group, null: false
+      foreign_key :agency_id, :agency, null: false
+      foreign_key :agency_location_id, :agency_location, null: false
+
+      String :role, null: false
+
+      Integer :allow_transfers, null: false, default: 0
+      Integer :allow_file_issue, null: false, default: 0
+      Integer :allow_set_raps, null: false, default: 0
+      Integer :allow_change_raps, null: false, default: 0
+      Integer :allow_restricted_access, null: false, default: 0
 
       Bignum :create_time, null: false
       Bignum :modified_time, null: false

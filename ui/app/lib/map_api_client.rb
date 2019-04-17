@@ -11,16 +11,21 @@ class MAPAPIClient
     end
   end
 
-  Group = Struct.new(:agency_id, :aspace_agency_id, :agency_location_id, :role) do
+  AgencyRole = Struct.new(:agency_id, :aspace_agency_id, :agency_location_id, :role, :permissions) do
     def self.from_json(json)
       new(json.fetch('agency_id'),
           json.fetch('aspace_agency_id'),
-          json.fetch('agency_location_id') || 'ANY',
-          json.fetch('role'))
+          json.fetch('agency_location_id'),
+          json.fetch('role'),
+          json.fetch('permissions'))
     end
 
-    def admin?
-      self.role == 'ADMIN'
+    def is_senior_agency_admin?
+      self.role == 'SENIOR_AGENCY_ADMIN'
+    end
+
+    def is_agency_admin?
+      is_senior_agency_admin? || self.role == 'AGENCY_ADMIN'
     end
 
     def agency_ref
@@ -28,14 +33,14 @@ class MAPAPIClient
     end
   end
 
-  Permissions = Struct.new(:is_admin, :groups) do
+  Permissions = Struct.new(:is_admin, :agency_roles) do
     def self.from_json(json)
       new(json.fetch('is_admin'),
-          json.fetch('groups', []).map {|group_json| Group.from_json(group_json)})
+          json.fetch('agency_roles', []).map {|agency_role_json| AgencyRole.from_json(agency_role_json)})
     end
 
     def allow_manage_users?
-      self.is_admin || self.groups.any? {|group| group.admin?}
+      self.is_admin || is_agency_admin?
     end
 
     def is_admin?
@@ -43,19 +48,24 @@ class MAPAPIClient
     end
 
     def allow_manage_locations?
-      self.is_admin || self.groups.any?{|group| group.admin?}
+      self.is_admin || is_senior_agency_admin?
     end
 
     def allow_create_locations?
-      self.is_admin || self.groups.any?{|group| group.agency_location_id == 'ANY' && group.admin?}
+      self.is_admin || true # self.groups.any?{|group| group.agency_location_id == 'ANY' && group.admin?}
     end
 
-    def agency_admin?(agency_ref)
-      self.groups.any?{|group| group.agency_ref == agency_ref && group.agency_location_id == 'ANY' && group.admin?}
+    def is_senior_agency_admin?
+      self.agency_roles.any?{|agency_role| agency_role.agency_id == Ctx.get.current_location.agency_id && agency_role.is_senior_agency_admin?}
+    end
+
+    def is_agency_admin?
+      self.agency_roles.any?{|agency_role| agency_role.agency_id == Ctx.get.current_location.agency_id && agency_role.agency_location_id == Ctx.get.current_location.id && agency_role.is_agency_admin?}
     end
 
     def location_admin?(agency_ref, location_id)
-      agency_admin?(agency_ref) || self.groups.any?{|group| group.agency_ref == agency_ref && group.agency_location_id == location_id && group.admin?}
+      # FIXME
+      true
     end
   end
 
@@ -70,13 +80,13 @@ class MAPAPIClient
     end
   end
 
-  User = Struct.new(:username, :name, :is_admin, :create_time, :agency_permissions) do
+  User = Struct.new(:username, :name, :is_admin, :create_time, :agency_roles) do
     def self.from_json(json)
       User.new(json.fetch('username'),
                json.fetch('name'),
                json.fetch('is_admin'),
                json.fetch('create_time'),
-               json.fetch('agency_permissions').map do |agency, role, location_label|
+               json.fetch('agency_roles').map do |agency, role, location_label|
                  [Agency.from_json(agency), role, location_label]
                end)
     end
@@ -125,10 +135,10 @@ class MAPAPIClient
     get('/search/agencies', q: q)
   end
 
-  def get_my_agencies
-    get('/my-agencies', {}).map do |json|
-      Agency.from_json(json)
-    end
+  def get_current_agency
+    return nil if Ctx.get.permissions.is_admin?
+
+    Agency.from_json(get('/my-agency', {}))
   end
 
   AgencyLocation = Struct.new(:id, :name, :agency_id, :create_time, :agency) do
@@ -162,6 +172,20 @@ class MAPAPIClient
 
   def permissions_for_current_user
     Permissions.from_json(get('/my-permissions', {}))
+  end
+
+  def location_for_current_user
+    json = get('/my-location', {})
+
+    return nil if json.nil?
+
+    AgencyLocation.from_json(json)
+  end
+
+  def permission_types_for_agency(agency_ref)
+    get('/permission-types', {
+      'agency_ref' => agency_ref,
+    })
   end
 
   private

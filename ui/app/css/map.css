@@ -6,3 +6,7 @@
 #login form {
     padding: 20px;
 }
+
+.user-role-table tbody tr:first-child {
+    border-bottom: none;
+}

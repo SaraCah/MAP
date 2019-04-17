@@ -49,7 +49,11 @@ class UserUpdateRequest
         ["user[agency][][id]", agency[:id]],
         ["user[agency][][role]", agency[:role]],
         ["user[agency][][location_id]", agency[:location_id]],
-      ]
+      ] + Array(agency['permission']).map {|permission|
+        [
+          ["user[agency][][permission][]", permission]
+        ]
+      }.flatten(1)
     }.flatten(1)
   end
 

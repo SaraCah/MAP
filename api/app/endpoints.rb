@@ -78,6 +78,7 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/locations_for_agency')
     .param(:agency_ref, String, "Agency Ref") do
     if Ctx.user_logged_in?
+      # FIXME scope to current context
       (_, aspace_agency_id) =  params[:agency_ref].split(':')
 
       json_response(Locations.locations_for_agency(aspace_agency_id))
@@ -97,4 +98,30 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.get('/permission-types')
+    .param(:agency_ref, String, "Agency Ref") do
+    if Ctx.user_logged_in?
+      (_, aspace_agency_id) =  params[:agency_ref].split(':')
+      json_response(Permissions.available_permissions_for_agency(aspace_agency_id))
+    else
+      json_response([])
+    end
+  end
+
+  Endpoint.get('/my-location') do
+    if Ctx.user_logged_in?
+      json_response(Ctx.get.current_location)
+    else
+      json_response({})
+    end
+  end
+
+
+  Endpoint.get('/my-agency') do
+    if Ctx.user_logged_in? && Ctx.get.current_location
+      json_response(Agencies.get_summary(Ctx.get.current_location.agency_id))
+    else
+      json_response({})
+    end
+  end
 end

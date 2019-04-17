@@ -10,13 +10,14 @@ interface agency {
     role: string,
     location_id: number,
     location_options: location[],
+    permissions: string[],
+    permission_options: string[],
 }
 
 interface location {
     id: number,
     label: string,
 }
-
 
 Vue.component('agency-typeahead', {
     template: `
@@ -96,34 +97,55 @@ Vue.component('agency-role-linker', {
     template: `
 <div class="input-field col s12">
   <agency-typeahead v-on:selected="addSelected"></agency-typeahead>
-  <table>
-    <thead><tr><th>Agency</th><th>Location</th><th>Role</th><th></th></tr></thead>
-    <tbody>
-      <tr v-for="agency in selected">
+  <table class="user-role-table">
+    <thead><tr><th style="width: 40%;">Agency</th><th style="width: 20%;">Location</th><th style="width: 20%;">Role</th><th></th></tr></thead>
+    <tbody v-for="agency in selected">
+      <tr>
         <td>
           {{agency.label}}
           <input type="hidden" name="user[agency][][id]" v-bind:value="agency.id"/>
           <input type="hidden" name="user[agency][][label]" v-bind:value="agency.label"/>
         </td>
         <td>
-          <select class="browser-default" name="user[agency][][location_id]" v-bind:value="agency.location_id" v-model="agency.location_id">
-            <option></option>
-            <option v-for="location in agency.location_options" v-bind:value="location.id">{{ location.label }}</option>
-          </select>
-          <div v-for="location in agency.location_options">
-              <input type="hidden" name="user[agency][][location_options][][id]" v-bind:value="location.id" />
-              <input type="hidden" name="user[agency][][location_options][][label]" v-bind:value="location.label" />
-          </div>
+          <template v-if="agency.role !== 'SENIOR_AGENCY_ADMIN'">
+              <div v-if="agency.location_options.length == 0">Agency Top Level Location</div>
+              <div v-if="agency.location_options.length > 0">
+                  <select class="browser-default" name="user[agency][][location_id]" v-bind:value="agency.location_id" v-model="agency.location_id">
+                    <option v-for="location in agency.location_options" v-bind:value="location.id">{{ location.label }}</option>
+                  </select>
+                  <div v-for="location in agency.location_options">
+                      <input type="hidden" name="user[agency][][location_options][][id]" v-bind:value="location.id" />
+                      <input type="hidden" name="user[agency][][location_options][][label]" v-bind:value="location.label" />
+                  </div>
+              </div>
+          </template>
+          <template v-if="agency.role === 'SENIOR_AGENCY_ADMIN'">N/A</template>
         </td>
         <td>
-          <select class="browser-default" name="user[agency][][role]" v-bind:value="agency.role" v-model="agency.role">
-            <option value="MEMBER">Contact</option>
-            <option value="ADMIN">Admin</option>
+          <select class="browser-default" name="user[agency][][role]" v-model="agency.role">
+            <option value="SENIOR_AGENCY_ADMIN">Senior Agency Admin</option>
+            <option value="AGENCY_ADMIN">Agency Admin</option>
+            <option value="AGENCY_CONTACT">Agency Contact</option>
           </select>
         </td>
         <td>
           <button class="btn" v-on:click="removeSelected(agency)">Remove</button>
         </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td>
+            <div v-if="agency.role !== 'SENIOR_AGENCY_ADMIN'">
+                <div v-for="permission_type in agency.permission_options">
+                    <label>
+                        <input type="checkbox" name="user[agency][][permission][]" v-bind:value="permission_type" v-on:change="togglePermission($event, permission_type, agency)">
+                        <span>{{ permission_type }}</span>
+                    </label>
+                </div>
+            </div>
+        </td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -148,10 +170,10 @@ Vue.component('agency-role-linker', {
         addSelected(agency: agency) {
             let selected_agency = agency;
 
-            if (selected_agency != null) {
-                selected_agency.role = 'MEMBER';
+            Vue.set(selected_agency, 'role', 'SENIOR_AGENCY_ADMIN');
 
-                this.$http.get('/locations_for_agency', {
+            if (selected_agency != null) {
+                this.$http.get('/linker_data_for_agency', {
                     method: 'GET',
                     params: {
                         'agency_ref': selected_agency.id,
@@ -161,14 +183,28 @@ Vue.component('agency-role-linker', {
                 }, () => {
                     console.log("FAIL");
                     if (selected_agency != null) {
-                        selected_agency.location_options = [];
+                        Vue.set(selected_agency, 'location_options', []);
+                        Vue.set(selected_agency, 'permission_options', []);
+                        Vue.set(selected_agency, 'permissions', []);
                     }
                 }).then((json: any) => {
                     if (selected_agency != null) {
-                        selected_agency.location_options = json;
+                        Vue.set(selected_agency, 'location_options', json['location_options']);
+                        Vue.set(selected_agency, 'permission_options', json['permission_options']);
+                        Vue.set(selected_agency, 'permissions', []);
+                        if (selected_agency.location_options.length > 0) {
+                            Vue.set(selected_agency, 'location_id', selected_agency.location_options[0].id);
+                        }
                         this.selected.push(selected_agency);
                     }
                 });
+            }
+        },
+        togglePermission(event:any, permission: string, agency: agency ) {
+            if (event.target.checked) {
+                agency.permissions.push(permission);
+            } else {
+                agency.permissions.splice(agency.permissions.indexOf(permission), 1);
             }
         }
     }

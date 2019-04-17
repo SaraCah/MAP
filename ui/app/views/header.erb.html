@@ -14,6 +14,18 @@
             <% if Ctx.permissions.allow_manage_locations? %>
                 <li class="tab"><a href="/locations" <% if context == 'locations' %> class='active'<% end %>>My Locations</a></li>
             <% end %>
+            <% unless Ctx.permissions.is_admin %>
+            <li class="right">
+                <select class="browser-default">
+                    <option><%= Ctx.get.current_location.name %></option>
+                </select>
+            </li>
+            <li class="right">
+                <select class="browser-default">
+                    <option><%= Ctx.get.current_location.agency.label %></option>
+                </select>
+            </li>
+            <% end %>
         </ul>
     </div>
 </nav>

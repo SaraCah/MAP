@@ -6,29 +6,37 @@ class Agencies < BaseStorage
     if agency
       agency[:id]
     else
-      db[:agency].insert(aspace_agency_id: aspace_agency_id,
-                         create_time: java.lang.System.currentTimeMillis,
-                         modified_time: java.lang.System.currentTimeMillis)
+      agency_id = db[:agency].insert(aspace_agency_id: aspace_agency_id,
+                                     create_time: java.lang.System.currentTimeMillis,
+                                     modified_time: java.lang.System.currentTimeMillis)
+
+      db[:agency_location].insert(agency_id: agency_id,
+                                  name: 'Agency Top Level Location',
+                                  top_level_location: 1,
+                                  create_time: java.lang.System.currentTimeMillis,
+                                  modified_time: java.lang.System.currentTimeMillis)
+
+      agency_id
     end
   end
 
-  def self.agencies_for_user
+  def self.get_summary(agency_id)
     result = {}
 
-    aspace_agency_ids = Ctx.get.permissions.groups.collect(&:aspace_agency_id)
+    aspace_agency_id = db[:agency][:id => agency_id][:aspace_agency_id]
 
     AspaceDB.open do |aspace_db|
       aspace_db[:agent_corporate_entity]
         .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
         .filter(Sequel[:name_corporate_entity][:authorized] => 1)
-        .filter(Sequel[:agent_corporate_entity][:id] => aspace_agency_ids)
+        .filter(Sequel[:agent_corporate_entity][:id] => aspace_agency_id)
         .select(Sequel[:agent_corporate_entity][:id],
                 Sequel[:name_corporate_entity][:sort_name]).each do |row|
         result[row[:id]] = Agency.from_row(row)
       end
 
       aspace_db[:series_system_rlshp]
-        .filter(:agent_corporate_entity_id_0 => aspace_agency_ids)
+        .filter(:agent_corporate_entity_id_0 => aspace_agency_id)
         .filter(:jsonmodel_type => 'series_system_agent_record_ownership_relationship')
         .filter(:end_date => nil)
         .group_and_count(:agent_corporate_entity_id_0).map do |row|
@@ -36,6 +44,6 @@ class Agencies < BaseStorage
       end
     end
 
-    result.values
+    result.values.first
   end
 end

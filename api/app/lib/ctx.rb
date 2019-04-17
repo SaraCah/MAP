@@ -45,6 +45,12 @@ class Ctx
       @session = nil
     end
 
+    def current_location
+      return nil if permissions.is_admin?
+
+      @current_location ||= Locations.default_location 
+    end
+
     def permissions
       @permissions ||= Users.permissions_for_user(session.username)
     end

@@ -1,19 +1,19 @@
 <p>Hello, <%= name %>!</p>
 
-My Agencies:
-<table>
-<thead>
-    <tr>
-        <th>Agency</th>
-        <th>Number of Controlled Records</th>
-    </tr>
-</thead>
-<tbody>
-<% agencies.each do |agency| %>
-    <tr>
-        <td><%= agency.label %></td>
-        <td><%= agency.series_count %></td>
-    </tr>
+<% if agency %>
+    Agency Summary:
+    <table>
+    <thead>
+        <tr>
+            <th>Agency</th>
+            <th>Number of Controlled Records</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><%= agency.label %></td>
+            <td><%= agency.series_count %></td>
+        </tr>
+    </tbody>
+    </table>
 <% end %>
-</tbody>
-</table>
