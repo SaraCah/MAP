@@ -88,8 +88,6 @@ class MAPTheApp < Sinatra::Base
   Endpoint.post('/users/create')
     .param(:user, UserUpdateRequest, "The user to create") do
 
-    params[:user].validate!
-
     unless Ctx.permissions.is_admin?
       params[:user].is_admin = false
 
@@ -100,9 +98,9 @@ class MAPTheApp < Sinatra::Base
           Ctx.permissions.location_admin?(agency['id'], Integer(agency['location_id']))
         end
       end
-
-      params[:user].add_error('agencies', 'insufficient permissions to create user for agency/location')
     end
+
+    params[:user].validate!
 
     Ctx.client.create_user(params[:user]) unless params[:user].has_errors?
 
@@ -144,11 +142,12 @@ class MAPTheApp < Sinatra::Base
   Endpoint.post('/locations/create')
     .param(:location, AgencyLocationUpdateRequest, "The agency location to create") do
 
-    params[:location].validate!
-
-    unless Ctx.permissions.is_admin?
-      # FIXME check agency_id against permissions
+    unless Ctx.permissions.is_admin? || Ctx.permissions.agency_admin?(params[:location].agency_ref)
+        params[:location].agency_ref = ''
+        params[:location].agency_label = ''
     end
+
+    params[:location].validate!
 
     Ctx.client.create_location(params[:location]) unless params[:location].has_errors?
 
