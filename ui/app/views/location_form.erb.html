@@ -5,14 +5,18 @@
     <form class="col s12" action="/locations/create" method="post">
         <%== FormHelper.hidden_authenticity_token %>
         <div class="row">
-            <div class="input-field col s12">
-                <select class="browser-default" id="agency_id" name="location[agency_ref]" required>
-                    <option value="" disabled selected>Select an Agency</option>
-                    <% agencies.each do |agency| %>
+            <% if Ctx.permissions.is_admin? %>
+                <agency-linker agency='<%= location.agency.to_json %>'></agency-linker>
+            <% else %>
+                <div class="input-field col s12">
+                    <select class="browser-default" id="agency_id" name="location[agency_ref]" required>
+                        <option value="" disabled selected>Select an Agency</option>
+                        <% agencies.each do |agency| %>
                         <option value="<%= agency.id %>" <% if location.agency_ref == agency.id %>selected<% end %>><%= agency.label %></option>
-                    <% end %>
-                </select>
-            </div>
+                        <% end %>
+                    </select>
+                </div>
+            <% end %>
         </div>
         <div class="row">
             <div class="input-field col s12">

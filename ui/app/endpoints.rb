@@ -144,11 +144,13 @@ class MAPTheApp < Sinatra::Base
   Endpoint.post('/locations/create')
     .param(:location, AgencyLocationUpdateRequest, "The agency location to create") do
 
+    params[:location].validate!
+
     unless Ctx.permissions.is_admin?
       # FIXME check agency_id against permissions
     end
 
-    Ctx.client.create_location(params[:location])
+    Ctx.client.create_location(params[:location]) unless params[:location].has_errors?
 
     if params[:location].has_errors?
       Templates.emit_with_layout(:location_new, {location: params[:location], agencies: Ctx.client.get_my_agencies},

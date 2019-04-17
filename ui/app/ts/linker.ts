@@ -18,11 +18,11 @@ interface location {
 }
 
 
-Vue.component('agency-linker', {
+Vue.component('agency-typeahead', {
     template: `
 <div>
-  <input id="agency-role-linker" v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
-  <label for="agency-role-linker">Agency</label>
+  <input id="agency-typeahead" v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
+  <label for="agency-typeahead">Agency</label>
   <ul>
     <li v-for="agency in matches">
       <a href="javascript:void(0);" v-on:click="select(agency)">{{ agency.label }}</a>
@@ -67,11 +67,35 @@ Vue.component('agency-linker', {
     }
 });
 
+Vue.component('agency-linker', {
+    template: `
+<div class="input-field col s12">
+  <agency-typeahead v-on:selected="addSelected"></agency-typeahead>
+  <input type="hidden" name="location[agency_ref]" v-bind:value="selected.id"/>
+  <strong v-bind:value="selected.label">{{selected.label}}</strong>
+</div>
+`,
+    data: function ():
+        {
+            selected: agency,
+        }
+    {
+        return {
+            selected: JSON.parse(this.agency),
+        }
+    },
+    props: ['agency'],
+    methods: {
+        addSelected(agency: agency) {
+            this.selected = agency;
+        }
+    }
+});
 
 Vue.component('agency-role-linker', {
     template: `
 <div class="input-field col s12">
-  <agency-linker v-on:selected="addSelected"></agency-linker>
+  <agency-typeahead v-on:selected="addSelected"></agency-typeahead>
   <table>
     <thead><tr><th>Agency</th><th>Location</th><th>Role</th><th></th></tr></thead>
     <tbody>
