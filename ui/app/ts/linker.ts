@@ -9,7 +9,7 @@ interface agency {
     label: string,
     role: string,
     location_id: number,
-    locations: location[],
+    location_options: location[],
 }
 
 interface location {
@@ -20,14 +20,58 @@ interface location {
 
 Vue.component('agency-linker', {
     template: `
-<div class="input-field col s12">
-  <input id="agency_id_linker" v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
-  <label for="agency_id_linker">Agency</label>
+<div>
+  <input id="agency-role-linker" v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
+  <label for="agency-role-linker">Agency</label>
   <ul>
     <li v-for="agency in matches">
-      <a href="javascript:void(0);" v-on:click="addSelected(agency.id)">{{ agency.label }}</a>
+      <a href="javascript:void(0);" v-on:click="select(agency)">{{ agency.label }}</a>
     </li>
   </ul>
+</div>
+`,
+    data: function ():
+        {
+            matches: agency[],
+            text: string,
+        }
+    {
+        return {
+            matches: [],
+            text: '',
+        }
+    },
+    methods: {
+        handleInput() {
+            if (this.text.length > 3) {
+                this.$http.get('/search/agencies', {
+                    method: 'GET',
+                    params: {
+                        q: this.text,
+                    }
+                }).then((response: any) => {
+                    return response.json();
+                }, () => {
+                    this.matches = [];
+                }).then((json: any) => {
+                    this.matches = json;
+                });
+            }
+        },
+        select(agency: agency) {
+            this.$emit('selected', agency);
+            this.matches = [];
+            this.text = '';
+            (this.$refs.text as HTMLElement).focus();
+        }
+    }
+});
+
+
+Vue.component('agency-role-linker', {
+    template: `
+<div class="input-field col s12">
+  <agency-linker v-on:selected="addSelected"></agency-linker>
   <table>
     <thead><tr><th>Agency</th><th>Location</th><th>Role</th><th></th></tr></thead>
     <tbody>
@@ -40,8 +84,12 @@ Vue.component('agency-linker', {
         <td>
           <select class="browser-default" name="user[agency][][location_id]" v-bind:value="agency.location_id" v-model="agency.location_id">
             <option></option>
-            <option v-for="location in agency.locations" v-bind:value="location.id">{{ location.label }}</option>
+            <option v-for="location in agency.location_options" v-bind:value="location.id">{{ location.label }}</option>
           </select>
+          <div v-for="location in agency.location_options">
+              <input type="hidden" name="user[agency][][location_options][][id]" v-bind:value="location.id" />
+              <input type="hidden" name="user[agency][][location_options][][label]" v-bind:value="location.label" />
+          </div>
         </td>
         <td>
           <select class="browser-default" name="user[agency][][role]" v-bind:value="agency.role" v-model="agency.role">
@@ -59,45 +107,24 @@ Vue.component('agency-linker', {
 `,
     data: function ():
         {
-            matches: agency[],
             selected: agency[],
-            text: string,
         }
     {
         return {
-            matches: [],
             selected: JSON.parse(this.agencies),
-            text: '',
         }
     },
     props: ['agencies'],
     methods: {
-        handleInput() {
-            if (this.text.length > 3) {
-                this.$http.get('/search/agencies', {
-                    method: 'GET',
-                    params: {
-                        q: this.text,
-                    }
-                }).then((response: any) => {
-                    return response.json();
-                }, () => {
-                    console.log("FAIL");
-                    this.matches = [];
-                }).then((json: any) => {
-                    this.matches = json;
-                });
-            }
-        },
         removeSelected(agencyToRemove: agency) {
             this.selected = Utils.filter(this.selected, (agency:agency) => {
                 return agency != agencyToRemove;
             });
         },
-        addSelected(agency_id: number) {
-            let selected_agency = Utils.find(this.matches, (agency) => {
-                return agency.id == agency_id;
-            });
+        addSelected(agency: agency) {
+            let selected_agency = agency;
+
+            console.log(agency);
 
             if (selected_agency != null) {
                 selected_agency.role = 'MEMBER';
@@ -112,19 +139,16 @@ Vue.component('agency-linker', {
                 }, () => {
                     console.log("FAIL");
                     if (selected_agency != null) {
-                        selected_agency.locations = [];
+                        selected_agency.location_options = [];
                     }
                 }).then((json: any) => {
                     if (selected_agency != null) {
-                        selected_agency.locations = json;
+                        console.log(json);
+                        selected_agency.location_options = json;
                         this.selected.push(selected_agency);
                     }
                 });
             }
-
-            this.matches = [];
-            this.text = '';
-            (this.$refs.text as HTMLElement).focus();
         }
     }
 });
