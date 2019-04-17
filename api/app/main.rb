@@ -50,6 +50,7 @@ require 'storage/users'
 require 'storage/sessions'
 require 'storage/groups'
 require 'storage/agencies'
+require 'storage/locations'
 
 require 'indexer/indexer'
 

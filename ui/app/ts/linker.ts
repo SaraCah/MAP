@@ -148,12 +148,10 @@ Vue.component('agency-role-linker', {
         addSelected(agency: agency) {
             let selected_agency = agency;
 
-            console.log(agency);
-
             if (selected_agency != null) {
                 selected_agency.role = 'MEMBER';
 
-                this.$http.get('/locations_for_groups', {
+                this.$http.get('/locations_for_agency', {
                     method: 'GET',
                     params: {
                         'agency_ref': selected_agency.id,
@@ -167,7 +165,6 @@ Vue.component('agency-role-linker', {
                     }
                 }).then((json: any) => {
                     if (selected_agency != null) {
-                        console.log(json);
                         selected_agency.location_options = json;
                         this.selected.push(selected_agency);
                     }

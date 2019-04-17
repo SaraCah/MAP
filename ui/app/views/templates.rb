@@ -17,7 +17,7 @@ Templates.define(:layout_blank, [:title, :template, :template_args, :message?], 
 Templates.define(:login, [:username?, :message?], "views/login.erb.html")
 Templates.define(:users, [:paged_users], "views/users.erb.html")
 Templates.define(:user_new, [:user], "views/user_form.erb.html")
-Templates.define(:locations, [:locations], "views/locations.erb.html")
+Templates.define(:locations, [:paged_results], "views/locations.erb.html")
 Templates.define(:location_new, [:location, :agencies], "views/location_form.erb.html")
 Templates.define(:flash_message, [:message], "views/_message.erb.html")
 Templates.define(:header, [:title, :context?], "views/header.erb.html")

@@ -66,13 +66,21 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.get('/my-agency-locations')
-    .param(:agency_ref, String, "Agency Ref", :optional => true) do
+  Endpoint.get('/locations')
+    .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in?
-      agency_id = nil
-      (_, agency_id) =  params[:agency_ref].split(':') if params[:agency_ref]
+      json_response(Locations.page(params[:page], 10))
+    else
+      json_response([])
+    end
+  end
 
-      json_response(Agencies.locations_for_user(agency_id))
+  Endpoint.get('/locations_for_agency')
+    .param(:agency_ref, String, "Agency Ref") do
+    if Ctx.user_logged_in?
+      (_, aspace_agency_id) =  params[:agency_ref].split(':')
+
+      json_response(Locations.locations_for_agency(aspace_agency_id))
     else
       json_response([])
     end
@@ -80,7 +88,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/locations/create')
     .param(:location, AgencyLocationUpdateRequest, "Location") do
-    Agencies.create_location_from_dto(params[:location])
+    Locations.create_location_from_dto(params[:location])
 
     if params[:location].has_errors?
       json_response(errors: params[:location].errors)

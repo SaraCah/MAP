@@ -148,8 +148,12 @@ class MAPAPIClient
     end
   end
 
-  def get_my_locations(agency_ref = nil)
-    get('/my-agency-locations', {
+  def locations(page = 0)
+    PagedResults.from_json(get('/locations', page: page), AgencyLocation)
+  end
+
+  def locations_for_agency(agency_ref)
+    get('/locations_for_agency', {
       'agency_ref' => agency_ref,
     }).map do |json|
       AgencyLocation.from_json(json)

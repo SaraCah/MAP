@@ -129,8 +129,10 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
-  Endpoint.get('/locations') do
-    Templates.emit_with_layout(:locations, {locations: Ctx.client.get_my_locations},
+  Endpoint.get('/locations')
+    .param(:page, Integer, "Page to return", optional: true) do
+
+    Templates.emit_with_layout(:locations, {paged_results: Ctx.client.locations(params[:page] || 0)},
                                :layout, title: "Locations", context: 'locations')
   end
 
@@ -159,12 +161,12 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
-  Endpoint.get('/locations_for_groups')
+  Endpoint.get('/locations_for_agency')
     .param(:agency_ref, String, "Agency Ref") do
     [
       200,
       {'Content-type' => 'text/json'},
-      Ctx.client.get_my_locations(params[:agency_ref]).map(&:to_search_result).to_json
+      Ctx.client.locations_for_agency(params[:agency_ref]).map(&:to_search_result).to_json
     ]
   end
 
