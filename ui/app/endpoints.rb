@@ -5,7 +5,7 @@ class MAPTheApp < Sinatra::Base
       # These tags get escaped...
       Templates.emit_with_layout(:hello, {
                                    :name => Ctx.session[:username],
-                                   :agencies => Ctx.client.get_my_agencies,
+                                   :agency => Ctx.client.get_current_agency
                                  },
                                  :layout, title: "Welcome", context: 'home')
     else
@@ -89,15 +89,16 @@ class MAPTheApp < Sinatra::Base
     .param(:user, UserUpdateRequest, "The user to create") do
 
     unless Ctx.permissions.is_admin?
-      params[:user].is_admin = false
-
-      params[:user].agencies.select! do |agency|
-        if agency['location_id'].nil?
-          Ctx.permissions.agency_admin?(agency['id'])
-        else
-          Ctx.permissions.location_admin?(agency['id'], Integer(agency['location_id']))
-        end
-      end
+      # FIXME to deal with location on context
+      # params[:user].is_admin = false
+      # 
+      # params[:user].agencies.select! do |agency|
+      #   if agency['location_id'].nil?
+      #     Ctx.permissions.agency_admin?(agency['id'])
+      #   else
+      #     Ctx.permissions.location_admin?(agency['id'], Integer(agency['location_id']))
+      #   end
+      # end
     end
 
     params[:user].validate!
@@ -137,36 +138,38 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/locations/new') do
-    Templates.emit_with_layout(:location_new, {location: AgencyLocationUpdateRequest.new, agencies: Ctx.client.get_my_agencies},
+    Templates.emit_with_layout(:location_new, {location: AgencyLocationUpdateRequest.new,
+                                               agencies: Ctx.client.get_my_agencies},
                                :layout, title: "New Location", context: 'locations')
   end
 
   Endpoint.post('/locations/create')
     .param(:location, AgencyLocationUpdateRequest, "The agency location to create") do
 
-    unless Ctx.permissions.is_admin? || Ctx.permissions.agency_admin?(params[:location].agency_ref)
-        params[:location].agency_ref = ''
-        params[:location].agency_label = ''
+    unless Ctx.permissions.is_admin?
+        params[:location].agency_ref = Ctx.get.current_location.agency.id
     end
 
-    params[:location].validate!
-
-    Ctx.client.create_location(params[:location]) unless params[:location].has_errors?
+    Ctx.client.create_location(params[:location])
 
     if params[:location].has_errors?
-      Templates.emit_with_layout(:location_new, {location: params[:location], agencies: Ctx.client.get_my_agencies},
+      Templates.emit_with_layout(:location_new, {location: params[:location],
+                                                 agencies: Ctx.client.get_my_agencies},
                                  :layout, title: "New Location", context: 'locations')
     else
       redirect '/locations'
     end
   end
 
-  Endpoint.get('/locations_for_agency')
+  Endpoint.get('/linker_data_for_agency')
     .param(:agency_ref, String, "Agency Ref") do
     [
       200,
       {'Content-type' => 'text/json'},
-      Ctx.client.locations_for_agency(params[:agency_ref]).map(&:to_search_result).to_json
+      {
+        'location_options' => Ctx.client.locations_for_agency(params[:agency_ref]).map(&:to_search_result),
+        'permission_options' => Ctx.client.permission_types_for_agency(params[:agency_ref]) 
+      }.to_json
     ]
   end
 

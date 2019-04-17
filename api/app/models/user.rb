@@ -1,10 +1,10 @@
-User = Struct.new(:username, :name, :is_admin, :create_time, :agency_permissions) do
-  def self.from_row(row, agency_permissions)
+User = Struct.new(:username, :name, :is_admin, :create_time, :agency_roles) do
+  def self.from_row(row, agency_roles)
     User.new(row[:username],
              row[:name],
              (row[:admin] == 1),
              row[:create_time],
-             agency_permissions)
+             agency_roles)
   end
 
   def to_json(*args)

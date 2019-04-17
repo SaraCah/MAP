@@ -48,6 +48,10 @@ class Ctx
     def permissions
       @permissions ||= client.permissions_for_current_user
     end
+
+    def current_location
+      @current_location ||= client.location_for_current_user
+    end
   end
 
 end

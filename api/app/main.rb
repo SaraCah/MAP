@@ -48,7 +48,7 @@ require 'storage/base_storage'
 require 'storage/db_auth'
 require 'storage/users'
 require 'storage/sessions'
-require 'storage/groups'
+require 'storage/permissions'
 require 'storage/agencies'
 require 'storage/locations'
 

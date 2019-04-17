@@ -10,7 +10,7 @@
                 <tr>
                     <th>Username</th>
                     <th>Name</th>
-                    <th>Permissions</th>
+                    <th>Roles</th>
                     <th>Date Created</th>
                     <th></th>
                 </tr>
@@ -24,8 +24,8 @@
                             <% if user.is_admin %>
                                 Administrator
                             <% else %>
-                                <% user.agency_permissions.each do |agency, role, location_label| %>
-                                    <%= [agency.label, location_label].compact.join(' -- ') %> <% if role == 'ADMIN' %><i class="fa fa-crown"></i><% end %><br/>
+                                <% user.agency_roles.each do |agency, role, location_label| %>
+                                    <%= [agency.label, location_label, role].compact.join(' -- ') %><br/>
                                 <% end %>
                             <% end %>
                         </td>

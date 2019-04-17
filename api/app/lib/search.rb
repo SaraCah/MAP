@@ -13,10 +13,8 @@ class Search
 
   def self.build_permissions_filter(permissions)
     return "*:*" if permissions.is_admin
-
-    agency_refs = permissions.admin_groups.collect(&:agency_ref)
-
-    return "id:(%s)" % [agency_refs.map {|ref| solr_escape(ref)}.join(' OR ')]
+    
+    return "id:(%s)" % [solr_escape(Ctx.get.current_location.agency.id)]
   end
 
   def self.agency_typeahead(q, permissions)
