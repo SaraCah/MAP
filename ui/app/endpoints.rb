@@ -92,7 +92,7 @@ class MAPTheApp < Sinatra::Base
       params[:user].is_admin = false
 
       params[:user].agencies.select! do |agency|
-        if agency['location_id'].empty?
+        if agency['location_id'].nil?
           Ctx.permissions.agency_admin?(agency['id'])
         else
           Ctx.permissions.location_admin?(agency['id'], Integer(agency['location_id']))
