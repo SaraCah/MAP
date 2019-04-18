@@ -33,7 +33,7 @@ Vue.component('current-location-selector', {
             </select>
         </div>
         <div style="display: inline-block; width: 80px;">
-            <button v-on:click="updateCurrentLocation()">Switch</button>
+            <button class="waves-effect waves-light btn-small" v-on:click="updateCurrentLocation()">Go</button>
         </div>
     </template>
 </div>
