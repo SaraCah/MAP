@@ -32,12 +32,54 @@
                 </div>
             </div>
         <% end %>
-        <br>
-        <br>
-        <br>
-        <div class="row">
-            <agency-role-linker agencies='<%= user.agencies.to_json %>'></agency-role-linker>
-        </div>
+        <% if Ctx.get.permissions.is_admin? %>
+            <br>
+            <div class="row">
+                <agency-role-linker agencies='<%= user.agencies.to_json %>'></agency-role-linker>
+            </div>
+        <% else %>
+            <input type="hidden" name="user[agency][][id]" value="<%= Ctx.get.current_location.agency.id  %>">
+            <input type="hidden" name="user[agency][][location_id]" value="<%= Ctx.get.current_location.id %>">
+            <div class="row">
+                <div class="col s12">
+                    <label for="role">Role</label>
+                    <select id="role" name="user[agency][][role]" class="browser-default">
+                        <% if Ctx.get.permissions.is_senior_agency_admin? %>
+                            <option value="SENIOR_AGENCY_ADMIN">Senior Agency Admin</option>
+                        <% end %>
+                        <option value="AGENCY_ADMIN">Agency Admin</option>
+                        <option value="AGENCY_CONTACT">Agency Contact</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <label><input type="checkbox" name="user[agency][][permission][]" value="allow_transfers"> <span>allow_transfers</span></label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <label><input type="checkbox" name="user[agency][][permission][]" value="allow_file_issue"> <span>allow_file_issue</span></label>
+                </div>
+            </div>
+            <% if Ctx.get.permissions.is_senior_agency_admin? %>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <label><input type="checkbox" name="user[agency][][permission][]" value="allow_set_raps"> <span>allow_set_raps</span></label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <label><input type="checkbox" name="user[agency][][permission][]" value="allow_change_raps"> <span>allow_change_raps</span></label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <label><input type="checkbox" name="user[agency][][permission][]" value="allow_restricted_access"> <span>allow_restricted_access</span></label>
+                    </div>
+                </div>
+            <% end %>
+        <% end %>
         <div class="row">
             <br>
             <br>

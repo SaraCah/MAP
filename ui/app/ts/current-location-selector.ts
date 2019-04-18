@@ -99,9 +99,5 @@ Vue.component('current-location-selector', {
                 console.log("FAILED TO SET LOCATION");
             });
         },
-    },
-    mounted: function () {
-        console.log(this.selected_agency_id);
-        console.log(this.selected_location_id);
     }
 });
