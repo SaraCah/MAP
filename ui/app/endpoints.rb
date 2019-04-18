@@ -161,14 +161,19 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/linker_data_for_agency')
     .param(:agency_ref, String, "Agency Ref") do
-    [
-      200,
-      {'Content-type' => 'text/json'},
-      {
-        'location_options' => Ctx.client.locations_for_agency(params[:agency_ref]).map(&:to_search_result),
-        'permission_options' => Ctx.client.permission_types_for_agency(params[:agency_ref]) 
-      }.to_json
-    ]
+    if Ctx.permissions.is_admin?
+      [
+        200,
+        {'Content-type' => 'text/json'},
+        {
+          'location_options' => Ctx.client.locations_for_agency(params[:agency_ref]).map(&:to_search_result),
+          # FIXME some shared lib?
+          'permission_options' => [:allow_transfers, :allow_file_issue, :allow_set_raps, :allow_change_raps, :allow_restricted_access]
+        }.to_json
+      ]
+    else
+      [404]
+    end
   end
 
   Endpoint.post('/set-location')

@@ -195,12 +195,6 @@ class MAPAPIClient
     get('/my-locations', {})
   end
 
-  def permission_types_for_agency(agency_ref)
-    get('/permission-types', {
-      'agency_ref' => agency_ref,
-    })
-  end
-
   def set_location(agency_id, location_id)
     post('/set-location', {
       agency_id: agency_id,

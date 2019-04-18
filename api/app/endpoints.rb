@@ -98,15 +98,6 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.get('/permission-types')
-    .param(:agency_ref, String, "Agency Ref") do
-    if Ctx.user_logged_in?
-      (_, aspace_agency_id) =  params[:agency_ref].split(':')
-      json_response(Permissions.available_permissions_for_agency(aspace_agency_id))
-    else
-      json_response([])
-    end
-  end
 
   Endpoint.get('/my-location') do
     if Ctx.user_logged_in?

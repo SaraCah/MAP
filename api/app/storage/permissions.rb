@@ -96,9 +96,4 @@ class Permissions < BaseStorage
     end
   end
 
-
-  def self.available_permissions_for_agency(agency_id)
-    AVAILABLE_PERMISSIONS
-  end
-
 end
