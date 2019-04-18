@@ -14,7 +14,7 @@ class Search
   def self.build_permissions_filter(permissions)
     return "*:*" if permissions.is_admin
     
-    return "id:(%s)" % [solr_escape(Ctx.get.current_location.agency.id)]
+    return "id:(%s)" % [solr_escape(Ctx.get.current_location.agency.id.agency.id)]
   end
 
   def self.agency_typeahead(q, permissions)

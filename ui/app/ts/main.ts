@@ -2,6 +2,7 @@ import Vue from "vue";
 
 import 'greeter';
 import 'linker';
+import 'current-location-selector';
 
 new Greeter().greet("Hello world");
 

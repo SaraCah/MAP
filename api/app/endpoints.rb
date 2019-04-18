@@ -117,11 +117,30 @@ class MAPTheAPI < Sinatra::Base
   end
 
 
+  Endpoint.get('/my-locations') do
+    if Ctx.user_logged_in?
+      json_response(Locations.locations_for_user)
+    else
+      json_response({})
+    end
+  end
+
+
   Endpoint.get('/my-agency') do
     if Ctx.user_logged_in? && Ctx.get.current_location
       json_response(Agencies.get_summary(Ctx.get.current_location.agency_id))
     else
       json_response({})
     end
+  end
+
+  Endpoint.post('/set-location')
+    .param(:agency_id, Integer, "Agency Id")
+    .param(:location_id, Integer, "Location Id") do
+
+    # FIXME only select if allowed!
+    Ctx.get.set_location(params[:agency_id], params[:location_id])
+
+    json_response({'status' => 'ok'})
   end
 end

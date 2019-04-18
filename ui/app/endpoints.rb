@@ -171,4 +171,19 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
+  Endpoint.post('/set-location')
+    .param(:agency_id, Integer, "Agency Id")
+    .param(:location_id, Integer, "Location Id") do
+
+    Ctx.client.set_location(params[:agency_id], params[:location_id])
+
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      {
+        'status' => 'ok'
+      }.to_json
+    ]
+  end
+
 end

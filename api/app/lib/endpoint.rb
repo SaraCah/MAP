@@ -111,7 +111,13 @@ class Endpoint
           raise "A session is required to access this endpoint"
         end
 
-        app_instance.instance_eval(&block)
+        result = app_instance.instance_eval(&block)
+
+        if Ctx.get.session
+          Sessions.save_session(Ctx.get.session)
+        end
+
+        result
       end
     end
   end

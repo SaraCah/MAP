@@ -60,7 +60,7 @@ class MAPAPIClient
     end
 
     def is_agency_admin?
-      self.agency_roles.any?{|agency_role| agency_role.agency_id == Ctx.get.current_location.agency_id && agency_role.agency_location_id == Ctx.get.current_location.id && agency_role.is_agency_admin?}
+      is_senior_agency_admin? || self.agency_roles.any?{|agency_role| agency_role.agency_id == Ctx.get.current_location.agency_id && agency_role.agency_location_id == Ctx.get.current_location.id && agency_role.is_agency_admin?}
     end
 
     def location_admin?(agency_ref, location_id)
@@ -97,6 +97,11 @@ class MAPAPIClient
       Agency.new(json.fetch('id'),
                  json.fetch('label'),
                  json.fetch('series_count', 0))
+    end
+
+
+    def to_json(*args)
+      to_h.to_json
     end
   end
 
@@ -156,6 +161,10 @@ class MAPAPIClient
         'label' => name
       }
     end
+
+    def to_json(*args)
+      to_h.to_json
+    end
   end
 
   def locations(page = 0)
@@ -182,9 +191,20 @@ class MAPAPIClient
     AgencyLocation.from_json(json)
   end
 
+  def locations_for_current_user
+    get('/my-locations', {})
+  end
+
   def permission_types_for_agency(agency_ref)
     get('/permission-types', {
       'agency_ref' => agency_ref,
+    })
+  end
+
+  def set_location(agency_id, location_id)
+    post('/set-location', {
+      agency_id: agency_id,
+      location_id: location_id,
     })
   end
 

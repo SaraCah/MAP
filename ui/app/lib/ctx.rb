@@ -52,6 +52,10 @@ class Ctx
     def current_location
       @current_location ||= client.location_for_current_user
     end
+
+    def available_locations
+      client.locations_for_current_user
+    end
   end
 
 end

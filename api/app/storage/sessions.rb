@@ -14,11 +14,11 @@ class Sessions < BaseStorage
     end
 
     def [](key)
-      self.data[key]
+      self.data[key.to_s]
     end
 
     def []=(key, value)
-      self.data[key] = value
+      self.data[key.to_s] = value
     end
   end
 

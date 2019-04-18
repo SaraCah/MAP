@@ -1,10 +1,18 @@
 AgencyLocation = Struct.new(:id, :name, :agency_id, :create_time, :agency) do
   def self.from_row(row, agency = nil)
-    AgencyLocation.new(row[:id],
-                       row[:name],
-                       row[:agency_id],
-                       row[:create_time],
-                       agency)
+    self.new(row[:id],
+             row[:name],
+             row[:agency_id],
+             row[:create_time],
+             agency)
+  end
+
+  def self.from_hash(hash)
+    self.new(hash.fetch('id'),
+             hash.fetch('name'),
+             hash.fetch('agency_id'),
+             hash.fetch('create_time'),
+             hash.fetch('agency'))
   end
 
   def to_json(*args)

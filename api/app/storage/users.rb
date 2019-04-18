@@ -11,6 +11,7 @@ class Users < BaseStorage
       if Ctx.get.permissions.is_senior_agency_admin?(current_location.agency_id)
         dataset = dataset
                     .filter(Sequel[:agency_user][:agency_id] => current_location.agency_id)
+                    .filter(Sequel[:agency_user][:agency_location_id] => current_location.id)
 
       elsif Ctx.get.permissions.is_agency_admin?(current_location.agency_id, current_location.id)
         dataset = dataset
