@@ -1,10 +1,14 @@
 class URLHelper
 
   def self.cache_buster
+      "?#{cb}"
+  end
+
+  def self.cb
     if MAPTheApp.production?
-      "?cb=#{MAPTheApp.cache_nonce}"
+      "cb=#{MAPTheApp.cache_nonce}"
     else
-      "?cb=#{SecureRandom.hex}"
+      "cb=#{SecureRandom.hex}"
     end
   end
 

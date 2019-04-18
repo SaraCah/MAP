@@ -29,6 +29,7 @@
         <script>
          require.config({
              baseUrl: "/js",
+             urlArgs: "<%= URLHelper.cb %>"
          });
 
          require(["main"]);
