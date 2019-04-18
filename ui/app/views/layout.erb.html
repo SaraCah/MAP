@@ -15,6 +15,13 @@
         <main>
             <div class="row">
                 <div class="col s12">
+                    <% if (typescript_errors = TypescriptHelper.error_report) %>
+                        <div style="border: #cc3333 solid 2px; padding: 1em;">
+                            <h4>Typescript compilation failed</h4>
+                            <pre><%= typescript_errors %></pre>
+                        </div>
+                    <% end %>
+
                     <% if message %>
                         <%== Templates.emit(:flash_message, message: message) %>
                     <% end %>

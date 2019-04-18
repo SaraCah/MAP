@@ -13,7 +13,7 @@ cd "`dirname "$0"`/../"
 
 trap "exit" INT TERM
 trap "kill 0" EXIT
-(tsc --build --watch app/ts/tsconfig.json --preserveWatchOutput) &
+(tsc --build --watch app/ts/tsconfig.json | scripts/tsc_filter.rb) &
 
 export MAP_ENV=development
 scripts/start.sh

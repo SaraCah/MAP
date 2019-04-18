@@ -36,6 +36,7 @@ require 'lib/endpoint'
 require 'lib/map_api_client'
 require 'lib/url_helper'
 require 'lib/form_helper'
+require 'lib/typescript_helper'
 
 require 'dto/user_update_request'
 require 'dto/agency_location_update_request'
