@@ -52,8 +52,6 @@ require 'storage/permissions'
 require 'storage/agencies'
 require 'storage/locations'
 
-#require 'indexer/indexer'
-
 require 'endpoints'
 
 class MAPTheAPI < Sinatra::Base
@@ -67,7 +65,6 @@ class MAPTheAPI < Sinatra::Base
       load File.join(Dir.pwd, 'endpoints.rb')
     end
 
-#    WatchDirReloader.new(["indexer"]).start
   end
 
   configure do
@@ -98,7 +95,6 @@ class MAPTheAPI < Sinatra::Base
       end
     end
 
-#    Indexer.start(AppConfig[:solr_url], MapAPI.base_dir(File.join('data', 'indexer', 'indexer.state')))
   end
 
   configure :development do
