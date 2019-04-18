@@ -3,18 +3,18 @@
 class Users < BaseStorage
 
   def self.page(page, page_size)
-    dataset = db[:user]
-                .join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
+    permission_dataset = db[:user]
+                           .join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
 
     unless Ctx.get.permissions.is_admin?
       current_location = Ctx.get.current_location
       if Ctx.get.permissions.is_senior_agency_admin?(current_location.agency_id)
-        dataset = dataset
+        permission_dataset = permission_dataset
                     .filter(Sequel[:agency_user][:agency_id] => current_location.agency_id)
                     .filter(Sequel[:agency_user][:agency_location_id] => current_location.id)
 
       elsif Ctx.get.permissions.is_agency_admin?(current_location.agency_id, current_location.id)
-        dataset = dataset
+        permission_dataset = permission_dataset
                     .filter(Sequel[:agency_user][:agency_id] => current_location.agency_id)
                     .filter(Sequel[:agency_user][:agency_location_id] => current_location.id)
 
@@ -23,14 +23,16 @@ class Users < BaseStorage
       end
     end
 
-    max_page = (dataset.count / page_size.to_f).ceil
+    users_visible_to_current_user = db[:user].filter(:id => permission_dataset.select(Sequel[:user][:id]))
 
-    dataset = dataset.limit(page_size, page * page_size)
+    max_page = (users_visible_to_current_user.count / page_size.to_f).ceil
+
+    users_visible_to_current_user = users_visible_to_current_user.limit(page_size, page * page_size)
 
     agency_permissions_by_user_id = {}
     aspace_agency_ids_to_resolve = []
 
-    permission_dataset = dataset
+    permission_dataset = permission_dataset
                            .join(:agency, Sequel[:agency][:id] => Sequel[:agency_user][:agency_id])
                            .join(:agency_location, Sequel[:agency_location][:id] => Sequel[:agency_user][:agency_location_id])
 
@@ -62,7 +64,7 @@ class Users < BaseStorage
       end
     end
 
-    PagedResults.new(dataset.select_all(:user).map {|r| User.from_row(r, agency_permissions_by_user_id.fetch(r[:id], []).map {|agency_ref, role, location_id, location_label| [ agencies_by_agency_ref.fetch(agency_ref), role, location_label ]})},
+    PagedResults.new(users_visible_to_current_user.select_all(:user).map {|r| User.from_row(r, agency_permissions_by_user_id.fetch(r[:id], []).map {|agency_ref, role, location_id, location_label| [ agencies_by_agency_ref.fetch(agency_ref), role, location_label ]})},
                    page,
                    max_page)
   end
