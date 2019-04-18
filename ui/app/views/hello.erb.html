@@ -1,19 +1,21 @@
 <p>Hello, <%= name %>!</p>
 
 <% if agency %>
-    Agency Summary:
+    Controlled Records:
     <table>
     <thead>
         <tr>
-            <th>Agency</th>
-            <th>Number of Controlled Records</th>
+            <th>Record</th>
+            <th>URI</th>
         </tr>
     </thead>
     <tbody>
+      <% agency.controlled_records.each do |record| %>
         <tr>
-            <td><%= agency.label %></td>
-            <td><%= agency.series_count %></td>
+            <td><%= record['title'] %></td>
+            <td><%= record['id'] %></td>
         </tr>
+      <% end %>
     </tbody>
     </table>
 <% end %>

@@ -92,11 +92,12 @@ class MAPAPIClient
     end
   end
 
-  Agency = Struct.new(:id, :label, :series_count) do
+  Agency = Struct.new(:id, :label, :series_count, :controlled_records) do
     def self.from_json(json)
       Agency.new(json.fetch('id'),
                  json.fetch('label'),
-                 json.fetch('series_count', 0))
+                 json.fetch('series_count', 0),
+                 json.fetch('controlled_records'))
     end
 
 
