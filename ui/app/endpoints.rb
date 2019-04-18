@@ -138,8 +138,7 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/locations/new') do
-    Templates.emit_with_layout(:location_new, {location: AgencyLocationUpdateRequest.new,
-                                               agencies: Ctx.client.get_my_agencies},
+    Templates.emit_with_layout(:location_new, {location: AgencyLocationUpdateRequest.new},
                                :layout, title: "New Location", context: 'locations')
   end
 
@@ -153,8 +152,7 @@ class MAPTheApp < Sinatra::Base
     Ctx.client.create_location(params[:location])
 
     if params[:location].has_errors?
-      Templates.emit_with_layout(:location_new, {location: params[:location],
-                                                 agencies: Ctx.client.get_my_agencies},
+      Templates.emit_with_layout(:location_new, {location: params[:location]},
                                  :layout, title: "New Location", context: 'locations')
     else
       redirect '/locations'
