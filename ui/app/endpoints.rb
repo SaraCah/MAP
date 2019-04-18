@@ -89,16 +89,19 @@ class MAPTheApp < Sinatra::Base
     .param(:user, UserUpdateRequest, "The user to create") do
 
     unless Ctx.permissions.is_admin?
-      # FIXME to deal with location on context
-      # params[:user].is_admin = false
-      # 
-      # params[:user].agencies.select! do |agency|
-      #   if agency['location_id'].nil?
-      #     Ctx.permissions.agency_admin?(agency['id'])
-      #   else
-      #     Ctx.permissions.location_admin?(agency['id'], Integer(agency['location_id']))
-      #   end
-      # end
+      params[:user].is_admin = false
+      if Ctx.permissions.is_senior_agency_admin?
+        params[:user].agencies.select! do |agency|
+          (agency['location_id'] == Ctx.get.current_location.id) 
+        end
+      elsif Ctx.permissions.is_agency_admin?
+        params[:user].agencies.select! do |agency|
+          (agency['location_id'] == Ctx.get.current_location.id) && agency['role'] != 'SENIOR_AGENCY_ADMIN'
+        end
+      else
+        # FIXME
+        raise "Insufficient Privileges"
+      end
     end
 
     params[:user].validate!
