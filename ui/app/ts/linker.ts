@@ -7,8 +7,13 @@ import Utils from "./utils";
 interface Agency {
     id: number;
     label: string;
+}
+
+interface AgencyRole {
+    id: number;
+    label: string;
     role: string;
-    location_id: number;
+    location_id?: number;
     location_options: Location[];
     permissions: string[];
     permission_options: string[];
@@ -142,51 +147,46 @@ Vue.component('agency-role-linker', {
   </table>
 </div>
 `,
-    data: function(): {selected: Agency[]} {
+    data: function(): {selected: AgencyRole[]} {
         return {
             selected: JSON.parse(this.agencies),
         };
     },
     props: ['agencies'],
     methods: {
-        removeSelected(agencyToRemove: Agency) {
-            this.selected = Utils.filter(this.selected, (agency: Agency) => {
+        removeSelected(agencyToRemove: AgencyRole) {
+            this.selected = Utils.filter(this.selected, (agency: AgencyRole) => {
                 return agency.id !== agencyToRemove.id;
             });
         },
         addSelected(agency: Agency) {
-            const selectedAgency = agency;
+            const selectedAgency: AgencyRole = (Object as any).assign({}, agency, {
+                role: 'SENIOR_AGENCY_ADMIN',
+                location_options: [],
+                permission_options: [],
+                permissions: [],
+            });
 
-            Vue.set(selectedAgency, 'role', 'SENIOR_AGENCY_ADMIN');
+            // selectedAgency.role == 'SENIOR_AGENCY_ADMIN';
+            // Vue.set(selectedAgency, 'role', 'SENIOR_AGENCY_ADMIN');
 
-            if (selectedAgency != null) {
-                this.$http.get('/linker_data_for_agency', {
-                    method: 'GET',
-                    params: {
-                        agency_ref: selectedAgency.id,
-                    },
-                }).then((response: any) => {
-                    return response.json();
-                }, () => {
-                    if (selectedAgency != null) {
-                        Vue.set(selectedAgency, 'location_options', []);
-                        Vue.set(selectedAgency, 'permission_options', []);
-                        Vue.set(selectedAgency, 'permissions', []);
-                    }
-                }).then((json: any) => {
-                    if (selectedAgency != null) {
-                        Vue.set(selectedAgency, 'location_options', json.location_options);
-                        Vue.set(selectedAgency, 'permission_options', json.permission_options);
-                        Vue.set(selectedAgency, 'permissions', []);
-                        if (selectedAgency.location_options.length > 0) {
-                            Vue.set(selectedAgency, 'location_id', selectedAgency.location_options[0].id);
-                        }
-                        this.selected.push(selectedAgency);
-                    }
-                });
-            }
+            this.$http.get('/linker_data_for_agency', {
+                method: 'GET',
+                params: {
+                    agency_ref: selectedAgency.id,
+                },
+            }).then((response: any) => response.json())
+              .then((json: any) => {
+                  selectedAgency.location_options = json.location_options;
+                  selectedAgency.permission_options = json.permission_options;
+                  if (selectedAgency.location_options.length > 0) {
+                      selectedAgency.location_id = selectedAgency.location_options[0].id;
+                  }
+
+                  this.selected.push(selectedAgency);
+              });
         },
-        togglePermission(event: any, permission: string, agency: Agency ) {
+        togglePermission(event: any, permission: string, agency: AgencyRole) {
             if (event.target.checked) {
                 agency.permissions.push(permission);
             } else {
