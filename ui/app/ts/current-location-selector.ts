@@ -23,15 +23,15 @@ Vue.component('current-location-selector', {
             {{ current_location.agency_label }} -- {{ current_location.name }}
         </div>
     </template>
-    <template v-if="available.length > 1">
+    <template v-else>
         <div style="display: inline-block; width: 200px;">
-            <select class="browser-default" v-model="selected_agency_id" v-on:change="refresh()">
-                <option v-for="agency in agencyOptions()" v-bind:value="agency.id">{{ agency.label }}</option>
+            <select class="browser-default" v-model.number="selected_agency_id">
+                <option v-for="agency in agencyOptions" v-bind:value="agency.id">{{ agency.label }}</option>
             </select>
         </div>
         <div style="display: inline-block; width: 200px;">
-            <select class="browser-default" v-model="selected_location_id">
-                <option v-for="location in locationOptions()" v-bind:value="location.id">{{ location.name }}</option>
+            <select class="browser-default" v-model.number="selected_location_id">
+                <option v-for="location in locationOptions" v-bind:value="location.id">{{ location.name }}</option>
             </select>
         </div>
         <div style="display: inline-block; width: 80px;">
@@ -48,13 +48,13 @@ Vue.component('current-location-selector', {
     } {
         return {
             current_location: JSON.parse(this.current_location),
-            selected_location_id: JSON.parse(this.current_location).id,
-            selected_agency_id: JSON.parse(this.current_agency).id,
+            selected_location_id: Number(JSON.parse(this.current_location).id),
+            selected_agency_id: Number(JSON.parse(this.current_agency).id),
             available: JSON.parse(this.available_locations),
         };
     },
     props: ['current_agency', 'current_location', 'available_locations', 'csrf_token'],
-    methods: {
+    computed: {
         agencyOptions: function() {
             const agencies: Agency[] = [];
 
@@ -70,6 +70,7 @@ Vue.component('current-location-selector', {
         },
 
         locationOptions: function() {
+            // Recomputed on page load & when the user changes agencies.
             const locations: Location[] = [];
 
             for (const location of this.available) {
@@ -78,22 +79,21 @@ Vue.component('current-location-selector', {
                 }
             }
 
+            if (locations.length > 0) {
+                // Select the first location by default
+                this.selected_location_id = locations[0].id;
+            }
+
             return locations;
         },
-
-        refresh: function() {
-            Vue.set(this, 'selected_location_id', this.locationOptions()[0].id);
-            this.$forceUpdate();
-        },
-
+    },
+    methods: {
         updateCurrentLocation: function() {
-            this.$http.post('/set-location',
-            {
+            this.$http.post('/set-location', {
                 agency_id: this.selected_agency_id,
                 location_id: this.selected_location_id,
                 authenticity_token: this.csrf_token,
-            },
-            {
+            }, {
                 emulateJSON: true,
             }).then(() => {
                 location.reload();
