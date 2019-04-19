@@ -93,6 +93,12 @@ class MAPAPIClient
   end
 
   Agency = Struct.new(:id, :label, :series_count, :controlled_records) do
+    def initialize(*)
+      super
+      self.series_count ||= 0
+      self.controlled_records ||= []
+    end
+
     def self.from_json(json)
       Agency.new(json.fetch('id'),
                  json.fetch('label'),
