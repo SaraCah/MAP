@@ -4,19 +4,19 @@ Vue.use(VueResource);
 import Utils from "./utils";
 
 
-interface agency {
-    id: number,
-    label: string,
-    role: string,
-    location_id: number,
-    location_options: location[],
-    permissions: string[],
-    permission_options: string[],
+interface Agency {
+    id: number;
+    label: string;
+    role: string;
+    location_id: number;
+    location_options: Location[];
+    permissions: string[];
+    permission_options: string[];
 }
 
-interface location {
-    id: number,
-    label: string,
+interface Location {
+    id: number;
+    label: string;
 }
 
 Vue.component('agency-typeahead', {
@@ -31,16 +31,11 @@ Vue.component('agency-typeahead', {
   </ul>
 </div>
 `,
-    data: function ():
-        {
-            matches: agency[],
-            text: string,
-        }
-    {
+    data: function(): {matches: Agency[], text: string} {
         return {
             matches: [],
             text: '',
-        }
+        };
     },
     methods: {
         handleInput() {
@@ -49,7 +44,7 @@ Vue.component('agency-typeahead', {
                     method: 'GET',
                     params: {
                         q: this.text,
-                    }
+                    },
                 }).then((response: any) => {
                     return response.json();
                 }, () => {
@@ -59,13 +54,13 @@ Vue.component('agency-typeahead', {
                 });
             }
         },
-        select(agency: agency) {
+        select(agency: Agency) {
             this.$emit('selected', agency);
             this.matches = [];
             this.text = '';
             (this.$refs.text as HTMLElement).focus();
-        }
-    }
+        },
+    },
 });
 
 Vue.component('agency-linker', {
@@ -76,21 +71,17 @@ Vue.component('agency-linker', {
   <strong v-bind:value="selected.label">{{selected.label}}</strong>
 </div>
 `,
-    data: function ():
-        {
-            selected: agency,
-        }
-    {
+    data: function(): {selected: Agency} {
         return {
             selected: JSON.parse(this.agency),
-        }
+        };
     },
     props: ['agency'],
     methods: {
-        addSelected(agency: agency) {
+        addSelected(agency: Agency) {
             this.selected = agency;
-        }
-    }
+        },
+    },
 });
 
 Vue.component('agency-role-linker', {
@@ -151,63 +142,58 @@ Vue.component('agency-role-linker', {
   </table>
 </div>
 `,
-    data: function ():
-        {
-            selected: agency[],
-        }
-    {
+    data: function(): {selected: Agency[]} {
         return {
             selected: JSON.parse(this.agencies),
-        }
+        };
     },
     props: ['agencies'],
     methods: {
-        removeSelected(agencyToRemove: agency) {
-            this.selected = Utils.filter(this.selected, (agency:agency) => {
-                return agency != agencyToRemove;
+        removeSelected(agencyToRemove: Agency) {
+            this.selected = Utils.filter(this.selected, (agency: Agency) => {
+                return agency.id !== agencyToRemove.id;
             });
         },
-        addSelected(agency: agency) {
-            let selected_agency = agency;
+        addSelected(agency: Agency) {
+            const selectedAgency = agency;
 
-            Vue.set(selected_agency, 'role', 'SENIOR_AGENCY_ADMIN');
+            Vue.set(selectedAgency, 'role', 'SENIOR_AGENCY_ADMIN');
 
-            if (selected_agency != null) {
+            if (selectedAgency != null) {
                 this.$http.get('/linker_data_for_agency', {
                     method: 'GET',
                     params: {
-                        'agency_ref': selected_agency.id,
-                    }
+                        agency_ref: selectedAgency.id,
+                    },
                 }).then((response: any) => {
                     return response.json();
                 }, () => {
-                    console.log("FAIL");
-                    if (selected_agency != null) {
-                        Vue.set(selected_agency, 'location_options', []);
-                        Vue.set(selected_agency, 'permission_options', []);
-                        Vue.set(selected_agency, 'permissions', []);
+                    if (selectedAgency != null) {
+                        Vue.set(selectedAgency, 'location_options', []);
+                        Vue.set(selectedAgency, 'permission_options', []);
+                        Vue.set(selectedAgency, 'permissions', []);
                     }
                 }).then((json: any) => {
-                    if (selected_agency != null) {
-                        Vue.set(selected_agency, 'location_options', json['location_options']);
-                        Vue.set(selected_agency, 'permission_options', json['permission_options']);
-                        Vue.set(selected_agency, 'permissions', []);
-                        if (selected_agency.location_options.length > 0) {
-                            Vue.set(selected_agency, 'location_id', selected_agency.location_options[0].id);
+                    if (selectedAgency != null) {
+                        Vue.set(selectedAgency, 'location_options', json.location_options);
+                        Vue.set(selectedAgency, 'permission_options', json.permission_options);
+                        Vue.set(selectedAgency, 'permissions', []);
+                        if (selectedAgency.location_options.length > 0) {
+                            Vue.set(selectedAgency, 'location_id', selectedAgency.location_options[0].id);
                         }
-                        this.selected.push(selected_agency);
+                        this.selected.push(selectedAgency);
                     }
                 });
             }
         },
-        togglePermission(event:any, permission: string, agency: agency ) {
+        togglePermission(event: any, permission: string, agency: Agency ) {
             if (event.target.checked) {
                 agency.permissions.push(permission);
             } else {
                 agency.permissions.splice(agency.permissions.indexOf(permission), 1);
             }
-        }
-    }
+        },
+    },
 });
 
 

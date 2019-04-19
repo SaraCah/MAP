@@ -1,6 +1,6 @@
 export default class Utils {
-    static filter<T>(array: T[], predicate: (item: T) => boolean): T[] {
-        let result: T[] = [];
+    public static filter<T>(array: T[], predicate: (item: T) => boolean): T[] {
+        const result: T[] = [];
 
         array.forEach((item: T) => {
             if (predicate(item)) {
@@ -11,8 +11,8 @@ export default class Utils {
         return result;
     }
 
-    static find<T>(array: T[], predicate: (item: T) => boolean): T | null {
-        for (let item of array) {
+    public static find<T>(array: T[], predicate: (item: T) => boolean): T | null {
+        for (const item of array) {
             if (predicate(item)) {
                 return item;
             }

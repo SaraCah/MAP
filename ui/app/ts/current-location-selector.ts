@@ -3,16 +3,16 @@ import VueResource from "vue-resource";
 Vue.use(VueResource);
 import Utils from "./utils";
 
-interface location {
-    id: number,
-    name: string,
-    agency_id: number,
-    agency_label: string,
+interface Location {
+    id: number;
+    name: string;
+    agency_id: number;
+    agency_label: string;
 }
 
-interface agency {
-    id: number,
-    label: string,
+interface Agency {
+    id: number;
+    label: string;
 }
 
 Vue.component('current-location-selector', {
@@ -40,30 +40,28 @@ Vue.component('current-location-selector', {
     </template>
 </div>
 `,
-    data: function ():
-        {
-	    current_location: location,
-            selected_location_id: number,
-            selected_agency_id: number,
-            available: location[],
-        }
-    {
+    data: function(): {
+        current_location: Location,
+        selected_location_id: number,
+        selected_agency_id: number,
+        available: Location[],
+    } {
         return {
             current_location: JSON.parse(this.current_location),
             selected_location_id: JSON.parse(this.current_location).id,
             selected_agency_id: JSON.parse(this.current_agency).id,
             available: JSON.parse(this.available_locations),
-        }
+        };
     },
     props: ['current_agency', 'current_location', 'available_locations', 'csrf_token'],
     methods: {
         agencyOptions: function() {
-            var agencies:agency[] = [];
+            const agencies: Agency[] = [];
 
-            this.available.forEach(function (location:location) {
-                let agency:agency = {id: location.agency_id, label: location.agency_label};
+            this.available.forEach(function(location: Location) {
+                const agency: Agency = {id: location.agency_id, label: location.agency_label};
 
-                if (!Utils.find(agencies, (a)=>{return a.id == agency.id})) {
+                if (!Utils.find(agencies, (a) => a.id === agency.id)) {
                     agencies.push(agency);
                 }
             });
@@ -72,18 +70,18 @@ Vue.component('current-location-selector', {
         },
 
         locationOptions: function() {
-            var locations:location[] = [];
+            const locations: Location[] = [];
 
-            for (let location of this.available) {
-                if (location.agency_id == this.selected_agency_id) {
+            for (const location of this.available) {
+                if (location.agency_id === this.selected_agency_id) {
                     locations.push(location);
                 }
-            };
+            }
 
             return locations;
         },
 
-        refresh:function() {
+        refresh: function() {
             Vue.set(this, 'selected_location_id', this.locationOptions()[0].id);
             this.$forceUpdate();
         },
@@ -96,12 +94,12 @@ Vue.component('current-location-selector', {
                 authenticity_token: this.csrf_token,
             },
             {
-                emulateJSON: true
+                emulateJSON: true,
             }).then(() => {
                 location.reload();
             }, () => {
                 console.log("FAILED TO SET LOCATION");
             });
         },
-    }
+    },
 });
