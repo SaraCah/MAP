@@ -5,7 +5,8 @@ class MAPTheApp < Sinatra::Base
       # These tags get escaped...
       Templates.emit_with_layout(:hello, {
                                    :name => Ctx.session[:username],
-                                   :agency => Ctx.client.get_current_agency
+                                   :agency => Ctx.client.get_current_agency,
+                                   :location => Ctx.get.current_location
                                  },
                                  :layout, title: "Welcome", context: 'home')
     else

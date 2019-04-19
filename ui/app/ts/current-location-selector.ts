@@ -19,7 +19,9 @@ Vue.component('current-location-selector', {
     template: `
 <div>
     <template v-if="available.length == 1">
-        {{current.agency.label}} {{current.name}}
+        <div style="display: inline-block;">
+            {{ current_location.agency_label }} -- {{ current_location.name }}
+        </div>
     </template>
     <template v-if="available.length > 1">
         <div style="display: inline-block; width: 200px;">
@@ -40,12 +42,14 @@ Vue.component('current-location-selector', {
 `,
     data: function ():
         {
+	    current_location: location,
             selected_location_id: number,
             selected_agency_id: number,
             available: location[],
         }
     {
         return {
+            current_location: JSON.parse(this.current_location),
             selected_location_id: JSON.parse(this.current_location).id,
             selected_agency_id: JSON.parse(this.current_agency).id,
             available: JSON.parse(this.available_locations),

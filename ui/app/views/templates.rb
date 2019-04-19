@@ -9,7 +9,7 @@
 # Partials would work the same way--just <%== Templates.emit(:partial_name) %>
 #
 
-Templates.define(:hello, [:name, :agency?], "views/hello.erb.html")
+Templates.define(:hello, [:name, :agency?, :location?], "views/hello.erb.html")
 Templates.define(:example_partial, [], "views/_partial.erb.html")
 
 Templates.define(:layout, [:title, :template, :template_args, :message?, :context?], "views/layout.erb.html")
