@@ -1,22 +1,41 @@
 import Vue from "vue";
 import VueResource from "vue-resource";
 Vue.use(VueResource);
-import Utils from "./utils";
 
+import Utils from "./utils";
 
 interface Agency {
     id: number;
     label: string;
 }
 
-interface AgencyRole {
-    id: number;
-    label: string;
-    role: string;
-    location_id?: number;
-    location_options: Location[];
-    permissions: string[];
-    permission_options: string[];
+class AgencyRole {
+    public static fromAgency(a: Agency): AgencyRole {
+        return new AgencyRole(a.id, a.label, 'SENIOR_AGENCY_ADMIN');
+    }
+
+    public locationId?: number;
+    public locationOptions: Location[];
+    public permissions: string[];
+    public permissionOptions: string[];
+
+    constructor(public id: number,
+                public label: string,
+                public role: string) {
+        this.locationId = undefined;
+        this.locationOptions = [];
+        this.permissions = [];
+        this.permissionOptions = [];
+    }
+
+    public populateFromJSON(json: any) {
+        this.locationOptions = json.location_options;
+        this.permissionOptions = json.permission_options;
+
+        if (this.locationOptions.length > 0) {
+            this.locationId = this.locationOptions[0].id;
+        }
+    }
 }
 
 interface Location {
@@ -104,12 +123,12 @@ Vue.component('agency-role-linker', {
         </td>
         <td>
           <template v-if="agency.role !== 'SENIOR_AGENCY_ADMIN'">
-              <div v-if="agency.location_options.length == 0">Agency Top Level Location</div>
-              <div v-if="agency.location_options.length > 0">
-                  <select class="browser-default" name="user[agency][][location_id]" v-bind:value="agency.location_id" v-model="agency.location_id">
-                    <option v-for="location in agency.location_options" v-bind:value="location.id">{{ location.label }}</option>
+              <div v-if="agency.locationOptions.length == 0">Agency Top Level Location</div>
+              <div v-if="agency.locationOptions.length > 0">
+                  <select class="browser-default" name="user[agency][][location_id]" v-bind:value="agency.locationId" v-model="agency.locationId">
+                    <option v-for="location in agency.locationOptions" v-bind:value="location.id">{{ location.label }}</option>
                   </select>
-                  <div v-for="location in agency.location_options">
+                  <div v-for="location in agency.locationOptions">
                       <input type="hidden" name="user[agency][][location_options][][id]" v-bind:value="location.id" />
                       <input type="hidden" name="user[agency][][location_options][][label]" v-bind:value="location.label" />
                   </div>
@@ -133,7 +152,7 @@ Vue.component('agency-role-linker', {
         <td></td>
         <td>
             <div v-if="agency.role !== 'SENIOR_AGENCY_ADMIN'">
-                <div v-for="permission_type in agency.permission_options">
+                <div v-for="permission_type in agency.permissionOptions">
                     <label>
                         <input type="checkbox" name="user[agency][][permission][]" v-bind:value="permission_type" v-on:change="togglePermission($event, permission_type, agency)">
                         <span>{{ permission_type }}</span>
@@ -160,15 +179,7 @@ Vue.component('agency-role-linker', {
             });
         },
         addSelected(agency: Agency) {
-            const selectedAgency: AgencyRole = (Object as any).assign({}, agency, {
-                role: 'SENIOR_AGENCY_ADMIN',
-                location_options: [],
-                permission_options: [],
-                permissions: [],
-            });
-
-            // selectedAgency.role == 'SENIOR_AGENCY_ADMIN';
-            // Vue.set(selectedAgency, 'role', 'SENIOR_AGENCY_ADMIN');
+            const selectedAgency: AgencyRole = AgencyRole.fromAgency(agency);
 
             this.$http.get('/linker_data_for_agency', {
                 method: 'GET',
@@ -177,12 +188,7 @@ Vue.component('agency-role-linker', {
                 },
             }).then((response: any) => response.json())
               .then((json: any) => {
-                  selectedAgency.location_options = json.location_options;
-                  selectedAgency.permission_options = json.permission_options;
-                  if (selectedAgency.location_options.length > 0) {
-                      selectedAgency.location_id = selectedAgency.location_options[0].id;
-                  }
-
+                  selectedAgency.populateFromJSON(json);
                   this.selected.push(selectedAgency);
               });
         },
@@ -309,7 +315,7 @@ Vue.component('agency-role-linker', {
 //                 }
 //                 return;
 //             }
-// 
+//
 //             // escape these keys
 //             if (e.which === 9 ||        // tab
 //                 e.which === 16 ||       // shift
@@ -325,10 +331,10 @@ Vue.component('agency-role-linker', {
 //                 self.$autocomplete.empty();
 //                 return;
 //             }
-// 
+//
 //             var val = self.$input.val().toLowerCase();
 //             self.$autocomplete.empty();
-// 
+//
 //             if (val.length >= 1) {
 //                 self.timeout = setTimeout(function () {
 //                     self.runningRequest = true;
@@ -365,14 +371,14 @@ Vue.component('agency-role-linker', {
 //                 }, 250);
 //             }
 //         });
-// 
+//
 //         $(document).click(function (event) { // close ul if clicked outside
 //             if (!$(event.target).closest(self.$autocomplete).length) {
 //                 self.$autocomplete.empty();
 //             }
 //         });
 //     }
-// 
+//
 //     highlight(string, match) {
 //         var matchStart = string.toLowerCase().indexOf("" + match.toLowerCase() + ""),
 //         matchEnd = matchStart + match.length - 1,
@@ -383,22 +389,22 @@ Vue.component('agency-role-linker', {
 //             matchText + "</span>" + afterMatch + "</span>";
 //         return string;
 //     }
-// 
+//
 //     reset_for_types: (types) {
 //         this.$input.val('');
 //         this.$hiddenInputId.val('');
 //         this.$hiddenInputRepository.val('');
-//         
+//
 //         this.$input.siblings('.prefix').remove();
 //         this.types = types;
 //     }
-// 
+//
 //     disable() {
 //         this.$input.prop('disabled', true);
 //         this.$hiddenInputId.prop('disabled', true);
 //         this.$hiddenInputRepository.prop('disabled', true);
 //     }
-// 
+//
 //     enable() {
 //         this.$input.prop('disabled', false);
 //         this.$hiddenInputId.prop('disabled', false);
