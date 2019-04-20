@@ -6,4 +6,4 @@ cd "`dirname "$0"`/../"
 
 export GEM_HOME=$PWD/distlibs/gems
 
-java ${JAVA_OPTS} -Xmx${JVM_HEAP_SIZE} -cp 'distlibs/*' org.jruby.Main ${1+"$@"}
+java -Dapp=MAPAPI ${JAVA_OPTS} -Xmx${JVM_HEAP_SIZE} -cp 'distlibs/*' org.jruby.Main ${1+"$@"}
