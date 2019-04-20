@@ -18,6 +18,13 @@ interface Agency {
     label: string;
 }
 
+interface SelectorState {
+    current_location: Location;
+    selected_location_id: number;
+    selected_agency_id: number;
+    available: Location[];
+}
+
 Vue.component('current-location-selector', {
     template: `
 <div>
@@ -43,20 +50,15 @@ Vue.component('current-location-selector', {
     </template>
 </div>
 `,
-    data: function(): {
-        current_location: Location,
-        selected_location_id: number,
-        selected_agency_id: number,
-        available: Location[],
-    } {
+    data: function(): SelectorState {
         return {
-            current_location: JSON.parse(this.current_location),
-            selected_location_id: Number(JSON.parse(this.current_location).id),
-            selected_agency_id: Number(JSON.parse(this.current_agency).id),
-            available: JSON.parse(this.available_locations),
+            current_location: JSON.parse(this.current_location_json),
+            selected_location_id: Number(JSON.parse(this.current_location_json).id),
+            selected_agency_id: Number(JSON.parse(this.current_agency_json).id),
+            available: JSON.parse(this.available_locations_json),
         };
     },
-    props: ['current_agency', 'current_location', 'available_locations', 'csrf_token'],
+    props: ['current_agency_json', 'current_location_json', 'available_locations_json', 'csrf_token'],
     computed: {
         agencyOptions: function() {
             const agencies: Agency[] = [];
