@@ -202,91 +202,89 @@ Vue.component('agency-role-linker', {
     },
 });
 
-
-
 // class AgencyLinker {
-// 
+//
 //     constructor($input) {
 //         this.$input = $input;
 //         this.$hiddenInputId = $input.siblings('.morty-relationship-object-id');
 //         this.$hiddenInputRepository = this.$input.siblings('morty-relationship-object-repository');
-// 
+//
 //         this.$autocomplete = $('<ul id="ac" class="autocomplete-content dropdown-content"'
 //                                + 'style="position:absolute"></ul>');
 //         this.$inputDiv = this.$input.closest('.input-field');
-// 
+//
 //         this.request = undefined;
 //         this.runningRequest = false;
 //         this.timeout = undefined;
 //         this.liSelected = undefined;
 //         this.next = undefined;
-// 
+//
 //         this.types = [];
-// 
+//
 //         this.init();
 //     }
-// 
+//
 //     init() {
 //         var self = this;
-// 
+//
 //         if (self.$inputDiv.length) {
 //             self.$inputDiv.append(self.$autocomplete); // Set ul in body
 //         } else {
 //             self.$input.after(self.$autocomplete);
 //         }
-// 
-// 
+//
+//
 //         self.$autocomplete.on('click', 'li', function (event) {
 //             event.preventDefault();
 //             event.stopPropagation();
-// 
+//
 //             self.$input.val('');
 //             self.$hiddenInputId.val('');
 //             self.$hiddenInputRepository.val('');
 //             self.$input.siblings('.prefix').remove();
-// 
+//
 //             if ($(this).data('id')) {
 //                 self.$input.val($(this).data('display_string'));
 //                 self.$hiddenInputId.val($(this).data('id'));
 //                 self.$hiddenInputRepository.val($(this).data('repository'));
-// 
+//
 //                 if ($(this).data('icon')) {
 //                     var $icon = $($(this).data('icon'));
 //                     $icon.addClass('prefix');
 //                     self.$input.before($icon);
 //                 }
 //             }
-// 
+//
 //             self.$autocomplete.empty();
 //             self.$input.focus();
 //         });
-// 
+//
 //         self.$input.on('keydown', function (e) {
 //             if (e.which === 13) { // select element with Enter
 //                 e.preventDefault();
 //                 e.stopPropagation();
-// 
+//
 //                 self.liSelected[0].click();
 //                 return false;
 //             }
 //             return true;
 //         });
-// 
+//
 //         self.$input.on('keyup', function (e) {
-// 
+//
 //             if (self.timeout) { // comment to remove timeout
 //                 clearTimeout(self.timeout);
 //             }
-// 
+//
 //             if (self.runningRequest) {
 //                 self.request.abort();  // stop requests that are already sent
 //             }
-// 
+//
 //             if (e.which === 13) { // select element with Enter
 //                 self.liSelected[0].click();
 //                 return false;
 //             }
-// 
+//
 //             // scroll ul with arrow keys
 //             if (e.which === 40) {   // down arrow
 //                 if (self.liSelected) {
