@@ -36,7 +36,8 @@
         <script>
          require.config({
              baseUrl: "/js",
-             urlArgs: "<%= URLHelper.cb %>"
+             urlArgs: "<%= URLHelper.cb %>",
+             bundles: <%== JSBundle.requirejs_bundle_defs %>
          });
 
          require(["main"]);

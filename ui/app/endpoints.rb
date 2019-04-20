@@ -19,7 +19,10 @@ class MAPTheApp < Sinatra::Base
     .param(:cb, String, "Cachebuster (ignored)", optional: true) do
 
     filename = request.path.split('/').last
-    if filename == 'vue.js'
+
+    if JSBundle.has_bundle?(filename)
+      send_file JSBundle.filename_for_bundle(filename)
+    elsif filename == 'vue.js'
       if MAPTheApp.production?
         send_file File.join('ts/node_modules/vue/dist/vue.min.js')
       else
@@ -27,14 +30,12 @@ class MAPTheApp < Sinatra::Base
       end
     elsif filename == 'vue-resource.js'
       send_file File.join('ts/node_modules/vue-resource/dist/vue-resource.min.js')
+    elsif File.exist?(file = File.join('js', filename))
+      send_file file
+    elsif File.exist?(file = File.join('buildjs', filename))
+      send_file file
     else
-      if File.exist?(file = File.join('js', filename))
-        send_file file
-      elsif File.exist?(file = File.join('buildjs', filename))
-        send_file file
-      else
-        [404]
-      end
+      [404]
     end
   end
 

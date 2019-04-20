@@ -37,6 +37,7 @@ require 'lib/map_api_client'
 require 'lib/url_helper'
 require 'lib/form_helper'
 require 'lib/typescript_helper'
+require 'lib/js_bundle'
 
 require 'dto/user_update_request'
 require 'dto/agency_location_update_request'
@@ -44,6 +45,15 @@ require 'dto/agency_location_update_request'
 require 'endpoints'
 
 class MAPTheApp < Sinatra::Base
+
+  configure do
+    JSBundle.add_to_bundle('map_ui_bundle', 'utils', 'buildjs/utils.js')
+    JSBundle.add_to_bundle('map_ui_bundle', 'current-location-selector', 'buildjs/current-location-selector.js')
+    JSBundle.add_to_bundle('map_ui_bundle', 'linker', 'buildjs/linker.js')
+    JSBundle.add_to_bundle('map_ui_bundle', 'main', 'buildjs/main.js')
+
+    JSBundle.init
+  end
 
   configure :development do |config|
     register Sinatra::Reloader

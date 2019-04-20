@@ -1,3 +1,5 @@
+/// <amd-module name='main'/>
+
 import Vue from "vue";
 
 import 'current-location-selector';

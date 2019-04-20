@@ -1,3 +1,5 @@
+/// <amd-module name='utils'/>
+
 export default class Utils {
     public static filter<T>(array: T[], predicate: (item: T) => boolean): T[] {
         const result: T[] = [];
