@@ -10,3 +10,14 @@
 .user-role-table tbody tr:first-child {
     border-bottom: none;
 }
+
+.brand-logo .logo-text {
+    display: inline-block;
+    position: relative;
+    text-shadow: 1px 1px 20px #333;
+}
+
+.logo-icon {
+    font-size: 200%;
+    opacity: 0.35;
+}
