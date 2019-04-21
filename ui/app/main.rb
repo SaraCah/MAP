@@ -48,6 +48,7 @@ class MAPTheApp < Sinatra::Base
 
   configure do
     JSBundle.add_to_bundle('map_ui_bundle', 'utils', 'buildjs/utils.js')
+    JSBundle.add_to_bundle('map_ui_bundle', 'ui', 'buildjs/ui.js')
     JSBundle.add_to_bundle('map_ui_bundle', 'current-location-selector', 'buildjs/current-location-selector.js')
     JSBundle.add_to_bundle('map_ui_bundle', 'linker', 'buildjs/linker.js')
     JSBundle.add_to_bundle('map_ui_bundle', 'main', 'buildjs/main.js')

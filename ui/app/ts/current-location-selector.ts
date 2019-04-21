@@ -5,6 +5,7 @@ import Vue from "vue";
 import VueResource from "vue-resource";
 Vue.use(VueResource);
 import Utils from "./utils";
+import UI from "./ui";
 
 interface Location {
     id: number;
@@ -103,7 +104,7 @@ Vue.component('current-location-selector', {
             }).then(() => {
                 location.reload();
             }, () => {
-                Utils.genericModal("Error: Failed to set your location");
+                UI.genericModal("Error: Failed to set your location");
             });
         },
     },
