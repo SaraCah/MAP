@@ -15,6 +15,13 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  STATIC_JS_FILES = {
+    'require.js' => 'ts/node_modules/requirejs/require.js',
+    'materialize.min.js' => 'ts/node_modules/materialize-css/dist/js/materialize.min.js',
+    'vue.js' => (MAPTheApp.production? ? 'ts/node_modules/vue/dist/vue.min.js' : 'ts/node_modules/vue/dist/vue.js'),
+    'vue-resource.js' => 'ts/node_modules/vue-resource/dist/vue-resource.min.js',
+  }
+
   Endpoint.get('/js/*')
     .param(:cb, String, "Cachebuster (ignored)", optional: true) do
 
@@ -22,14 +29,8 @@ class MAPTheApp < Sinatra::Base
 
     if JSBundle.has_bundle?(filename)
       send_file JSBundle.filename_for_bundle(filename)
-    elsif filename == 'vue.js'
-      if MAPTheApp.production?
-        send_file File.join('ts/node_modules/vue/dist/vue.min.js')
-      else
-        send_file File.join('ts/node_modules/vue/dist/vue.js')
-      end
-    elsif filename == 'vue-resource.js'
-      send_file File.join('ts/node_modules/vue-resource/dist/vue-resource.min.js')
+    elsif (match = STATIC_JS_FILES.fetch(filename, nil))
+      send_file match
     elsif File.exist?(file = File.join('js', filename))
       send_file file
     elsif File.exist?(file = File.join('buildjs', filename))
@@ -43,7 +44,10 @@ class MAPTheApp < Sinatra::Base
     .param(:cb, String, "Cachebuster (ignored)", optional: true) do
 
     filename = request.path.split('/').last
-    if File.exist?(file = File.join('css', filename))
+
+    if filename == 'materialize.min.css'
+      send_file 'ts/node_modules/materialize-css/dist/css/materialize.min.css'
+    elsif File.exist?(file = File.join('css', filename))
       send_file file
     else
       [404]
