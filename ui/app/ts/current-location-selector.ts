@@ -103,7 +103,7 @@ Vue.component('current-location-selector', {
             }).then(() => {
                 location.reload();
             }, () => {
-                console.log("FAILED TO SET LOCATION");
+                Utils.genericModal("Error: Failed to set your location");
             });
         },
     },
