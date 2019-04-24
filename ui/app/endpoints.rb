@@ -98,11 +98,11 @@ class MAPTheApp < Sinatra::Base
       params[:user].is_admin = false
       if Ctx.permissions.is_senior_agency_admin?
         params[:user].agencies.select! do |agency|
-          (agency['location_id'] == Ctx.get.current_location.id) 
+          (Integer(agency['location_id']) == Ctx.get.current_location.id)
         end
       elsif Ctx.permissions.is_agency_admin?
         params[:user].agencies.select! do |agency|
-          (agency['location_id'] == Ctx.get.current_location.id) && agency['role'] != 'SENIOR_AGENCY_ADMIN'
+          (Integer(agency['location_id']) == Ctx.get.current_location.id) && agency['role'] != 'SENIOR_AGENCY_ADMIN'
         end
       else
         # FIXME
@@ -117,6 +117,48 @@ class MAPTheApp < Sinatra::Base
     if params[:user].has_errors?
       Templates.emit_with_layout(:user_new, {user: params[:user]},
                                    :layout, title: "New User", context: 'users')
+    else
+      redirect '/users'
+    end
+  end
+
+  Endpoint.get('/users/edit')
+    .param(:username, String, "Username") do
+    unless Ctx.permissions.is_admin?
+      # FIXME check permissions
+    end
+
+    Templates.emit_with_layout(:user_edit, {user: Ctx.client.user_for_edit(params[:username])},
+                               :layout, title: "Edit User", context: 'users')
+  end
+
+  Endpoint.post('/users/update/:id')
+    .param(:id, Integer, "User id")
+    .param(:user, UserUpdateRequest, "The user to update") do
+
+    unless Ctx.permissions.is_admin?
+      params[:user].is_admin = false
+      if Ctx.permissions.is_senior_agency_admin?
+        params[:user].agencies.select! do |agency|
+          (Integer(agency['location_id']) == Ctx.get.current_location.id)
+        end
+      elsif Ctx.permissions.is_agency_admin?
+        params[:user].agencies.select! do |agency|
+          (Integer(agency['location_id']) == Ctx.get.current_location.id) && agency['role'] != 'SENIOR_AGENCY_ADMIN'
+        end
+      else
+        # FIXME
+        raise "Insufficient Privileges"
+      end
+    end
+
+    params[:user].validate!
+
+    Ctx.client.update_user(params[:user]) unless params[:user].has_errors?
+
+    if params[:user].has_errors?
+      Templates.emit_with_layout(:user_edit, {user: params[:user]},
+                                 :layout, title: "Edit User", context: 'users')
     else
       redirect '/users'
     end
@@ -177,7 +219,7 @@ class MAPTheApp < Sinatra::Base
         {
           'location_options' => Ctx.client.locations_for_agency(params[:agency_ref]).map(&:to_search_result),
           # FIXME some shared lib?
-          'permission_options' => [:allow_transfers, :allow_file_issue, :allow_set_raps, :allow_change_raps, :allow_restricted_access]
+          'permission_options' => Ctx.client.permission_options
         }.to_json
       ]
     else

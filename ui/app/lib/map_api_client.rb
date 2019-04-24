@@ -11,9 +11,10 @@ class MAPAPIClient
     end
   end
 
-  AgencyRole = Struct.new(:agency_id, :aspace_agency_id, :agency_location_id, :role, :permissions) do
+  AgencyRole = Struct.new(:agency_id, :agency_label, :aspace_agency_id, :agency_location_id, :role, :permissions) do
     def self.from_json(json)
       new(json.fetch('agency_id'),
+          json.fetch('agency_label'),
           json.fetch('aspace_agency_id'),
           json.fetch('agency_location_id'),
           json.fetch('role'),
@@ -69,6 +70,9 @@ class MAPAPIClient
     end
   end
 
+  def permission_options
+    [:allow_transfers, :allow_file_issue, :allow_set_raps, :allow_change_raps, :allow_restricted_access]
+  end
 
   def authenticate(username, password)
     response = post('/authenticate', username: username, password: password)
@@ -130,10 +134,22 @@ class MAPAPIClient
   end
 
   def create_user(user)
-    response = post('/users/create', user.to_hash)
+    response = post('/users/create', user.to_request)
     if response['errors']
       user.add_errors(response['errors'])
     end
+  end
+
+  def update_user(user)
+    response = post('/users/update', user.to_request)
+    if response['errors']
+      user.add_errors(response['errors'])
+    end
+  end
+
+  def user_for_edit(username)
+    dto = get('/user-for-edit', {username: username})
+    UserUpdateRequest.parse(dto)
   end
 
   def create_location(location)

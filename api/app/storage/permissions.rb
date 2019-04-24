@@ -2,24 +2,47 @@ class Permissions < BaseStorage
 
   AVAILABLE_PERMISSIONS = [:allow_transfers, :allow_file_issue, :allow_set_raps, :allow_change_raps, :allow_restricted_access]
 
-  def self.agency_roles_for_user(user_id)
-    db[:agency_user]
-      .join(:agency, Sequel[:agency][:id] => Sequel[:agency_user][:agency_id])
-      .join(:agency_location, Sequel[:agency_location][:id] => Sequel[:agency_user][:agency_location_id])
-      .filter(Sequel[:agency_user][:user_id] => user_id)
-      .select(Sequel.as(Sequel[:agency_user][:id], :agency_user_id),
-              Sequel.as(Sequel[:agency_user][:role], :role),
-              Sequel.as(Sequel[:agency][:id], :agency_id),
-              Sequel.as(Sequel[:agency][:aspace_agency_id], :aspace_agency_id),
-              Sequel.as(Sequel[:agency_location][:id], :agency_location_id),
-              Sequel.as(Sequel[:agency_location][:name], :agency_location_label),
-              Sequel.as(Sequel[:agency_user][:allow_transfers], :allow_transfers),
-              Sequel.as(Sequel[:agency_user][:allow_file_issue], :allow_file_issue),
-              Sequel.as(Sequel[:agency_user][:allow_set_raps], :allow_set_raps),
-              Sequel.as(Sequel[:agency_user][:allow_change_raps], :allow_change_raps),
-              Sequel.as(Sequel[:agency_user][:allow_restricted_access], :allow_restricted_access))
-      .map do |row|
-        AgencyRole.from_row(row)
+  def self.agency_roles_for_user(user_id, with_labels = false)
+    agency_roles = db[:agency_user]
+                    .join(:agency, Sequel[:agency][:id] => Sequel[:agency_user][:agency_id])
+                    .join(:agency_location, Sequel[:agency_location][:id] => Sequel[:agency_user][:agency_location_id])
+                    .filter(Sequel[:agency_user][:user_id] => user_id)
+                    .select(Sequel.as(Sequel[:agency_user][:id], :agency_user_id),
+                            Sequel.as(Sequel[:agency_user][:role], :role),
+                            Sequel.as(Sequel[:agency][:id], :agency_id),
+                            Sequel.as(Sequel[:agency][:aspace_agency_id], :aspace_agency_id),
+                            Sequel.as(Sequel[:agency_location][:id], :agency_location_id),
+                            Sequel.as(Sequel[:agency_location][:name], :agency_location_label),
+                            Sequel.as(Sequel[:agency_user][:allow_transfers], :allow_transfers),
+                            Sequel.as(Sequel[:agency_user][:allow_file_issue], :allow_file_issue),
+                            Sequel.as(Sequel[:agency_user][:allow_set_raps], :allow_set_raps),
+                            Sequel.as(Sequel[:agency_user][:allow_change_raps], :allow_change_raps),
+                            Sequel.as(Sequel[:agency_user][:allow_restricted_access], :allow_restricted_access))
+                    .map do |row|
+                      agency_role = AgencyRole.from_row(row)
+                      agency_role.agency_location_label = row[:agency_location_label] if with_labels
+                      agency_role
+                    end
+
+    if with_labels
+      aspace_agencies = Agencies.aspace_agencies(agency_roles.map(&:aspace_agency_id))
+      agency_roles.each do |agency_role|
+        agency_role.agency_label = aspace_agencies.fetch(agency_role.aspace_agency_id).label
+      end
+    end
+
+    agency_roles
+  end
+
+
+  def self.clear_roles(user_id)
+    if Ctx.get.permissions.is_admin?
+      db[:agency_user].filter(:user_id => user_id).delete
+    else
+      db[:agency_user]
+        .filter(:user_id => user_id)
+        .filter(:agency_location_id => Ctx.get.current_location.id)
+        .delete
     end
   end
 

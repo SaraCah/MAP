@@ -4,7 +4,7 @@ class Users < BaseStorage
 
   def self.page(page, page_size)
     permission_dataset = db[:user]
-                           .join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
+                           .left_join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
 
     unless Ctx.get.permissions.is_admin?
       current_location = Ctx.get.current_location
@@ -90,8 +90,56 @@ class Users < BaseStorage
                      :modified_time => java.lang.System.currentTimeMillis)
   end
 
+  def self.update_user(user_id, username, name, is_admin)
+    db[:user]
+      .filter(:id => user_id)
+      .update(:username => username,
+              :name => name,
+              :admin => is_admin ? 1 : 0,
+              :modified_time => java.lang.System.currentTimeMillis)
+  end
+
   def self.id_for_username(username)
     db[:user][:username => username][:id]
+  end
+
+  def self.update_from_dto(user)
+    user.validate!
+    return if user.has_errors?
+
+    # check for uniqueness
+    user_for_username = db[:user][:username => user.username]
+    if user_for_username.nil? || user_for_username[:id] == Integer(user.id)
+      update_user(user.id, user.username, user.name, user.is_admin?)
+
+      Permissions.clear_roles(user.id)
+
+      user.agencies.each do |user_agency|
+        agency_ref = user_agency.fetch('id')
+        role = user_agency.fetch('role')
+        location_id = user_agency['location_id']
+        permissions = Array(user_agency['permission'])
+
+        # FIXME ref
+        (_, aspace_agency_id) = agency_ref.split(':')
+
+        agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
+
+        if role == 'SENIOR_AGENCY_ADMIN'
+          Permissions.add_agency_senior_admin(user.id, agency_id)
+        elsif role == 'AGENCY_ADMIN'
+          Permissions.add_agency_admin(user.id, agency_id, location_id, permissions)
+        elsif role == 'AGENCY_CONTACT'
+          Permissions.add_agency_contact(user.id, agency_id, location_id, permissions)
+        end
+      end
+
+      unless user.password.empty?
+        DBAuth.set_user_password(user.id, user.password)
+      end
+    else
+      user.add_error('username', 'already in use')
+    end
   end
 
   def self.create_from_dto(user)
@@ -145,5 +193,11 @@ class Users < BaseStorage
     end
 
     result
+  end
+
+  def self.dto_for(username)
+    UserUpdateRequest.from_row(
+      user = db[:user][:username => username],
+      Permissions.agency_roles_for_user(user[:id], true))
   end
 end

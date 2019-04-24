@@ -44,6 +44,17 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.post('/users/update')
+    .param(:user, UserUpdateRequest, "User") do
+    Users.update_from_dto(params[:user])
+
+    if params[:user].has_errors?
+      json_response(errors: params[:user].errors)
+    else
+      json_response(status: 'updated')
+    end
+  end
+
   Endpoint.get('/search/agencies')
     .param(:q, String, "Search string") do
     permissions = Users.permissions_for_user(Ctx.username)
@@ -133,5 +144,14 @@ class MAPTheAPI < Sinatra::Base
     Ctx.get.set_location(params[:agency_id], params[:location_id])
 
     json_response({'status' => 'ok'})
+  end
+
+  Endpoint.get('/user-for-edit')
+    .param(:username, String, "Username to authenticate") do
+    if Ctx.user_logged_in?
+      json_response(Users.dto_for(params[:username]).to_hash)
+    else
+      json_response({})
+    end
   end
 end

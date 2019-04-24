@@ -2,8 +2,9 @@
     <% if user.has_errors? %>
     <pre><%= user.errors %></pre>
     <% end %>
-    <form class="col s12" action="/users/create" method="post">
+    <form class="col s12" action='/users/<%= user.new? ? "create" : "update/#{user.id}" %>' method="post">
         <%== FormHelper.hidden_authenticity_token %>
+        <% unless user.new? %><input type="hidden" name="user[id]" value="<%= user.id  %>"><% end %>
         <div class="row">
             <div class="input-field col s12">
                 <input id="username" name="user[username]" type="text" value="<%= user.username %>" required>
@@ -18,7 +19,7 @@
         </div>
         <div class="row">
             <div class="input-field col s12">
-                <input id="password" name="user[password]" type="password" required>
+                <input id="password" name="user[password]" type="password" <% if user.new? %>required<% end %>>
                 <label for="password">Password</label>
             </div>
         </div>
@@ -35,9 +36,10 @@
         <% if Ctx.get.permissions.is_admin? %>
             <br>
             <div class="row">
-                <agency-role-linker agencies='<%= user.agencies.to_json %>'></agency-role-linker>
+                <agency-role-linker agencies='<%= user.agencies.to_json %>' permission_options="<%= Ctx.client.permission_options.to_json %>"></agency-role-linker>
             </div>
         <% else %>
+            <% agency_role = user.agencies.first %>
             <input type="hidden" name="user[agency][][id]" value="<%= Ctx.get.current_location.agency.id  %>">
             <input type="hidden" name="user[agency][][location_id]" value="<%= Ctx.get.current_location.id %>">
             <div class="row">
@@ -45,37 +47,37 @@
                     <label for="role">Role</label>
                     <select id="role" name="user[agency][][role]" class="browser-default">
                         <% if Ctx.get.permissions.is_senior_agency_admin? %>
-                            <option value="SENIOR_AGENCY_ADMIN">Senior Agency Admin</option>
+                            <option value="SENIOR_AGENCY_ADMIN" <% if agency_role['role'] == 'SENIOR_AGENCY_ADMIN' %>selected<% end %>>Senior Agency Admin</option>
                         <% end %>
-                        <option value="AGENCY_ADMIN">Agency Admin</option>
-                        <option value="AGENCY_CONTACT">Agency Contact</option>
+                        <option value="AGENCY_ADMIN" <% if agency_role['role'] == 'AGENCY_ADMIN' %>selected<% end %>>Agency Admin</option>
+                        <option value="AGENCY_CONTACT" <% if agency_role['role'] == 'AGENCY_CONTACT' %>selected<% end %>>Agency Contact</option>
                     </select>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s12">
-                    <label><input type="checkbox" name="user[agency][][permission][]" value="allow_transfers"> <span>allow_transfers</span></label>
+                    <label><input type="checkbox" name="user[agency][][permission][]" value="allow_transfers" <% if Array(agency_role['permission']).include?('allow_transfers') %>checked<% end %>> <span>allow_transfers</span></label>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s12">
-                    <label><input type="checkbox" name="user[agency][][permission][]" value="allow_file_issue"> <span>allow_file_issue</span></label>
+                    <label><input type="checkbox" name="user[agency][][permission][]" value="allow_file_issue" <% if Array(agency_role['permission']).include?('allow_file_issue') %>checked<% end %>> <span>allow_file_issue</span></label>
                 </div>
             </div>
             <% if Ctx.get.permissions.is_senior_agency_admin? %>
                 <div class="row">
                     <div class="input-field col s12">
-                        <label><input type="checkbox" name="user[agency][][permission][]" value="allow_set_raps"> <span>allow_set_raps</span></label>
+                        <label><input type="checkbox" name="user[agency][][permission][]" value="allow_set_raps" <% if Array(agency_role['permission']).include?('allow_set_raps') %>checked<% end %>> <span>allow_set_raps</span></label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <label><input type="checkbox" name="user[agency][][permission][]" value="allow_change_raps"> <span>allow_change_raps</span></label>
+                        <label><input type="checkbox" name="user[agency][][permission][]" value="allow_change_raps" <% if Array(agency_role['permission']).include?('allow_change_raps') %>checked<% end %>> <span>allow_change_raps</span></label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s12">
-                        <label><input type="checkbox" name="user[agency][][permission][]" value="allow_restricted_access"> <span>allow_restricted_access</span></label>
+                        <label><input type="checkbox" name="user[agency][][permission][]" value="allow_restricted_access" <% if Array(agency_role['permissions']).include?('allow_restricted_access') %>checked<% end %>> <span>allow_restricted_access</span></label>
                     </div>
                 </div>
             <% end %>

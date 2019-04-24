@@ -31,7 +31,7 @@
                         </td>
                         <td><%= Time.at(user.create_time / 1000)%></td>
                         <td>
-                            <!--<button>Edit</button>-->
+                            <a class="btn btn-small waves-effect" href="/users/edit?username=<%= user.username %>">Edit</a>
                             <!--<button>Delete</button>-->
                         </td>
                     </tr>

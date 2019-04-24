@@ -1,11 +1,11 @@
-AgencyRole = Struct.new(:id, :role, :agency_id, :aspace_agency_id, :agency_location_id, :permissions) do
+AgencyRole = Struct.new(:id, :role, :agency_id, :aspace_agency_id, :agency_location_id, :permissions, :agency_label, :agency_location_label) do
   def self.from_row(row)
-    agency_role = AgencyRole.new(row[:agency_user_id],
-                                 row[:role],
-                                 row[:agency_id],
-                                 row[:aspace_agency_id],
-                                 row[:agency_location_id],
-                                 Permissions::AVAILABLE_PERMISSIONS.select{|permission| row[permission] == 1})
+    AgencyRole.new(row[:agency_user_id],
+                   row[:role],
+                   row[:agency_id],
+                   row[:aspace_agency_id],
+                   row[:agency_location_id],
+                   Permissions::AVAILABLE_PERMISSIONS.select{|permission| row[permission] == 1})
   end
 
   # FIXME ref business

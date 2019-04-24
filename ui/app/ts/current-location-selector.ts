@@ -30,7 +30,7 @@ Vue.component('current-location-selector', {
     template: `
 <div>
     <template v-if="available.length == 1">
-        <div style="display: inline-block;">
+        <div style="line-height: 48px;padding-right: 10px;">
             {{ current_location.agency_label }} -- {{ current_location.name }}
         </div>
     </template>

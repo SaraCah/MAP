@@ -47,4 +47,21 @@ class Agencies < BaseStorage
 
     result.values.first
   end
+
+  def self.aspace_agencies(aspace_agency_ids)
+    result = {}
+
+    AspaceDB.open do |aspace_db|
+      aspace_db[:agent_corporate_entity]
+        .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
+        .filter(Sequel[:name_corporate_entity][:authorized] => 1)
+        .filter(Sequel[:agent_corporate_entity][:id] => aspace_agency_ids)
+        .select(Sequel[:agent_corporate_entity][:id],
+                Sequel[:name_corporate_entity][:sort_name]).each do |row|
+        result[row[:id]] = Agency.from_row(row)
+      end
+    end
+
+    result
+  end
 end

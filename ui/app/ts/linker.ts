@@ -18,6 +18,7 @@ class AgencyRole {
     }
 
     public locationId?: number;
+    public locationLabel?: string;
     public locationOptions: Location[];
     public permissions: string[];
     public permissionOptions: string[];
@@ -26,6 +27,7 @@ class AgencyRole {
                 public label: string,
                 public role: string) {
         this.locationId = undefined;
+        this.locationLabel = undefined;
         this.locationOptions = [];
         this.permissions = [];
         this.permissionOptions = [];
@@ -109,6 +111,9 @@ Vue.component('agency-linker', {
             this.selected = agency;
         },
     },
+    mounted: function() {
+        console.log(this.selected);
+    }
 });
 
 Vue.component('agency-role-linker', {
@@ -126,7 +131,10 @@ Vue.component('agency-role-linker', {
         </td>
         <td>
           <template v-if="agency.role !== 'SENIOR_AGENCY_ADMIN'">
-              <div v-if="agency.locationOptions.length == 0">Agency Top Level Location</div>
+              <div v-if="agency.locationOptions.length == 0">
+                <div v-if="agency.locationLabel">{{agency.locationLabel}}</div>
+                <div v-if="!agency.locationLabel">Agency Top Level Location</div>
+              </div>
               <div v-if="agency.locationOptions.length > 0">
                   <select class="browser-default" name="user[agency][][location_id]" v-bind:value="agency.locationId" v-model="agency.locationId">
                     <option v-for="location in agency.locationOptions" v-bind:value="location.id">{{ location.label }}</option>
@@ -157,7 +165,7 @@ Vue.component('agency-role-linker', {
             <div v-if="agency.role !== 'SENIOR_AGENCY_ADMIN'">
                 <div v-for="permission_type in agency.permissionOptions">
                     <label>
-                        <input type="checkbox" name="user[agency][][permission][]" v-bind:value="permission_type" v-on:change="togglePermission($event, permission_type, agency)">
+                        <input type="checkbox" name="user[agency][][permission][]" v-bind:value="permission_type" v-model="agency.permissions">
                         <span>{{ permission_type }}</span>
                     </label>
                 </div>
@@ -170,11 +178,23 @@ Vue.component('agency-role-linker', {
 </div>
 `,
     data: function(): {selected: AgencyRole[]} {
+        let prepopulated:AgencyRole[] = [];
+        let permissionOptions:string[] = JSON.parse(this.permission_options);
+
+        JSON.parse(this.agencies).forEach((agency_blob:any) => {
+            let role:AgencyRole = new AgencyRole(agency_blob.id, agency_blob.label, agency_blob.role);
+            role.locationId = agency_blob.agency_location_id;
+            role.locationLabel = agency_blob.agency_location_label;
+            role.permissions = agency_blob.permissions;
+            role.permissionOptions = permissionOptions;
+            prepopulated.push(role);
+        });
+
         return {
-            selected: JSON.parse(this.agencies),
+            selected: prepopulated,
         };
     },
-    props: ['agencies'],
+    props: ['agencies', 'permission_options'],
     methods: {
         removeSelected(agencyToRemove: AgencyRole) {
             this.selected = Utils.filter(this.selected, (agency: AgencyRole) => {
@@ -195,14 +215,7 @@ Vue.component('agency-role-linker', {
                   this.selected.push(selectedAgency);
               });
         },
-        togglePermission(event: any, permission: string, agency: AgencyRole) {
-            if (event.target.checked) {
-                agency.permissions.push(permission);
-            } else {
-                agency.permissions.splice(agency.permissions.indexOf(permission), 1);
-            }
-        },
-    },
+    }
 });
 
 // class AgencyLinker {
