@@ -1,5 +1,5 @@
 <%
-can_edit = proc{|user|
+can_edit = lambda{|user|
     return true if Ctx.get.permissions.is_admin?
     return true if Ctx.get.permissions.is_senior_agency_admin?
 
