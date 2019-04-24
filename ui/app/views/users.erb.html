@@ -1,3 +1,14 @@
+<%
+can_edit = proc{|user|
+    return true if Ctx.get.permissions.is_admin?
+    return true if Ctx.get.permissions.is_senior_agency_admin?
+
+    user.agency_roles.any? {|_, role, _|
+        role != 'SENIOR_AGENCY_ADMIN'
+    }
+}
+%>
+
 <div class="row">
     <div class="col s12">
         <a class="btn waves-effect" href="/users/new">Add User</a>
@@ -31,7 +42,9 @@
                         </td>
                         <td><%= Time.at(user.create_time / 1000)%></td>
                         <td>
-                            <a class="btn btn-small waves-effect" href="/users/edit?username=<%= user.username %>">Edit</a>
+                            <% if can_edit.call(user) %>
+                                <a class="btn btn-small waves-effect" href="/users/edit?username=<%= user.username %>">Edit</a>
+                            <% end %>
                             <!--<button>Delete</button>-->
                         </td>
                     </tr>
