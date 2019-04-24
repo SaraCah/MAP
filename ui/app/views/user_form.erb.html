@@ -39,7 +39,7 @@
                 <agency-role-linker agencies='<%= user.agencies.to_json %>' permission_options="<%= Ctx.client.permission_options.to_json %>"></agency-role-linker>
             </div>
         <% else %>
-            <% agency_role = user.agencies.first %>
+            <% agency_role = user.agencies.first || {} %>
             <input type="hidden" name="user[agency][][id]" value="<%= Ctx.get.current_location.agency.id  %>">
             <input type="hidden" name="user[agency][][location_id]" value="<%= Ctx.get.current_location.id %>">
             <div class="row">
