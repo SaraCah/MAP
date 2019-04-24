@@ -94,6 +94,15 @@ class MAPAPIClient
                  [Agency.from_json(agency), role, location_label]
                end)
     end
+
+    def can_edit?
+      return true if Ctx.get.permissions.is_admin?
+      return true if Ctx.get.permissions.is_senior_agency_admin?
+
+      agency_roles.any? {|_, role, _|
+        role != 'SENIOR_AGENCY_ADMIN'
+      }
+    end
   end
 
   Agency = Struct.new(:id, :label, :series_count, :controlled_records) do
