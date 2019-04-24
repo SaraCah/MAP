@@ -112,22 +112,48 @@ class Users < BaseStorage
     if user_for_username.nil? || user_for_username[:id] == Integer(user.id)
       update_user(user.id, user.username, user.name, user.is_admin?)
 
-      Permissions.clear_roles(user.id)
+      # FIXME what to do about user_agency.mtime? currently clear_roles drops create_time
+      if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)
+        Permissions.clear_roles(user.id)
 
-      user.agencies.each do |user_agency|
+        user.agencies.each do |user_agency|
+          agency_ref = user_agency.fetch('id')
+          role = user_agency.fetch('role')
+          location_id = user_agency['location_id']
+          permissions = Array(user_agency['permission'])
+
+          # FIXME ref
+          (_, aspace_agency_id) = agency_ref.split(':')
+
+          agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
+
+          if role == 'SENIOR_AGENCY_ADMIN'
+            Permissions.add_agency_senior_admin(user.id, agency_id)
+          elsif role == 'AGENCY_ADMIN'
+            Permissions.add_agency_admin(user.id, agency_id, location_id, permissions)
+          elsif role == 'AGENCY_CONTACT'
+            Permissions.add_agency_contact(user.id, agency_id, location_id, permissions)
+          end
+        end
+      else
+        # ensure permissions set by more senior user are not lost
+        # FIXME clean this up
+        user_agency = user.agencies.first
         agency_ref = user_agency.fetch('id')
+        # FIXME ref
+        (_, aspace_agency_id) = agency_ref.split(':')
+        agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
         role = user_agency.fetch('role')
         location_id = user_agency['location_id']
         permissions = Array(user_agency['permission'])
 
-        # FIXME ref
-        (_, aspace_agency_id) = agency_ref.split(':')
+        current_permissions = Permissions.permissions_for_agency_user(user.id, agency_id, location_id)
 
-        agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
+        permissions += (current_permissions - ['allow_transfers', 'allow_file_issue'])
 
-        if role == 'SENIOR_AGENCY_ADMIN'
-          Permissions.add_agency_senior_admin(user.id, agency_id)
-        elsif role == 'AGENCY_ADMIN'
+        Permissions.clear_roles(user.id)
+
+        if role == 'AGENCY_ADMIN'
           Permissions.add_agency_admin(user.id, agency_id, location_id, permissions)
         elsif role == 'AGENCY_CONTACT'
           Permissions.add_agency_contact(user.id, agency_id, location_id, permissions)

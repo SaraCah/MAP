@@ -119,4 +119,10 @@ class Permissions < BaseStorage
     end
   end
 
+
+  def self.permissions_for_agency_user(user_id, agency_id, location_id)
+    current_role = db[:agency_user][:user_id => user_id, :agency_id => agency_id, :agency_location_id => location_id]
+    AVAILABLE_PERMISSIONS.select{|permission| current_role[permission] == 1}.map(&:to_s)
+  end
+
 end
