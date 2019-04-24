@@ -185,7 +185,7 @@ Vue.component('agency-role-linker', {
             let role:AgencyRole = new AgencyRole(agency_blob.id, agency_blob.label, agency_blob.role);
             role.locationId = agency_blob.agency_location_id;
             role.locationLabel = agency_blob.agency_location_label;
-            role.permissions = agency_blob.permissions;
+            role.permissions = agency_blob.permission;
             role.permissionOptions = permissionOptions;
             prepopulated.push(role);
         });
