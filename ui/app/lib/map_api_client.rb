@@ -52,21 +52,12 @@ class MAPAPIClient
       self.is_admin || is_senior_agency_admin?
     end
 
-    def allow_create_locations?
-      self.is_admin || true # self.groups.any?{|group| group.agency_location_id == 'ANY' && group.admin?}
-    end
-
     def is_senior_agency_admin?
       self.agency_roles.any?{|agency_role| agency_role.agency_id == Ctx.get.current_location.agency_id && agency_role.is_senior_agency_admin?}
     end
 
     def is_agency_admin?
       is_senior_agency_admin? || self.agency_roles.any?{|agency_role| agency_role.agency_id == Ctx.get.current_location.agency_id && agency_role.agency_location_id == Ctx.get.current_location.id && agency_role.is_agency_admin?}
-    end
-
-    def location_admin?(agency_ref, location_id)
-      # FIXME
-      true
     end
   end
 

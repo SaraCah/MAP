@@ -184,17 +184,27 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/locations')
     .param(:page, Integer, "Page to return", optional: true) do
 
-    Templates.emit_with_layout(:locations, {paged_results: Ctx.client.locations(params[:page] || 0)},
-                               :layout, title: "Locations", context: 'locations')
+    if Ctx.permissions.allow_manage_locations?
+      Templates.emit_with_layout(:locations, {paged_results: Ctx.client.locations(params[:page] || 0)},
+                                 :layout, title: "Locations", context: 'locations')
+    else
+      [404]
+    end
   end
 
   Endpoint.get('/locations/new') do
-    Templates.emit_with_layout(:location_new, {location: AgencyLocationUpdateRequest.new},
-                               :layout, title: "New Location", context: 'locations')
+    if Ctx.permissions.allow_manage_locations?
+      Templates.emit_with_layout(:location_new, {location: AgencyLocationUpdateRequest.new},
+                                 :layout, title: "New Location", context: 'locations')
+    else
+      [404]
+    end
   end
 
   Endpoint.post('/locations/create')
     .param(:location, AgencyLocationUpdateRequest, "The agency location to create") do
+
+    return [404] unless Ctx.permissions.allow_manage_locations?
 
     unless Ctx.permissions.is_admin?
         params[:location].agency_ref = Ctx.get.current_location.agency.id
