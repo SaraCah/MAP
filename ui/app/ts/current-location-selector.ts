@@ -52,11 +52,19 @@ Vue.component('current-location-selector', {
 </div>
 `,
     data: function(): SelectorState {
+        let currentLocation = JSON.parse(this.current_location_json);
+        let currentAgency = JSON.parse(this.current_agency_json);
+        let availableLocations = JSON.parse(this.available_locations_json);
+
+
+        console.log(currentLocation);
+        console.log(currentAgency);
+
         return {
-            current_location: JSON.parse(this.current_location_json),
-            selected_location_id: Number(JSON.parse(this.current_location_json).id),
-            selected_agency_id: Number(JSON.parse(this.current_agency_json).id),
-            available: JSON.parse(this.available_locations_json),
+            current_location: currentLocation,
+            selected_location_id: Number(currentLocation.id),
+            selected_agency_id: Number(currentAgency.id),
+            available: availableLocations,
         };
     },
     props: ['current_agency_json', 'current_location_json', 'available_locations_json', 'csrf_token'],
@@ -85,8 +93,7 @@ Vue.component('current-location-selector', {
                 }
             }
 
-            if (locations.length > 0) {
-                // Select the first location by default
+            if (!Utils.find(locations, (location: Location) => { return location.id == this.selected_location_id })) {
                 this.selected_location_id = locations[0].id;
             }
 
