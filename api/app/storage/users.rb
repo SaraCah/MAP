@@ -224,6 +224,6 @@ class Users < BaseStorage
   def self.dto_for(username)
     UserUpdateRequest.from_row(
       user = db[:user][:username => username],
-      Permissions.agency_roles_for_user(user[:id], true))
+      Permissions.agency_roles_for_user(user[:id], with_labels: true))
   end
 end

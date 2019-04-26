@@ -2,7 +2,7 @@ class Permissions < BaseStorage
 
   AVAILABLE_PERMISSIONS = [:allow_transfers, :allow_file_issue, :allow_set_raps, :allow_change_raps, :allow_restricted_access]
 
-  def self.agency_roles_for_user(user_id, with_labels = false)
+  def self.agency_roles_for_user(user_id, with_labels: false)
     agency_roles = db[:agency_user]
                     .join(:agency, Sequel[:agency][:id] => Sequel[:agency_user][:agency_id])
                     .join(:agency_location, Sequel[:agency_location][:id] => Sequel[:agency_user][:agency_location_id])
