@@ -35,7 +35,7 @@ class DB
               return nil
             end
           end
-        rescue Sequel::DatabaseDisconnectError => e
+        rescue Sequel::DatabaseDisconnectError, Sequel::DatabaseConnectionError => e
           # MySQL might have been restarted.
           last_err = e
           $LOG.info("Connecting to the database failed.  Retrying...")
@@ -68,8 +68,12 @@ class DB
 
   def self.is_retriable_exception(exception, opts = {})
     # Transaction was rolled back, but we can retry
-    ((opts[:retry_on_optimistic_locking_fail] &&
-      exception.instance_of?(Sequel::Plugins::OptimisticLocking::Error)) ||
-     (exception.wrapped_exception && ( exception.wrapped_exception.cause or exception.wrapped_exception).getSQLState() =~ /^(40|41)/) )
+    return true if (opts[:retry_on_optimistic_locking_fail] && exception.instance_of?(Sequel::Plugins::OptimisticLocking::Error))
+    return true if (exception.wrapped_exception && exception.wrapped_exception.class == java.net.SocketException)
+
+    wrapped_exception = (exception.wrapped_exception.cause or exception.wrapped_exception)
+    return true if (wrapped_exception.class == java.sql.SQLException && wrapped_exception.getSQLState() =~ /^(40|41)/)
+
+    return false
   end
 end
