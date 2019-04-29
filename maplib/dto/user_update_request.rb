@@ -1,5 +1,5 @@
 class UserUpdateRequest
-  attr_accessor :id, :username, :name, :password, :errors, :agencies, :is_admin
+  attr_accessor :id, :username, :name, :password, :errors, :agencies, :is_admin, :is_inactive
 
   def initialize(hash = {})
     @id = hash.fetch('id', nil)
@@ -7,6 +7,7 @@ class UserUpdateRequest
     @name = hash.fetch('name', '')
     @password = hash.fetch('password', '')
     @is_admin = hash.fetch('is_admin', 'false') == 'true'
+    @is_inactive = hash.fetch('is_inactive', 'false') == 'true'
     @agencies = hash.fetch('agency', [])
     @errors = []
   end
@@ -21,6 +22,7 @@ class UserUpdateRequest
       'username' => row[:username],
       'name' => row[:name],
       'is_admin' => ((row[:admin] == 1) ? 'true' : 'false'),
+      'is_inactive' => ((row[:inactive] == 1) ? 'true' : 'false'),
       'agency' => agency_roles.map do |agency_role|
         {
           'id' => agency_role.agency_ref,
@@ -40,6 +42,10 @@ class UserUpdateRequest
 
   def is_admin?
     @is_admin
+  end
+
+  def is_inactive?
+    @is_inactive
   end
 
   def has_errors?
@@ -68,7 +74,8 @@ class UserUpdateRequest
       ['user[username]', @username],
       ['user[name]', @name],
       ['user[password]', @password],
-      ['user[is_admin]', @is_admin]
+      ['user[is_admin]', @is_admin],
+      ['user[is_inactive]', @is_inactive],
     ] + @agencies.map {|agency|
       [
         ["user[agency][][id]", agency[:id]],
@@ -88,6 +95,7 @@ class UserUpdateRequest
       'name' => @name,
       'username' => @username,
       'is_admin' => @is_admin ? 'true' : 'false',
+      'is_inactive' => @is_inactive ? 'true' : 'false',
       'agency' => @agencies,
     }
   end

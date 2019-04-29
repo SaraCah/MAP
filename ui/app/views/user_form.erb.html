@@ -33,6 +33,16 @@
                 </div>
             </div>
         <% end %>
+        <% unless user.new? %>
+            <div class="row">
+                <div class="input-field col s12">
+                    <label>
+                        <input type="checkbox" name="user[is_inactive]" value="true" <% if user.is_inactive? %> checked="checked" <% end %> />
+                        <span>Inactive?</span>
+                    </label>
+                </div>
+            </div>
+        <% end %>
         <% if Ctx.get.permissions.is_admin? %>
             <br>
             <div class="row">

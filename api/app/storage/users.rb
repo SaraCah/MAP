@@ -90,12 +90,13 @@ class Users < BaseStorage
                      :modified_time => java.lang.System.currentTimeMillis)
   end
 
-  def self.update_user(user_id, username, name, is_admin)
+  def self.update_user(user_id, username, name, is_admin, is_inactive)
     db[:user]
       .filter(:id => user_id)
       .update(:username => username,
               :name => name,
               :admin => is_admin ? 1 : 0,
+              :inactive => is_inactive ? 1 : 0,
               :modified_time => java.lang.System.currentTimeMillis)
   end
 
@@ -110,7 +111,7 @@ class Users < BaseStorage
     # check for uniqueness
     user_for_username = db[:user][:username => user.username]
     if user_for_username.nil? || user_for_username[:id] == Integer(user.id)
-      update_user(user.id, user.username, user.name, user.is_admin?)
+      update_user(user.id, user.username, user.name, user.is_admin?, user.is_inactive?)
 
       # FIXME what to do about user_agency.mtime? currently clear_roles drops create_time
       if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)

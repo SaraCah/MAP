@@ -1,8 +1,9 @@
-User = Struct.new(:username, :name, :is_admin, :create_time, :agency_roles) do
+User = Struct.new(:username, :name, :is_admin, :is_inactive, :create_time, :agency_roles) do
   def self.from_row(row, agency_roles)
     User.new(row[:username],
              row[:name],
              (row[:admin] == 1),
+             (row[:inactive] == 1),
              row[:create_time],
              agency_roles)
   end

@@ -75,11 +75,12 @@ class MAPAPIClient
     end
   end
 
-  User = Struct.new(:username, :name, :is_admin, :create_time, :agency_roles) do
+  User = Struct.new(:username, :name, :is_admin, :is_inactive, :create_time, :agency_roles) do
     def self.from_json(json)
       User.new(json.fetch('username'),
                json.fetch('name'),
                json.fetch('is_admin'),
+               json.fetch('is_inactive'),
                json.fetch('create_time'),
                json.fetch('agency_roles').map do |agency, role, location_label|
                  [Agency.from_json(agency), role, location_label]

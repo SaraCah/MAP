@@ -6,6 +6,7 @@ Sequel.migration do
       String :name, null: false
 
       Integer :admin, null: false, default: 0
+      Integer :inactive, null: false, default: 0
 
       Bignum :create_time, null: false
       Bignum :modified_time, null: false

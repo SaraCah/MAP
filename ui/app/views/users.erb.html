@@ -17,7 +17,7 @@
             </thead>
             <tbody>
                 <% paged_users.results.each do |user| %>
-                    <tr>
+                    <tr <% if user.is_inactive %>class="grey-text"<% end %>>
                         <td><%= user.username %></td>
                         <td><%= user.name %></td>
                         <td>
