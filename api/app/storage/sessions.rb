@@ -11,6 +11,8 @@ class Sessions < BaseStorage
       @username = username
       @create_time = create_time
       @data = data
+
+      @dirty = false
     end
 
     def [](key)
@@ -19,6 +21,11 @@ class Sessions < BaseStorage
 
     def []=(key, value)
       self.data[key.to_s] = value
+      @dirty = true
+    end
+
+    def dirty?
+      @dirty
     end
   end
 
@@ -47,13 +54,21 @@ class Sessions < BaseStorage
   end
 
   def self.save_session(session)
-    delete_session(session.id)
+    if session.dirty?
+      delete_session(session.id)
 
-    db[:session].insert(:session_id => session.id,
-                        :username => session.username,
-                        :create_time => session.create_time,
-                        :last_used_time => java.lang.System.currentTimeMillis,
-                        :session_data => JSON.dump(session.data))
+      db[:session].insert(:session_id => session.id,
+                          :username => session.username,
+                          :create_time => session.create_time,
+                          :last_used_time => java.lang.System.currentTimeMillis,
+                          :session_data => JSON.dump(session.data))
+    else
+      begin
+        db[:session].filter(:session_id => session.id).update(:last_used_time => java.lang.System.currentTimeMillis)
+      rescue Sequel::DatabaseError
+        nil
+      end
+    end
   end
 
   def self.delete_session(session_id)
