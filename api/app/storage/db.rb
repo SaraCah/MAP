@@ -72,6 +72,11 @@ class DB
     return true if (exception.wrapped_exception && exception.wrapped_exception.class == java.net.SocketException)
 
     wrapped_exception = (exception.wrapped_exception.cause or exception.wrapped_exception)
+
+    # Connection failures (SQL_STATE_COMMUNICATION_LINK_FAILURE)
+    return true if (wrapped_exception.class == java.sql.SQLException && wrapped_exception.getSQLState() =~ /^80/)
+
+    # Deadlocks
     return true if (wrapped_exception.class == java.sql.SQLException && wrapped_exception.getSQLState() =~ /^(40|41)/)
 
     return false
