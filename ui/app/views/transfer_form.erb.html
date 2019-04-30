@@ -1,0 +1,30 @@
+<div class="row vue-enabled">
+    <% if errors %>
+    <pre><%= errors %></pre>
+    <% end %>
+    <form class="col s12" action="/transfers/create" method="post" enctype="multipart/form-data">
+        <%== FormHelper.hidden_authenticity_token %>
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="name" name="transfer[title]" type="text" value="<%= transfer.fetch('title', '') %>" required>
+                <label for="name">Title</label>
+            </div>
+        </div>
+        <div class="file-field input-field">
+            <div class="btn">
+                <span>CSV</span>
+                <input name="csv" type="file" required>
+            </div>
+            <div class="file-path-wrapper">
+                <input class="file-path validate" name="transfer[csv_filename]" type="text" required>
+            </div>
+        </div>
+        <div class="row">
+            <br>
+            <br>
+            <div class="col s12">
+                <button class="btn">Save Transfer</button>
+            </div>
+        </div>
+    </form>
+</div>

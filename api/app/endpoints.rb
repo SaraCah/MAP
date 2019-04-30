@@ -154,4 +154,25 @@ class MAPTheAPI < Sinatra::Base
       json_response({})
     end
   end
+
+  Endpoint.get('/transfers')
+    .param(:page, Integer, "Page to return") do
+    if Ctx.user_logged_in?
+      json_response(Transfers.page(params[:page], 10))
+    else
+      json_response([])
+    end
+  end
+
+  Endpoint.post('/transfers/create')
+    .param(:transfer, Transfer, "Transfer to create")
+    .param(:csv, UploadFile, "CSV file") do
+    Transfers.create_from_dto(params[:transfer], params[:csv])
+
+    if (errors = params[:transfer].validate).empty?
+      json_response(status: 'created')
+    else
+      json_response(errors: errors)
+    end
+  end
 end

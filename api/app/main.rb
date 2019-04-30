@@ -34,6 +34,8 @@ Dir["models/*.rb"].sort.each {|file| require file }
 
 require 'dto/user_update_request'
 require 'dto/agency_location_update_request'
+require 'dto/dto'
+require 'dto/transfer'
 
 require 'common/bootstrap'
 require 'storage/db_pool'
@@ -51,7 +53,9 @@ require 'storage/sessions'
 require 'storage/permissions'
 require 'storage/agencies'
 require 'storage/locations'
+require 'storage/transfers'
 
+require 'endpoints/upload_file'
 require 'endpoints'
 
 class MAPTheAPI < Sinatra::Base

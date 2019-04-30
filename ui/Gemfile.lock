@@ -8,6 +8,7 @@ GEM
       rjack-jetty (>= 9.2.11, < 9.5)
       rjack-slf4j (~> 1.7.2)
     multi_json (1.13.1)
+    multipart-post (2.0.0)
     mustermann (1.0.3)
     rack (2.0.7)
     rack-protection (2.0.5)
@@ -36,6 +37,7 @@ PLATFORMS
 DEPENDENCIES
   erubis (= 2.7.0)
   fishwife (= 1.10.1)
+  multipart-post (= 2.0.0)
   rack-protection (= 2.0.5)
   rjack-logback (= 1.9.0)
   sinatra (= 2.0.5)

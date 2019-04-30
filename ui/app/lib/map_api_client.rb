@@ -1,4 +1,5 @@
 require 'net/http'
+require 'net/http/post/multipart'
 
 class MAPAPIClient
   def initialize(session)
@@ -119,7 +120,7 @@ class MAPAPIClient
 
   PagedResults = Struct.new(:results, :current_page, :max_page) do
     def self.from_json(json, type_class)
-      PagedResults.new(json.fetch('results', []).map{|user_json| type_class.from_json(user_json)},
+      PagedResults.new(json.fetch('results', []).map{|user_json| type_class.included_modules.include?(DTO) ? type_class.from_hash(user_json) : type_class.from_json(user_json)},
                      json.fetch('current_page'),
                      json.fetch('max_page'))
     end
@@ -226,14 +227,33 @@ class MAPAPIClient
     })
   end
 
+  def transfers(page = 0)
+    PagedResults.from_json(get('/transfers', page: page), Transfer)
+  end
+
+  def create_transfer(transfer, csv_upload)
+    response = post('/transfers/create',
+                    { transfer: transfer.to_json, csv: csv_upload.to_io },
+                    :multipart_form_data)
+    response['errors'] || []
+  end
+
   private
 
-  def post(url, params = {})
+  def post(url, params = {}, encoding = :x_www_form_urlencoded)
     uri = build_url(url)
 
-    request = Net::HTTP::Post.new(uri)
+    request = if encoding == :x_www_form_urlencoded
+                req = Net::HTTP::Post.new(uri)
+                req.form_data = params
+                req
+              elsif encoding == :multipart_form_data
+                Net::HTTP::Post::Multipart.new(uri, params)
+              else
+                raise "Unknown form encoding: #{encoding.inspect}"
+              end
+
     request['X-MAP-SESSION'] = @session[:api_session_id] if @session[:api_session_id]
-    request.set_form_data(params)
 
     response = Net::HTTP.start(uri.hostname, uri.port) {|http|
       http.request(request)
