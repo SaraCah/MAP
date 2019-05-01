@@ -1,7 +1,7 @@
 #!/bin/bash
 
-JRUBY_VERSION="https://repo1.maven.org/maven2/org/jruby/jruby-complete/9.2.6.0/jruby-complete-9.2.6.0.jar"
-JRUBY_SHA256="602e6b2ace6cd18e33b02a41b3a2e188fcdcacc35856df2c76afea6908b8c8c5"
+JRUBY_VERSION="https://repo1.maven.org/maven2/org/jruby/jruby-complete/9.2.7.0/jruby-complete-9.2.7.0.jar"
+JRUBY_SHA256="a43125f921e707eef861713028d79f60d2f4b024ea6af71a992395ee9e697c22"
 
 SOLR_VERSION="http://apache.mirror.amaze.com.au/lucene/solr/8.0.0/solr-8.0.0.tgz"
 SOLR_SHA256="0e6392d3b980ab917c731b054101aafcebceacc0e5063cb1e305aeeaec911d12"

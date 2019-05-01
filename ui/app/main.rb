@@ -7,6 +7,11 @@ $LOAD_PATH << File.join(Dir.pwd, '../../maplib')
 # Dist
 $LOAD_PATH << File.join(Dir.pwd, 'maplib')
 
+Dir.glob('../distlibs/gems/gems/bundler-*/lib').each do |bundler_dir|
+  # Force the version of bundler we explicitly installed!
+  $LOAD_PATH.unshift(bundler_dir)
+end
+
 require 'bundler/setup'
 Bundler.require
 
