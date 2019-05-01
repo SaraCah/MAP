@@ -39,7 +39,7 @@ if [ "$have_jruby" != "1" ]; then
     echo
     echo "Fetching JRuby..."
     curl -L -s "$JRUBY_VERSION" > distlibs/jruby-complete.jar
-    checksum="`openssl dgst -sha256 -r distlibs/jruby-complete.jar | awk '{print $1}'`"
+    checksum="`openssl dgst -sha256 distlibs/jruby-complete.jar | awk '{print $2}'`"
 
     if [ "$checksum" != $JRUBY_SHA256 ]; then
         fail "JRuby checksum mismatch.  Freaking out."
