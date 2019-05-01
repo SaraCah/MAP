@@ -58,7 +58,11 @@ class Endpoint
                         # Integer, String and friends
                         Kernel.send(type.name.intern, params[param])
                       elsif type.is_a?(Array)
-                        params[param].map {|val| type[0].parse(val)}
+                        if params[param] && !params[param].is_a?(Array)
+                          raise "Parameter #{param} must be an array.  Please send as #{param}[]"
+                        else
+                          Array(params[param]).map {|val| type[0].parse(val)}
+                        end
                       elsif type.included_modules.include?(DTO)
                         type.from_json(params[param])
                       elsif type.respond_to?(:parse)
