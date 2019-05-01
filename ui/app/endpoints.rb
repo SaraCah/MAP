@@ -278,4 +278,10 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  Endpoint.post('/file-upload')
+    .param(:file, [UploadFile], "Files to upload") do
+    Ctx.client.store_files(params[:file])
+  end
+
+
 end

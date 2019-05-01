@@ -58,6 +58,7 @@ require 'storage/permissions'
 require 'storage/agencies'
 require 'storage/locations'
 require 'storage/transfers'
+require 'storage/files'
 
 require 'endpoints/upload_file'
 require 'endpoints'

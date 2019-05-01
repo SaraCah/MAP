@@ -238,6 +238,12 @@ class MAPAPIClient
     response['errors'] || []
   end
 
+  def store_files(files)
+    post('/store-files',
+         { "file[]" => files.map(&:to_io) },
+         :multipart_form_data)
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

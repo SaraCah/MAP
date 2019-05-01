@@ -53,6 +53,8 @@ class Endpoint
       params[param] = if type.is_a?(Class) && Kernel.respond_to?(type.name.intern)
                         # Integer, String and friends
                         Kernel.send(type.name.intern, params[param])
+                      elsif type.is_a?(Array)
+                        params[param].map {|val| type[0].parse(val)}
                       elsif type.included_modules.include?(DTO)
                         type.from_hash(params[param])
                       elsif type.respond_to?(:parse)

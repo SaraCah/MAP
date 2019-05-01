@@ -175,4 +175,10 @@ class MAPTheAPI < Sinatra::Base
       json_response(errors: errors)
     end
   end
+
+  Endpoint.post('/store-files')
+    .param(:file, [UploadFile], "Files to store") do
+
+    json_response(params[:file].map {|file| Files.store(file.tmp_file)})
+  end
 end
