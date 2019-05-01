@@ -1,4 +1,4 @@
-class Transfer
+class TransferProposal
   include DTO
 
   define_field(:id, Integer, required: false)

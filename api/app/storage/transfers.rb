@@ -1,6 +1,6 @@
 class Transfers < BaseStorage
 
-  def self.page(page, page_size)
+  def self.proposals(page, page_size)
     dataset = db[:transfer]
 
     unless Ctx.get.permissions.is_admin?
@@ -19,11 +19,11 @@ class Transfers < BaseStorage
                      max_page)
   end
 
-  def self.create_from_dto(transfer, csv_upload)
+  def self.create_proposal_from_dto(transfer, csv_upload)
     raise "FIXME admin user" if Ctx.get.permissions.is_admin?
 
     db[:transfer].insert(title: transfer.fetch('title'),
-                         status: 'PROPOSED',
+                         status: 'ACTIVE',
                          csv: csv_upload.tmp_file.read,
                          csv_filename: transfer.fetch('csv_filename'),
                          agency_id: Ctx.get.current_location.agency_id,

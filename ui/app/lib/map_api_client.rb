@@ -228,7 +228,7 @@ class MAPAPIClient
   end
 
   def transfers(page = 0)
-    PagedResults.from_json(get('/transfers', page: page), Transfer)
+    PagedResults.from_json(get('/transfers', page: page), TransferProposal)
   end
 
   def create_transfer(transfer, csv_upload)

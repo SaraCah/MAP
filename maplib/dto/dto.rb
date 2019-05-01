@@ -89,7 +89,7 @@ module DTO
   end
 
   def new?
-    !!fetch('id', false)
+    !fetch('id', false)
   end
 
   module ClassMethods

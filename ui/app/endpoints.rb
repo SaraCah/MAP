@@ -252,28 +252,28 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
-  Endpoint.get('/transfers')
+  Endpoint.get('/transfer_proposals')
     .param(:page, Integer, "Page to return", optional: true) do
 
-    Templates.emit_with_layout(:transfers, {paged_results: Ctx.client.transfers(params[:page] || 0)},
+    Templates.emit_with_layout(:transfer_proposals, {paged_results: Ctx.client.transfers(params[:page] || 0)},
                                :layout, title: "Transfers", context: 'transfers')
   end
 
-  Endpoint.get('/transfers/new') do
-    Templates.emit_with_layout(:transfer_new, {transfer: Transfer.new},
+  Endpoint.get('/transfer_proposals/new') do
+    Templates.emit_with_layout(:transfer_proposal_new, {transfer: TransferProposal.new},
                                :layout, title: "Transfer Proposal", context: 'transfers')
   end
 
-  Endpoint.post('/transfers/create')
-    .param(:transfer, Transfer, "The transfer to create")
+  Endpoint.post('/transfer_proposals/create')
+    .param(:transfer, TransferProposal, "The transfer to create")
     .param(:csv, UploadFile, "The transfer CSV") do
 
     errors = Ctx.client.create_transfer(params[:transfer], params['csv'])
 
     if errors.empty?
-      redirect '/transfers'
+      redirect '/transfer_proposals'
     else
-      Templates.emit_with_layout(:transfer_new, {transfer: params[:transfer], errors: errors},
+      Templates.emit_with_layout(:transfer_proposal_new, {transfer: params[:transfer], errors: errors},
                                  :layout, title: "Transfer Proposal", context: 'transfers')
     end
   end

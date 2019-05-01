@@ -23,5 +23,6 @@ Templates.define(:location_new, [:location], "views/location_form.erb.html")
 Templates.define(:flash_message, [:message], "views/_message.erb.html")
 Templates.define(:header, [:title, :context?], "views/header.erb.html")
 
+Templates.define(:transfer_proposals, [:paged_results], "views/transfer_proposals.erb.html")
 Templates.define(:transfers, [:paged_results], "views/transfers.erb.html")
-Templates.define(:transfer_new, [:transfer, :errors?], "views/transfer_form.erb.html")
+Templates.define(:transfer_proposal_new, [:transfer, :errors?], "views/transfer_proposal_form.erb.html")
