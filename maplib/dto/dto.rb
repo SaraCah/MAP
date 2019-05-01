@@ -88,6 +88,10 @@ module DTO
     errors
   end
 
+  def new?
+    !!fetch('id', false)
+  end
+
   module ClassMethods
 
     def self.extended(base)
