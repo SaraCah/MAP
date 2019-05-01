@@ -33,8 +33,8 @@ Sequel.migration do
     create_table(:transfer_identifier) do
       primary_key :id
 
-      foreign_key :transfer_proposal_id, :transfer_proposal, null: false
-      foreign_key :transfer_id, :transfer, null: false
+      foreign_key :transfer_proposal_id, :transfer_proposal
+      foreign_key :transfer_id, :transfer
     end
 
     create_table(:transfer_proposal_series) do
@@ -72,6 +72,7 @@ Sequel.migration do
       foreign_key :transfer_id, :transfer_identifier, null: false
 
       String :key, null: false
+      String :filename, null: false
       String :role, null: false
 
       String :created_by, null: false

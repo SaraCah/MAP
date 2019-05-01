@@ -47,6 +47,7 @@ require 'lib/js_bundle'
 require 'dto/user_update_request'
 require 'dto/agency_location_update_request'
 require 'dto/dto'
+require 'dto/transfer_file'
 require 'dto/transfer_proposal'
 
 require 'endpoints/upload_file'

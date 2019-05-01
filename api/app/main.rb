@@ -39,6 +39,7 @@ Dir["models/*.rb"].sort.each {|file| require file }
 require 'dto/user_update_request'
 require 'dto/agency_location_update_request'
 require 'dto/dto'
+require 'dto/transfer_file'
 require 'dto/transfer_proposal'
 
 require 'common/bootstrap'

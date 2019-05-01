@@ -265,10 +265,9 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.post('/transfer_proposals/create')
-    .param(:transfer, TransferProposal, "The transfer to create")
-    .param(:csv, UploadFile, "The transfer CSV") do
+    .param(:transfer, TransferProposal, "The transfer to create") do
 
-    errors = Ctx.client.create_transfer(params[:transfer], params['csv'])
+    errors = Ctx.client.create_transfer_proposal(params[:transfer])
 
     if errors.empty?
       redirect '/transfer_proposals'
@@ -280,7 +279,19 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.post('/file-upload')
     .param(:file, [UploadFile], "Files to upload") do
-    Ctx.client.store_files(params[:file])
+    files = []
+    Ctx.client.store_files(params[:file]).zip(params[:file]).map do |file_key, file|
+      files << {
+        'key' => file_key,
+        'filename' => file.filename,
+      }
+    end
+
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      files.to_json
+    ]
   end
 
 

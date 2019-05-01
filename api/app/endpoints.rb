@@ -164,10 +164,9 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.post('/transfers/create')
-    .param(:transfer, TransferProposal, "Transfer to create")
-    .param(:csv, UploadFile, "CSV file") do
-    Transfers.create_proposal_from_dto(params[:transfer], params[:csv])
+  Endpoint.post('/transfer_proposals/create')
+    .param(:transfer, TransferProposal, "Transfer to create") do
+    Transfers.create_proposal_from_dto(params[:transfer])
 
     if (errors = params[:transfer].validate).empty?
       json_response(status: 'created')

@@ -231,10 +231,8 @@ class MAPAPIClient
     PagedResults.from_json(get('/transfers', page: page), TransferProposal)
   end
 
-  def create_transfer(transfer, csv_upload)
-    response = post('/transfers/create',
-                    { transfer: transfer.to_json, csv: csv_upload.to_io },
-                    :multipart_form_data)
+  def create_transfer_proposal(transfer)
+    response = post('/transfer_proposals/create', transfer: transfer.to_json)
     response['errors'] || []
   end
 

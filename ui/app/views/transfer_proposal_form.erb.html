@@ -15,7 +15,7 @@
             </div>
         </div>
     </div>
-    <form class="col s12" action="/transfers/create" method="post" enctype="multipart/form-data">
+    <form class="col s12" action="/transfer_proposals/create" method="post" enctype="multipart/form-data">
         <%== FormHelper.hidden_authenticity_token %>
         <div class="row">
             <div class="input-field col s12">
@@ -23,15 +23,10 @@
                 <label for="name">Title</label>
             </div>
         </div>
-        <div class="file-field input-field">
-            <div class="btn">
-                <span>CSV</span>
-                <input name="csv" type="file" required>
-            </div>
-            <div class="file-path-wrapper">
-                <input class="file-path validate" name="transfer[csv_filename]" type="text" required>
-            </div>
-        </div>
+        <file-uploader files="<%= transfer.fetch('files', []).to_json %>"
+                       input_path="transfer[files][]"
+                       csrf_token="<%= FormHelper.csrf_token %>">
+        </file-uploader>
         <div class="row">
             <br>
             <br>
