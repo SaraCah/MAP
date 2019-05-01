@@ -2,6 +2,19 @@
     <% if errors %>
     <pre><%= errors %></pre>
     <% end %>
+    <div class="col s12">
+        <div class="row">
+            <div class="col s12">
+                <ul class="status-infomatic">
+                    <li <% if transfer.new? %>class="current"<% end %>>Inactive</li>
+                    <li <% if transfer.fetch('status', '') == 'PROPOSED' %>class="current"<% end %>>Active</li>
+                    <li <% if transfer.fetch('status', '') == 'APPROVED' %>class="current"<% end %>>Approved</li>
+                    <li <% if transfer.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>class="current"<% end %>>Cancelled<br>By User</li>
+                    <li <% if transfer.fetch('status', '') == 'CANCELLED_BY_QSA' %>class="current"<% end %>>Cancelled<br>By QSA</li>
+                </ul>
+            </div>
+        </div>
+    </div>
     <form class="col s12" action="/transfers/create" method="post" enctype="multipart/form-data">
         <%== FormHelper.hidden_authenticity_token %>
         <div class="row">
