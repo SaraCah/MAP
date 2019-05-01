@@ -29,7 +29,7 @@ mkdir -p distlibs
 have_jruby=0
 
 if [ -e distlibs/jruby-complete.jar ]; then
-    checksum="`openssl dgst -sha256 -r distlibs/jruby-complete.jar | awk '{print $1}'`"
+    checksum="`openssl dgst -sha256 distlibs/jruby-complete.jar | awk '{print $2}'`"
     if [ "$checksum" = $JRUBY_SHA256 ]; then
         have_jruby=1
     fi
