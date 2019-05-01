@@ -65,8 +65,8 @@ function fail() {
     exit 1
 }
 
-lsof -i ":${listen_port}" && fail "Port $listen_port already in use"
-lsof -i ":${solr_port}" && fail "Port $solr_port already in use"
+lsof -i ":${listen_port}" -sTCP:LISTEN && fail "Port $listen_port already in use"
+lsof -i ":${solr_port}" -sTCP:LISTEN && fail "Port $solr_port already in use"
 
 trap "stop_solr" INT TERM EXIT
 

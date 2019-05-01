@@ -53,7 +53,7 @@ function fail() {
     exit 1
 }
 
-lsof -i ":${listen_port}" && fail "Port $listen_port already in use"
+lsof -i ":${listen_port}" -sTCP:LISTEN && fail "Port $listen_port already in use"
 
 function run() {
     scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --host $listen_address --port $listen_port -E "$MAP_ENV"
