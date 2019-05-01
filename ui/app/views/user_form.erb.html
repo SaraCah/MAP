@@ -46,7 +46,7 @@
         <% if Ctx.get.permissions.is_admin? %>
             <br>
             <div class="row">
-                <agency-role-linker agencies='<%= user.agencies.to_json %>' permission_options="<%= Ctx.client.permission_options.to_json %>"></agency-role-linker>
+                <agency-role-linker agencies="<%= user.agencies.to_json %>" permission_options="<%= Ctx.client.permission_options.to_json %>"></agency-role-linker>
             </div>
         <% else %>
             <% agency_role = user.agencies.first || {} %>

@@ -6,7 +6,7 @@
         <%== FormHelper.hidden_authenticity_token %>
         <div class="row">
             <% if Ctx.permissions.is_admin? %>
-                <agency-linker agency='<%= location.agency.to_json %>'></agency-linker>
+                <agency-linker agency="<%= location.agency.to_json %>"></agency-linker>
             <% end %>
         </div>
         <div class="row">
