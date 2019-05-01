@@ -56,7 +56,7 @@ function fail() {
 lsof -i ":${listen_port}" -sTCP:LISTEN && fail "Port $listen_port already in use"
 
 function run() {
-    scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --host $listen_address --port $listen_port -E "$MAP_ENV"
+    scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --host $listen_address --port $listen_port -E "$MAP_ENV" -O request_body_max=134217728
 }
 
 if [ "$logging" = "0" ]; then
