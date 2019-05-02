@@ -14,7 +14,7 @@ class DB
 
     begin
       last_err = false
-      retries = opts.fetch(:retries, 10)
+      retries = opts.fetch(:retries, 100)
 
       retries.times do |attempt|
         begin
@@ -39,13 +39,13 @@ class DB
           # MySQL might have been restarted.
           last_err = e
           $LOG.info("Connecting to the database failed.  Retrying...")
-          sleep(opts[:db_failed_retry_delay] || 3)
+          sleep(opts[:db_failed_retry_delay] || 0.5)
 
 
         rescue Sequel::NoExistingObject, Sequel::DatabaseError => e
           if (attempt + 1) < retries && is_retriable_exception(e, opts) && transaction
             $LOG.info("Retrying transaction after retriable exception (#{e})")
-            sleep(opts[:retry_delay] || 1)
+            sleep(opts[:retry_delay] || 0.2)
           else
             raise e
           end
