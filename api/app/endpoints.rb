@@ -180,4 +180,24 @@ class MAPTheAPI < Sinatra::Base
 
     json_response(params[:file].map {|file| Files.store(file.tmp_file)})
   end
+
+  Endpoint.get('/transfer_proposals/:id')
+    .param(:id, Integer, "ID of transfer proposal") do
+    if Ctx.user_logged_in?
+      json_response(Transfers.proposal_dto_for(params[:id]).to_hash)
+    else
+      json_response({})
+    end
+  end
+
+  Endpoint.post('/transfer_proposals/update')
+    .param(:transfer, TransferProposal, "Transfer to update") do
+    Transfers.update_proposal_from_dto(params[:transfer])
+
+    if (errors = params[:transfer].validate).empty?
+      json_response(status: 'updated')
+    else
+      json_response(errors: errors)
+    end
+  end
 end

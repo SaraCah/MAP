@@ -261,7 +261,7 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/transfer_proposals/new') do
     Templates.emit_with_layout(:transfer_proposal_new, {transfer: TransferProposal.new},
-                               :layout, title: "Transfer Proposal", context: 'transfers')
+                               :layout, title: "New Transfer Proposal", context: 'transfers')
   end
 
   Endpoint.post('/transfer_proposals/create')
@@ -273,7 +273,7 @@ class MAPTheApp < Sinatra::Base
       redirect '/transfer_proposals'
     else
       Templates.emit_with_layout(:transfer_proposal_new, {transfer: params[:transfer], errors: errors},
-                                 :layout, title: "Transfer Proposal", context: 'transfers')
+                                 :layout, title: "New Transfer Proposal", context: 'transfers')
     end
   end
 
@@ -294,5 +294,34 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
+  Endpoint.get('/transfer_proposals/:id')
+    .param(:id, Integer, "ID of transfer proposal") do
+    transfer = Ctx.client.get_transfer_proposal(params[:id])
+    if false
+      # FIXME check permissions and agency/location etc
+      # return [404]
+    end
+
+    Templates.emit_with_layout(:transfer_proposal_view, {transfer: transfer, is_readonly: (transfer.fetch('status') != 'ACTIVE')},
+                               :layout, title: "Transfer Proposal", context: 'transfers')
+  end
+
+  Endpoint.post('/transfer_proposals/update')
+    .param(:transfer, TransferProposal, "The transfer to create") do
+
+    errors = Ctx.client.update_transfer_proposal(params[:transfer])
+
+    if errors.empty?
+      redirect '/transfer_proposals'
+    else
+      Templates.emit_with_layout(:transfer_proposal_view,
+                                 {
+                                   transfer: params[:transfer],
+                                   errors: errors,
+                                   is_readonly: false,
+                                 },
+                                 :layout, title: "Transfer Proposal", context: 'transfers')
+    end
+  end
 
 end

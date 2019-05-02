@@ -57,4 +57,62 @@ class Transfers < BaseStorage
     end
   end
 
+
+  def self.update_proposal_from_dto(transfer)
+    # FIXME check permissions
+
+    transfer_proposal_id = transfer.fetch('id')
+    transfer_identifier = db[:transfer_identifier][transfer_proposal_id: transfer_proposal_id][:id]
+
+    db[:transfer_proposal]
+      .filter(id: transfer_proposal_id)
+      .update(title: transfer.fetch('title'),
+              estimated_quantity: transfer.fetch('estimated_quantity', nil))
+
+
+    file_keys_to_remove = db[:transfer_file].filter(transfer_id: transfer_identifier).select(:key).all
+
+    db[:transfer_file]
+      .filter(transfer_id: transfer_identifier)
+      .delete
+
+    db[:file]
+      .filter(key: file_keys_to_remove)
+      .delete
+
+    transfer.fetch('files', []).each do |file|
+      db[:transfer_file].insert(transfer_id: transfer_identifier,
+                                filename: file.fetch('filename'),
+                                key: file.fetch('key'),
+                                role: 'OTHER',
+                                created_by: Ctx.username,
+                                create_time: java.lang.System.currentTimeMillis)
+    end
+
+    db[:transfer_proposal_series]
+      .filter(transfer_proposal_id: transfer_proposal_id)
+      .delete
+
+    transfer.fetch('series', []).each do |series|
+      db[:transfer_proposal_series].insert(transfer_proposal_id: transfer_proposal_id,
+                                           series_title: series.fetch('series_title', nil),
+                                           disposal_class: series.fetch('disposal_class', nil),
+                                           date_range: series.fetch('date_range', nil),
+                                           accrual_details: series.fetch('accrual_details', nil),
+                                           creating_agency: series.fetch('creating_agency', nil),
+                                           mandate: series.fetch('mandate', nil),
+                                           function: series.fetch('function', nil),
+                                           system_of_arrangement: series.fetch('system_of_arrangement', nil),
+                                           composition_digital: series.fetch('composition_digital', false ) ? 1 : 0,
+                                           composition_hybrid: series.fetch('composition_hybrid', false ) ? 1 : 0,
+                                           composition_physical: series.fetch('composition_physical', false ) ? 1 : 0)
+    end
+  end
+
+
+  def self.proposal_dto_for(transfer_proposal_id)
+    TransferProposal.from_row(db[:transfer_proposal][id: transfer_proposal_id],
+                              db[:transfer_file].filter(transfer_id: db[:transfer_identifier][transfer_proposal_id: transfer_proposal_id][:id]),
+                              db[:transfer_proposal_series].filter(transfer_proposal_id: transfer_proposal_id))
+  end
 end

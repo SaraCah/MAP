@@ -24,7 +24,8 @@ interface SeriesMetadata {
 }
 
 interface SeriesMetadataState {
-    metadata: SeriesMetadata[];
+    metadata:SeriesMetadata[];
+    is_readonly:Boolean;
 }
 
 declare var M: any; // Materialize on the window context
@@ -32,7 +33,9 @@ declare var M: any; // Materialize on the window context
 Vue.component('transfer-proposal-series', {
     template: `
 <div>
-    <a class="btn" v-on:click="add">Add Series Metadata</a>
+    <template v-if="!is_readonly">
+        <a class="btn" v-on:click="add">Add Series Metadata</a>
+    </template>
     <template v-if="metadata.length > 0">
         <div v-for="(series, index) in metadata" class="card">
             <div class="card-content">
@@ -105,7 +108,7 @@ Vue.component('transfer-proposal-series', {
                     </div>
                     <div class="col s12">
                         <label>
-                            <input type="checkbox" name="transfer[series][][composition_phyiscal]" v-model="series.composition_phyiscal">
+                            <input type="checkbox" name="transfer[series][][composition_physical]" v-model="series.composition_physical">
                             <span>Physical</span>
                         </label>
                     </div>
@@ -116,11 +119,13 @@ Vue.component('transfer-proposal-series', {
                         </label>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col s12">
-                        <a class="btn right" v-on:click="remove(series)">Remove</a>
+                <template v-if="!is_readonly">
+                    <div class="row">
+                        <div class="col s12">
+                            <a class="btn right" v-on:click="remove(series)">Remove</a>
+                        </div>
                     </div>
-                </div>
+                </template>
             </div>
         </div>
     </template>
@@ -129,9 +134,10 @@ Vue.component('transfer-proposal-series', {
     data: function(): SeriesMetadataState {
         return {
             metadata: JSON.parse(this.existing_metadata),
+            is_readonly: (this.readonly == 'true'),
         };
     },
-    props: ['existing_metadata'],
+    props: ['existing_metadata', 'readonly'],
     methods: {
         add: function() {
             this.metadata.push({});
@@ -144,5 +150,20 @@ Vue.component('transfer-proposal-series', {
     },
     updated: function() {
         M.FormSelect.init(this.$el.querySelectorAll('select'));
+    },
+    mounted: function() {
+        this.$el.querySelectorAll('input,textarea,select').forEach(function(el) {
+            if ((<HTMLFormElement>el).value != "") {
+                if (el.nextElementSibling) {
+                    el.nextElementSibling.classList.add('active');
+                }
+            }
+        });
+
+        if (this.is_readonly) {
+            this.$el.querySelectorAll('input,textarea,select').forEach(function(el) {
+                (<HTMLFormElement>el).disabled = true;
+            });
+        }
     }
 });

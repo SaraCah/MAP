@@ -8,11 +8,11 @@
         <table class="highlight responsive-table">
             <thead>
             <tr>
-                <th>Transfer Title</th>
-                <th>Status</th>
-                <th>Created By</th>
-                <th>Date Created</th>
-                <th></th>
+                <th style="width:60%">Transfer Title</th>
+                <th style="width:10%">Status</th>
+                <th style="width:10%">Created By</th>
+                <th style="width:10%">Date Created</th>
+                <th style="width:10%"></th>
             </tr>
             </thead>
             <tbody>
@@ -22,7 +22,9 @@
                 <td><%= transfer.fetch('status') %></td>
                 <td><%= transfer.fetch('created_by') %></td>
                 <td><%= Time.at(transfer.fetch('create_time') / 1000)%></td>
-                <td></td>
+                <td>
+                    <a class="btn" href="/transfer_proposals/<%= transfer.fetch('id') %>">View</a>
+                </td>
             </tr>
             <% end %>
             </tbody>

@@ -242,6 +242,19 @@ class MAPAPIClient
          :multipart_form_data)
   end
 
+  def get_transfer_proposal(transfer_proposal_id)
+    json = get("/transfer_proposals/#{transfer_proposal_id}")
+
+    return nil if json.nil?
+
+    TransferProposal.from_hash(json)
+  end
+
+  def update_transfer_proposal(transfer)
+    response = post('/transfer_proposals/update', transfer: transfer.to_json)
+    response['errors'] || []
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

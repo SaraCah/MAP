@@ -19,20 +19,23 @@ interface UploadedFile {
 
 interface UploaderState {
     uploaded:UploadedFile[];
+    is_readonly:Boolean;
 }
 
 Vue.component('file-uploader', {
     template: `
 <div>
-    <div class="file-field input-field">
-        <div class="btn">
-            <span>Upload File(s)</span>
-            <input type="file" ref="upload" multiple v-on:change="uploadFiles">
+    <template v-if="!is_readonly">
+        <div class="file-field input-field">
+            <div class="btn">
+                <span>Upload File(s)</span>
+                <input type="file" ref="upload" multiple v-on:change="uploadFiles">
+            </div>
+            <div class="file-path-wrapper">
+                <input class="file-path" type="text">
+            </div>
         </div>
-        <div class="file-path-wrapper">
-            <input class="file-path" type="text">
-        </div>
-    </div>
+    </template>
     <template v-if="uploaded.length > 0">
         <div class="card">
             <div class="card-content">
@@ -54,7 +57,11 @@ Vue.component('file-uploader', {
                             </td>
                             <td>{{file.created_by}}</td>
                             <td>{{file.created_time}}</td>
-                            <td><a class="btn" v-on:click="remove(file)">Remove</a></td>
+                            <td>
+                                <template v-if="!is_readonly">
+                                    <a class="btn" v-on:click="remove(file)">Remove</a>
+                                </template>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -66,9 +73,10 @@ Vue.component('file-uploader', {
     data: function(): UploaderState {
         return {
             uploaded: JSON.parse(this.files),
+            is_readonly: (this.readonly == 'true'),
         };
     },
-    props: ['files', 'csrf_token', 'input_path'],
+    props: ['files', 'csrf_token', 'input_path', 'readonly'],
     methods: {
         uploadFiles: function() {
             let uploadInput = <HTMLInputElement>this.$refs.upload;
@@ -106,5 +114,5 @@ Vue.component('file-uploader', {
         buildPath(field:String) {
             return this.input_path + "[" + field + "]";
         }
-    },
+    }
 });

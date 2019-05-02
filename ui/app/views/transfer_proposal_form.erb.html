@@ -7,7 +7,7 @@
             <div class="col s12">
                 <ul class="status-infomatic">
                     <li <% if transfer.new? %>class="current"<% end %>>Inactive</li>
-                    <li <% if transfer.fetch('status', '') == 'PROPOSED' %>class="current"<% end %>>Active</li>
+                    <li <% if transfer.fetch('status', '') == 'ACTIVE' %>class="current"<% end %>>Active</li>
                     <li <% if transfer.fetch('status', '') == 'APPROVED' %>class="current"<% end %>>Approved</li>
                     <li <% if transfer.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>class="current"<% end %>>Cancelled<br>By User</li>
                     <li <% if transfer.fetch('status', '') == 'CANCELLED_BY_QSA' %>class="current"<% end %>>Cancelled<br>By QSA</li>
@@ -15,11 +15,16 @@
             </div>
         </div>
     </div>
-    <form class="col s12" action="/transfer_proposals/create" method="post" enctype="multipart/form-data">
+    <form id="transferProposalForm" class="col s12" <% if is_readonly %>disabled<% else %>action="<%= transfer.new? ? '/transfer_proposals/create' : '/transfer_proposals/update' %>" method="post" enctype="multipart/form-data"<% end %>>
         <%== FormHelper.hidden_authenticity_token %>
+
+        <% unless transfer.new? %>
+            <input type="hidden" name="transfer[id]" value="<%= transfer.fetch('id') %>">
+        <% end %>
+
         <div class="row">
             <div class="input-field col s12">
-                <input id="title" name="transfer[title]" type="text" value="<%= transfer.fetch('title', '') %>" required>
+                <input id="title" name="transfer[title]" type="text" value="<%= transfer.fetch('title', '') %>" required <% if is_readonly %>disabled<% end %>>
                 <label for="title">Title</label>
             </div>
         </div>
@@ -28,27 +33,30 @@
             <div class="col s12">
                 <file-uploader files="<%= transfer.fetch('files', []).to_json %>"
                                input_path="transfer[files][]"
+                               readonly="<%= is_readonly %>"
                                csrf_token="<%= FormHelper.csrf_token %>">
                 </file-uploader>
             </div>
         </div>
 
-        <transfer-proposal-series existing_metadata="<%=  transfer.fetch('series', []).to_json %>">
+        <transfer-proposal-series readonly="<%= is_readonly %>" existing_metadata="<%=  transfer.fetch('series', []).to_json %>">
         </transfer-proposal-series>
 
         <div class="row">
             <div class="input-field col s12">
-                <input id="estimated_quantity" name="transfer[estimated_quantity]" type="text" value="<%= transfer.fetch('estimated_quantity', '') %>">
+                <input id="estimated_quantity" name="transfer[estimated_quantity]" type="text" value="<%= transfer.fetch('estimated_quantity', '') %>" <% if is_readonly %>disabled<% end %>>
                 <label for="estimated_quantity">Estimated Quantity</label>
             </div>
         </div>
 
-        <div class="row">
-            <br>
-            <br>
-            <div class="col s12">
-                <button class="btn">Save Transfer</button>
+        <% unless is_readonly %>
+            <div class="row">
+                <br>
+                <br>
+                <div class="col s12">
+                    <button class="btn">Save Transfer</button>
+                </div>
             </div>
-        </div>
+        <% end %>
     </form>
 </div>
