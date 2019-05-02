@@ -272,6 +272,10 @@ class MAPAPIClient
     response['errors'] || []
   end
 
+  def cancel_transfer_proposal(transfer_proposal_id)
+    post('/transfer_proposals/cancel', id: transfer_proposal_id)
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

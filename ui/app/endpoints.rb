@@ -326,6 +326,16 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  Endpoint.post('/transfer_proposals/:id/cancel')
+    .param(:id, Integer, "The ID of the transfer to cancel") do
+
+    # FIXME check permissions
+
+    Ctx.client.cancel_transfer_proposal(params[:id])
+
+    redirect '/transfer_proposals'
+  end
+
   Endpoint.get('/file-download')
     .param(:key, String, "File key")
     .param(:filename, String, "Filename") do

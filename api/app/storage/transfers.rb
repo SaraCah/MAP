@@ -115,4 +115,10 @@ class Transfers < BaseStorage
                               db[:transfer_file].filter(transfer_id: db[:transfer_identifier][transfer_proposal_id: transfer_proposal_id][:id]),
                               db[:transfer_proposal_series].filter(transfer_proposal_id: transfer_proposal_id))
   end
+
+  def self.cancel_proposal(transfer_proposal_id)
+    db[:transfer_proposal]
+      .filter(id: transfer_proposal_id)
+      .update(status: 'CANCELLED_BY_AGENCY')
+  end
 end

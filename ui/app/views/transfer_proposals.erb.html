@@ -4,16 +4,16 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row vue-enabled">
     <div class="col s12">
         <table class="highlight responsive-table">
             <thead>
             <tr>
-                <th style="width:60%">Transfer Title</th>
+                <th style="width:50%">Transfer Title</th>
                 <th style="width:10%">Status</th>
                 <th style="width:10%">Created By</th>
                 <th style="width:10%">Date Created</th>
-                <th style="width:10%"></th>
+                <th style="width:20%"></th>
             </tr>
             </thead>
             <tbody>
@@ -25,6 +25,14 @@
                 <td><%= Time.at(transfer.fetch('create_time') / 1000)%></td>
                 <td>
                     <a class="btn" href="/transfer_proposals/<%= transfer.fetch('id') %>">View</a>
+                    <% if transfer.fetch('status') == 'ACTIVE' %>
+                        <confirmable-action action="/transfer_proposals/<%= transfer.fetch('id') %>/cancel"
+                                            csrf_token="<%= FormHelper.csrf_token %>"
+                                            css="btn red lighten-2"
+                                            label="Cancel"
+                                            message="Are you sure you want to cancel this transfer proposal?">
+                        </confirmable-action>
+                    <% end %>
                 </td>
             </tr>
             <% end %>

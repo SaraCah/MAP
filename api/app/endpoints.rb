@@ -211,4 +211,11 @@ class MAPTheAPI < Sinatra::Base
     ]
   end
 
+  Endpoint.post('/transfer_proposals/cancel')
+    .param(:id, Integer, "Transfer Propposal ID to cancel") do
+    Transfers.cancel_proposal(params[:id])
+
+    json_response(status: 'cancelled')
+  end
+
 end
