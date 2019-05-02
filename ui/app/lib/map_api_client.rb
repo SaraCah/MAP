@@ -255,6 +255,10 @@ class MAPAPIClient
          :multipart_form_data)
   end
 
+  def stream_file(key)
+    get('/stream-file', { "key" => key }, true)
+  end
+
   def get_transfer_proposal(transfer_proposal_id)
     json = get("/transfer_proposals/#{transfer_proposal_id}")
 
@@ -292,7 +296,7 @@ class MAPAPIClient
     JSON.parse(response.body)
   end
 
-  def get(url, params = {})
+  def get(url, params = {}, raw = false)
     uri = build_url(url, params)
 
     request = Net::HTTP::Get.new(uri)
@@ -302,7 +306,11 @@ class MAPAPIClient
 
     check_errors!(response)
 
-    JSON.parse(response.body)
+    if raw
+      response.body
+    else
+      JSON.parse(response.body)
+    end
   end
 
   class SessionGoneError < StandardError

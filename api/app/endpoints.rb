@@ -200,4 +200,15 @@ class MAPTheAPI < Sinatra::Base
       json_response(errors: errors)
     end
   end
+
+  Endpoint.get('/stream-file')
+    .param(:key, String, "File key to stream") do
+
+    [
+      200,
+      {'Content-Type' => 'application/octet-stream'},
+      StringIO.new(Files.read(params[:key]))
+    ]
+  end
+
 end

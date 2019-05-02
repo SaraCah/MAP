@@ -7,4 +7,8 @@ class Files < BaseStorage
     key
   end
 
+  def self.read(key)
+    db[:file][key: key][:blob]
+  end
+
 end

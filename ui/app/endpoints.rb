@@ -309,6 +309,8 @@ class MAPTheApp < Sinatra::Base
   Endpoint.post('/transfer_proposals/update')
     .param(:transfer, TransferProposal, "The transfer to create") do
 
+    # FIXME check permissions
+
     errors = Ctx.client.update_transfer_proposal(params[:transfer])
 
     if errors.empty?
@@ -324,4 +326,17 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+
+  Endpoint.get('/file-download')
+    .param(:key, String, "File key")
+    .param(:filename, String, "Filename") do
+    [
+      200,
+      {
+        'Content-Type' => 'application/octet-stream',
+        'Content-Disposition' => "attachment; filename=#{params[:filename]}"
+      },
+      Ctx.client.stream_file(params[:key])
+    ]
+  end
 end
