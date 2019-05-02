@@ -14,7 +14,9 @@
             <% if Ctx.permissions.allow_manage_locations? %>
                 <li class="tab"><a href="/locations" <% if context == 'locations' %> class='active'<% end %>>My Locations</a></li>
             <% end %>
-            <li class="tab"><a href="/transfer_proposals" <% if context == 'transfers' %> class='active'<% end %>>My Transfers</a></li>
+            <% unless Ctx.permissions.is_admin %>
+                <li class="tab"><a href="/transfer_proposals" <% if context == 'transfers' %> class='active'<% end %>>My Transfers</a></li>
+            <% end %>
             <% unless Ctx.permissions.is_admin %>
                 <li class="vue-enabled right">
                     <%

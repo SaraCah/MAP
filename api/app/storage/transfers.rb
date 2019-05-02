@@ -24,6 +24,7 @@ class Transfers < BaseStorage
 
     transfer_proposal_id = db[:transfer_proposal].insert(title: transfer.fetch('title'),
                                                          status: 'ACTIVE',
+                                                         estimated_quantity: transfer.fetch('estimated_quantity', nil),
                                                          agency_id: Ctx.get.current_location.agency_id,
                                                          agency_location_id: Ctx.get.current_location.id,
                                                          created_by: Ctx.username,
@@ -38,6 +39,21 @@ class Transfers < BaseStorage
                                 role: 'OTHER',
                                 created_by: Ctx.username,
                                 create_time: java.lang.System.currentTimeMillis)
+    end
+
+    transfer.fetch('series', []).each do |series|
+      db[:transfer_proposal_series].insert(transfer_proposal_id: transfer_proposal_id,
+                                           series_title: series.fetch('series_title', nil),
+                                           disposal_class: series.fetch('disposal_class', nil),
+                                           date_range: series.fetch('date_range', nil),
+                                           accrual_details: series.fetch('accrual_details', nil),
+                                           creating_agency: series.fetch('creating_agency', nil),
+                                           mandate: series.fetch('mandate', nil),
+                                           function: series.fetch('function', nil),
+                                           system_of_arrangement: series.fetch('system_of_arrangement', nil),
+                                           composition_digital: series.fetch('composition_digital', false ) ? 1 : 0,
+                                           composition_hybrid: series.fetch('composition_hybrid', false ) ? 1 : 0,
+                                           composition_physical: series.fetch('composition_physical', false ) ? 1 : 0)
     end
   end
 

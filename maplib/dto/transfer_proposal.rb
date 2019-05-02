@@ -4,7 +4,9 @@ class TransferProposal
   define_field(:id, Integer, required: false)
   define_field(:title, String, validator: proc {|s| (s.length > 0) ? nil : "Title can't be blank" })
   define_field(:status, String, required: false)
+  define_field(:estimated_quantity, String, required: false)
   define_field(:files, [TransferFile], default: [])
+  define_field(:series, [TransferProposalSeries], default: [])
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)
 

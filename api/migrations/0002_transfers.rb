@@ -8,6 +8,7 @@ Sequel.migration do
       foreign_key :agency_location_id, :agency_location, null: false
 
       String :title, null: false
+      String :estimated_quantity
 
       String :status, null: false
 
@@ -42,17 +43,18 @@ Sequel.migration do
 
       foreign_key :transfer_proposal_id, :transfer_proposal, null: false
 
-      # FIXME business rules / types for these:
+      # FIXME sizes?
       String :series_title
       String :disposal_class
       String :date_range
-      String :accrual_details
+      String :accrual_details, text: true
       String :creating_agency
       String :mandate
       String :function
       String :system_of_arrangement
-      String :composition
-      String :estimated_quantity
+      Integer :composition_digital, null: false, default: 0
+      Integer :composition_hybrid, null: false, default: 0
+      Integer :composition_physical, null: false, default: 0
     end
 
     create_table(:conversation) do

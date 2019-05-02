@@ -19,14 +19,30 @@
         <%== FormHelper.hidden_authenticity_token %>
         <div class="row">
             <div class="input-field col s12">
-                <input id="name" name="transfer[title]" type="text" value="<%= transfer.fetch('title', '') %>" required>
-                <label for="name">Title</label>
+                <input id="title" name="transfer[title]" type="text" value="<%= transfer.fetch('title', '') %>" required>
+                <label for="title">Title</label>
             </div>
         </div>
-        <file-uploader files="<%= transfer.fetch('files', []).to_json %>"
-                       input_path="transfer[files][]"
-                       csrf_token="<%= FormHelper.csrf_token %>">
-        </file-uploader>
+
+        <div class="row">
+            <div class="col s12">
+                <file-uploader files="<%= transfer.fetch('files', []).to_json %>"
+                               input_path="transfer[files][]"
+                               csrf_token="<%= FormHelper.csrf_token %>">
+                </file-uploader>
+            </div>
+        </div>
+
+        <transfer-proposal-series existing_metadata="<%=  transfer.fetch('series', []).to_json %>">
+        </transfer-proposal-series>
+
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="estimated_quantity" name="transfer[estimated_quantity]" type="text" value="<%= transfer.fetch('estimated_quantity', '') %>">
+                <label for="estimated_quantity">Estimated Quantity</label>
+            </div>
+        </div>
+
         <div class="row">
             <br>
             <br>

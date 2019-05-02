@@ -33,28 +33,34 @@ Vue.component('file-uploader', {
             <input class="file-path" type="text">
         </div>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Filename</th>
-                <th>Created by</th>
-                <th>Create Time</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="file in uploaded">
-                <td>
-                    {{file.filename}}
-                    <input type="hidden" v-bind:name="buildPath('key')" v-bind:value="file.key"/>
-                    <input type="hidden" v-bind:name="buildPath('filename')" v-bind:value="file.filename"/>
-                </td>
-                <td>{{file.created_by}}</td>
-                <td>{{file.created_time}}</td>
-                <td><a class="btn" v-on:click="remove(file)">Remove</a></td>
-            </tr>
-        </tbody>
-    </table>
+    <template v-if="uploaded.length > 0">
+        <div class="card">
+            <div class="card-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Filename</th>
+                            <th>Created by</th>
+                            <th>Create Time</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="file in uploaded">
+                            <td>
+                                {{file.filename}}
+                                <input type="hidden" v-bind:name="buildPath('key')" v-bind:value="file.key"/>
+                                <input type="hidden" v-bind:name="buildPath('filename')" v-bind:value="file.filename"/>
+                            </td>
+                            <td>{{file.created_by}}</td>
+                            <td>{{file.created_time}}</td>
+                            <td><a class="btn" v-on:click="remove(file)">Remove</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
 </div>
 `,
     data: function(): UploaderState {
