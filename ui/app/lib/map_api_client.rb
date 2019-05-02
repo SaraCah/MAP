@@ -2,6 +2,19 @@ require 'net/http'
 require 'net/http/post/multipart'
 
 class MAPAPIClient
+
+  # Documented as thread safe, so we'll share between all threads to reduce the
+  # need to connect.
+  @http_persistent = Net::HTTP::Persistent.new(name: "map_api_client")
+
+  def self.http_persistent
+    @http_persistent
+  end
+
+  def http_client
+    self.class.http_persistent
+  end
+
   def initialize(session)
     @session = session
   end
@@ -272,9 +285,7 @@ class MAPAPIClient
 
     request['X-MAP-SESSION'] = @session[:api_session_id] if @session[:api_session_id]
 
-    response = Net::HTTP.start(uri.hostname, uri.port) {|http|
-      http.request(request)
-    }
+    response = http_client.request(uri, request)
 
     check_errors!(response)
 
@@ -287,9 +298,7 @@ class MAPAPIClient
     request = Net::HTTP::Get.new(uri)
     request['X-MAP-SESSION'] = @session[:api_session_id] if @session[:api_session_id]
 
-    response = Net::HTTP.start(uri.hostname, uri.port) {|http|
-      http.request(request)
-    }
+    response = http_client.request(uri, request)
 
     check_errors!(response)
 
