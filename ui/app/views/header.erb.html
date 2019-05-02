@@ -7,15 +7,15 @@
     </div>
     <div class="nav-content blue-grey lighten-1">
         <ul class="tabs tabs-transparent">
-            <li class="tab"><a href="/" <% if context == 'home' %> class='active'<% end %>>Home</a></li>
+            <li class="tab"><a href="/" <% if context.include?('home') %> class='active'<% end %>>Home</a></li>
             <% if Ctx.permissions.allow_manage_users? %>
-                <li class="tab"><a href="/users" <% if context == 'users' %> class='active'<% end %>>My Users</a></li>
+                <li class="tab"><a href="/users" <% if context.include?('users') %> class='active'<% end %>>My Users</a></li>
             <% end %>
             <% if Ctx.permissions.allow_manage_locations? %>
-                <li class="tab"><a href="/locations" <% if context == 'locations' %> class='active'<% end %>>My Locations</a></li>
+                <li class="tab"><a href="/locations" <% if context.include?('locations') %> class='active'<% end %>>My Locations</a></li>
             <% end %>
             <% unless Ctx.permissions.is_admin %>
-                <li class="tab"><a href="/transfer_proposals" <% if context == 'transfers' %> class='active'<% end %>>My Transfers</a></li>
+                <li class="tab"><a href="/transfer_proposals" <% if context.include?('transfers') %> class='active'<% end %>>My Transfers</a></li>
             <% end %>
             <% unless Ctx.permissions.is_admin %>
                 <li class="vue-enabled right">
@@ -33,6 +33,14 @@
             <% end %>
         </ul>
     </div>
+    <% if context.include?('transfers') %>
+        <div class="nav-content blue-grey lighten-3">
+            <ul class="tabs tabs-transparent">
+                <li class="tab col s3"><a <% if context.include?('transfer_proposals') %>class="active"<% end %> href="/transfer_proposals">Proposals</a></li>
+                <li class="tab col s3"><a <% if context.include?('initiated_transfers') %>class="active"<% end %> href="/transfers">Transfers</a></li>
+            </ul>
+        </div>
+    <% end %>
 </nav>
 <div class="row">
     <div class="col s12">

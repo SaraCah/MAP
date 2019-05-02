@@ -8,7 +8,7 @@ class MAPTheApp < Sinatra::Base
                                    :agency => Ctx.client.get_current_agency,
                                    :location => Ctx.get.current_location
                                  },
-                                 :layout, title: "Welcome", context: 'home')
+                                 :layout, title: "Welcome", context: ['home'])
     else
       Templates.emit_with_layout(:login, {},
                                  :layout_blank, title: "Please log in")
@@ -83,12 +83,12 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/users')
     .param(:page, Integer, "Page to return", optional: true) do
       Templates.emit_with_layout(:users, {paged_users: Ctx.client.users(params[:page] || 0)},
-                                 :layout, title: "Users", context: 'users')
+                                 :layout, title: "Users", context: ['users'])
   end
 
   Endpoint.get('/users/new') do
     Templates.emit_with_layout(:user_new, {user: UserUpdateRequest.new},
-                               :layout, title: "New User", context: 'users')
+                               :layout, title: "New User", context: ['users'])
   end
 
   Endpoint.post('/users/create')
@@ -116,7 +116,7 @@ class MAPTheApp < Sinatra::Base
 
     if params[:user].has_errors?
       Templates.emit_with_layout(:user_new, {user: params[:user]},
-                                   :layout, title: "New User", context: 'users')
+                                   :layout, title: "New User", context: ['users'])
     else
       redirect '/users'
     end
@@ -129,7 +129,7 @@ class MAPTheApp < Sinatra::Base
     end
 
     Templates.emit_with_layout(:user_edit, {user: Ctx.client.user_for_edit(params[:username])},
-                               :layout, title: "Edit User", context: 'users')
+                               :layout, title: "Edit User", context: ['users'])
   end
 
   Endpoint.post('/users/update/:id')
@@ -158,7 +158,7 @@ class MAPTheApp < Sinatra::Base
 
     if params[:user].has_errors?
       Templates.emit_with_layout(:user_edit, {user: params[:user]},
-                                 :layout, title: "Edit User", context: 'users')
+                                 :layout, title: "Edit User", context: ['users'])
     else
       redirect '/users'
     end
@@ -186,7 +186,7 @@ class MAPTheApp < Sinatra::Base
 
     if Ctx.permissions.allow_manage_locations?
       Templates.emit_with_layout(:locations, {paged_results: Ctx.client.locations(params[:page] || 0)},
-                                 :layout, title: "Locations", context: 'locations')
+                                 :layout, title: "Locations", context: ['locations'])
     else
       [404]
     end
@@ -195,7 +195,7 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/locations/new') do
     if Ctx.permissions.allow_manage_locations?
       Templates.emit_with_layout(:location_new, {location: AgencyLocationUpdateRequest.new},
-                                 :layout, title: "New Location", context: 'locations')
+                                 :layout, title: "New Location", context: ['locations'])
     else
       [404]
     end
@@ -214,7 +214,7 @@ class MAPTheApp < Sinatra::Base
 
     if params[:location].has_errors?
       Templates.emit_with_layout(:location_new, {location: params[:location]},
-                                 :layout, title: "New Location", context: 'locations')
+                                 :layout, title: "New Location", context: ['locations'])
     else
       redirect '/locations'
     end
@@ -256,12 +256,12 @@ class MAPTheApp < Sinatra::Base
     .param(:page, Integer, "Page to return", optional: true) do
 
     Templates.emit_with_layout(:transfer_proposals, {paged_results: Ctx.client.transfers(params[:page] || 0)},
-                               :layout, title: "Transfers", context: 'transfers')
+                               :layout, title: "Transfer Proposals", context: ['transfers', 'transfer_proposals'])
   end
 
   Endpoint.get('/transfer_proposals/new') do
-    Templates.emit_with_layout(:transfer_proposal_new, {transfer: TransferProposal.new},
-                               :layout, title: "New Transfer Proposal", context: 'transfers')
+    Templates.emit_with_layout(:transfer_proposal_new, {transfer: TransferProposal.new, is_readonly: false},
+                               :layout, title: "New Transfer Proposal", context: ['transfers', 'transfer_proposals'])
   end
 
   Endpoint.post('/transfer_proposals/create')
@@ -273,7 +273,7 @@ class MAPTheApp < Sinatra::Base
       redirect '/transfer_proposals'
     else
       Templates.emit_with_layout(:transfer_proposal_new, {transfer: params[:transfer], errors: errors},
-                                 :layout, title: "New Transfer Proposal", context: 'transfers')
+                                 :layout, title: "New Transfer Proposal", context: ['transfers', 'transfer_proposals'])
     end
   end
 
@@ -303,7 +303,7 @@ class MAPTheApp < Sinatra::Base
     end
 
     Templates.emit_with_layout(:transfer_proposal_view, {transfer: transfer, is_readonly: (transfer.fetch('status') != 'ACTIVE')},
-                               :layout, title: "Transfer Proposal", context: 'transfers')
+                               :layout, title: "Transfer Proposal", context: ['transfers', 'transfer_proposals'])
   end
 
   Endpoint.post('/transfer_proposals/update')
@@ -322,10 +322,9 @@ class MAPTheApp < Sinatra::Base
                                    errors: errors,
                                    is_readonly: false,
                                  },
-                                 :layout, title: "Transfer Proposal", context: 'transfers')
+                                 :layout, title: "Transfer Proposal", context: ['transfers', 'transfer_proposals'])
     end
   end
-
 
   Endpoint.get('/file-download')
     .param(:key, String, "File key")
@@ -338,5 +337,12 @@ class MAPTheApp < Sinatra::Base
       },
       Ctx.client.stream_file(params[:key])
     ]
+  end
+
+  Endpoint.get('/transfers')
+    .param(:page, Integer, "Page to return", optional: true) do
+
+    Templates.emit_with_layout(:transfers, {paged_results: Ctx.client.transfers(params[:page] || 0)},
+                               :layout, title: "Transfers", context: ['transfers', 'active_transfers'])
   end
 end
