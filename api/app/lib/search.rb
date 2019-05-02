@@ -83,11 +83,35 @@ class Search
   end
 
 
+  def self.query(hash)
+    hash.map{|k,v| [k,'"'+v+'"'].join(':')}.join('&&')
+  end
+
   def self.controlled_records(agency_id)
     agency_uri = "/agents/corporate_entities/#{agency_id}"
 
-    execute('responsible_agency_u_sstr:"' + agency_uri + '"').fetch('docs')
+    out = execute(query('responsible_agency_u_sstr' => agency_uri)).fetch('docs')
       .map{|record| {'id' => record['id'], 'title' => record['title']}}
+
+    # FIXME: hardcoded 90 days
+    cutoff_date = Time.now() - (60*60*24 * 90)
+
+    execute(query('recent_responsible_agencies_u_sstr' => agency_uri)).fetch('docs').map do |record|
+      json = JSON.parse(record['json'])
+      not_too_old = json['recent_responsible_agencies'].select{|rh|
+        rh['ref'] == agency_uri && Time.new(*rh['end_date'].split('-')) >= cutoff_date
+      }
+
+      if not_too_old.length > 0
+        # it is possible that this record passed in and out of this agency's control
+        # more than once since the cutoff, so get the latest end_date
+        latest_end_date = not_too_old.sort{|a,b| a['end_date'] <=> b['end_date']}.last['end_date']
+
+        out << {'id' => record['id'], 'title' => record['title'], 'end_date' => latest_end_date}
+      end
+    end
+
+    out
   end
 
 end

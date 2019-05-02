@@ -10,6 +10,7 @@
     <thead>
         <tr>
             <th>Record</th>
+            <th>End Date</th>
             <th>URI</th>
         </tr>
     </thead>
@@ -17,6 +18,7 @@
       <% agency.controlled_records.each do |record| %>
         <tr>
             <td><%= record['title'] %></td>
+            <td><%= record['end_date'] %></td>
             <td><%= record['id'] %></td>
         </tr>
       <% end %>
