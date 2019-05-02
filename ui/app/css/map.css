@@ -29,9 +29,20 @@
     width: 100%;
     margin: 0;
     padding: 0;
+    position: relative;
 }
 
-.status-infomatic li:before {
+.status-infomatic:before {
+    content: '';
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background-color: #546e7a;
+    display: block;
+    top: 15px;
+}
+
+.status-infomatic li:after {
     content: ' ';
     width: 30px;
     height: 30px;
@@ -47,13 +58,38 @@
 .status-infomatic li {
     position: relative;
     display: block;
-    flex: 0 1 auto;
+    flex: 1 1 auto;
+    /*flex-grow: 1;*/
     list-style-type: none;
     text-align: center;
     vertical-align: top;
     padding-top: 40px;
 }
 
-.status-infomatic li.current:before {
+.status-infomatic li.first:before {
+    position: absolute;
+    background-color: white;
+    top: 0;
+    left: 0;
+    height: 30px;
+    width: 50%;
+    content: '';
+}
+
+.status-infomatic li.last:before {
+    position: absolute;
+    background-color: white;
+    top: 0;
+    right: 0;
+    height: 30px;
+    width: 50%;
+    content: '';
+}
+
+.status-infomatic li.current:after {
     background-color: #546e7a;
+}
+
+.status-infomatic li.stand-alone {
+    background-color: white;
 }

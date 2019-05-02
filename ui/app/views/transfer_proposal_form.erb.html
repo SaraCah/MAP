@@ -6,11 +6,11 @@
         <div class="row">
             <div class="col s12">
                 <ul class="status-infomatic">
-                    <li <% if transfer.new? %>class="current"<% end %>>Inactive</li>
-                    <li <% if transfer.fetch('status', '') == 'ACTIVE' %>class="current"<% end %>>Active</li>
-                    <li <% if transfer.fetch('status', '') == 'APPROVED' %>class="current"<% end %>>Approved</li>
-                    <li <% if transfer.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>class="current"<% end %>>Cancelled<br>By User</li>
-                    <li <% if transfer.fetch('status', '') == 'CANCELLED_BY_QSA' %>class="current"<% end %>>Cancelled<br>By QSA</li>
+                    <li class="first <% if transfer.new? %>current<% end %>">Inactive</li>
+                    <li class="<% if transfer.fetch('status', '') == 'ACTIVE' %><% end %>">Active</li>
+                    <li class="last <% if transfer.fetch('status', '') == 'APPROVED' %>current<% end %>">Approved</li>
+                    <li class="stand-alone <% if transfer.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled<br>By User</li>
+                    <li class="stand-alone <% if transfer.fetch('status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled<br>By QSA</li>
                 </ul>
             </div>
         </div>
