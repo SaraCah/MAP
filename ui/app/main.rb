@@ -56,6 +56,18 @@ require 'endpoints'
 
 require 'rack/map_logger'
 
+module Rack
+  module Protection
+    class Base
+      def drop_session(env)
+        $LOG.warn("Dropping session: #{env}")
+        $LOG.warn("Initiator: #{self}")
+        session(env).clear if session? env
+      end
+    end
+  end
+end
+
 class MAPTheApp < Sinatra::Base
 
   configure do
