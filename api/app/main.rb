@@ -64,6 +64,8 @@ require 'storage/files'
 require 'endpoints/upload_file'
 require 'endpoints'
 
+require 'rack/map_logger'
+
 class MAPTheAPI < Sinatra::Base
 
   configure :development do |config|
@@ -82,7 +84,7 @@ class MAPTheAPI < Sinatra::Base
   end
 
   configure do
-    use Rack::CommonLogger, $LOG
+    use Rack::MAPLogger, $LOG
   end
 
   configure do

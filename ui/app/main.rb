@@ -24,6 +24,7 @@ RJack::Logback.configure do
       p.pattern = "%date [%thread] %-5level %logger{35} - %msg %ex%n"
     end
   end
+
   RJack::Logback.root.add_appender( console )
   RJack::Logback.root.level = RJack::Logback::INFO
 end
@@ -53,6 +54,8 @@ require 'dto/transfer_proposal'
 require 'endpoints/upload_file'
 require 'endpoints'
 
+require 'rack/map_logger'
+
 class MAPTheApp < Sinatra::Base
 
   configure do
@@ -80,8 +83,9 @@ class MAPTheApp < Sinatra::Base
   end
 
   configure do
-    use Rack::CommonLogger, $LOG
+    use Rack::MAPLogger, $LOG
   end
+
 
   configure :production do
     # In production mode, we want assets to be cached persistently but cleared
