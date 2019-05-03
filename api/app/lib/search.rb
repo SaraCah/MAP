@@ -88,10 +88,21 @@ class Search
   end
 
   def self.controlled_records(agency_id)
+    # FIXME: starting to feel modelly ... refactorme
+
     agency_uri = "/agents/corporate_entities/#{agency_id}"
 
+    def self.record_hash(record)
+      {
+        'uri' => record['uri'],
+        'type' => record['primary_type'] == 'resource' ? 'Series' : 'Record',
+        'title' => record['title'],
+        'qsa_id' => record['qsa_id__u_sint'].first.to_s
+      }
+    end
+
     out = execute(query('responsible_agency_u_sstr' => agency_uri)).fetch('docs')
-      .map{|record| {'id' => record['id'], 'title' => record['title']}}
+      .map{|record| record_hash(record) }
 
     # FIXME: hardcoded 90 days
     cutoff_date = Time.now() - (60*60*24 * 90)
@@ -107,7 +118,7 @@ class Search
         # more than once since the cutoff, so get the latest end_date
         latest_end_date = not_too_old.sort{|a,b| a['end_date'] <=> b['end_date']}.last['end_date']
 
-        out << {'id' => record['id'], 'title' => record['title'], 'end_date' => latest_end_date}
+        out << record_hash(record).merge('end_date' => latest_end_date)
       end
     end
 

@@ -10,16 +10,16 @@
     <thead>
         <tr>
             <th>Record</th>
-            <th>End Date</th>
-            <th>URI</th>
+            <th></th>
+            <th>QSA Identifier</th>
         </tr>
     </thead>
     <tbody>
       <% agency.controlled_records.each do |record| %>
         <tr>
             <td><%= record['title'] %></td>
-            <td><%= record['end_date'] %></td>
-            <td><%= record['id'] %></td>
+            <td><%= record['end_date'] ? 'under movement' : '' %></td>
+            <td><%= record['type'] + ' ' + record['qsa_id'] %></td>
         </tr>
       <% end %>
     </tbody>
