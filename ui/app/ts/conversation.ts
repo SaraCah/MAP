@@ -28,7 +28,7 @@ Vue.component('conversation', {
             </div>
         </div>
         <div>
-            <textarea class="materialize-textarea" placeholder="Type your message!" v-model="message"></textarea>
+            <textarea ref="message" class="materialize-textarea" placeholder="Type your message!" v-model="message"></textarea>
             <a class="btn" ref="postButton" v-on:click="post()">Post Message</a>
         </div>
     </div>
@@ -82,6 +82,7 @@ Vue.component('conversation', {
                     this.busy = false;
                     this.message = '';
                     this.loadMessages();
+                    (<HTMLFormElement>this.$refs.message).focus();
                 });
         },
         formatTimestamp: function(epochTime:number) {
@@ -102,6 +103,9 @@ Vue.component('conversation', {
         },
     },
     mounted: function() {
-        this.loadMessages()
+        this.loadMessages();
+        setInterval(() => {
+            this.loadMessages();
+        }, 20 * 1000);
     }
 });
