@@ -30,6 +30,13 @@
         </div>
 
         <div class="row">
+            <div class="input-field col s12">
+                <input id="estimated_quantity" name="transfer[estimated_quantity]" type="text" value="<%= transfer.fetch('estimated_quantity', '') %>" <% if is_readonly %>disabled<% end %>>
+                <label for="estimated_quantity">Estimated Quantity</label>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col s12">
                 <file-uploader files="<%= transfer.fetch('files', []).to_json %>"
                                input_path="transfer[files][]"
@@ -42,13 +49,6 @@
         <transfer-proposal-series readonly="<%= is_readonly %>"
                                   existing_metadata="<%=  transfer.fetch('series', []).to_json %>">
         </transfer-proposal-series>
-
-        <div class="row">
-            <div class="input-field col s12">
-                <input id="estimated_quantity" name="transfer[estimated_quantity]" type="text" value="<%= transfer.fetch('estimated_quantity', '') %>" <% if is_readonly %>disabled<% end %>>
-                <label for="estimated_quantity">Estimated Quantity</label>
-            </div>
-        </div>
 
         <% unless is_readonly %>
             <div class="row">

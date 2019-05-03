@@ -17,8 +17,15 @@
             </tr>
             </thead>
             <tbody>
-            <% paged_results.results.each do |transfer| %>
-            <tr>
+            <% paged_results.results.each do |transfer|
+                rowCSSClass = ""
+                if transfer.fetch('status') == 'APPROVED'
+                    rowCSSClass = "light-green lighten-5"
+                elsif transfer.fetch('status').start_with?('CANCELLED')
+                    rowCSSClass = "red lighten-5"
+                end
+            %>
+            <tr class="<%= rowCSSClass %>">
                 <td><%= transfer.fetch('title') %></td>
                 <td><%= transfer.fetch('status') %></td>
                 <td><%= transfer.fetch('created_by') %></td>
