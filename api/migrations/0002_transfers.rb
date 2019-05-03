@@ -14,7 +14,13 @@ Sequel.migration do
 
       String :created_by, null: false
       Bignum :create_time, null: false
+
+      # This here for ArchivesSpace ASModel compatibility
+      DateTime :system_mtime, :null => false, :index => true
     end
+
+    run 'CREATE TRIGGER `transfer_proposal_insert_set_system_mtime` before insert on transfer_proposal for each row set new.system_mtime = UTC_TIMESTAMP()'
+    run 'CREATE TRIGGER `transfer_proposal_update_set_system_mtime` before update on transfer_proposal for each row set new.system_mtime = UTC_TIMESTAMP()'
 
     create_table(:transfer) do
       primary_key :id
