@@ -51,6 +51,7 @@ require 'dto/dto'
 require 'dto/transfer_file'
 require 'dto/transfer_proposal_series'
 require 'dto/transfer_proposal'
+require 'dto/transfer'
 
 require 'endpoints/upload_file'
 require 'endpoints'

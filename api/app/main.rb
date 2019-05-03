@@ -42,6 +42,7 @@ require 'dto/dto'
 require 'dto/transfer_file'
 require 'dto/transfer_proposal_series'
 require 'dto/transfer_proposal'
+require 'dto/transfer'
 
 require 'common/bootstrap'
 require 'storage/db_pool'

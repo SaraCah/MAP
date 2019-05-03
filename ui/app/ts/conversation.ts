@@ -53,7 +53,7 @@ Vue.component('conversation', {
     props: ['record_type', 'id', 'csrf_token'],
     methods: {
         loadMessages: function() {
-            this.$http.get('/get_messages?record_type='+this.record_type+'&id='+this.id)
+            this.$http.get('/get-messages?record_type='+this.record_type+'&id='+this.id)
                 .then((response: any) => response.json())
                 .then((json: any) => {
                     this.messages = json.messages;
@@ -71,7 +71,7 @@ Vue.component('conversation', {
             this.busy = true;
 
             this.$http.post(
-                '/post_message',
+                '/post-message',
                 {
                     record_type: this.record_type,
                     id: this.id,

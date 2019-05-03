@@ -155,7 +155,7 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.get('/transfers')
+  Endpoint.get('/transfer-proposals')
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in?
       json_response(Transfers.proposals(params[:page], 10))
@@ -164,7 +164,16 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.post('/transfer_proposals/create')
+  Endpoint.get('/transfers')
+    .param(:page, Integer, "Page to return") do
+    if Ctx.user_logged_in?
+      json_response(Transfers.transfers(params[:page], 10))
+    else
+      json_response([])
+    end
+  end
+
+  Endpoint.post('/transfer-proposals/create')
     .param(:transfer, TransferProposal, "Transfer to create") do
     Transfers.create_proposal_from_dto(params[:transfer])
 
@@ -181,7 +190,7 @@ class MAPTheAPI < Sinatra::Base
     json_response(params[:file].map {|file| Files.store(file.tmp_file)})
   end
 
-  Endpoint.get('/transfer_proposals/:id')
+  Endpoint.get('/transfer-proposals/:id')
     .param(:id, Integer, "ID of transfer proposal") do
     if Ctx.user_logged_in?
       json_response(Transfers.proposal_dto_for(params[:id]).to_hash)
@@ -190,7 +199,7 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.post('/transfer_proposals/update')
+  Endpoint.post('/transfer-proposals/update')
     .param(:transfer, TransferProposal, "Transfer to update") do
     Transfers.update_proposal_from_dto(params[:transfer])
 
@@ -211,14 +220,14 @@ class MAPTheAPI < Sinatra::Base
     ]
   end
 
-  Endpoint.post('/transfer_proposals/cancel')
+  Endpoint.post('/transfer-proposals/cancel')
     .param(:id, Integer, "Transfer Propposal ID to cancel") do
     Transfers.cancel_proposal(params[:id])
 
     json_response(status: 'cancelled')
   end
 
-  Endpoint.get('/get_messages')
+  Endpoint.get('/get-messages')
     .param(:record_type, String, "Record type")
     .param(:id, String, "Record id") do
     if Ctx.user_logged_in?
@@ -228,7 +237,7 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.post('/post_message')
+  Endpoint.post('/post-message')
     .param(:message, String, "Message")
     .param(:record_type, String, "Record Type")
     .param(:id, Integer, "Record ID") do

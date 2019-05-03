@@ -19,6 +19,7 @@ class Transfers < BaseStorage
                      max_page)
   end
 
+
   def self.create_proposal_from_dto(transfer)
     raise "FIXME admin user" if Ctx.get.permissions.is_admin?
 
@@ -118,9 +119,30 @@ class Transfers < BaseStorage
                               db[:transfer_proposal_series].filter(transfer_proposal_id: transfer_proposal_id))
   end
 
+
   def self.cancel_proposal(transfer_proposal_id)
     db[:transfer_proposal]
       .filter(id: transfer_proposal_id)
       .update(status: 'CANCELLED_BY_AGENCY')
+  end
+
+
+  def self.transfers(page, page_size)
+    dataset = db[:transfer]
+
+    unless Ctx.get.permissions.is_admin?
+      current_location = Ctx.get.current_location
+      dataset = dataset
+                  .filter(Sequel[:transfer][:agency_id] => current_location.agency_id)
+                  .filter(Sequel[:transfer][:agency_location_id] => current_location.id)
+    end
+
+    max_page = (dataset.count / page_size.to_f).ceil
+
+    dataset = dataset.limit(page_size, page * page_size)
+
+    PagedResults.new(dataset.map{|row| Transfer.from_row(row)},
+                     page,
+                     max_page)
   end
 end

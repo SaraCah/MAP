@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col s12">
-        <a class="btn waves-effect" href="/transfer_proposals/new">Create Transfer Proposal</a>
+        <a class="btn waves-effect" href="/transfer-proposals/new">Create Transfer Proposal</a>
     </div>
 </div>
 
@@ -31,9 +31,9 @@
                 <td><%= transfer.fetch('created_by') %></td>
                 <td><%= Time.at(transfer.fetch('create_time') / 1000)%></td>
                 <td>
-                    <a class="btn" href="/transfer_proposals/<%= transfer.fetch('id') %>">View</a>
+                    <a class="btn" href="/transfer-proposals/<%= transfer.fetch('id') %>">View</a>
                     <% if transfer.fetch('status') == 'ACTIVE' %>
-                        <confirmable-action action="/transfer_proposals/<%= transfer.fetch('id') %>/cancel"
+                        <confirmable-action action="/transfer-proposals/<%= transfer.fetch('id') %>/cancel"
                                             csrf_token="<%= FormHelper.csrf_token %>"
                                             css="btn red lighten-2"
                                             label="Cancel"

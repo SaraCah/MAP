@@ -240,12 +240,17 @@ class MAPAPIClient
     })
   end
 
+  def transfer_proposals(page = 0)
+    PagedResults.from_json(get('/transfer-proposals', page: page), TransferProposal)
+  end
+
+
   def transfers(page = 0)
-    PagedResults.from_json(get('/transfers', page: page), TransferProposal)
+    PagedResults.from_json(get('/transfers', page: page), Transfer)
   end
 
   def create_transfer_proposal(transfer)
-    response = post('/transfer_proposals/create', transfer: transfer.to_json)
+    response = post('/transfer-proposals/create', transfer: transfer.to_json)
     response['errors'] || []
   end
 
@@ -260,7 +265,7 @@ class MAPAPIClient
   end
 
   def get_transfer_proposal(transfer_proposal_id)
-    json = get("/transfer_proposals/#{transfer_proposal_id}")
+    json = get("/transfer-proposals/#{transfer_proposal_id}")
 
     return nil if json.nil?
 
@@ -268,12 +273,12 @@ class MAPAPIClient
   end
 
   def update_transfer_proposal(transfer)
-    response = post('/transfer_proposals/update', transfer: transfer.to_json)
+    response = post('/transfer-proposals/update', transfer: transfer.to_json)
     response['errors'] || []
   end
 
   def cancel_transfer_proposal(transfer_proposal_id)
-    post('/transfer_proposals/cancel', id: transfer_proposal_id)
+    post('/transfer-proposals/cancel', id: transfer_proposal_id)
   end
 
   ConversationMessage = Struct.new(:message, :author, :timestamp) do
@@ -289,7 +294,7 @@ class MAPAPIClient
   end
 
   def get_messages(record_type, id)
-    get('/get_messages', {
+    get('/get-messages', {
       'record_type' => record_type,
       'id' => id,
     }).map do |json|
@@ -298,7 +303,7 @@ class MAPAPIClient
   end
 
   def post_message(record_type, id, message)
-    post('/post_message', record_type: record_type,
+    post('/post-message', record_type: record_type,
                           id: id,
                           message: message)
   end

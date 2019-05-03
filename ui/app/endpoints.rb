@@ -252,25 +252,25 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
-  Endpoint.get('/transfer_proposals')
+  Endpoint.get('/transfer-proposals')
     .param(:page, Integer, "Page to return", optional: true) do
 
-    Templates.emit_with_layout(:transfer_proposals, {paged_results: Ctx.client.transfers(params[:page] || 0)},
+    Templates.emit_with_layout(:transfer_proposals, {paged_results: Ctx.client.transfer_proposals(params[:page] || 0)},
                                :layout, title: "Transfer Proposals", context: ['transfers', 'transfer_proposals'])
   end
 
-  Endpoint.get('/transfer_proposals/new') do
+  Endpoint.get('/transfer-proposals/new') do
     Templates.emit_with_layout(:transfer_proposal_new, {transfer: TransferProposal.new, is_readonly: false},
                                :layout, title: "New Transfer Proposal", context: ['transfers', 'transfer_proposals'])
   end
 
-  Endpoint.post('/transfer_proposals/create')
+  Endpoint.post('/transfer-proposals/create')
     .param(:transfer, TransferProposal, "The transfer to create") do
 
     errors = Ctx.client.create_transfer_proposal(params[:transfer])
 
     if errors.empty?
-      redirect '/transfer_proposals'
+      redirect '/transfer-proposals'
     else
       Templates.emit_with_layout(:transfer_proposal_new, {transfer: params[:transfer], errors: errors},
                                  :layout, title: "New Transfer Proposal", context: ['transfers', 'transfer_proposals'])
@@ -294,7 +294,7 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
-  Endpoint.get('/transfer_proposals/:id')
+  Endpoint.get('/transfer-proposals/:id')
     .param(:id, Integer, "ID of transfer proposal") do
     transfer = Ctx.client.get_transfer_proposal(params[:id])
     if false
@@ -306,7 +306,7 @@ class MAPTheApp < Sinatra::Base
                                :layout, title: "Transfer Proposal", context: ['transfers', 'transfer_proposals'])
   end
 
-  Endpoint.post('/transfer_proposals/update')
+  Endpoint.post('/transfer-proposals/update')
     .param(:transfer, TransferProposal, "The transfer to create") do
 
     # FIXME check permissions
@@ -326,7 +326,7 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
-  Endpoint.post('/transfer_proposals/:id/cancel')
+  Endpoint.post('/transfer-proposals/:id/cancel')
     .param(:id, Integer, "The ID of the transfer to cancel") do
 
     # FIXME check permissions
@@ -356,7 +356,7 @@ class MAPTheApp < Sinatra::Base
                                :layout, title: "Transfers", context: ['transfers', 'active_transfers'])
   end
 
-  Endpoint.get('/get_messages')
+  Endpoint.get('/get-messages')
     .param(:record_type, String, "Record Type")
     .param(:id, Integer, "Record ID") do
 
@@ -370,7 +370,7 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
-  Endpoint.post('/post_message')
+  Endpoint.post('/post-message')
     .param(:message, String, "Message")
     .param(:record_type, String, "Record Type")
     .param(:id, Integer, "Record ID") do
