@@ -308,6 +308,19 @@ class MAPAPIClient
                           message: message)
   end
 
+  def get_transfer(transfer_id)
+    json = get("/transfers/#{transfer_id}")
+
+    return nil if json.nil?
+
+    Transfer.from_hash(json)
+  end
+
+  def update_transfer(transfer)
+    response = post('/transfers/update', transfer: transfer.to_json)
+    response['errors'] || []
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

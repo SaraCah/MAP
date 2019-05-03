@@ -249,4 +249,25 @@ class MAPTheAPI < Sinatra::Base
       json_response({})
     end
   end
+
+  Endpoint.get('/transfers/:id')
+    .param(:id, Integer, "ID of transfer") do
+    if Ctx.user_logged_in?
+      json_response(Transfers.transfer_dto_for(params[:id]).to_hash)
+    else
+      json_response({})
+    end
+  end
+
+  Endpoint.post('/transfers/update')
+    .param(:transfer, Transfer, "Transfer to update") do
+    Transfers.update_transfer_from_dto(params[:transfer])
+
+    if (errors = params[:transfer].validate).empty?
+      json_response(status: 'updated')
+    else
+      json_response(errors: errors)
+    end
+  end
+
 end

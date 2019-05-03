@@ -307,7 +307,7 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.post('/transfer-proposals/update')
-    .param(:transfer, TransferProposal, "The transfer to create") do
+    .param(:transfer, TransferProposal, "The transfer to update") do
 
     # FIXME check permissions
 
@@ -353,7 +353,7 @@ class MAPTheApp < Sinatra::Base
     .param(:page, Integer, "Page to return", optional: true) do
 
     Templates.emit_with_layout(:transfers, {paged_results: Ctx.client.transfers(params[:page] || 0)},
-                               :layout, title: "Transfers", context: ['transfers', 'active_transfers'])
+                               :layout, title: "Transfers", context: ['transfers', 'initiated_transfers'])
   end
 
   Endpoint.get('/get-messages')
@@ -384,5 +384,37 @@ class MAPTheApp < Sinatra::Base
       {'Content-type' => 'text/json'},
       {'status' => 'success'}.to_json
     ]
+  end
+
+  Endpoint.get('/transfers/:id')
+    .param(:id, Integer, "ID of transfer") do
+    transfer = Ctx.client.get_transfer(params[:id])
+    if false
+      # FIXME check permissions and agency/location etc
+      # return [404]
+    end
+
+    Templates.emit_with_layout(:transfer_view, {transfer: transfer, is_readonly: (transfer.fetch('status') == 'COMPLETE')},
+                               :layout, title: "Transfer", context: ['transfers', 'initiated_transfers'])
+  end
+
+  Endpoint.post('/transfers/update')
+    .param(:transfer, Transfer, "The transfer to update") do
+
+    # FIXME check permissions
+
+    errors = Ctx.client.update_transfer(params[:transfer])
+
+    if errors.empty?
+      redirect '/transfers'
+    else
+      Templates.emit_with_layout(:transfer_view,
+                                 {
+                                   transfer: params[:transfer],
+                                   errors: errors,
+                                   is_readonly: false,
+                                 },
+                                 :layout, title: "Transfer", context: ['transfers', 'initiated_transfers'])
+    end
   end
 end

@@ -145,4 +145,38 @@ class Transfers < BaseStorage
                      page,
                      max_page)
   end
+
+
+  def self.transfer_dto_for(transfer_id)
+    transfer_identifier = db[:transfer_identifier][transfer_id: transfer_id][:id]
+    Transfer.from_row(db[:transfer][id: transfer_id],
+                      transfer_identifier,
+                      db[:transfer_file].filter(transfer_id: transfer_identifier))
+  end
+
+  def self.update_transfer_from_dto(transfer)
+    # FIXME check permissions
+
+    transfer_id = transfer.fetch('id')
+    transfer_identifier = db[:transfer_identifier][transfer_id: transfer_id][:id]
+
+    file_keys_to_remove = db[:transfer_file].filter(transfer_id: transfer_identifier).select(:key).all
+
+    db[:transfer_file]
+      .filter(transfer_id: transfer_identifier)
+      .delete
+
+    db[:file]
+      .filter(key: file_keys_to_remove)
+      .delete
+
+    transfer.fetch('files', []).each do |file|
+      db[:transfer_file].insert(transfer_id: transfer_identifier,
+                                filename: file.fetch('filename'),
+                                key: file.fetch('key'),
+                                role: file.fetch('role', 'other'),
+                                created_by: Ctx.username,
+                                create_time: java.lang.System.currentTimeMillis)
+    end
+  end
 end

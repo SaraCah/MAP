@@ -3,6 +3,7 @@ class Transfer
 
   define_field(:id, Integer, required: false)
   define_field(:title, String, required: false)
+  define_field(:checklist_status, String, required: false)
   define_field(:status, String, required: false)
   define_field(:scheduled_date, Integer, required: false)
   define_field(:transfer_received_date, Integer, required: false)
@@ -19,6 +20,7 @@ class Transfer
     new(id: row[:id],
         title: row[:title],
         status: row[:status],
+        checklist_status: row[:checklist_status],
         scheduled_date: row[:scheduled_date],
         transfer_received_date: row[:transfer_received_date],
         quantity_received: row[:quantity_received],

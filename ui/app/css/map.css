@@ -58,7 +58,7 @@
 .status-infomatic li {
     position: relative;
     display: block;
-    flex: 1 1 auto;
+    flex: 1;
     /*flex-grow: 1;*/
     list-style-type: none;
     text-align: center;
@@ -84,6 +84,10 @@
     height: 30px;
     width: 50%;
     content: '';
+}
+
+.status-infomatic li.empty:after {
+    content: initial;
 }
 
 .status-infomatic li.current:after {

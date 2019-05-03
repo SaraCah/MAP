@@ -20,6 +20,7 @@ interface UploadedFile {
 interface UploaderState {
     uploaded:UploadedFile[];
     is_readonly:Boolean;
+    is_role_enabled:Boolean;
 }
 
 Vue.component('file-uploader', {
@@ -42,7 +43,10 @@ Vue.component('file-uploader', {
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 50%">Filename</th>
+                            <th style="width: 40%">Filename</th>
+                            <template v-if="is_role_enabled">
+                                <th>Role</th>
+                            </template>
                             <th>Created by</th>
                             <th>Create Time</th>
                             <th></th>
@@ -55,6 +59,15 @@ Vue.component('file-uploader', {
                                 <input type="hidden" v-bind:name="buildPath('key')" v-bind:value="file.key"/>
                                 <input type="hidden" v-bind:name="buildPath('filename')" v-bind:value="file.filename"/>
                             </td>
+                            <template v-if="is_role_enabled">
+                                <td>
+                                    <select :name="buildPath('role')" v-model="file.role" class="browser-default">
+                                        <option value="csv">CSV</option>
+                                        <option value="rap">RAP Notice</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </td>
+                            </template>
                             <td>{{file.created_by}}</td>
                             <td>{{file.created_time}}</td>
                             <td>
@@ -75,9 +88,10 @@ Vue.component('file-uploader', {
         return {
             uploaded: JSON.parse(this.files),
             is_readonly: (this.readonly == 'true'),
+            is_role_enabled: (this.role == 'enabled'),
         };
     },
-    props: ['files', 'csrf_token', 'input_path', 'readonly'],
+    props: ['files', 'csrf_token', 'input_path', 'readonly', 'role'],
     methods: {
         uploadFiles: function() {
             let uploadInput = <HTMLInputElement>this.$refs.upload;
@@ -102,6 +116,13 @@ Vue.component('file-uploader', {
                 }, () => {
                 }).then((json:UploadedFile[]) => {
                     for (let uploadedFile of json) {
+                        if (uploadedFile.role == null) {
+                            if (uploadedFile.filename.slice(-3) == 'csv') {
+                                uploadedFile.role = 'csv';
+                            } else {
+                                uploadedFile.role = 'other';
+                            }
+                        }
                         this.uploaded.push(uploadedFile);
                     }
                 });

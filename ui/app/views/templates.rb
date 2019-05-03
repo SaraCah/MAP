@@ -27,3 +27,4 @@ Templates.define(:transfer_proposals, [:paged_results], "views/transfer_proposal
 Templates.define(:transfers, [:paged_results], "views/transfers.erb.html")
 Templates.define(:transfer_proposal_new, [:transfer, :errors?, :is_readonly], "views/transfer_proposal_form.erb.html")
 Templates.define(:transfer_proposal_view, [:transfer, :errors?, :is_readonly], "views/transfer_proposal_form.erb.html")
+Templates.define(:transfer_view, [:transfer, :errors?, :is_readonly], "views/transfer_form.erb.html")
