@@ -5,8 +5,8 @@ class Transfer
   define_field(:title, String, required: false)
   define_field(:checklist_status, String, required: false)
   define_field(:status, String, required: false)
-  define_field(:scheduled_date, Integer, required: false)
-  define_field(:transfer_received_date, Integer, required: false)
+  define_field(:date_scheduled, Integer, required: false)
+  define_field(:date_received, Integer, required: false)
   define_field(:quantity_received, Integer, required: false)
 
   define_field(:files, [TransferFile], default: [])
@@ -21,8 +21,8 @@ class Transfer
         title: row[:title],
         status: row[:status],
         checklist_status: row[:checklist_status],
-        scheduled_date: row[:scheduled_date],
-        transfer_received_date: row[:transfer_received_date],
+        date_scheduled: row[:date_scheduled],
+        date_received: row[:date_received],
         quantity_received: row[:quantity_received],
         files: file_rows.map{|file_row| TransferFile.from_row(file_row)},
         created_by: row[:created_by],

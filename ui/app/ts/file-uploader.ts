@@ -62,9 +62,9 @@ Vue.component('file-uploader', {
                             <template v-if="is_role_enabled">
                                 <td>
                                     <select :name="buildPath('role')" v-model="file.role" class="browser-default">
-                                        <option value="csv">CSV</option>
-                                        <option value="rap">RAP Notice</option>
-                                        <option value="other">Other</option>
+                                        <option value="CSV">CSV</option>
+                                        <option value="RAP">RAP Notice</option>
+                                        <option value="OTHER">Other</option>
                                     </select>
                                 </td>
                             </template>
@@ -118,9 +118,9 @@ Vue.component('file-uploader', {
                     for (let uploadedFile of json) {
                         if (uploadedFile.role == null) {
                             if (uploadedFile.filename.slice(-3) == 'csv') {
-                                uploadedFile.role = 'csv';
+                                uploadedFile.role = 'CSV';
                             } else {
-                                uploadedFile.role = 'other';
+                                uploadedFile.role = 'OTHER';
                             }
                         }
                         this.uploaded.push(uploadedFile);

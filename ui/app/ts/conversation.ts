@@ -25,8 +25,7 @@ Vue.component('conversation', {
                 <div v-html="escapeMessage(message.message)"></div>
                 <br>
                 <div>
-                    <span class="grey-text">{{message.author}}</span> - 
-                    <span class="grey-text">{{localDate(message.timestamp)}}</span>
+                    <span class="grey-text">{{message.author}} - {{localDate(message.timestamp)}}</span>
                 </div>
             </div>
         </div>
