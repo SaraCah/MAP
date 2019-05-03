@@ -3,11 +3,9 @@
 
 import Vue from "vue";
 import VueResource from "vue-resource";
-// import Utils from "./utils";
-// import UI from "./ui";
+import Utils from "./utils";
+
 Vue.use(VueResource);
-// import Utils from "./utils";
-// import UI from "./ui";
 
 interface Message {
     message: String;
@@ -25,7 +23,7 @@ Vue.component('conversation', {
                 <div v-html="escapeMessage(message.message)"></div>
                 <br>
                 <div>
-                    <span class="grey-text">{{message.author}} - {{localDate(message.timestamp)}}</span>
+                    <span class="grey-text">{{message.author}} - {{formatTimestamp(message.timestamp)}}</span>
                 </div>
             </div>
         </div>
@@ -86,8 +84,8 @@ Vue.component('conversation', {
                     this.loadMessages();
                 });
         },
-        localDate: function(epoch:number) {
-            return new Date(epoch).toLocaleString();
+        formatTimestamp: function(epochTime:number) {
+            return Utils.localDateForEpoch(epochTime);
         },
         escapeMessage: function(message:string) {
             return message.replace(/[&<>"\n]/g, function (tag) {

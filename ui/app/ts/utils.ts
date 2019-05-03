@@ -22,4 +22,8 @@ export default class Utils {
 
         return null;
     }
+
+    public static localDateForEpoch(epochTine:number):String {
+        return new Date(epochTine).toLocaleString();
+    }
 }

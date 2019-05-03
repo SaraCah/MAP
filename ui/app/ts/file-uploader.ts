@@ -4,10 +4,8 @@
 import Vue from "vue";
 import VueResource from "vue-resource";
 import Utils from "./utils";
-// import UI from "./ui";
+
 Vue.use(VueResource);
-// import Utils from "./utils";
-// import UI from "./ui";
 
 interface UploadedFile {
     key:String;
@@ -69,7 +67,7 @@ Vue.component('file-uploader', {
                                 </td>
                             </template>
                             <td>{{file.created_by}}</td>
-                            <td>{{file.created_time}}</td>
+                            <td>{{formatTime(file.create_time)}}</td>
                             <td>
                                 <a class="btn" target="_blank" :href="'/file-download?key=' + file.key + '&filename=' + file.filename">Download</a>
                                 <template v-if="!is_readonly">
@@ -135,6 +133,13 @@ Vue.component('file-uploader', {
         },
         buildPath(field:String) {
             return this.input_path + "[" + field + "]";
-        }
+        },
+        formatTime: function(epochTime:number|null) {
+            if (epochTime) {
+                return Utils.localDateForEpoch(epochTime);
+            } else {
+                return '';
+            }
+        },
     }
 });
