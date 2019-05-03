@@ -218,4 +218,26 @@ class MAPTheAPI < Sinatra::Base
     json_response(status: 'cancelled')
   end
 
+  Endpoint.get('/get_messages')
+    .param(:record_type, String, "Record type")
+    .param(:id, String, "Record id") do
+    if Ctx.user_logged_in?
+      json_response(Conversations.messages_for(params[:record_type], params[:id]))
+    else
+      json_response({})
+    end
+  end
+
+  Endpoint.post('/post_message')
+    .param(:message, String, "Message")
+    .param(:record_type, String, "Record Type")
+    .param(:id, Integer, "Record ID") do
+
+    if Ctx.user_logged_in?
+      Conversations.create(params[:record_type], params[:id], params[:message])
+      json_response(status: 'created')
+    else
+      json_response({})
+    end
+  end
 end

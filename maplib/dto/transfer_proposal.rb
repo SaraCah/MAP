@@ -9,8 +9,9 @@ class TransferProposal
   define_field(:series, [TransferProposalSeries], default: [])
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)
+  define_field(:transfer_identifier, Integer, required: false)
 
-  def self.from_row(row, file_rows = [], series_rows = [])
+  def self.from_row(row, transfer_identifier = nil, file_rows = [], series_rows = [])
     new(id: row[:id],
         title: row[:title],
         status: row[:status],
@@ -18,6 +19,7 @@ class TransferProposal
         files: file_rows.map{|file_row| TransferFile.from_row(file_row)},
         series: series_rows.map{|series_row| TransferProposalSeries.from_row(series_row)},
         created_by: row[:created_by],
-        create_time: row[:create_time])
+        create_time: row[:create_time],
+        transfer_identifier: transfer_identifier)
   end
 end

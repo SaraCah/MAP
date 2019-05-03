@@ -111,8 +111,10 @@ class Transfers < BaseStorage
 
 
   def self.proposal_dto_for(transfer_proposal_id)
+    transfer_identifier = db[:transfer_identifier][transfer_proposal_id: transfer_proposal_id][:id]
     TransferProposal.from_row(db[:transfer_proposal][id: transfer_proposal_id],
-                              db[:transfer_file].filter(transfer_id: db[:transfer_identifier][transfer_proposal_id: transfer_proposal_id][:id]),
+                              transfer_identifier,
+                              db[:transfer_file].filter(transfer_id: transfer_identifier),
                               db[:transfer_proposal_series].filter(transfer_proposal_id: transfer_proposal_id))
   end
 

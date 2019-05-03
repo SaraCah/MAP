@@ -355,4 +355,34 @@ class MAPTheApp < Sinatra::Base
     Templates.emit_with_layout(:transfers, {paged_results: Ctx.client.transfers(params[:page] || 0)},
                                :layout, title: "Transfers", context: ['transfers', 'active_transfers'])
   end
+
+  Endpoint.get('/get_messages')
+    .param(:record_type, String, "Record Type")
+    .param(:id, Integer, "Record ID") do
+
+    # FIXME permissions check!
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      {
+        'messages' => Ctx.client.get_messages(params[:record_type], params[:id]),
+      }.to_json
+    ]
+  end
+
+  Endpoint.post('/post_message')
+    .param(:message, String, "Message")
+    .param(:record_type, String, "Record Type")
+    .param(:id, Integer, "Record ID") do
+
+    # FIXME check permissions, error handling
+
+    Ctx.client.post_message(params[:record_type], params[:id], params[:message])
+
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      {'status' => 'success'}.to_json
+    ]
+  end
 end

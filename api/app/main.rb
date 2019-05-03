@@ -61,6 +61,7 @@ require 'storage/agencies'
 require 'storage/locations'
 require 'storage/transfers'
 require 'storage/files'
+require 'storage/conversations'
 
 require 'endpoints/upload_file'
 require 'endpoints'

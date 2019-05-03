@@ -7,6 +7,7 @@ import 'linker';
 import 'file-uploader';
 import 'transfer-proposal-series';
 import 'confirmable-action';
+import 'conversation';
 
 document.querySelectorAll('.vue-enabled').forEach(function(elt: Element) {
     /* tslint:disable:no-unused-expression */

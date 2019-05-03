@@ -276,6 +276,33 @@ class MAPAPIClient
     post('/transfer_proposals/cancel', id: transfer_proposal_id)
   end
 
+  ConversationMessage = Struct.new(:message, :author, :timestamp) do
+    def self.from_json(json)
+      new(json.fetch('message'),
+          json.fetch('author'),
+          json.fetch('timestamp'))
+    end
+
+    def to_json(*args)
+      to_h.to_json
+    end
+  end
+
+  def get_messages(record_type, id)
+    get('/get_messages', {
+      'record_type' => record_type,
+      'id' => id,
+    }).map do |json|
+      ConversationMessage.from_json(json)
+    end
+  end
+
+  def post_message(record_type, id, message)
+    post('/post_message', record_type: record_type,
+                          id: id,
+                          message: message)
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

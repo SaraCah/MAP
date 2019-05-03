@@ -7,7 +7,7 @@
             <div class="col s12">
                 <ul class="status-infomatic">
                     <li class="first <% if transfer.new? %>current<% end %>">Inactive</li>
-                    <li class="<% if transfer.fetch('status', '') == 'ACTIVE' %><% end %>">Active</li>
+                    <li class="<% if transfer.fetch('status', '') == 'ACTIVE' %>current<% end %>">Active</li>
                     <li class="last <% if transfer.fetch('status', '') == 'APPROVED' %>current<% end %>">Approved</li>
                     <li class="stand-alone <% if transfer.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled<br>By User</li>
                     <li class="stand-alone <% if transfer.fetch('status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled<br>By QSA</li>
@@ -39,7 +39,8 @@
             </div>
         </div>
 
-        <transfer-proposal-series readonly="<%= is_readonly %>" existing_metadata="<%=  transfer.fetch('series', []).to_json %>">
+        <transfer-proposal-series readonly="<%= is_readonly %>"
+                                  existing_metadata="<%=  transfer.fetch('series', []).to_json %>">
         </transfer-proposal-series>
 
         <div class="row">
@@ -60,3 +61,13 @@
         <% end %>
     </form>
 </div>
+<% unless transfer.new? %>
+    <div class="row vue-enabled">
+        <div class="col s12">
+            <conversation record_type="transfer"
+                          id="<%= transfer.fetch('transfer_identifier') %>"
+                          csrf_token="<%= FormHelper.csrf_token %>">
+            </conversation>
+        </div>
+    </div>
+<% end %>
