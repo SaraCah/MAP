@@ -59,11 +59,16 @@ Vue.component('file-uploader', {
                             </td>
                             <template v-if="is_role_enabled">
                                 <td>
-                                    <select :name="buildPath('role')" v-model="file.role" class="browser-default">
-                                        <option value="CSV">CSV</option>
-                                        <option value="RAP">RAP Notice</option>
-                                        <option value="OTHER">Other</option>
-                                    </select>
+                                    <template v-if="is_readonly">
+                                        {{file.role}}
+                                    </template>
+                                    <template v-else>
+                                        <select :name="buildPath('role')" v-model="file.role" class="browser-default">
+                                            <option value="CSV">CSV</option>
+                                            <option value="RAP">RAP Notice</option>
+                                            <option value="OTHER">Other</option>
+                                        </select>
+                                    </template>
                                 </td>
                             </template>
                             <td>{{file.created_by}}</td>
