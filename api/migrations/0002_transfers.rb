@@ -87,6 +87,8 @@ Sequel.migration do
       String :filename, null: false
       String :role, null: false
 
+      String :mime_type, null: false
+
       String :created_by, null: false
       Bignum :create_time, null: false
     end

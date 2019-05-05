@@ -36,6 +36,7 @@ class Transfers < BaseStorage
     transfer.fetch('files', []).each do |file|
       db[:transfer_file].insert(transfer_id: transfer_identifier,
                                 filename: file.fetch('filename'),
+                                mime_type: file.fetch('mime_type'),
                                 key: file.fetch('key'),
                                 role: 'OTHER',
                                 created_by: Ctx.username,
@@ -84,6 +85,7 @@ class Transfers < BaseStorage
     transfer.fetch('files', []).each do |file|
       db[:transfer_file].insert(transfer_id: transfer_identifier,
                                 filename: file.fetch('filename'),
+                                mime_type: file.fetch('mime_type'),
                                 key: file.fetch('key'),
                                 role: 'OTHER',
                                 created_by: Ctx.username,
@@ -173,6 +175,7 @@ class Transfers < BaseStorage
     transfer.fetch('files', []).each do |file|
       db[:transfer_file].insert(transfer_id: transfer_identifier,
                                 filename: file.fetch('filename'),
+                                mime_type: file.fetch('mime_type'),
                                 key: file.fetch('key'),
                                 role: file.fetch('role', 'other'),
                                 created_by: Ctx.username,

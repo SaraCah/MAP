@@ -13,6 +13,7 @@ import UI from "./ui";
 interface UploadedFile {
     key:String;
     filename:String;
+    mime_type:String;
     role?:String;
     created_by?:String;
     create_time?:String;
@@ -58,6 +59,7 @@ Vue.component('file-uploader', {
                             <td>
                                 {{file.filename}}
                                 <input type="hidden" v-bind:name="buildPath('key')" v-bind:value="file.key"/>
+                                <input type="hidden" v-bind:name="buildPath('mime_type')" v-bind:value="file.mime_type"/>
                                 <input type="hidden" v-bind:name="buildPath('filename')" v-bind:value="file.filename"/>
                             </td>
                             <template v-if="is_role_enabled">
@@ -124,7 +126,7 @@ Vue.component('file-uploader', {
                 }).then((json:UploadedFile[]) => {
                     for (let uploadedFile of json) {
                         if (uploadedFile.role == null) {
-                            if (uploadedFile.filename.slice(-3) == 'csv') {
+                            if (uploadedFile.filename.toLowerCase().slice(-3) == 'csv') {
                                 uploadedFile.role = 'CSV';
                             } else {
                                 uploadedFile.role = 'OTHER';

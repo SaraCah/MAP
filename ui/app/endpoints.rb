@@ -298,6 +298,7 @@ class MAPTheApp < Sinatra::Base
     Ctx.client.store_files(params[:file]).zip(params[:file]).map do |file_key, file|
       files << {
         'key' => file_key,
+        'mime_type' => file.mime_type,
         'filename' => file.filename,
       }
     end
