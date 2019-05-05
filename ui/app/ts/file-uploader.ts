@@ -99,7 +99,7 @@ Vue.component('file-uploader', {
             is_role_enabled: (this.role == 'enabled'),
         };
     },
-    props: ['files', 'csrf_token', 'input_path', 'readonly', 'role'],
+    props: ['files', 'csrf_token', 'input_path', 'readonly', 'role', 'submit_button_ids'],
     methods: {
         uploadFiles: function() {
             let uploadInput = <HTMLInputElement>this.$refs.upload;
@@ -114,6 +114,11 @@ Vue.component('file-uploader', {
                     }
                 }
                 formData.append('authenticity_token', this.csrf_token);
+
+                // If we were handed the IDs of submit buttons, disable those
+                // form inputs until we're done uploading.
+                this.disableFormSubmit();
+
                 this.$http.post('/file-upload', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
@@ -122,6 +127,7 @@ Vue.component('file-uploader', {
                 }).then((response: any) => {
                     return response.json();
                 }, (_response: any) => {
+                    this.enableFormSubmit();
                     UI.genericModal("File upload failed");
                 }).then((json:UploadedFile[]) => {
                     for (let uploadedFile of json) {
@@ -134,6 +140,8 @@ Vue.component('file-uploader', {
                         }
                         this.uploaded.push(uploadedFile);
                     }
+
+                    this.enableFormSubmit();
                 });
             }
         },
@@ -142,7 +150,7 @@ Vue.component('file-uploader', {
                 return fileToRemove.key !== file.key;
             });
         },
-        buildPath(field:String) {
+        buildPath(field:string) {
             return this.input_path + "[" + field + "]";
         },
         formatTime: function(epochTime:number|null) {
@@ -150,6 +158,27 @@ Vue.component('file-uploader', {
                 return Utils.localDateForEpoch(epochTime);
             } else {
                 return '';
+            }
+        },
+        disableFormSubmit() {
+            if (this.submit_button_ids) {
+                for (const buttonId of this.submit_button_ids) {
+                    const button = document.getElementById(buttonId);
+                    if (button) {
+                        console.log("DISABLE", button);
+                        button.classList.add('disabled');
+                    }
+                }
+            }
+        },
+        enableFormSubmit() {
+            if (this.submit_button_ids) {
+                for (const buttonId of this.submit_button_ids) {
+                    const button = document.getElementById(buttonId);
+                    if (button) {
+                        button.classList.remove('disabled');
+                    }
+                }
             }
         },
     }

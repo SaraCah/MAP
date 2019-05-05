@@ -67,6 +67,7 @@
                                input_path="transfer[files][]"
                                readonly="<%= is_readonly %>"
                                role="enabled"
+                               v-bind:submit_button_ids="['save_transfer_btn']"
                                csrf_token="<%= FormHelper.csrf_token %>">
                 </file-uploader>
             </div>
@@ -77,7 +78,7 @@
                 <br>
                 <br>
                 <div class="col s12">
-                    <button class="btn">Save Transfer</button>
+                    <button id="save_transfer_btn" class="btn">Save Transfer</button>
                 </div>
             </div>
         <% end %>
