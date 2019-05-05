@@ -79,7 +79,7 @@ Vue.component('file-uploader', {
                             <td>{{file.created_by}}</td>
                             <td>{{formatTime(file.create_time)}}</td>
                             <td>
-                                <a class="btn" target="_blank" :href="'/file-download?key=' + file.key + '&filename=' + file.filename">Download</a>
+                                <a class="btn" target="_blank" :href="'/file-download?key=' + encodeURIComponent(file.key) + '&filename=' + encodeURIComponent(file.filename)">Download</a>
                                 <template v-if="!is_readonly">
                                     <a class="btn" v-on:click="remove(file)">Remove</a>
                                 </template>
