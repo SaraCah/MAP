@@ -40,6 +40,21 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  if MAPTheApp.development?
+    # Serve out TS for debugging
+    Endpoint.get('/ts/*')
+      .param(:cb, String, "Cachebuster (ignored)", optional: true) do
+
+      filename = request.path.split('/').last
+
+      if File.exist?(file = File.join('ts', filename))
+        send_file file
+      else
+        [404]
+      end
+    end
+  end
+
   Endpoint.get('/css/*')
     .param(:cb, String, "Cachebuster (ignored)", optional: true) do
 
