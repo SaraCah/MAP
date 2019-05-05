@@ -354,11 +354,12 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/file-download')
     .param(:key, String, "File key")
+    .param(:mime_type, String, "MIME type of file")
     .param(:filename, String, "Filename") do
     [
       200,
       {
-        'Content-Type' => 'application/octet-stream',
+        'Content-Type' => params[:mime_type],
         'Content-Disposition' => "attachment; filename=#{params[:filename]}"
       },
       Ctx.client.stream_file(params[:key])

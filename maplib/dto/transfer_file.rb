@@ -5,6 +5,7 @@ class TransferFile
   define_field(:filename, String)
   define_field(:key, String)
   define_field(:role, String, required: false)
+  define_field(:mime_type, String)
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)
 
@@ -13,6 +14,7 @@ class TransferFile
         filename: row[:filename],
         key: row[:key],
         role: row[:role],
+        mime_type: row[:mime_type],
         created_by: row[:created_by],
         create_time: row[:create_time])
   end
