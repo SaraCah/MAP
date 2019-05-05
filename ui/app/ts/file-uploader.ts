@@ -7,6 +7,9 @@ import Utils from "./utils";
 
 Vue.use(VueResource);
 
+import UI from "./ui";
+
+
 interface UploadedFile {
     key:String;
     filename:String;
@@ -116,7 +119,8 @@ Vue.component('file-uploader', {
                     // emulateJSON: true,
                 }).then((response: any) => {
                     return response.json();
-                }, () => {
+                }, (_response: any) => {
+                    UI.genericModal("File upload failed");
                 }).then((json:UploadedFile[]) => {
                     for (let uploadedFile of json) {
                         if (uploadedFile.role == null) {
