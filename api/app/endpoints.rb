@@ -35,12 +35,8 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/users/create')
     .param(:user, UserDTO, "User") do
-    errors = params[:user].validate
-
-    if errors.empty?
-      errors = Users.create_from_dto(params[:user])
-
-      if errors.empty?
+    if (errors = params[:user].validate).empty?
+      if (errors = Users.create_from_dto(params[:user])).empty?
         json_response(status: 'created')
       else
         json_response(errors: errors)
@@ -52,12 +48,8 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/users/update')
     .param(:user, UserDTO, "User") do\
-    errors = params[:user].validate
-
-    if errors.empty?
-      errors = Users.update_from_dto(params[:user])
-
-      if errors.empty?
+    if (errors = params[:user].validate).empty?
+      if (errors = Users.update_from_dto(params[:user])).empty?
         json_response(status: 'updated')
       else
         json_response(errors: errors)
@@ -112,12 +104,8 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/locations/create')
     .param(:location, AgencyLocationDTO, "Location") do
-    errors = params[:location].validate
-
-    if errors.empty?
-      errors = Locations.create_location_from_dto(params[:location])
-
-      if errors.empty?
+    if (errors = params[:location].validate).empty?
+      if (errors = Locations.create_location_from_dto(params[:location])).empty?
         json_response(status: 'created')
       else
         json_response(errors: errors)
@@ -152,11 +140,8 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/locations/update')
     .param(:location, AgencyLocationDTO, "Location to update") do
-    errors = params[:location].validate
-    if errors.empty?
-      errors = Locations.update_location_from_dto(params[:location])
-
-      if errors.empty?
+    if (errors = params[:location].validate).empty?
+      if (errors = Locations.update_location_from_dto(params[:location])).empty?
         json_response(status: 'updated')
       else
         json_response(errors: errors)
@@ -223,11 +208,12 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/transfer-proposals/create')
     .param(:transfer, TransferProposal, "Transfer to create") do
-    # FIXME order of validations
-    Transfers.create_proposal_from_dto(params[:transfer])
-
     if (errors = params[:transfer].validate).empty?
-      json_response(status: 'created')
+      if (errors = Transfers.create_proposal_from_dto(params[:transfer])).empty?
+        json_response(status: 'created')
+      else
+        json_response(errors: errors)
+      end
     else
       json_response(errors: errors)
     end
@@ -250,11 +236,12 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/transfer-proposals/update')
     .param(:transfer, TransferProposal, "Transfer to update") do
-    # FIXME order of validations
-    Transfers.update_proposal_from_dto(params[:transfer])
-
     if (errors = params[:transfer].validate).empty?
-      json_response(status: 'updated')
+      if (errors = Transfers.update_proposal_from_dto(params[:transfer])).empty?
+        json_response(status: 'updated')
+      else
+        json_response(errors: errors)
+      end
     else
       json_response(errors: errors)
     end
@@ -311,11 +298,12 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/transfers/update')
     .param(:transfer, Transfer, "Transfer to update") do
-    # FIXME order of validations
-    Transfers.update_transfer_from_dto(params[:transfer])
-
     if (errors = params[:transfer].validate).empty?
-      json_response(status: 'updated')
+      if (errors = Transfers.update_transfer_from_dto(params[:transfer])).empty?
+        json_response(status: 'updated')
+      else
+        json_response(errors: errors)
+      end
     else
       json_response(errors: errors)
     end
