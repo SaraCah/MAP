@@ -71,6 +71,14 @@ require 'endpoints'
 
 require 'rack/map_logger'
 
+require 'map_validator'
+
+# Using the validator:
+# csv_validator = MapValidator.new
+# csv_validator.run_validations("test.csv", csv_validator.sample_validations)
+# csv_validator.notifications.notification_list.each {|notification| puts "[#{notification.type}](#{notification.source}): #{notification.message}" }
+
+
 class MAPTheAPI < Sinatra::Base
 
   configure :development do |config|
