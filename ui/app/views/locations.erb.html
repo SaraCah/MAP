@@ -8,10 +8,10 @@
         <table class="highlight responsive-table">
             <thead>
             <tr>
-                <th>Agency</th>
-                <th>Location Name</th>
-                <th>Date Created</th>
-                <th></th>
+                <th style="width: 30%">Agency</th>
+                <th style="width: 40%">Location Name</th>
+                <th style="width: 20%">Date Created</th>
+                <th style="width: 10%"></th>
             </tr>
             </thead>
             <tbody>
@@ -20,7 +20,9 @@
                 <td><%= location.agency.label %></td>
                 <td><%= location.name %></td>
                 <td><%= Time.at(location.create_time / 1000)%></td>
-                <td></td>
+                <td>
+                    <a class="btn btn-small waves-effect" href="/locations/<%= location.id %>">Edit</a>
+                </td>
             </tr>
             <% end %>
             </tbody>

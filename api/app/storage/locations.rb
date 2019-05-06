@@ -136,6 +136,25 @@ class Locations < BaseStorage
     end
   end
 
+  def self.update_location_from_dto(location)
+    (_, aspace_agency_id) = location.fetch('agency_ref').split(':')
+
+    agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
+
+    # check for uniqueness
+    existing_location = db[:agency_location][name: location.fetch('name'), agency_id: agency_id]
+    if existing_location.nil? || existing_location[:id] == Integer(location.fetch('id'))
+      db[:agency_location]
+        .filter(id: location.fetch('id'))
+        .update(:name => location.fetch('name'),
+                :modified_time => java.lang.System.currentTimeMillis)
+
+      []
+    else
+      [{code: "UNIQUE_CONSTRAINT", field: 'name'}]
+    end
+  end
+
   def self.default_location
     return nil if Ctx.get.permissions.is_admin?
 
@@ -192,5 +211,28 @@ class Locations < BaseStorage
 
       return AgencyLocation.from_row(row, agencies.fetch(row[:aspace_agency_id]))
     end
+  end
+
+  def self.dto_for(location_id)
+
+    location = db[:agency_location][id: location_id]
+    aspace_agency_id = db[:agency][id: location[:agency_id]][:aspace_agency_id]
+
+    agency = nil
+
+    AspaceDB.open do |aspace_db|
+      aspace_db[:agent_corporate_entity]
+        .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
+        .filter(Sequel[:name_corporate_entity][:authorized] => 1)
+        .filter(Sequel[:agent_corporate_entity][:id] => aspace_agency_id)
+        .select(Sequel[:agent_corporate_entity][:id],
+                Sequel[:name_corporate_entity][:sort_name]).each do |row|
+        agency = Agency.from_row(row)
+      end
+    end
+
+    raise "Agency not found" if agency.nil?
+
+    AgencyLocationDTO.from_row(location, agency)
   end
 end

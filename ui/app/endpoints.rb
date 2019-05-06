@@ -231,6 +231,37 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  Endpoint.get('/locations/:id')
+    .param(:id, Integer, "ID of agency location") do
+    location = Ctx.client.location_for_edit(params[:id])
+    if false
+      # FIXME check permissions and agency/location etc
+      # return [404]
+    end
+
+    Templates.emit_with_layout(:location_edit, {location: location},
+                               :layout, title: "Location", context: ['locations'])
+  end
+
+  Endpoint.post('/locations/update')
+    .param(:location, AgencyLocationDTO, "The location to update") do
+
+    return [404] unless Ctx.permissions.allow_manage_locations?
+
+    unless Ctx.permissions.is_admin?
+      params[:location]['agency_ref'] = Ctx.get.current_location.agency.id
+    end
+
+    errors = Ctx.client.update_location(params[:location])
+
+    if errors.empty?
+      redirect '/locations'
+    else
+      Templates.emit_with_layout(:location_edit, {location: params[:location], errors: errors},
+                                 :layout, title: "Location", context: ['locations'])
+    end
+  end
+
   Endpoint.get('/linker_data_for_agency')
     .param(:agency_ref, String, "Agency Ref") do
     if Ctx.permissions.is_admin?

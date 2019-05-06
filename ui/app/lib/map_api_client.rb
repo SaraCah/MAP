@@ -171,6 +171,19 @@ class MAPAPIClient
     response['errors'] || []
   end
 
+  def location_for_edit(agency_location_id)
+    json = get("/locations/#{agency_location_id}")
+
+    return nil if json.nil?
+
+    AgencyLocationDTO.from_hash(json)
+  end
+
+  def update_location(location)
+    response = post('/locations/update', location: location.to_json)
+    response['errors'] || []
+  end
+
   def agency_typeahead(q)
     get('/search/agencies', q: q)
   end

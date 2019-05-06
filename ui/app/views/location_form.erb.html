@@ -2,13 +2,27 @@
     <% if errors %>
         <pre><%= errors %></pre>
     <% end %>
-    <form class="col s12" action="/locations/create" method="post">
+    <% form_action = "/locations/" + (location.new? ? "create" : "update") %>
+    <form class="col s12" action="<%= form_action %>" method="post">
         <%== FormHelper.hidden_authenticity_token %>
-        <div class="row">
-            <% if Ctx.permissions.is_admin? %>
-                <agency-linker agency_ref="<%= location.fetch('agency_ref', nil) %>" agency_label="<%= location.fetch('agency_label', nil) %>"></agency-linker>
-            <% end %>
-        </div>
+
+        <% unless location.new? %>
+            <input type="hidden" name="location[id]" value="<%= location.fetch('id') %>">
+        <% end %>
+
+        <% if Ctx.permissions.is_admin? %>
+            <div class="row">
+                <% if location.new? %>
+                    <agency-linker agency_ref="<%= location.fetch('agency_ref', nil) %>" agency_label="<%= location.fetch('agency_label', nil) %>"></agency-linker>
+                <% else %>
+                    <div class="col s12">
+                        <%= location.fetch('agency_label') %>
+                        <input type="hidden" name="location[agency_ref]" value="<%= location.fetch('agency_ref') %>">
+                        <input type="hidden" name="location[agency_label]" value="<%= location.fetch('agency_label') %>">
+                    </div>
+                <% end %>
+            </div>
+        <% end %>
         <div class="row">
             <div class="input-field col s12">
                 <input id="name" name="location[name]" type="text" value="<%= location.fetch('name', '') %>" required>

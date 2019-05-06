@@ -5,4 +5,11 @@ class AgencyLocationDTO
   define_field(:name, String)
   define_field(:agency_ref, String) # FIXME
   define_field(:agency_label, String, required: false)
+
+  def self.from_row(row, agency)
+    new(id: row[:id],
+        name: row[:name],
+        agency_ref: agency.id,
+        agency_label: agency.label)
+  end
 end

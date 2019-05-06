@@ -128,11 +128,41 @@ class MAPTheAPI < Sinatra::Base
   end
 
 
-  Endpoint.get('/my-location') do
+  Endpoint.get('/locations/:id')
+    .param(:id, Integer, "ID of agency location") do
     if Ctx.user_logged_in?
-      json_response(Ctx.get.current_location)
+      # FIXME check permissions
+      json_response(Locations.dto_for(params[:id]).to_hash)
     else
       json_response({})
+    end
+  end
+
+
+  Endpoint.get('/locations/:id')
+    .param(:id, Integer, "ID of agency location") do
+    if Ctx.user_logged_in?
+      # FIXME check permissions
+      json_response(Locations.dto_for(params[:id]).to_hash)
+    else
+      json_response({})
+    end
+  end
+
+
+  Endpoint.post('/locations/update')
+    .param(:location, AgencyLocationDTO, "Location to update") do
+    errors = params[:location].validate
+    if errors.empty?
+      errors = Locations.update_location_from_dto(params[:location])
+
+      if errors.empty?
+        json_response(status: 'updated')
+      else
+        json_response(errors: errors)
+      end
+    else
+      json_response(errors: errors)
     end
   end
 
