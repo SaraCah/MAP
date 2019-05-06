@@ -28,6 +28,8 @@ Sequel.migration do
       foreign_key :agency_id, :agency, null: false
       foreign_key :agency_location_id, :agency_location, null: false
 
+      foreign_key :transfer_proposal_id, :transfer_proposal, null: true, unique: true
+
       String :title, null: false
 
       String :checklist_status, null: false
@@ -39,7 +41,13 @@ Sequel.migration do
 
       String :created_by, null: false
       Bignum :create_time, null: false
+
+      # This here for ArchivesSpace ASModel compatibility
+      DateTime :system_mtime, :null => false, :index => true
     end
+
+    run 'CREATE TRIGGER `transfer_insert_set_system_mtime` before insert on transfer for each row set new.system_mtime = UTC_TIMESTAMP()'
+    run 'CREATE TRIGGER `transfer_update_set_system_mtime` before update on transfer for each row set new.system_mtime = UTC_TIMESTAMP()'
 
     create_table(:handle) do
       primary_key :id
