@@ -149,22 +149,21 @@ class MAPAPIClient
   end
 
   def create_user(user)
-    response = post('/users/create', user.to_request)
-    if response['errors']
-      user.add_errors(response['errors'])
-    end
+    response = post('/users/create', user: user.to_json)
+    response['errors'] || []
   end
 
   def update_user(user)
-    response = post('/users/update', user.to_request)
-    if response['errors']
-      user.add_errors(response['errors'])
-    end
+    response = post('/users/update', user: user.to_json)
+    response['errors'] || []
   end
 
   def user_for_edit(username)
-    dto = get('/user-for-edit', {username: username})
-    UserUpdateRequest.parse(dto)
+    json = get('/user-for-edit', {username: username})
+
+    return nil if json.nil?
+
+    UserDTO.from_hash(json)
   end
 
   def create_location(location)

@@ -121,34 +121,42 @@ Vue.component('agency-role-linker', {
 <div class="input-field col s12">
   <agency-typeahead v-on:selected="addSelected"></agency-typeahead>
   <table class="user-role-table">
-    <thead><tr><th style="width: 40%;">Agency</th><th style="width: 20%;">Location</th><th style="width: 20%;">Role</th><th></th></tr></thead>
+    <thead>
+        <tr>
+            <th style="width: 40%;">Agency</th>
+            <th style="width: 20%;">Location</th>
+            <th style="width: 20%;">Role</th>
+            <th></th>
+        </tr>
+    </thead>
     <tbody v-for="agency in selected">
       <tr>
         <td>
           {{agency.label}}
-          <input type="hidden" name="user[agency][][id]" v-bind:value="agency.id"/>
-          <input type="hidden" name="user[agency][][label]" v-bind:value="agency.label"/>
+          <input type="hidden" name="user[agency_roles][][agency_ref]" v-bind:value="agency.id"/>
+          <input type="hidden" name="user[agency_roles][][agency_label]" v-bind:value="agency.label"/>
         </td>
         <td>
           <template v-if="agency.role !== 'SENIOR_AGENCY_ADMIN'">
               <div v-if="agency.locationOptions.length == 0">
                 <div v-if="agency.locationLabel">{{agency.locationLabel}}</div>
                 <div v-if="!agency.locationLabel">Agency Top Level Location</div>
+                <input type="hidden" name="user[agency_roles][][agency_location_id]" v-bind:value="agency.locationId"/>
               </div>
               <div v-if="agency.locationOptions.length > 0">
-                  <select class="browser-default" name="user[agency][][location_id]" v-bind:value="agency.locationId" v-model="agency.locationId">
+                  <select class="browser-default" name="user[agency_roles][][agency_location_id]" v-bind:value="agency.locationId" v-model="agency.locationId">
                     <option v-for="location in agency.locationOptions" v-bind:value="location.id">{{ location.label }}</option>
                   </select>
                   <div v-for="location in agency.locationOptions">
-                      <input type="hidden" name="user[agency][][location_options][][id]" v-bind:value="location.id" />
-                      <input type="hidden" name="user[agency][][location_options][][label]" v-bind:value="location.label" />
+                      <input type="hidden" name="user[agency_roles][][location_options][][id]" v-bind:value="location.id" />
+                      <input type="hidden" name="user[agency_roles][][location_options][][label]" v-bind:value="location.label" />
                   </div>
               </div>
           </template>
           <template v-if="agency.role === 'SENIOR_AGENCY_ADMIN'">N/A</template>
         </td>
         <td>
-          <select class="browser-default" name="user[agency][][role]" v-model="agency.role">
+          <select class="browser-default" name="user[agency_roles][][role]" v-model="agency.role">
             <option value="SENIOR_AGENCY_ADMIN">Senior Agency Admin</option>
             <option value="AGENCY_ADMIN">Agency Admin</option>
             <option value="AGENCY_CONTACT">Agency Contact</option>
@@ -165,7 +173,7 @@ Vue.component('agency-role-linker', {
             <div v-if="agency.role !== 'SENIOR_AGENCY_ADMIN'">
                 <div v-for="permission_type in agency.permissionOptions">
                     <label>
-                        <input type="checkbox" name="user[agency][][permission][]" v-bind:value="permission_type" v-model="agency.permissions">
+                        <input type="checkbox" name="user[agency_roles][][permissions][]" v-bind:value="permission_type" v-model="agency.permissions">
                         <span>{{ permission_type }}</span>
                     </label>
                 </div>
@@ -182,10 +190,11 @@ Vue.component('agency-role-linker', {
         let permissionOptions:string[] = JSON.parse(this.permission_options);
 
         JSON.parse(this.agencies).forEach((agency_blob:any) => {
-            let role:AgencyRole = new AgencyRole(agency_blob.id, agency_blob.label, agency_blob.role);
+            let role:AgencyRole = new AgencyRole(agency_blob.agency_ref, agency_blob.agency_label, agency_blob.role);
             role.locationId = agency_blob.agency_location_id;
             role.locationLabel = agency_blob.agency_location_label;
-            role.permissions = agency_blob.permission;
+            role.locationOptions = agency_blob.location_options;
+            role.permissions = agency_blob.permissions;
             role.permissionOptions = permissionOptions;
             prepopulated.push(role);
         });

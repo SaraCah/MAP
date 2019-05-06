@@ -34,24 +34,36 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.post('/users/create')
-    .param(:user, UserUpdateRequest, "User") do
-    Users.create_from_dto(params[:user])
+    .param(:user, UserDTO, "User") do
+    errors = params[:user].validate
 
-    if params[:user].has_errors?
-      json_response(errors: params[:user].errors)
+    if errors.empty?
+      errors = Users.create_from_dto(params[:user])
+
+      if errors.empty?
+        json_response(status: 'created')
+      else
+        json_response(errors: errors)
+      end
     else
-      json_response(status: 'created')
+      json_response(errors: errors) unless errors.empty?
     end
   end
 
   Endpoint.post('/users/update')
-    .param(:user, UserUpdateRequest, "User") do
-    Users.update_from_dto(params[:user])
+    .param(:user, UserDTO, "User") do\
+    errors = params[:user].validate
 
-    if params[:user].has_errors?
-      json_response(errors: params[:user].errors)
+    if errors.empty?
+      errors = Users.update_from_dto(params[:user])
+
+      if errors.empty?
+        json_response(status: 'updated')
+      else
+        json_response(errors: errors)
+      end
     else
-      json_response(status: 'updated')
+      json_response(errors: errors) unless errors.empty?
     end
   end
 
@@ -100,6 +112,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/locations/create')
     .param(:location, AgencyLocationUpdateRequest, "Location") do
+    # FIXME order of validations
     Locations.create_location_from_dto(params[:location])
 
     if params[:location].has_errors?
@@ -175,6 +188,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/transfer-proposals/create')
     .param(:transfer, TransferProposal, "Transfer to create") do
+    # FIXME order of validations
     Transfers.create_proposal_from_dto(params[:transfer])
 
     if (errors = params[:transfer].validate).empty?
@@ -201,6 +215,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/transfer-proposals/update')
     .param(:transfer, TransferProposal, "Transfer to update") do
+    # FIXME order of validations
     Transfers.update_proposal_from_dto(params[:transfer])
 
     if (errors = params[:transfer].validate).empty?
@@ -261,6 +276,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/transfers/update')
     .param(:transfer, Transfer, "Transfer to update") do
+    # FIXME order of validations
     Transfers.update_transfer_from_dto(params[:transfer])
 
     if (errors = params[:transfer].validate).empty?

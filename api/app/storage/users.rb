@@ -105,23 +105,21 @@ class Users < BaseStorage
   end
 
   def self.update_from_dto(user)
-    user.validate!
-    return if user.has_errors?
-
     # check for uniqueness
-    user_for_username = db[:user][:username => user.username]
-    if user_for_username.nil? || user_for_username[:id] == Integer(user.id)
-      update_user(user.id, user.username, user.name, user.is_admin?, user.is_inactive?)
+    user_for_username = db[:user][:username => user.fetch('username')]
+
+    if user_for_username.nil? || user_for_username[:id] == Integer(user.fetch('id'))
+      update_user(user.fetch('id'), user.fetch('username'), user.fetch('name'), user.fetch('is_admin'), user.fetch('is_inactive'))
 
       # FIXME what to do about user_agency.mtime? currently clear_roles drops create_time
       if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)
-        Permissions.clear_roles(user.id)
+        Permissions.clear_roles(user.fetch('id'))
 
-        user.agencies.each do |user_agency|
-          agency_ref = user_agency.fetch('id')
-          role = user_agency.fetch('role')
-          location_id = user_agency['location_id']
-          permissions = Array(user_agency['permission'])
+        user.fetch('agency_roles').each do |agency_role|
+          agency_ref = agency_role.fetch('agency_ref')
+          role = agency_role.fetch('role')
+          location_id = agency_role.fetch('agency_location_id', nil)
+          permissions = agency_role.fetch('permissions')
 
           # FIXME ref
           (_, aspace_agency_id) = agency_ref.split(':')
@@ -129,63 +127,62 @@ class Users < BaseStorage
           agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
 
           if role == 'SENIOR_AGENCY_ADMIN'
-            Permissions.add_agency_senior_admin(user.id, agency_id)
+            Permissions.add_agency_senior_admin(user.fetch('id'), agency_id)
           elsif role == 'AGENCY_ADMIN'
-            Permissions.add_agency_admin(user.id, agency_id, location_id, permissions)
+            Permissions.add_agency_admin(user.fetch('id'), agency_id, location_id, permissions)
           elsif role == 'AGENCY_CONTACT'
-            Permissions.add_agency_contact(user.id, agency_id, location_id, permissions)
+            Permissions.add_agency_contact(user.fetch('id'), agency_id, location_id, permissions)
           end
         end
       else
         # ensure permissions set by more senior user are not lost
         # FIXME clean this up
-        user_agency = user.agencies.first
-        agency_ref = user_agency.fetch('id')
+        agency_role = user.fetch('agency_roles').first
+        agency_ref = agency_role.fetch('agency_ref')
         # FIXME ref
         (_, aspace_agency_id) = agency_ref.split(':')
         agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
-        role = user_agency.fetch('role')
-        location_id = user_agency['location_id']
-        permissions = Array(user_agency['permission'])
+        role = agency_role.fetch('role')
+        location_id = agency_role.fetch('aspace_location_id', nil)
+        permissions = agency_role.fetch('permissions')
 
-        current_permissions = Permissions.permissions_for_agency_user(user.id, agency_id, location_id)
+        current_permissions = Permissions.permissions_for_agency_user(user.fetch('id'), agency_id, location_id)
 
         permissions += (current_permissions - ['allow_transfers', 'allow_file_issue'])
 
-        Permissions.clear_roles(user.id)
+        Permissions.clear_roles(user.fetch('id'))
 
         if role == 'AGENCY_ADMIN'
-          Permissions.add_agency_admin(user.id, agency_id, location_id, permissions)
+          Permissions.add_agency_admin(user.fetch('id'), agency_id, location_id, permissions)
         elsif role == 'AGENCY_CONTACT'
-          Permissions.add_agency_contact(user.id, agency_id, location_id, permissions)
+          Permissions.add_agency_contact(user.fetch('id'), agency_id, location_id, permissions)
         end
       end
 
-      unless user.password.empty?
-        DBAuth.set_user_password(user.id, user.password)
+      unless user.fetch('password').empty?
+        DBAuth.set_user_password(user.fetch('id'), user.fetch('password'))
       end
+
+      []
     else
-      user.add_error('username', 'already in use')
+      [{code: "UNIQUE_CONSTRAINT", field: 'username'}]
     end
   end
 
   def self.create_from_dto(user)
-    user.validate!
-    return if user.has_errors?
-
     # check for uniqueness
-    if db[:user][:username => user.username].nil?
-      user_id = if user.is_admin?
-                  self.create_admin_user(user.username, user.name)
+    if db[:user][:username => user.fetch('username')].nil?
+      user_id = if user.fetch('is_admin')
+                  self.create_admin_user(user.fetch('username'), user.fetch('name'))
                 else
-                  self.create_user(user.username, user.name)
+                  self.create_user(user.fetch('username'), user.fetch('username'))
                 end
 
-      user.agencies.each do |user_agency|
-        agency_ref = user_agency.fetch('id')
-        role = user_agency.fetch('role')
-        location_id = user_agency['location_id']
-        permissions = Array(user_agency['permission'])
+      user.fetch('agency_roles', []).each do |agency_role|
+        agency_ref = agency_role.fetch('agency_ref')
+        role = agency_role.fetch('role')
+        location_id = agency_role.fetch('agency_location_id', nil)
+        permissions = agency_role.fetch('permissions')
 
         # FIXME ref
         (_, aspace_agency_id) = agency_ref.split(':')
@@ -201,9 +198,11 @@ class Users < BaseStorage
         end
       end
 
-      DBAuth.set_user_password(user_id, user.password)
+      DBAuth.set_user_password(user_id, user.fetch('password'))
+
+      []
     else
-      user.add_error('username', 'already in use')
+      [{code: "UNIQUE_CONSTRAINT", field: 'username'}]
     end
   end
 
@@ -223,8 +222,10 @@ class Users < BaseStorage
   end
 
   def self.dto_for(username)
-    UserUpdateRequest.from_row(
-      user = db[:user][:username => username],
+    user = db[:user][:username => username]
+
+    UserDTO.from_row(
+      user,
       Permissions.agency_roles_for_user(user[:id], with_labels: true))
   end
 end

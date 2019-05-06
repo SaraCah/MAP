@@ -79,7 +79,7 @@ module DTO
         end
       end
 
-      if field_value && field_def.validator && (validation_code = field_def.validator.call(self.fetch(field_def.name)))
+      if field_value && field_def.validator && (validation_code = field_def.validator.call(self.fetch(field_def.name), self))
         errors << {code: "VALIDATION_FAILED", validation_code: validation_code, field: field_def.name}
         next
       end

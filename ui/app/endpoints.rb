@@ -102,22 +102,22 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/users/new') do
-    Templates.emit_with_layout(:user_new, {user: UserUpdateRequest.new},
+    Templates.emit_with_layout(:user_new, {user: UserDTO.new},
                                :layout, title: "New User", context: ['users'])
   end
 
   Endpoint.post('/users/create')
-    .param(:user, UserUpdateRequest, "The user to create") do
+    .param(:user, UserDTO, "The user to create") do
 
     unless Ctx.permissions.is_admin?
-      params[:user].is_admin = false
+      params[:user]['is_admin'] = false
       if Ctx.permissions.is_senior_agency_admin?
-        params[:user].agencies.select! do |agency|
-          (Integer(agency['location_id']) == Ctx.get.current_location.id)
+        params[:user].fetch('agency_roles', []).select! do |agency_role|
+          Integer(agency_role.fetch('agency_location_id')) == Ctx.get.current_location.id
         end
       elsif Ctx.permissions.is_agency_admin?
-        params[:user].agencies.select! do |agency|
-          (Integer(agency['location_id']) == Ctx.get.current_location.id) && agency['role'] != 'SENIOR_AGENCY_ADMIN'
+        params[:user].fetch('agency_roles', []).select! do |agency_role|
+          Integer(agency_role.fetch('agency_location_id')) == Ctx.get.current_location.id && agency_role.fetch('role', '') != 'SENIOR_AGENCY_ADMIN'
         end
       else
         # FIXME
@@ -125,15 +125,13 @@ class MAPTheApp < Sinatra::Base
       end
     end
 
-    params[:user].validate!
+    errors = Ctx.client.create_user(params[:user])
 
-    Ctx.client.create_user(params[:user]) unless params[:user].has_errors?
-
-    if params[:user].has_errors?
-      Templates.emit_with_layout(:user_new, {user: params[:user]},
-                                   :layout, title: "New User", context: ['users'])
-    else
+    if errors.empty?
       redirect '/users'
+    else
+      Templates.emit_with_layout(:user_new, {user: params[:user], errors: errors},
+                                 :layout, title: "New User", context: ['users'])
     end
   end
 
@@ -149,33 +147,31 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.post('/users/update/:id')
     .param(:id, Integer, "User id")
-    .param(:user, UserUpdateRequest, "The user to update") do
+    .param(:user, UserDTO, "The user to update") do
 
     unless Ctx.permissions.is_admin?
-      params[:user].is_admin = false
+      params[:user]['is_admin'] = false
       if Ctx.permissions.is_senior_agency_admin?
-        params[:user].agencies.select! do |agency|
-          (Integer(agency['location_id']) == Ctx.get.current_location.id)
+        params[:user].fetch('agency_roles', []).select! do |agency_role|
+          Integer(agency_role.fetch('agency_location_id')) == Ctx.get.current_location.id
         end
       elsif Ctx.permissions.is_agency_admin?
-        params[:user].agencies.select! do |agency|
-          (Integer(agency['location_id']) == Ctx.get.current_location.id) && agency['role'] != 'SENIOR_AGENCY_ADMIN'
+        params[:user].fetch('agency_roles', []).select! do |agency_role|
+          Integer(agency_role.fetch('agency_location_id')) == Ctx.get.current_location.id && agency_role.fetch('role', '') != 'SENIOR_AGENCY_ADMIN'
         end
       else
         # FIXME
         raise "Insufficient Privileges"
       end
     end
+    
+    errors = Ctx.client.update_user(params[:user])
 
-    params[:user].validate!
-
-    Ctx.client.update_user(params[:user]) unless params[:user].has_errors?
-
-    if params[:user].has_errors?
-      Templates.emit_with_layout(:user_edit, {user: params[:user]},
-                                 :layout, title: "Edit User", context: ['users'])
-    else
+    if errors.empty?
       redirect '/users'
+    else
+      Templates.emit_with_layout(:user_edit, {user: params[:user], errors: errors},
+                                 :layout, title: "Edit User", context: ['users'])
     end
   end
 
