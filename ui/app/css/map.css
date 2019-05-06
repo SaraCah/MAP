@@ -97,3 +97,8 @@
 .status-infomatic li.stand-alone {
     background-color: white;
 }
+
+.toc-wrapper .table-of-contents {
+    margin: 0;
+    padding: 0;
+}

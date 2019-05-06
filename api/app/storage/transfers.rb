@@ -166,7 +166,7 @@ class Transfers < BaseStorage
   end
 
   def self.update_transfer_from_dto(transfer)
-    # FIXME check permissions
+    errors = []
 
     transfer_id = transfer.fetch('id')
     handle = db[:handle][transfer_id: transfer_id][:id]
@@ -191,7 +191,6 @@ class Transfers < BaseStorage
                                 create_time: java.lang.System.currentTimeMillis)
     end
 
-    # No errors
-    []
+    errors
   end
 end

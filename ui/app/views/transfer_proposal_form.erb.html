@@ -1,74 +1,111 @@
-<div class="row vue-enabled">
-    <% if errors %>
-    <pre><%= errors %></pre>
-    <% end %>
-    <div class="col s12">
-        <div class="row">
-            <div class="col s12">
-                <ul class="status-infomatic">
-                    <li class="first <% if transfer.new? %>current<% end %>">Inactive</li>
-                    <li class="<% if transfer.fetch('status', '') == 'ACTIVE' %>current<% end %>">Active</li>
-                    <li class="last <% if transfer.fetch('status', '') == 'APPROVED' %>current<% end %>">Approved</li>
-                    <li class="stand-alone <% if transfer.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled<br>By User</li>
-                    <li class="stand-alone <% if transfer.fetch('status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled<br>By QSA</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <form id="transferProposalForm" class="col s12" <% if is_readonly %>disabled<% else %>action="<%= transfer.new? ? '/transfer-proposals/create' : '/transfer-proposals/update' %>" method="post" enctype="multipart/form-data"<% end %>>
-        <%== FormHelper.hidden_authenticity_token %>
-
-        <% unless transfer.new? %>
-            <input type="hidden" name="transfer[id]" value="<%= transfer.fetch('id') %>">
-        <% end %>
-
-        <div class="row">
-            <div class="input-field col s12">
-                <input id="title" name="transfer[title]" type="text" value="<%= transfer.fetch('title', '') %>" required <% if is_readonly %>disabled<% end %>>
-                <label for="title">Title</label>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="input-field col s12">
-                <input id="estimated_quantity" name="transfer[estimated_quantity]" type="text" value="<%= transfer.fetch('estimated_quantity', '') %>" <% if is_readonly %>disabled<% end %>>
-                <label for="estimated_quantity">Estimated Quantity</label>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col s12">
-                <file-uploader files="<%= transfer.fetch('files', []).to_json %>"
-                               input_path="transfer[files][]"
-                               readonly="<%= is_readonly %>"
-                               v-bind:submit_button_ids="['save_transfer_btn']"
-                               csrf_token="<%= FormHelper.csrf_token %>">
-                </file-uploader>
-            </div>
-        </div>
-
-        <transfer-proposal-series readonly="<%= is_readonly %>"
-                                  existing_metadata="<%=  transfer.fetch('series', []).to_json %>">
-        </transfer-proposal-series>
-
-        <% unless is_readonly %>
-            <div class="row">
-                <br>
-                <br>
+<div class="row">
+    <div class="col s12 m9 l10">
+        <div class="row vue-enabled">
+            <% if errors %>
+                <section id="errors" class="scroll-spy">
+                    <pre><%= errors %></pre>
+                </section>
+            <% end %>
+            <section id="status" class="scrollspy section">
                 <div class="col s12">
-                    <button id="save_transfer_btn" class="btn">Save Transfer Proposal</button>
+                    <div class="row">
+                        <div class="col s12">
+                            <ul class="status-infomatic">
+                                <li class="first <% if transfer.new? %>current<% end %>">Inactive</li>
+                                <li class="<% if transfer.fetch('status', '') == 'ACTIVE' %>current<% end %>">Active</li>
+                                <li class="last <% if transfer.fetch('status', '') == 'APPROVED' %>current<% end %>">Approved</li>
+                                <li class="stand-alone <% if transfer.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled<br>By User</li>
+                                <li class="stand-alone <% if transfer.fetch('status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled<br>By QSA</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
+            <form id="transferProposalForm" class="col s12" <% if is_readonly %>disabled<% else %>action="<%= transfer.new? ? '/transfer-proposals/create' : '/transfer-proposals/update' %>" method="post" enctype="multipart/form-data"<% end %>>
+                <%== FormHelper.hidden_authenticity_token %>
+        
+                <% unless transfer.new? %>
+                    <input type="hidden" name="transfer[id]" value="<%= transfer.fetch('id') %>">
+                <% end %>
+
+                <section id="details" class="scrollspy section">
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="title" name="transfer[title]" type="text" value="<%= transfer.fetch('title', '') %>" required <% if is_readonly %>disabled<% end %>>
+                            <label for="title">Title</label>
+                        </div>
+                    </div>
+            
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="estimated_quantity" name="transfer[estimated_quantity]" type="text" value="<%= transfer.fetch('estimated_quantity', '') %>" <% if is_readonly %>disabled<% end %>>
+                            <label for="estimated_quantity">Estimated Quantity</label>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="files" class="scrollspy section">
+                    <div class="row">
+                        <div class="col s12">
+                            <file-uploader files="<%= transfer.fetch('files', []).to_json %>"
+                                           input_path="transfer[files][]"
+                                           readonly="<%= is_readonly %>"
+                                           v-bind:submit_button_ids="['save_transfer_btn']"
+                                           csrf_token="<%= FormHelper.csrf_token %>">
+                            </file-uploader>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="series" class="scrollspy section">
+                    <transfer-proposal-series readonly="<%= is_readonly %>"
+                                              existing_metadata="<%=  transfer.fetch('series', []).to_json %>">
+                    </transfer-proposal-series>
+                </section>
+
+                <% unless is_readonly %>
+                    <section id="actions" class="scrollspy section">
+                        <div class="row">
+                            <br>
+                            <br>
+                            <div class="col s12">
+                                <button id="save_transfer_btn" class="btn">Save Transfer Proposal</button>
+                            </div>
+                        </div>
+                    </section>
+                <% end %>
+            </form>
+        </div>
+        <% unless transfer.new? %>
+            <section id="conversation" class="scrollspy section">
+                <div class="row vue-enabled">
+                    <div class="col s12">
+                        <conversation record_type="transfer"
+                                      id="<%= transfer.fetch('handle_id') %>"
+                                      csrf_token="<%= FormHelper.csrf_token %>">
+                        </conversation>
+                    </div>
+                </div>
+            </section>
         <% end %>
-    </form>
-</div>
-<% unless transfer.new? %>
-    <div class="row vue-enabled">
-        <div class="col s12">
-            <conversation record_type="transfer"
-                          id="<%= transfer.fetch('handle_id') %>"
-                          csrf_token="<%= FormHelper.csrf_token %>">
-            </conversation>
+    </div>
+    <div class="col hide-on-small-only m3 l2">
+        <div class="toc-wrapper pinned">
+            <ul class="section table-of-contents">
+                <% if errors %>
+                    <li><a href="#errors">Errors</a></li>
+                    <% end %>
+                <li><a href="#status">Status</a></li>
+                <li><a href="#details">Details</a></li>
+                <li><a href="#files">Files</a></li>
+                <li><a href="#series">Series Metadata</a></li>
+                <% unless is_readonly %>
+                    <li><a href="#actions">Form Actions</a></li>
+                <% end %>
+                <% unless transfer.new? %>
+                    <li><a href="#conversation">Comments/Discussion</a></li>
+                <% end %>
+            </ul>
         </div>
     </div>
-<% end %>
+</div>
