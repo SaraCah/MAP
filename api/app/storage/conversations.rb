@@ -1,7 +1,7 @@
 class Conversations < BaseStorage
 
   RECORD_TYPE_TO_COLUMN = {
-    :transfer => :transfer_id
+    :transfer => :handle_id
   }
 
   def self.messages_for(record_type, id)

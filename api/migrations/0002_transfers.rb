@@ -41,7 +41,7 @@ Sequel.migration do
       Bignum :create_time, null: false
     end
 
-    create_table(:transfer_identifier) do
+    create_table(:handle) do
       primary_key :id
 
       foreign_key :transfer_proposal_id, :transfer_proposal
@@ -70,7 +70,7 @@ Sequel.migration do
     create_table(:conversation) do
       primary_key :id
 
-      foreign_key :transfer_id, :transfer_identifier, null: false
+      foreign_key :handle_id, :handle, null: false
 
       String :message, text: true, null: false
 
@@ -81,7 +81,7 @@ Sequel.migration do
     create_table(:transfer_file) do
       primary_key :id
 
-      foreign_key :transfer_id, :transfer_identifier, null: false
+      foreign_key :handle_id, :handle, null: false
 
       String :key, null: false
       String :filename, null: false

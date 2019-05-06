@@ -31,10 +31,10 @@ class Transfers < BaseStorage
                                                          created_by: Ctx.username,
                                                          create_time: java.lang.System.currentTimeMillis)
 
-    transfer_identifier = db[:transfer_identifier].insert(transfer_proposal_id: transfer_proposal_id)
+    handle = db[:handle].insert(transfer_proposal_id: transfer_proposal_id)
 
     transfer.fetch('files', []).each do |file|
-      db[:transfer_file].insert(transfer_id: transfer_identifier,
+      db[:transfer_file].insert(handle_id: handle,
                                 filename: file.fetch('filename'),
                                 mime_type: file.fetch('mime_type'),
                                 key: file.fetch('key'),
@@ -64,7 +64,7 @@ class Transfers < BaseStorage
     # FIXME check permissions
 
     transfer_proposal_id = transfer.fetch('id')
-    transfer_identifier = db[:transfer_identifier][transfer_proposal_id: transfer_proposal_id][:id]
+    handle = db[:handle][transfer_proposal_id: transfer_proposal_id][:id]
 
     db[:transfer_proposal]
       .filter(id: transfer_proposal_id)
@@ -72,10 +72,10 @@ class Transfers < BaseStorage
               estimated_quantity: transfer.fetch('estimated_quantity', nil))
 
 
-    file_keys_to_remove = db[:transfer_file].filter(transfer_id: transfer_identifier).select(:key).all
+    file_keys_to_remove = db[:transfer_file].filter(handle_id: handle).select(:key).all
 
     db[:transfer_file]
-      .filter(transfer_id: transfer_identifier)
+      .filter(handle_id: handle)
       .delete
 
     db[:file]
@@ -83,7 +83,7 @@ class Transfers < BaseStorage
       .delete
 
     transfer.fetch('files', []).each do |file|
-      db[:transfer_file].insert(transfer_id: transfer_identifier,
+      db[:transfer_file].insert(handle_id: handle,
                                 filename: file.fetch('filename'),
                                 mime_type: file.fetch('mime_type'),
                                 key: file.fetch('key'),
@@ -114,10 +114,10 @@ class Transfers < BaseStorage
 
 
   def self.proposal_dto_for(transfer_proposal_id)
-    transfer_identifier = db[:transfer_identifier][transfer_proposal_id: transfer_proposal_id][:id]
+    handle = db[:handle][transfer_proposal_id: transfer_proposal_id][:id]
     TransferProposal.from_row(db[:transfer_proposal][id: transfer_proposal_id],
-                              transfer_identifier,
-                              db[:transfer_file].filter(transfer_id: transfer_identifier),
+                              handle,
+                              db[:transfer_file].filter(handle_id: handle),
                               db[:transfer_proposal_series].filter(transfer_proposal_id: transfer_proposal_id))
   end
 
@@ -150,22 +150,22 @@ class Transfers < BaseStorage
 
 
   def self.transfer_dto_for(transfer_id)
-    transfer_identifier = db[:transfer_identifier][transfer_id: transfer_id][:id]
+    handle = db[:handle][transfer_id: transfer_id][:id]
     Transfer.from_row(db[:transfer][id: transfer_id],
-                      transfer_identifier,
-                      db[:transfer_file].filter(transfer_id: transfer_identifier))
+                      handle,
+                      db[:transfer_file].filter(handle_id: handle))
   end
 
   def self.update_transfer_from_dto(transfer)
     # FIXME check permissions
 
     transfer_id = transfer.fetch('id')
-    transfer_identifier = db[:transfer_identifier][transfer_id: transfer_id][:id]
+    handle = db[:handle][transfer_id: transfer_id][:id]
 
-    file_keys_to_remove = db[:transfer_file].filter(transfer_id: transfer_identifier).select(:key).all
+    file_keys_to_remove = db[:transfer_file].filter(handle_id: handle).select(:key).all
 
     db[:transfer_file]
-      .filter(transfer_id: transfer_identifier)
+      .filter(handle_id: handle)
       .delete
 
     db[:file]
@@ -173,7 +173,7 @@ class Transfers < BaseStorage
       .delete
 
     transfer.fetch('files', []).each do |file|
-      db[:transfer_file].insert(transfer_id: transfer_identifier,
+      db[:transfer_file].insert(handle_id: handle,
                                 filename: file.fetch('filename'),
                                 mime_type: file.fetch('mime_type'),
                                 key: file.fetch('key'),

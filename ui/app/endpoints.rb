@@ -330,7 +330,7 @@ class MAPTheApp < Sinatra::Base
     errors = Ctx.client.update_transfer_proposal(params[:transfer])
 
     if errors.empty?
-      redirect '/transfer_proposals'
+      redirect '/transfer-proposals'
     else
       Templates.emit_with_layout(:transfer_proposal_view,
                                  {
@@ -349,7 +349,7 @@ class MAPTheApp < Sinatra::Base
 
     Ctx.client.cancel_transfer_proposal(params[:id])
 
-    redirect '/transfer_proposals'
+    redirect '/transfer-proposals'
   end
 
   Endpoint.get('/file-download')
