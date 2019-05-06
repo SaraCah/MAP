@@ -21,6 +21,8 @@ class Transfers < BaseStorage
 
 
   def self.create_proposal_from_dto(transfer)
+    errors = []
+
     raise "FIXME admin user" if Ctx.get.permissions.is_admin?
 
     transfer_proposal_id = db[:transfer_proposal].insert(title: transfer.fetch('title'),
@@ -29,7 +31,8 @@ class Transfers < BaseStorage
                                                          agency_id: Ctx.get.current_location.agency_id,
                                                          agency_location_id: Ctx.get.current_location.id,
                                                          created_by: Ctx.username,
-                                                         create_time: java.lang.System.currentTimeMillis)
+                                                         create_time: java.lang.System.currentTimeMillis,
+                                                         system_mtime: Time.now)
 
     handle = db[:handle].insert(transfer_proposal_id: transfer_proposal_id)
 
@@ -57,11 +60,14 @@ class Transfers < BaseStorage
                                            composition_hybrid: series.fetch('composition_hybrid', false ) ? 1 : 0,
                                            composition_physical: series.fetch('composition_physical', false ) ? 1 : 0)
     end
+
+    errors
   end
 
 
   def self.update_proposal_from_dto(transfer)
     # FIXME check permissions
+    errors = []
 
     transfer_proposal_id = transfer.fetch('id')
     handle = db[:handle][transfer_proposal_id: transfer_proposal_id][:id]
@@ -69,7 +75,8 @@ class Transfers < BaseStorage
     db[:transfer_proposal]
       .filter(id: transfer_proposal_id)
       .update(title: transfer.fetch('title'),
-              estimated_quantity: transfer.fetch('estimated_quantity', nil))
+              estimated_quantity: transfer.fetch('estimated_quantity', nil),
+              system_mtime: Time.now)
 
 
     file_keys_to_remove = db[:transfer_file].filter(handle_id: handle).select(:key).all
@@ -110,6 +117,8 @@ class Transfers < BaseStorage
                                            composition_hybrid: series.fetch('composition_hybrid', false ) ? 1 : 0,
                                            composition_physical: series.fetch('composition_physical', false ) ? 1 : 0)
     end
+
+    errors
   end
 
 
