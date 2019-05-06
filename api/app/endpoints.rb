@@ -151,6 +151,14 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.get('/my-location') do
+    if Ctx.user_logged_in?
+      json_response(Ctx.get.current_location)
+    else
+      json_response({})
+    end
+  end
+
 
   Endpoint.get('/my-locations') do
     if Ctx.user_logged_in?
