@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'pp'
+
 class Templates
 
   @templates = {}
@@ -21,6 +23,15 @@ class Templates
   def self.append_script(&block)
     Thread.current[:append_scripts] ||= []
     Thread.current[:append_scripts]
+  end
+
+  class TemplateRenderError < StandardError
+    attr_reader :cause
+
+    def initialize(msg, cause)
+      super(msg)
+      @cause = cause
+    end
   end
 
   class TemplateDef
@@ -46,7 +57,14 @@ class Templates
         raise "Unexpected arguments: #{(args.keys - @argspecs.keys).inspect}"
       end
 
-      Erubis::EscapedEruby.new(File.read(@erb_file)).result(EmptyBinding.for(parsed_args))
+      begin
+        Erubis::EscapedEruby.new(File.read(@erb_file)).result(EmptyBinding.for(parsed_args))
+      rescue
+        $LOG.error("Original error: #{$@.join("\n")}")
+        $LOG.error("Args were: #{args.pretty_inspect}")
+        raise TemplateRenderError.new("Failure rendering template: #{@name} (#{@erb_file}): #{$!}",
+                                     $!)
+      end
     end
 
 
