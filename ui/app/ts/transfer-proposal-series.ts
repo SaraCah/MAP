@@ -165,5 +165,7 @@ Vue.component('transfer-proposal-series', {
                 (<HTMLFormElement>el).disabled = true;
             });
         }
+
+        M.FormSelect.init(this.$el.querySelectorAll('select'));
     }
 });
