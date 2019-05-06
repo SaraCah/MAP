@@ -7,7 +7,7 @@ class AgencyRoleDTO
   define_field(:agency_location_id, Integer)
   define_field(:agency_location_label, String, required: false)
   define_field(:permissions, [String], default: [])
-  define_field(:location_options, [LocationOption], default: [])
+  define_field(:location_options, [AgencyLocationOption], default: [])
 
   def self.from_agency_role(agency_role)
     new(agency_ref: agency_role.agency_ref,

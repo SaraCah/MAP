@@ -97,15 +97,19 @@ Vue.component('agency-linker', {
 <div class="input-field col s12">
   <agency-typeahead v-on:selected="addSelected"></agency-typeahead>
   <input type="hidden" name="location[agency_ref]" v-bind:value="selected.id"/>
+  <input type="hidden" name="location[agency_label]" v-bind:value="selected.label"/>
   <strong v-bind:value="selected.label">{{selected.label}}</strong>
 </div>
 `,
     data: function(): {selected: Agency} {
         return {
-            selected: JSON.parse(this.agency),
+            selected: {
+                id: this.agency_ref,
+                label: this.agency_label,
+            },
         };
     },
-    props: ['agency'],
+    props: ['agency_ref', 'agency_label'],
     methods: {
         addSelected(agency: Agency) {
             this.selected = agency;

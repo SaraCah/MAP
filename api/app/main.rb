@@ -36,15 +36,15 @@ require 'net/http'
 
 Dir["models/*.rb"].sort.each {|file| require file }
 
-require 'dto/agency_location_update_request'
 require 'dto/dto'
 require 'dto/transfer_file'
 require 'dto/transfer_proposal_series'
 require 'dto/transfer_proposal'
 require 'dto/transfer'
-require 'dto/location_option'
+require 'dto/agency_location_option'
 require 'dto/agency_role_dto'
 require 'dto/user_dto'
+require 'dto/agency_location_dto'
 
 require 'common/bootstrap'
 require 'storage/db_pool'

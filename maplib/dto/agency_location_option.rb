@@ -1,4 +1,4 @@
-class LocationOption
+class AgencyLocationOption
   include DTO
 
   define_field(:id, Integer)

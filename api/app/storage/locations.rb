@@ -119,20 +119,20 @@ class Locations < BaseStorage
   end
 
   def self.create_location_from_dto(location)
-    return if location.has_errors?
-
-    (_, aspace_agency_id) = location.agency_ref.split(':')
+    (_, aspace_agency_id) = location.fetch('agency_ref').split(':')
 
     agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
 
     # check for uniqueness
-    if db[:agency_location][:name => location.name, :agency_id => agency_id].nil?
-      db[:agency_location].insert(:name => location.name,
+    if db[:agency_location][:name => location.fetch('name'), :agency_id => agency_id].nil?
+      db[:agency_location].insert(:name => location.fetch('name'),
                                   :agency_id => agency_id,
                                   :create_time => java.lang.System.currentTimeMillis,
                                   :modified_time => java.lang.System.currentTimeMillis)
+
+      []
     else
-      location.add_error('name', 'already in use')
+      [{code: "UNIQUE_CONSTRAINT", field: 'name'}]
     end
   end
 

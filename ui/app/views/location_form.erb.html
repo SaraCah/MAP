@@ -1,17 +1,17 @@
 <div class="row vue-enabled">
-    <% if location.has_errors? %>
-    <pre><%= location.errors %></pre>
+    <% if errors %>
+        <pre><%= errors %></pre>
     <% end %>
     <form class="col s12" action="/locations/create" method="post">
         <%== FormHelper.hidden_authenticity_token %>
         <div class="row">
             <% if Ctx.permissions.is_admin? %>
-                <agency-linker agency="<%= location.agency.to_json %>"></agency-linker>
+                <agency-linker agency_ref="<%= location.fetch('agency_ref', nil) %>" agency_label="<%= location.fetch('agency_label', nil) %>"></agency-linker>
             <% end %>
         </div>
         <div class="row">
             <div class="input-field col s12">
-                <input id="name" name="location[name]" type="text" value="<%= location.name %>" required>
+                <input id="name" name="location[name]" type="text" value="<%= location.fetch('name', '') %>" required>
                 <label for="name">Name</label>
             </div>
         </div>

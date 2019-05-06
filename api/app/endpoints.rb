@@ -111,14 +111,19 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.post('/locations/create')
-    .param(:location, AgencyLocationUpdateRequest, "Location") do
-    # FIXME order of validations
-    Locations.create_location_from_dto(params[:location])
+    .param(:location, AgencyLocationDTO, "Location") do
+    errors = params[:location].validate
 
-    if params[:location].has_errors?
-      json_response(errors: params[:location].errors)
+    if errors.empty?
+      errors = Locations.create_location_from_dto(params[:location])
+
+      if errors.empty?
+        json_response(status: 'created')
+      else
+        json_response(errors: errors)
+      end
     else
-      json_response(status: 'created')
+      json_response(errors: errors)
     end
   end
 

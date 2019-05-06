@@ -167,10 +167,8 @@ class MAPAPIClient
   end
 
   def create_location(location)
-    response = post('/locations/create', location.to_hash)
-    if response['errors']
-      location.add_errors(response['errors'])
-    end
+    response = post('/locations/create', location: location.to_json)
+    response['errors'] || []
   end
 
   def agency_typeahead(q)
