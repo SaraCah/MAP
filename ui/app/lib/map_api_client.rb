@@ -79,7 +79,7 @@ class MAPAPIClient
     end
 
     def allow_manage_transfers?
-      self.is_admin || is_senior_agency_admin? || current_location_roles.any?{|role| role.allow_transfers?}
+      is_senior_agency_admin? || current_location_roles.any?{|role| role.allow_transfers?}
     end
 
     def is_senior_agency_admin?

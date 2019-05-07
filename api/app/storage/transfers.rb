@@ -67,7 +67,6 @@ class Transfers < BaseStorage
 
 
   def self.update_proposal_from_dto(transfer)
-    # FIXME check permissions
     errors = []
 
     transfer_proposal_id = transfer.fetch('id')

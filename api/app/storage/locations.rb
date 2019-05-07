@@ -1,23 +1,27 @@
 class Locations < BaseStorage
 
-  def self.page(page, page_size)
+  def self.all(page, page_size)
+    page(page, page_size)
+  end
+
+  def self.for_agency(page, page_size, agency_id)
+    page(page, page_size, agency_id)
+  end
+
+  def self.for_agency_location(page, page_size, agency_id, agency_location_id)
+    page(page, page_size, agency_id, agency_location_id)
+  end
+
+  def self.page(page, page_size, agency_id = nil, agency_location_id = nil)
     dataset = db[:agency_location]
                 .join(:agency, Sequel[:agency][:id] => Sequel[:agency_location][:agency_id])
 
-    unless Ctx.get.permissions.is_admin?
-      current_location = Ctx.get.current_location
-      if Ctx.get.permissions.is_senior_agency_admin?(current_location.agency_id)
-        dataset = dataset
-                    .filter(Sequel[:agency_location][:agency_id] => current_location.agency_id)
+    if agency_id
+      dataset = dataset.filter(Sequel[:agency_location][:agency_id] => agency_id)
+    end
 
-      elsif Ctx.get.permissions.is_agency_admin?(current_location.agency_id, current_location.id)
-        dataset = dataset
-                    .filter(Sequel[:agency_location][:agency_id] => current_location.agency_id)
-                    .filter(Sequel[:agency_location][:id] => current_location.id)
-
-      else
-        raise "Insufficient Privileges"
-      end
+    if agency_location_id
+      dataset = dataset.filter(Sequel[:agency_location][:id] => agency_location_id)
     end
 
     max_page = (dataset.count / page_size.to_f).ceil
