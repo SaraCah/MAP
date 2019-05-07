@@ -230,4 +230,9 @@ class Users < BaseStorage
       user,
       Permissions.agency_roles_for_user(user[:id], with_labels: true))
   end
+
+  def self.validate_roles(dto)
+    # TODO validate roles on dto against the logged in user's permissions
+    []
+  end
 end

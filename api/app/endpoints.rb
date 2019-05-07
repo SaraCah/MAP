@@ -27,16 +27,26 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/users')
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in?
-      json_response(Users.page(params[:page], 10))
+      if Ctx.get.permissions.is_admin?
+        json_response(Users.all(params[:page], 10))
+      elsif Ctx.get.permissions.is_senior_agency_admin?(Ctx.current_location.agency_id)
+        json_response(Users.for_agency(Ctx.current_location.agency_id, params[:page], 10))
+      elsif Ctx.get.permissions.is_agency_admin?(Ctx.current_location.agency_id, Ctx.current_location.id)
+        json_response(Users.for_agency_location(Ctx.current_location.agency_id, Ctx.current_location.id, params[:page], 10))
+      else
+        return [404]
+      end
     else
-      json_response([])
+      [404]
     end
   end
 
   Endpoint.post('/users/create')
     .param(:user, UserDTO, "User") do
     if (errors = params[:user].validate).empty?
-      if (errors = Users.create_from_dto(params[:user])).empty?
+      if !(errors = Users.validate_roles(params[:user])).empty?
+        json_response(errors: errors)
+      elsif (errors = Users.create_from_dto(params[:user])).empty?
         json_response(status: 'created')
       else
         json_response(errors: errors)
@@ -49,7 +59,9 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.post('/users/update')
     .param(:user, UserDTO, "User") do\
     if (errors = params[:user].validate).empty?
-      if (errors = Users.update_from_dto(params[:user])).empty?
+      if !(errors = Users.validate_roles(params[:user])).empty?
+        json_response(errors: errors)
+      elsif (errors = Users.update_from_dto(params[:user])).empty?
         json_response(status: 'updated')
       else
         json_response(errors: errors)
