@@ -17,7 +17,7 @@ Vue.component('conversation', {
     template: `
 <div class="card grey lighten-5">
     <div class="card-content">
-        <h4>Conversation</h4>
+        <h4>{{title}}</h4>
         <div v-for="message in messages" class="card">
             <div class="card-content">
                 <div v-html="escapeMessage(message.message)"></div>
@@ -39,15 +39,17 @@ Vue.component('conversation', {
             messages: Message[],
             busy: Boolean,
             message: String,
+            title: String,
         }
     {
             return {
                 messages: [],
                 busy: false,
                 message: '',
+                title: this.title || 'Conversation',
             };
     },
-    props: ['record_type', 'id', 'csrf_token'],
+    props: ['record_type', 'id', 'csrf_token', 'title'],
     methods: {
         loadMessages: function() {
             this.$http.get('/get-messages?record_type='+this.record_type+'&id='+this.id)
