@@ -46,6 +46,10 @@ class MAPAPIClient
     def agency_ref
       "agent_corporate_entity:#{self.aspace_agency_id}"
     end
+
+    def allow_transfers?
+      self.permissions.include?('allow_transfers')
+    end
   end
 
   Permissions = Struct.new(:is_admin, :agency_roles) do
@@ -66,12 +70,24 @@ class MAPAPIClient
       self.is_admin || is_senior_agency_admin?
     end
 
+    def current_agency_roles
+      self.agency_roles.select{|role| role.agency_id == Ctx.get.current_location.agency_id}
+    end
+
+    def current_location_roles
+      current_agency_roles.select{|role| role.agency_location_id == Ctx.get.current_location.id}
+    end
+
+    def allow_manage_transfers?
+      self.is_admin || is_senior_agency_admin? || current_location_roles.any?{|role| role.allow_transfers?}
+    end
+
     def is_senior_agency_admin?
-      self.agency_roles.any?{|agency_role| agency_role.agency_id == Ctx.get.current_location.agency_id && agency_role.is_senior_agency_admin?}
+      current_agency_roles.any?{|role| role.is_senior_agency_admin?}
     end
 
     def is_agency_admin?
-      is_senior_agency_admin? || self.agency_roles.any?{|agency_role| agency_role.agency_id == Ctx.get.current_location.agency_id && agency_role.agency_location_id == Ctx.get.current_location.id && agency_role.is_agency_admin?}
+      is_senior_agency_admin? || current_location_roles.any?{|role| role.is_agency_admin?}
     end
   end
 
