@@ -29,6 +29,8 @@ class Users < BaseStorage
 
     users_visible_to_current_user = users_visible_to_current_user.limit(page_size, page * page_size)
 
+    users_visible_to_current_user = users_visible_to_current_user.order(Sequel.asc(Sequel[:user][:username]))
+
     agency_permissions_by_user_id = {}
     aspace_agency_ids_to_resolve = []
 

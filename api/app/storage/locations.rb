@@ -27,6 +27,8 @@ class Locations < BaseStorage
                 .select_append(Sequel[:agency][:aspace_agency_id])
                 .limit(page_size, page * page_size)
 
+    dataset = dataset.order(Sequel.asc(Sequel[:agency_location][:agency_id]), Sequel.asc(Sequel[:agency_location][:name]))
+
     aspace_agencies = {}
     aspace_agency_ids_to_resolve = dataset.map(:aspace_agency_id).uniq
 

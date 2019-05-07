@@ -14,6 +14,8 @@ class Transfers < BaseStorage
 
     dataset = dataset.limit(page_size, page * page_size)
 
+    dataset = dataset.order(Sequel.desc(Sequel[:transfer_proposal][:create_time]))
+
     PagedResults.new(dataset.map{|row| TransferProposal.from_row(row)},
                      page,
                      max_page)
@@ -149,6 +151,8 @@ class Transfers < BaseStorage
     max_page = (dataset.count / page_size.to_f).ceil
 
     dataset = dataset.limit(page_size, page * page_size)
+
+    dataset = dataset.order(Sequel.desc(Sequel[:transfer][:create_time]))
 
     PagedResults.new(dataset.map{|row| Transfer.from_row(row)},
                      page,
