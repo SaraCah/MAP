@@ -106,6 +106,6 @@ Vue.component('conversation', {
         this.loadMessages();
         setInterval(() => {
             this.loadMessages();
-        }, 20 * 1000);
+        }, 5 * 1000);
     }
 });
