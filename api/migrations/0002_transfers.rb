@@ -35,9 +35,9 @@ Sequel.migration do
       String :checklist_status, null: false
       String :status, null: false
 
-      Bignum :date_scheduled
-      Bignum :date_received
-      Integer :quantity_received
+      String :date_scheduled
+      String :date_received
+      String :quantity_received
 
       String :created_by, null: false
       Bignum :create_time, null: false
