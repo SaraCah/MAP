@@ -16,7 +16,7 @@ Sequel.migration do
       Bignum :create_time, null: false
 
       # This here for ArchivesSpace ASModel compatibility
-      DateTime :system_mtime, :null => false, :index => true
+      DateTime :system_mtime, :index => true
     end
 
     run 'CREATE TRIGGER `transfer_proposal_insert_set_system_mtime` before insert on transfer_proposal for each row set new.system_mtime = UTC_TIMESTAMP()'
@@ -43,7 +43,7 @@ Sequel.migration do
       Bignum :create_time, null: false
 
       # This here for ArchivesSpace ASModel compatibility
-      DateTime :system_mtime, :null => false, :index => true
+      DateTime :system_mtime, :index => true
     end
 
     run 'CREATE TRIGGER `transfer_insert_set_system_mtime` before insert on transfer for each row set new.system_mtime = UTC_TIMESTAMP()'

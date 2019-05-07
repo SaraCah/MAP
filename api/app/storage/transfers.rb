@@ -31,8 +31,7 @@ class Transfers < BaseStorage
                                                          agency_id: Ctx.get.current_location.agency_id,
                                                          agency_location_id: Ctx.get.current_location.id,
                                                          created_by: Ctx.username,
-                                                         create_time: java.lang.System.currentTimeMillis,
-                                                         system_mtime: Time.now)
+                                                         create_time: java.lang.System.currentTimeMillis)
 
     handle = db[:handle].insert(transfer_proposal_id: transfer_proposal_id)
 
@@ -75,8 +74,7 @@ class Transfers < BaseStorage
     db[:transfer_proposal]
       .filter(id: transfer_proposal_id)
       .update(title: transfer.fetch('title'),
-              estimated_quantity: transfer.fetch('estimated_quantity', nil),
-              system_mtime: Time.now)
+              estimated_quantity: transfer.fetch('estimated_quantity', nil))
 
 
     file_keys_to_remove = db[:transfer_file].filter(handle_id: handle).select(:key).all
