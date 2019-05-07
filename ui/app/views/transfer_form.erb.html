@@ -26,7 +26,7 @@
                                 <li class="first <% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_INITIATED' %>current<% end %>">Transfer Process Initiated</li>
                                 <li class="empty"></li>
                                 <li class="<% if transfer.fetch('status', '') == 'PENDING' %>current<% end %>">Pending</li>
-                                <li class="<% if transfer.fetch('status', '') == 'RAP_NOTICE_RECEIVED' %>current<% end %>">RAP Notice Received/<br>Exempt</li>
+                                <li class="empty"></li>
                                 <li class="<% if transfer.fetch('status', '') == 'IN_PROGRESS' %>current<% end %>">In Progress</li>
                                 <li class="last <% if transfer.fetch('status', '') == 'COMPLETE' %>current<% end %>">Complete</li>
                             </ul>
