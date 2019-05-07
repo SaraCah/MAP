@@ -16,6 +16,7 @@ Sequel.migration do
       Bignum :create_time, null: false
 
       # This here for ArchivesSpace ASModel compatibility
+      Integer :lock_version, :default => 1, :null => false
       DateTime :system_mtime, :index => true
     end
 
@@ -42,7 +43,9 @@ Sequel.migration do
       String :created_by, null: false
       Bignum :create_time, null: false
 
+
       # This here for ArchivesSpace ASModel compatibility
+      Integer :lock_version, :default => 1, :null => false
       DateTime :system_mtime, :index => true
     end
 
