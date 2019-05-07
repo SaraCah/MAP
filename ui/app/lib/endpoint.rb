@@ -80,6 +80,9 @@ class Endpoint
 
         method_routes = @routes.fetch(endpoint.method.to_s.upcase, [])
 
+        # Don't care about these in dev anyway, and they leak...
+        @routes["HEAD"] = []
+
         route_to_replace = method_routes.find do |route_def|
           uri = route_def[0]
 
