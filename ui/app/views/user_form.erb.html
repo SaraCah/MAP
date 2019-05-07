@@ -19,7 +19,7 @@
         </div>
         <div class="row">
             <div class="input-field col s12">
-                <input id="password" name="user[password]" type="password" <% if user.new? %>required<% end %>>
+                <input id="password" name="user[password]" type="password" <% if user.new? %>required<% else %>placeholder="************"<% end %>>
                 <label for="password">Password</label>
             </div>
         </div>
