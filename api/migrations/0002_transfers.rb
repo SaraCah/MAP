@@ -17,11 +17,8 @@ Sequel.migration do
 
       # This here for ArchivesSpace ASModel compatibility
       Integer :lock_version, :default => 1, :null => false
-      DateTime :system_mtime, :index => true
+      DateTime :system_mtime, :index => true, :null => false
     end
-
-    run 'CREATE TRIGGER `transfer_proposal_insert_set_system_mtime` before insert on transfer_proposal for each row set new.system_mtime = UTC_TIMESTAMP()'
-    run 'CREATE TRIGGER `transfer_proposal_update_set_system_mtime` before update on transfer_proposal for each row set new.system_mtime = UTC_TIMESTAMP()'
 
     create_table(:transfer) do
       primary_key :id
@@ -52,11 +49,8 @@ Sequel.migration do
 
       # This here for ArchivesSpace ASModel compatibility
       Integer :lock_version, :default => 1, :null => false
-      DateTime :system_mtime, :index => true
+      DateTime :system_mtime, :index => true, :null => false
     end
-
-    run 'CREATE TRIGGER `transfer_insert_set_system_mtime` before insert on transfer for each row set new.system_mtime = UTC_TIMESTAMP()'
-    run 'CREATE TRIGGER `transfer_update_set_system_mtime` before update on transfer for each row set new.system_mtime = UTC_TIMESTAMP()'
 
     create_table(:handle) do
       primary_key :id
