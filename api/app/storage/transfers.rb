@@ -78,14 +78,8 @@ class Transfers < BaseStorage
               estimated_quantity: transfer.fetch('estimated_quantity', nil))
 
 
-    file_keys_to_remove = db[:transfer_file].filter(handle_id: handle).select(:key).all
-
     db[:transfer_file]
       .filter(handle_id: handle)
-      .delete
-
-    db[:file]
-      .filter(key: file_keys_to_remove)
       .delete
 
     transfer.fetch('files', []).each do |file|
@@ -190,14 +184,8 @@ class Transfers < BaseStorage
     transfer_id = transfer.fetch('id')
     handle = db[:handle][transfer_id: transfer_id][:id]
 
-    file_keys_to_remove = db[:transfer_file].filter(handle_id: handle).select(:key).all
-
     db[:transfer_file]
       .filter(handle_id: handle)
-      .delete
-
-    db[:file]
-      .filter(key: file_keys_to_remove)
       .delete
 
     transfer.fetch('files', []).each do |file|
