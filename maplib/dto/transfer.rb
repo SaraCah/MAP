@@ -3,7 +3,6 @@ class Transfer
 
   define_field(:id, Integer, required: false)
   define_field(:title, String, required: false)
-  define_field(:checklist_status, String, required: false)
   define_field(:status, String, required: false)
   define_field(:date_scheduled, Integer, required: false)
   define_field(:date_received, Integer, required: false)
@@ -18,6 +17,14 @@ class Transfer
 
   define_field(:agency_id, Integer, required: false)
   define_field(:agency_location_id, Integer, required: false)
+
+  define_field(:checklist_transfer_proposal_approved, Boolean, default: false)
+  define_field(:checklist_metadata_received, Boolean, default: false)
+  define_field(:checklist_rap_received, Boolean, default: false)
+  define_field(:checklist_metadata_approved, Boolean, default: false)
+  define_field(:checklist_transfer_received, Boolean, default: false)
+  define_field(:checklist_metadata_imported, Boolean, default: false)
+
 
   def self.from_row(row, handle = nil, file_rows = [])
     new(id: row[:id],

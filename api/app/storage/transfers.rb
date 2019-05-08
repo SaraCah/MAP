@@ -169,6 +169,24 @@ class Transfers < BaseStorage
   def self.update_transfer_from_dto(transfer)
     errors = []
 
+    original_transfer = transfer_dto_for(transfer.fetch('id'))
+
+    needs_metadata = (original_transfer.fetch('checklist_metadata_received', false) || original_transfer.fetch('checklist_metadata_approved', false))
+    has_metadata = transfer.fetch('files', []).any? {|file| file.fetch('role') == 'CSV'}
+
+    needs_rap = original_transfer.fetch('checklist_rap_received', false)
+    has_rap = transfer.fetch('files', []).any? {|file| file.fetch('role') == 'RAP'}
+
+    if needs_metadata && !has_metadata
+      errors << ['files', "Cannot delete metadata file after it has been approved"]
+    end
+
+    if needs_rap && !has_rap
+      errors << ['files', "Cannot delete RAP file after it has been approved"]
+    end
+
+    return errors if !errors.empty?
+
     transfer_id = transfer.fetch('id')
     handle = db[:handle][transfer_id: transfer_id][:id]
 
@@ -187,7 +205,7 @@ class Transfers < BaseStorage
                                 filename: file.fetch('filename'),
                                 mime_type: file.fetch('mime_type'),
                                 key: file.fetch('key'),
-                                role: file.fetch('role', 'other'),
+                                role: file.fetch('role', 'OTHER'),
                                 created_by: Ctx.username,
                                 create_time: java.lang.System.currentTimeMillis)
     end
