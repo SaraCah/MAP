@@ -39,8 +39,24 @@
 
                 <input type="hidden" name="transfer[id]" value="<%= transfer.fetch('id') %>">
                 <input type="hidden" name="transfer[handle_id]" value="<%= transfer.fetch('handle_id') %>">
+                <input type="hidden" name="transfer[agency_id]" value="<%= transfer.fetch('agency_id') %>">
+                <input type="hidden" name="transfer[agency_location_id]" value="<%= transfer.fetch('agency_location_id') %>">
 
                 <section id="details" class="scrollspy section">
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="agency" type="text" value="<%= Ctx.get.current_location.agency.label %>" disabled>
+                            <label for="agency">Agency</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="agency_location" type="text" value="<%= Ctx.get.current_location.name %>" disabled>
+                            <label for="agency_location">Agency Location</label>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="input-field col s12">
                             <input id="title" type="text" value="<%= transfer.fetch('title', '') %>" required disabled>

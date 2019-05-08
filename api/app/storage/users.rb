@@ -2,25 +2,28 @@
 
 class Users < BaseStorage
 
-  def self.page(page, page_size)
+  def self.all(page, page_size)
+    page(page, page_size)
+  end
+
+  def self.for_agency(page, page_size, agency_id)
+    page(page, page_size, agency_id)
+  end
+
+  def self.for_agency_location(page, page_size, agency_id, agency_location_id)
+    page(page, page_size, agency_id, agency_location_id)
+  end
+
+  def self.page(page, page_size, agency_id = nil, agency_location_id = nil)
     permission_dataset = db[:user]
                            .left_join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
 
-    unless Ctx.get.permissions.is_admin?
-      current_location = Ctx.get.current_location
-      if Ctx.get.permissions.is_senior_agency_admin?(current_location.agency_id)
-        permission_dataset = permission_dataset
-                    .filter(Sequel[:agency_user][:agency_id] => current_location.agency_id)
-                    .filter(Sequel[:agency_user][:agency_location_id] => current_location.id)
+    if agency_id
+      permission_dataset = permission_dataset.filter(Sequel[:agency_user][:agency_id] => agency_id)
+    end
 
-      elsif Ctx.get.permissions.is_agency_admin?(current_location.agency_id, current_location.id)
-        permission_dataset = permission_dataset
-                    .filter(Sequel[:agency_user][:agency_id] => current_location.agency_id)
-                    .filter(Sequel[:agency_user][:agency_location_id] => current_location.id)
-
-      else
-        raise "Insufficient Privileges"
-      end
+    if agency_location_id
+      permission_dataset = permission_dataset.filter(Sequel[:agency_user][:agency_location_id] => agency_location_id)
     end
 
     users_visible_to_current_user = db[:user].filter(:id => permission_dataset.select(Sequel[:user][:id]))
@@ -66,9 +69,14 @@ class Users < BaseStorage
       end
     end
 
-    PagedResults.new(users_visible_to_current_user.select_all(:user).map {|r| User.from_row(r, agency_permissions_by_user_id.fetch(r[:id], []).map {|agency_ref, role, location_id, location_label| [ agencies_by_agency_ref.fetch(agency_ref), role, location_label ]})},
-                   page,
-                   max_page)
+    results = users_visible_to_current_user
+               .select_all(:user)
+               .map do |row|
+                 permissions = agency_permissions_by_user_id.fetch(row[:id], []).map {|agency_ref, role, location_id, location_label| [ agencies_by_agency_ref.fetch(agency_ref), role, location_label ]}
+                 User.from_row(row, permissions)
+               end
+
+    PagedResults.new(results, page, max_page)
   end
 
   def self.user_exists?(username)
@@ -232,7 +240,31 @@ class Users < BaseStorage
   end
 
   def self.validate_roles(dto)
-    # TODO validate roles on dto against the logged in user's permissions
-    []
+      errors = []
+
+      if Ctx.get.permissions.is_admin?
+        # No dramas
+      elsif Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)
+        dto.fetch('agency_roles').each do |agency_role|
+          if agency_role.fetch('agency_ref') != Ctx.get.current_location.agency_ref
+            errors << {code: "AGENCY_MISMATCH", field: 'agency_roles'}
+          end
+        end
+      elsif Ctx.get.permissions.is_agency_admin?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+        dto.fetch('agency_roles').each do |agency_role|
+          if agency_role.fetch('agency_ref') != Ctx.get.current_location.agency_ref
+            errors << {code: "AGENCY_MISMATCH", field: 'agency_roles'}
+          elsif agency_role.fetch('agency_location_id') != Ctx.get.current_location.id
+            errors << {code: "AGENCY_LOCATION_MISMATCH", field: 'agency_roles'}
+          end
+          if agency_role.fetch('role') == 'SENIOR_AGENCY_ADMIN'
+            errors << {code: "INSUFFICIENT_PRIVILEGES", field: 'agency_roles'}
+          end
+        end
+      else
+        errors << {code: "INSUFFICIENT_PRIVILEGES", field: 'agency_roles'}
+      end
+
+      errors
   end
 end

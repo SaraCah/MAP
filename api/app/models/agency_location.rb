@@ -15,6 +15,10 @@ AgencyLocation = Struct.new(:id, :name, :agency_id, :create_time, :agency) do
              hash.fetch('agency'))
   end
 
+  def agency_ref
+    agency.fetch('id')
+  end
+
   def to_json(*args)
     to_h.to_json
   end
