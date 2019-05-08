@@ -23,7 +23,14 @@ class Transfer
     new(id: row[:id],
         title: row[:title],
         status: row[:status],
-        checklist_status: row[:checklist_status],
+
+        checklist_transfer_proposal_approved: row[:checklist_transfer_proposal_approved] == 1,
+        checklist_metadata_received: row[:checklist_metadata_received] == 1,
+        checklist_rap_received: row[:checklist_rap_received] == 1,
+        checklist_metadata_approved: row[:checklist_metadata_approved] == 1,
+        checklist_transfer_received: row[:checklist_transfer_received] == 1,
+        checklist_metadata_imported: row[:checklist_metadata_imported] == 1,
+
         date_scheduled: row[:date_scheduled],
         date_received: row[:date_received],
         quantity_received: row[:quantity_received],

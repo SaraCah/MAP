@@ -11,12 +11,12 @@
                     <div class="row">
                         <div class="col s12">
                             <ul class="status-infomatic">
-                                <li class="first <% if transfer.fetch('checklist_status', '') == 'TRANSFER_PROPOSAL_APPROVED' %>current<% end %>">Transfer Proposal Approved</li>
-                                <li class="<% if transfer.fetch('checklist_status', '') == 'METADATA_RECEIVED' %>current<% end %>">Metadata Received</li>
-                                <li class="<% if transfer.fetch('checklist_status', '') == 'RAP_NOTICE_RECEIVED' %>current<% end %>">RAP Notice Received/<br>Exempt</li>
-                                <li class="<% if transfer.fetch('checklist_status', '') == 'METADATA_APPROVED' %>current<% end %>">Metadata Approved</li>
-                                <li class="<% if transfer.fetch('checklist_status', '') == 'TRANSFER_RECEIVED' %>current<% end %>">Transfer Received</li>
-                                <li class="last <% if transfer.fetch('checklist_status', '') == 'METADATA_IMPORTED' %>current<% end %>">Metadata Imported</li>
+                                <li class="first <% if transfer.fetch('checklist_transfer_proposal_approved', false) %>checked<% end %>">Transfer Proposal Approved</li>
+                                <li class="<% if transfer.fetch('checklist_metadata_received', false) %>checked<% end %>">Metadata Received</li>
+                                <li class="<% if transfer.fetch('checklist_rap_received', false) %>checked<% end %>">RAP Notice Received/<br>Exempt</li>
+                                <li class="<% if transfer.fetch('checklist_metadata_approved', false) %>checked<% end %>">Metadata Approved</li>
+                                <li class="<% if transfer.fetch('checklist_transfer_received', false) %>checked<% end %>">Transfer Received</li>
+                                <li class="last <% if transfer.fetch('checklist_metadata_imported', false) %>checked<% end %>">Metadata Imported</li>
                             </ul>
                         </div>
                     </div>
@@ -25,10 +25,10 @@
                             <ul class="status-infomatic">
                                 <li class="first <% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_INITIATED' %>current<% end %>">Transfer Process Initiated</li>
                                 <li class="empty"></li>
-                                <li class="<% if transfer.fetch('status', '') == 'PENDING' %>current<% end %>">Pending</li>
+                                <li class="<% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_PENDING' %>current<% end %>">Pending</li>
                                 <li class="empty"></li>
-                                <li class="<% if transfer.fetch('status', '') == 'IN_PROGRESS' %>current<% end %>">In Progress</li>
-                                <li class="last <% if transfer.fetch('status', '') == 'COMPLETE' %>current<% end %>">Complete</li>
+                                <li class="<% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_IN_PROGRESS' %>current<% end %>">In Progress</li>
+                                <li class="last <% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_COMPLETE' %>current<% end %>">Complete</li>
                             </ul>
                         </div>
                     </div>

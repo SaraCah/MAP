@@ -91,7 +91,11 @@
 }
 
 .status-infomatic li.current:after {
-    background-color: #546e7a;
+    background-color: #77dd77;
+}
+
+.status-infomatic li.checked:after {
+    background-color: #77dd77;
 }
 
 .status-infomatic li.stand-alone {

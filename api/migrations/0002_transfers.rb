@@ -33,7 +33,13 @@ Sequel.migration do
 
       String :title, null: false
 
-      String :checklist_status, null: false
+      Integer :checklist_transfer_proposal_approved, null: false, default: 1
+      Integer :checklist_metadata_received, null: false, default: 0
+      Integer :checklist_rap_received, null: false, default: 0
+      Integer :checklist_metadata_approved, null: false, default: 0
+      Integer :checklist_transfer_received, null: false, default: 0
+      Integer :checklist_metadata_imported, null: false, default: 0
+
       String :status, null: false
 
       String :date_scheduled

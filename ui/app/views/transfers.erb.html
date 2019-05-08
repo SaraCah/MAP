@@ -4,7 +4,6 @@
             <thead>
             <tr>
                 <th style="width:25%">Transfer Title</th>
-                <th style="width:15%">Checklist</th>
                 <th style="width:15%">Status</th>
                 <th style="width:10%">Created By</th>
                 <th style="width:15%">Date Created</th>
@@ -15,7 +14,6 @@
             <% paged_results.results.each do |transfer| %>
             <tr>
                 <td><%= transfer.fetch('title') %></td>
-                <td><%= transfer.fetch('checklist_status') %></td>
                 <td><%= transfer.fetch('status') %></td>
                 <td><%= transfer.fetch('created_by') %></td>
                 <td><%= Time.at(transfer.fetch('create_time') / 1000)%></td>
