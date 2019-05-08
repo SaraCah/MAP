@@ -21,6 +21,7 @@ interface UploadedFile {
 
 interface UploaderState {
     uploaded:UploadedFile[];
+    non_deleteable_roles:Array<string>;
     is_readonly:Boolean;
     is_role_enabled:Boolean;
 }
@@ -80,7 +81,7 @@ Vue.component('file-uploader', {
                             <td>{{formatTime(file.create_time)}}</td>
                             <td>
                                 <a class="btn" target="_blank" :href="'/file-download?key=' + encodeURIComponent(file.key) + '&filename=' + encodeURIComponent(file.filename) + '&mime_type=' + encodeURIComponent(file.mime_type)">Download</a>
-                                <template v-if="!is_readonly">
+                                <template v-if="!is_readonly && is_deleteable(file.role)">
                                     <a class="btn" v-on:click="remove(file)">Remove</a>
                                 </template>
                             </td>
@@ -95,11 +96,12 @@ Vue.component('file-uploader', {
     data: function(): UploaderState {
         return {
             uploaded: JSON.parse(this.files),
+            non_deleteable_roles: JSON.parse(this.locked_file_roles || "[]"),
             is_readonly: (this.readonly == 'true'),
             is_role_enabled: (this.role == 'enabled'),
         };
     },
-    props: ['files', 'csrf_token', 'input_path', 'readonly', 'role', 'submit_button_ids'],
+    props: ['files', 'csrf_token', 'input_path', 'readonly', 'role', 'submit_button_ids', 'locked_file_roles'],
     methods: {
         uploadFiles: function() {
             let uploadInput = <HTMLInputElement>this.$refs.upload;
@@ -144,6 +146,9 @@ Vue.component('file-uploader', {
                     this.enableFormSubmit();
                 });
             }
+        },
+        is_deleteable(role: string) {
+            return this.non_deleteable_roles.indexOf(role) < 0;
         },
         remove(fileToRemove: UploadedFile) {
             this.uploaded = Utils.filter(this.uploaded, (file: UploadedFile) => {

@@ -86,11 +86,18 @@
                     </div>
                 </section>
 
+                <%
+                locked_file_roles = []
+                locked_file_roles << 'RAP' if transfer.fetch('checklist_rap_received', false)
+                locked_file_roles << 'CSV' if (transfer.fetch('checklist_metadata_received', false) || transfer.fetch('checklist_metadata_approved', false))
+                %>
+
                 <section id="files" class="scrollspy section">
                     <div class="row">
                         <div class="col s12">
                             <file-uploader files="<%= transfer.fetch('files', []).to_json %>"
                                            input_path="transfer[files][]"
+                                           locked_file_roles="<%= locked_file_roles.to_json %>"
                                            readonly="<%= is_readonly %>"
                                            role="enabled"
                                            v-bind:submit_button_ids="['save_transfer_btn']"
@@ -99,7 +106,7 @@
                         </div>
                     </div>
                 </section>
-        
+
                 <% unless is_readonly %>
                     <section id="actions" class="scrollspy section">
                         <div class="row">
