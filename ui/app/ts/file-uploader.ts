@@ -11,12 +11,12 @@ import UI from "./ui";
 
 
 interface UploadedFile {
-    key:String;
-    filename:String;
-    mime_type:String;
-    role?:String;
-    created_by?:String;
-    create_time?:String;
+    key:string;
+    filename:string;
+    mime_type:string;
+    role?:string;
+    created_by?:string;
+    create_time?:string;
 }
 
 interface ValidationResult {
@@ -72,7 +72,8 @@ Vue.component('file-uploader', {
                             </td>
                             <template v-if="is_role_enabled">
                                 <td>
-                                    <template v-if="is_readonly">
+                                    <template v-if="is_readonly || !is_deleteable(file.role)">
+                                        <input type="hidden" v-bind:name="buildPath('role')" v-bind:value="file.role"/>
                                         {{file.role}}
                                     </template>
                                     <template v-else>
@@ -234,24 +235,30 @@ Vue.component('file-uploader', {
                 }
             }
         },
+        setFileValidationStatus() {
+            for (const file of this.uploaded) {
+                if (file.role === 'CSV' && !this.validation_status[file.key]) {
+                    this.$http.get('/csv-validate', { params: {key: file.key} }).then((response: any) => {
+                        return response.json();
+                    }, (_response: any) => {
+                        UI.genericModal("Validation failed.  Please retry.");
+                    }).then((validationResult:ValidationResult) => {
+                        this.validation_status[file.key] = validationResult;
+                        this.$forceUpdate();
+                    });
+                }
+            }
+        },
     },
     watch: {
         uploaded: {
-            handler(uploadedFiles) {
-                for (const file of uploadedFiles) {
-                    if (file.role === 'CSV' && !this.validation_status[file.key]) {
-                        this.$http.get('/csv-validate', { params: {key: file.key} }).then((response: any) => {
-                            return response.json();
-                        }, (_response: any) => {
-                            UI.genericModal("Validation failed.  Please retry.");
-                        }).then((validationResult:ValidationResult) => {
-                            this.validation_status[file.key] = validationResult;
-                            this.$forceUpdate();
-                        });
-                    }
-                }
+            handler() {
+                this.setFileValidationStatus();
             },
             deep: true,
         }
+    },
+    mounted: function() {
+        this.setFileValidationStatus();
     },
 });
