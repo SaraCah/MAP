@@ -19,11 +19,17 @@ interface UploadedFile {
     create_time?:String;
 }
 
+interface ValidationResult {
+    valid:boolean;
+    errors:Array<string>;
+}
+
 interface UploaderState {
     uploaded:UploadedFile[];
     non_deleteable_roles:Array<string>;
     is_readonly:Boolean;
     is_role_enabled:Boolean;
+    validation_status:any;
 }
 
 Vue.component('file-uploader', {
@@ -52,6 +58,7 @@ Vue.component('file-uploader', {
                             </template>
                             <th>Created by</th>
                             <th>Create Time</th>
+                            <th>Validated</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -80,6 +87,20 @@ Vue.component('file-uploader', {
                             <td>{{file.created_by}}</td>
                             <td>{{formatTime(file.create_time)}}</td>
                             <td>
+                              <template v-if="file.role !== 'CSV'">
+                                  N/A
+                              </template>
+                              <template v-else-if="is_valid(file.key)">
+                                Validated
+                              </template>
+                              <template v-else-if="is_not_yet_validated(file.key)">
+                                Pending
+                              </template>
+                              <template v-else>
+                                <a href="#" @click.prevent="showErrors(file.key)">Contains Errors</a>
+                              </template>
+                            </td>
+                            <td>
                                 <a class="btn" target="_blank" :href="'/file-download?key=' + encodeURIComponent(file.key) + '&filename=' + encodeURIComponent(file.filename) + '&mime_type=' + encodeURIComponent(file.mime_type)">Download</a>
                                 <template v-if="!is_readonly && is_deleteable(file.role)">
                                     <a class="btn" v-on:click="remove(file)">Remove</a>
@@ -99,6 +120,7 @@ Vue.component('file-uploader', {
             non_deleteable_roles: JSON.parse(this.locked_file_roles || "[]"),
             is_readonly: (this.readonly == 'true'),
             is_role_enabled: (this.role == 'enabled'),
+            validation_status: {},
         };
     },
     props: ['files', 'csrf_token', 'input_path', 'readonly', 'role', 'submit_button_ids', 'locked_file_roles'],
@@ -165,6 +187,32 @@ Vue.component('file-uploader', {
                 return '';
             }
         },
+        is_valid: function(key:string): boolean {
+            if (this.validation_status[key] !== undefined) {
+                const status: ValidationResult = (this.validation_status[key] as ValidationResult);
+                return status.valid;
+            } else {
+                return false;
+            }
+        },
+        is_not_yet_validated: function(key:string): boolean {
+            return !this.validation_status[key];
+        },
+        showErrors(key:string) {
+            if (this.validation_status[key]) {
+                const errors = document.createElement('ul');
+
+                for (const error of this.validation_status[key].errors) {
+                    const li = document.createElement('li');
+                    li.innerText = error;
+                    errors.appendChild(li);
+                }
+
+                console.log(errors);
+
+                UI.genericHTMLModal(errors);
+            }
+        },
         disableFormSubmit() {
             if (this.submit_button_ids) {
                 for (const buttonId of this.submit_button_ids) {
@@ -186,5 +234,24 @@ Vue.component('file-uploader', {
                 }
             }
         },
-    }
+    },
+    watch: {
+        uploaded: {
+            handler(uploadedFiles) {
+                for (const file of uploadedFiles) {
+                    if (file.role === 'CSV' && !this.validation_status[file.key]) {
+                        this.$http.get('/csv-validate', { params: {key: file.key} }).then((response: any) => {
+                            return response.json();
+                        }, (_response: any) => {
+                            UI.genericModal("Validation failed.  Please retry.");
+                        }).then((validationResult:ValidationResult) => {
+                            this.validation_status[file.key] = validationResult;
+                            this.$forceUpdate();
+                        });
+                    }
+                }
+            },
+            deep: true,
+        }
+    },
 });

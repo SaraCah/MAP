@@ -347,6 +347,11 @@ class MAPAPIClient
     response['errors'] || []
   end
 
+  def csv_validate(key)
+    get("/csv-validate", :key => key)
+  end
+
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

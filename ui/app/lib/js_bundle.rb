@@ -46,16 +46,20 @@ class JSBundle
 
         defs.each do |bundle_def|
           saw_lf = false
-          File.open(bundle_def[:file], 'r') do |fh|
-            while (chunk = fh.read(4096))
-              out.write(chunk)
-              saw_lf = chunk.end_with?("\n")
+          begin
+            File.open(bundle_def[:file], 'r') do |fh|
+              while (chunk = fh.read(4096))
+                out.write(chunk)
+                saw_lf = chunk.end_with?("\n")
+              end
             end
-          end
 
-          unless saw_lf
-            # Ensure we don't run our scripts together.
-            out.write("\n")
+            unless saw_lf
+              # Ensure we don't run our scripts together.
+              out.write("\n")
+            end
+          rescue
+            $LOG.warn("Bundle file couldn't be read: #{bundle_def[:file]}: #{$!}")
           end
         end
 

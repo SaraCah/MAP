@@ -461,4 +461,15 @@ class MAPTheApp < Sinatra::Base
                                  :layout, title: "Transfer", context: ['transfers', 'initiated_transfers'])
     end
   end
+
+  Endpoint.get('/csv-validate')
+    .param(:key, String, "The file key to validate") do
+    result = Ctx.client.csv_validate(params[:key])
+
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      result.to_json
+    ]
+  end
 end

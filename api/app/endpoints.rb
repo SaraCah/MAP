@@ -395,4 +395,35 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.get('/csv-validate')
+    .param(:key, String, "The file key to validate") do
+
+    # All of this will be rejiggered when we switch to S3, so just spamming it in here for now...
+    csv_file = Tempfile.new
+    begin
+      csv_file.write(Files.read(params[:key]))
+      csv_file.close
+
+      # Sanity check that the file we're looking at is CSV.  Maybe the CSV validator should handle this?
+      believable_csv = File.open(csv_file, "rb") do |csv|
+        csv.read(256).bytes.all? {|b| b >= 32}
+      end
+
+      if believable_csv
+        errors = []
+        csv_validator = MapValidator.new
+        csv_validator.run_validations(csv_file, csv_validator.sample_validations)
+        csv_validator.notifications.notification_list.each do |notification|
+          errors << "[#{notification.type}](#{notification.source}): #{notification.message}"
+        end
+
+        json_response({'valid' => errors.empty?, 'errors' => errors})
+      else
+        json_response({'valid' => false, 'errors' => ["Does not appear to be a comma-separated file"]})
+      end
+    ensure
+      csv_file.unlink
+    end
+  end
+
 end
