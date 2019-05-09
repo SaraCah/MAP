@@ -80,11 +80,6 @@ class MAPTheAPI < Sinatra::Base
     register Sinatra::Reloader
     config.also_reload File.join('**', '*.rb')
     config.also_reload File.join('../../maplib', '*.rb')
-
-    config.after_reload do
-      load File.join(Dir.pwd, 'endpoints.rb')
-    end
-
   end
 
   configure do
