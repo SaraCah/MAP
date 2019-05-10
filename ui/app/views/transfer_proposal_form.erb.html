@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col s12 m9 l10">
-        <% if transfer.fetch('transfer_id') %>
+        <% if transfer.fetch('transfer_id', false) %>
             <div class="row">
                 <div class="input-field col s12">
                     <a target="_blank" class="btn-small" href="/transfers/<%= transfer.fetch('transfer_id') %>">View Transfer</a>
