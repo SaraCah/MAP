@@ -12,8 +12,9 @@ class TransferProposal
   define_field(:handle_id, Integer, required: false)
   define_field(:agency_id, Integer, required: false)
   define_field(:agency_location_id, Integer, required: false)
+  define_field(:transfer_id, Integer, required: false)
 
-  def self.from_row(row, handle = nil, file_rows = [], series_rows = [])
+  def self.from_row(row, handle = nil, file_rows = [], series_rows = [], transfer_id = nil)
     new(id: row[:id],
         title: row[:title],
         status: row[:status],
@@ -24,6 +25,7 @@ class TransferProposal
         agency_location_id: row[:agency_location_id],
         created_by: row[:created_by],
         create_time: row[:create_time],
-        handle_id: handle)
+        handle_id: handle,
+        transfer_id: transfer_id)
   end
 end

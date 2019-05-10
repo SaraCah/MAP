@@ -122,7 +122,9 @@ class Transfers < BaseStorage
     TransferProposal.from_row(db[:transfer_proposal][id: transfer_proposal_id],
                               handle,
                               db[:transfer_file].filter(handle_id: handle),
-                              db[:transfer_proposal_series].filter(transfer_proposal_id: transfer_proposal_id))
+                              db[:transfer_proposal_series].filter(transfer_proposal_id: transfer_proposal_id),
+                              (transfer_id = db[:transfer].filter(transfer_proposal_id: transfer_proposal_id).get(:id)),
+                             )
   end
 
 

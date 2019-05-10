@@ -1,5 +1,14 @@
 <div class="row">
     <div class="col s12 m9 l10">
+        <% if transfer.fetch('transfer_proposal_id') %>
+            <div class="row">
+                <div class="input-field col s12">
+                    <a target="_blank" class="btn-small" href="/transfer-proposals/<%= transfer.fetch('transfer_proposal_id') %>">View Transfer Proposal</a>
+
+                </div>
+            </div>
+        <% end %>
+
         <div class="row vue-enabled">
             <% if errors %>
                 <section id="errors" class="scrollspy section">

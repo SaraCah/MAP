@@ -25,6 +25,8 @@ class Transfer
   define_field(:checklist_transfer_received, Boolean, default: false)
   define_field(:checklist_metadata_imported, Boolean, default: false)
 
+  define_field(:transfer_proposal_id, Integer, required: false)
+
 
   def self.from_row(row, handle = nil, file_rows = [])
     new(id: row[:id],
@@ -46,6 +48,8 @@ class Transfer
         agency_location_id: row[:agency_location_id],
         created_by: row[:created_by],
         create_time: row[:create_time],
-        handle_id: handle)
+        handle_id: handle,
+        transfer_proposal_id: row[:transfer_proposal_id],
+       )
   end
 end
