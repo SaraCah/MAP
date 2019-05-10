@@ -157,7 +157,7 @@ Vue.component('file-uploader', {
                 }).then((json:UploadedFile[]) => {
                     for (let uploadedFile of json) {
                         if (uploadedFile.role == null) {
-                            if (uploadedFile.filename.toLowerCase().slice(-3) == 'csv') {
+                            if (uploadedFile.filename.toLowerCase().slice(-3) == 'csv' && this.is_role_enabled) {
                                 uploadedFile.role = 'CSV';
                             } else {
                                 uploadedFile.role = 'OTHER';
