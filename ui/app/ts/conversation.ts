@@ -8,9 +8,9 @@ import Utils from "./utils";
 Vue.use(VueResource);
 
 interface Message {
-    message: String;
-    author: String;
-    timestamp: Number;
+    message: string;
+    author: string;
+    timestamp: number;
 }
 
 Vue.component('conversation', {
@@ -20,7 +20,7 @@ Vue.component('conversation', {
         <h4>{{title}}</h4>
         <div v-for="message in messages" class="card">
             <div class="card-content">
-                <div v-html="escapeMessage(message.message)"></div>
+                <div style="white-space: pre">{{message.message}}</div>
                 <br>
                 <div>
                     <span class="grey-text">{{message.author}} - {{formatTimestamp(message.timestamp)}}</span>
@@ -37,11 +37,10 @@ Vue.component('conversation', {
     data: function():
         {
             messages: Message[],
-            busy: Boolean,
-            message: String,
-            title: String,
-        }
-    {
+            busy: boolean,
+            message: string,
+            title: string,
+        } {
             return {
                 messages: [],
                 busy: false,
@@ -52,7 +51,7 @@ Vue.component('conversation', {
     props: ['record_type', 'id', 'csrf_token', 'title'],
     methods: {
         loadMessages: function() {
-            this.$http.get('/get-messages?record_type='+this.record_type+'&id='+this.id)
+            this.$http.get('/get-messages?record_type=' + this.record_type + '&id=' + this.id)
                 .then((response: any) => response.json())
                 .then((json: any) => {
                     this.messages = json.messages;
@@ -63,7 +62,7 @@ Vue.component('conversation', {
                 return;
             }
 
-            if (this.message == '') {
+            if (this.message === '') {
                 return;
             }
 
@@ -78,30 +77,17 @@ Vue.component('conversation', {
                     authenticity_token: this.csrf_token,
                 },
                 {
-                    emulateJSON: true
+                    emulateJSON: true,
                 })
                 .then(() => {
                     this.busy = false;
                     this.message = '';
                     this.loadMessages();
-                    (<HTMLFormElement>this.$refs.message).focus();
+                    (this.$refs.message as HTMLFormElement).focus();
                 });
         },
-        formatTimestamp: function(epochTime:number) {
+        formatTimestamp: function(epochTime: number) {
             return Utils.localDateForEpoch(epochTime);
-        },
-        escapeMessage: function(message:string) {
-            return message.replace(/[&<>"\n]/g, function (tag) {
-                var chars_to_replace:any = {
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    '\n': '<br>',
-                };
-
-                return chars_to_replace[tag] || tag;
-            });
         },
     },
     mounted: function() {
@@ -109,5 +95,5 @@ Vue.component('conversation', {
         setInterval(() => {
             this.loadMessages();
         }, 5 * 1000);
-    }
+    },
 });

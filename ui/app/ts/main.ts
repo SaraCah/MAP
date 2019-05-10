@@ -2,12 +2,12 @@
 
 import Vue from "vue";
 
-import 'current-location-selector';
-import 'linker';
-import 'file-uploader';
-import 'transfer-proposal-series';
 import 'confirmable-action';
 import 'conversation';
+import 'current-location-selector';
+import 'file-uploader';
+import 'linker';
+import 'transfer-proposal-series';
 
 declare var M: any; // Materialize on the window context
 

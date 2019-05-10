@@ -23,7 +23,7 @@ export default class Utils {
         return null;
     }
 
-    public static localDateForEpoch(epochTime:number):String {
+    public static localDateForEpoch(epochTime: number): string {
         return new Date(epochTime).toLocaleString();
     }
 }

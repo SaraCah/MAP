@@ -11,25 +11,25 @@ import UI from "./ui";
 
 
 interface UploadedFile {
-    key:string;
-    filename:string;
-    mime_type:string;
-    role?:string;
-    created_by?:string;
-    create_time?:string;
+    key: string;
+    filename: string;
+    mime_type: string;
+    role?: string;
+    created_by?: string;
+    create_time?: string;
 }
 
 interface ValidationResult {
-    valid:boolean;
-    errors:Array<string>;
+    valid: boolean;
+    errors: string[];
 }
 
 interface UploaderState {
-    uploaded:UploadedFile[];
-    non_deleteable_roles:Array<string>;
-    is_readonly:Boolean;
-    is_role_enabled:Boolean;
-    validation_status:any;
+    uploaded: UploadedFile[];
+    non_deleteable_roles: string[];
+    is_readonly: boolean;
+    is_role_enabled: boolean;
+    validation_status: any;
 }
 
 Vue.component('file-uploader', {
@@ -119,21 +119,21 @@ Vue.component('file-uploader', {
         return {
             uploaded: JSON.parse(this.files),
             non_deleteable_roles: JSON.parse(this.locked_file_roles || "[]"),
-            is_readonly: (this.readonly == 'true'),
-            is_role_enabled: (this.role == 'enabled'),
+            is_readonly: (this.readonly === 'true'),
+            is_role_enabled: (this.role === 'enabled'),
             validation_status: {},
         };
     },
     props: ['files', 'csrf_token', 'input_path', 'readonly', 'role', 'submit_button_ids', 'locked_file_roles'],
     methods: {
         uploadFiles: function() {
-            let uploadInput = <HTMLInputElement>this.$refs.upload;
-            let files:FileList|null = uploadInput.files;
+            const uploadInput = this.$refs.upload as HTMLInputElement;
+            const files: FileList|null = uploadInput.files;
 
             if (files && files.length > 0) {
-                let formData = new FormData();
+                const formData = new FormData();
                 for (let i = 0; i < files.length; i++) {
-                    let file:File|null = files.item(i);
+                    const file: File|null = files.item(i);
                     if (file) {
                         formData.append('file[]', file);
                     }
@@ -146,18 +146,18 @@ Vue.component('file-uploader', {
 
                 this.$http.post('/file-upload', formData, {
                     headers: {
-                        'Content-Type': 'multipart/form-data'
+                        'Content-Type': 'multipart/form-data',
                     },
                     // emulateJSON: true,
                 }).then((response: any) => {
                     return response.json();
-                }, (_response: any) => {
+                }, () => {
                     this.enableFormSubmit();
                     UI.genericModal("File upload failed");
-                }).then((json:UploadedFile[]) => {
-                    for (let uploadedFile of json) {
+                }).then((json: UploadedFile[]) => {
+                    for (const uploadedFile of json) {
                         if (uploadedFile.role == null) {
-                            if (uploadedFile.filename.toLowerCase().slice(-3) == 'csv' && this.is_role_enabled) {
+                            if (uploadedFile.filename.toLowerCase().slice(-3) === 'csv' && this.is_role_enabled) {
                                 uploadedFile.role = 'CSV';
                             } else {
                                 uploadedFile.role = 'OTHER';
@@ -178,17 +178,17 @@ Vue.component('file-uploader', {
                 return fileToRemove.key !== file.key;
             });
         },
-        buildPath(field:string) {
+        buildPath(field: string) {
             return this.input_path + "[" + field + "]";
         },
-        formatTime: function(epochTime:number|null) {
+        formatTime: function(epochTime: number|null) {
             if (epochTime) {
                 return Utils.localDateForEpoch(epochTime);
             } else {
                 return '';
             }
         },
-        is_valid: function(key:string): boolean {
+        is_valid: function(key: string): boolean {
             if (this.validation_status[key] !== undefined) {
                 const status: ValidationResult = (this.validation_status[key] as ValidationResult);
                 return status.valid;
@@ -196,10 +196,10 @@ Vue.component('file-uploader', {
                 return false;
             }
         },
-        is_not_yet_validated: function(key:string): boolean {
+        is_not_yet_validated: function(key: string): boolean {
             return !this.validation_status[key];
         },
-        showErrors(key:string) {
+        showErrors(key: string) {
             if (this.validation_status[key]) {
                 const errors = document.createElement('ul');
 
@@ -209,8 +209,6 @@ Vue.component('file-uploader', {
                     errors.appendChild(li);
                 }
 
-                console.log(errors);
-
                 UI.genericHTMLModal(errors);
             }
         },
@@ -219,7 +217,6 @@ Vue.component('file-uploader', {
                 for (const buttonId of this.submit_button_ids) {
                     const button = document.getElementById(buttonId);
                     if (button) {
-                        console.log("DISABLE", button);
                         button.classList.add('disabled');
                     }
                 }
@@ -240,9 +237,9 @@ Vue.component('file-uploader', {
                 if (file.role === 'CSV' && !this.validation_status[file.key]) {
                     this.$http.get('/csv-validate', { params: {key: file.key} }).then((response: any) => {
                         return response.json();
-                    }, (_response: any) => {
+                    }, () => {
                         UI.genericModal("Validation failed.  Please retry.");
-                    }).then((validationResult:ValidationResult) => {
+                    }).then((validationResult: ValidationResult) => {
                         this.validation_status[file.key] = validationResult;
                         this.$forceUpdate();
                     });
@@ -256,7 +253,7 @@ Vue.component('file-uploader', {
                 this.setFileValidationStatus();
             },
             deep: true,
-        }
+        },
     },
     mounted: function() {
         this.setFileValidationStatus();

@@ -10,22 +10,22 @@ Vue.use(VueResource);
 // import UI from "./ui";
 
 interface SeriesMetadata {
-    series_title?:String;
-    disposal_class?:String;
-    date_range?:String;
-    accrual_details?:String;
-    creating_agency?:String;
-    mandate?:String;
-    function?:String;
-    system_of_arrangement?:String;
-    composition_digital?:Boolean;
-    composition_physical?:Boolean;
-    composition_hybrid?:Boolean;
+    series_title?: string;
+    disposal_class?: string;
+    date_range?: string;
+    accrual_details?: string;
+    creating_agency?: string;
+    mandate?: string;
+    function?: string;
+    system_of_arrangement?: string;
+    composition_digital?: boolean;
+    composition_physical?: boolean;
+    composition_hybrid?: boolean;
 }
 
 interface SeriesMetadataState {
-    metadata:SeriesMetadata[];
-    is_readonly:Boolean;
+    metadata: SeriesMetadata[];
+    is_readonly: boolean;
 }
 
 declare var M: any; // Materialize on the window context
@@ -134,7 +134,7 @@ Vue.component('transfer-proposal-series', {
     data: function(): SeriesMetadataState {
         return {
             metadata: JSON.parse(this.existing_metadata),
-            is_readonly: (this.readonly == 'true'),
+            is_readonly: (this.readonly === 'true'),
         };
     },
     props: ['existing_metadata', 'readonly'],
@@ -142,9 +142,9 @@ Vue.component('transfer-proposal-series', {
         add: function() {
             this.metadata.push({});
         },
-        remove(toRemove:SeriesMetadata) {
-            this.metadata = Utils.filter(this.metadata, (entry:SeriesMetadata) => {
-                return entry != toRemove;
+        remove(toRemove: SeriesMetadata) {
+            this.metadata = Utils.filter(this.metadata, (entry: SeriesMetadata) => {
+                return entry !== toRemove;
             });
         },
     },
@@ -153,7 +153,7 @@ Vue.component('transfer-proposal-series', {
     },
     mounted: function() {
         this.$el.querySelectorAll('input,textarea,select').forEach(function(el) {
-            if ((<HTMLFormElement>el).value != "") {
+            if ((el as HTMLFormElement).value !== "") {
                 if (el.nextElementSibling) {
                     el.nextElementSibling.classList.add('active');
                 }
@@ -162,10 +162,10 @@ Vue.component('transfer-proposal-series', {
 
         if (this.is_readonly) {
             this.$el.querySelectorAll('input,textarea,select').forEach(function(el) {
-                (<HTMLFormElement>el).disabled = true;
+                (el as HTMLFormElement).disabled = true;
             });
         }
 
         M.FormSelect.init(this.$el.querySelectorAll('select'));
-    }
+    },
 });

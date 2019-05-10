@@ -115,9 +115,6 @@ Vue.component('agency-linker', {
             this.selected = agency;
         },
     },
-    mounted: function() {
-        console.log(this.selected);
-    }
 });
 
 Vue.component('agency-role-linker', {
@@ -190,15 +187,15 @@ Vue.component('agency-role-linker', {
 </div>
 `,
     data: function(): {selected: AgencyRole[]} {
-        let prepopulated:AgencyRole[] = [];
-        let permissionOptions:string[] = JSON.parse(this.permission_options);
+        const prepopulated: AgencyRole[] = [];
+        const permissionOptions: string[] = JSON.parse(this.permission_options);
 
-        JSON.parse(this.agencies).forEach((agency_blob:any) => {
-            let role:AgencyRole = new AgencyRole(agency_blob.agency_ref, agency_blob.agency_label, agency_blob.role);
-            role.locationId = agency_blob.agency_location_id;
-            role.locationLabel = agency_blob.agency_location_label;
-            role.locationOptions = agency_blob.location_options;
-            role.permissions = agency_blob.permissions;
+        JSON.parse(this.agencies).forEach((agencyBlob: any) => {
+            const role: AgencyRole = new AgencyRole(agencyBlob.agency_ref, agencyBlob.agency_label, agencyBlob.role);
+            role.locationId = agencyBlob.agency_location_id;
+            role.locationLabel = agencyBlob.agency_location_label;
+            role.locationOptions = agencyBlob.location_options;
+            role.permissions = agencyBlob.permissions;
             role.permissionOptions = permissionOptions;
             prepopulated.push(role);
         });
@@ -228,7 +225,7 @@ Vue.component('agency-role-linker', {
                   this.selected.push(selectedAgency);
               });
         },
-    }
+    },
 });
 
 // class AgencyLinker {

@@ -4,8 +4,8 @@
 import Vue from "vue";
 import VueResource from "vue-resource";
 Vue.use(VueResource);
-import Utils from "./utils";
 import UI from "./ui";
+import Utils from "./utils";
 
 interface Location {
     id: number;
@@ -52,13 +52,9 @@ Vue.component('current-location-selector', {
 </div>
 `,
     data: function(): SelectorState {
-        let currentLocation = JSON.parse(this.current_location_json);
-        let currentAgency = JSON.parse(this.current_agency_json);
-        let availableLocations = JSON.parse(this.available_locations_json);
-
-
-        console.log(currentLocation);
-        console.log(currentAgency);
+        const currentLocation = JSON.parse(this.current_location_json);
+        const currentAgency = JSON.parse(this.current_agency_json);
+        const availableLocations = JSON.parse(this.available_locations_json);
 
         return {
             current_location: currentLocation,
@@ -93,7 +89,7 @@ Vue.component('current-location-selector', {
                 }
             }
 
-            if (!Utils.find(locations, (location: Location) => { return location.id == this.selected_location_id })) {
+            if (!Utils.find(locations, (location: Location) => location.id === this.selected_location_id)) {
                 this.selected_location_id = locations[0].id;
             }
 

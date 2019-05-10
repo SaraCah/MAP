@@ -40,15 +40,15 @@ Vue.component('confirmable-action', {
     </div>
 </span>
 `,
-    data: function(): {active: Boolean} {
+    data: function(): {active: boolean} {
         return {
             active: false,
         };
     },
-    props: ['action','css', 'label', 'message', 'csrf_token'],
+    props: ['action', 'css', 'label', 'message', 'csrf_token'],
     methods: {
         show: function() {
-            const modal:any = M.Modal.init(this.$refs.modal, {
+            const modal: any = M.Modal.init(this.$refs.modal, {
             });
             modal.open();
         },
@@ -59,13 +59,13 @@ Vue.component('confirmable-action', {
 
             this.active = true;
 
-            (<Element>this.$refs.spinner).classList.remove('hide');
+            (this.$refs.spinner as Element).classList.remove('hide');
             this.$http.post(this.action,
-                            {'authenticity_token': this.csrf_token},
+                            {authenticity_token: this.csrf_token},
                             {emulateJSON: true})
             .then(() => {
                 location.reload();
             });
-        }
+        },
     },
 });
