@@ -39,16 +39,22 @@ Vue.component('conversation', {
             messages: Message[],
             busy: boolean,
             message: string,
-            title: string,
         } {
             return {
                 messages: [],
                 busy: false,
                 message: '',
-                title: this.title || 'Conversation',
             };
     },
-    props: ['record_type', 'id', 'csrf_token', 'title'],
+    props: {
+        record_type: String,
+        id: String,
+        csrf_token: String,
+        title: {
+            type: String,
+            default: "Conversation",
+        },
+    },
     methods: {
         loadMessages: function() {
             this.$http.get('/get-messages?record_type=' + this.record_type + '&id=' + this.id)
