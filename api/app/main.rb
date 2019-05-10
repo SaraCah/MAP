@@ -79,7 +79,7 @@ class MAPTheAPI < Sinatra::Base
   configure :development do |config|
     register Sinatra::Reloader
     config.also_reload File.join('**', '*.rb')
-    config.also_reload File.join('../../maplib', '*.rb')
+    config.also_reload File.join('../../maplib', '**', '*.rb')
   end
 
   configure do
