@@ -27,6 +27,8 @@ class Transfer
 
   define_field(:transfer_proposal_id, Integer, required: false)
 
+  define_field(:import_job_uri, String, required: false)
+
 
   def self.from_row(row, handle = nil, file_rows = [])
     new(id: row[:id],
