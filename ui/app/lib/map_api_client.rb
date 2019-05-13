@@ -400,7 +400,7 @@ class MAPAPIClient
     if !response.code.start_with?('2')
       error = JSON.parse(response.body)
 
-      if error.fetch('SERVER_ERROR', '') == 'Sessions::SessionNotFoundError'
+      if error.fetch('SERVER_ERROR', {})['type'] == 'Sessions::SessionNotFoundError'
         # Our backend session is gone.  Clear the frontend one too.
         raise SessionGoneError.new
       end

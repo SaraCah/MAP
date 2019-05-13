@@ -127,7 +127,7 @@ class MAPTheAPI < Sinatra::Base
     $LOG.info("*** Caught unexpected exception: #{$!}")
     $LOG.info($@.join("\n"))
     $LOG.info("=" * 80)
-    return [500, {}, {"SERVER_ERROR" => $!.to_s}.to_json]
+    return [500, {}, {"SERVER_ERROR" => {type: $!.class.to_s, message: $!.to_s}}.to_json]
   end
 
   private

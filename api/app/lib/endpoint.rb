@@ -116,7 +116,7 @@ class Endpoint
         end
 
         if endpoint.needs_session? && Ctx.get.session.nil?
-          raise "A session is required to access this endpoint"
+          raise Sessions::SessionNotFoundError.new("A session is required to access this endpoint")
         end
 
         result = app_instance.instance_eval(&block)
