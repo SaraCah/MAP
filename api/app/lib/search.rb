@@ -87,19 +87,21 @@ class Search
     hash.map{|k,v| [k,'"'+v+'"'].join(':')}.join('&&')
   end
 
+
+  def self.record_hash(record)
+    {
+      'uri' => record['uri'],
+      'type' => record['primary_type'] == 'resource' ? 'Series' : 'Record',
+      'title' => record['title'],
+      'qsa_id' => record['qsa_id__u_sint'].first.to_s
+    }
+  end
+
+
   def self.controlled_records(agency_id)
     # FIXME: starting to feel modelly ... refactorme
 
     agency_uri = "/agents/corporate_entities/#{agency_id}"
-
-    def self.record_hash(record)
-      {
-        'uri' => record['uri'],
-        'type' => record['primary_type'] == 'resource' ? 'Series' : 'Record',
-        'title' => record['title'],
-        'qsa_id' => record['qsa_id__u_sint'].first.to_s
-      }
-    end
 
     out = execute(query('responsible_agency_u_sstr' => agency_uri)).fetch('docs')
       .map{|record| record_hash(record) }
