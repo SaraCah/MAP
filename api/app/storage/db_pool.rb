@@ -16,7 +16,7 @@ class DBPool
       @pool = Sequel.connect(@db_url,
                              max_connections: @pool_size,
                              test: true,
-                             loggers: $LOG)
+                             loggers: AppConfig[:enable_db_logging] ? $LOG : [])
 
       self
     rescue
