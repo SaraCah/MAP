@@ -56,6 +56,8 @@ fi
 echo
 echo "Installing gems"
 scripts/jruby.sh distlibs/gems/bin/bundle install
+scripts/jruby.sh distlibs/gems/bin/bundle update --all
+
 
 if [ ! -d "solr_dist" ]; then
     echo

@@ -53,6 +53,7 @@ fi
 echo
 echo "Installing gems"
 scripts/jruby.sh distlibs/gems/bin/bundle install
+scripts/jruby.sh distlibs/gems/bin/bundle update --all
 
 echo
 echo "Installing JS libs"

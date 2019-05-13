@@ -10,5 +10,8 @@ gem "sequel", "5.19.0"
 gem "bcrypt", "3.1.12"
 gem "jdbc-mysql", "5.1.47"
 
-gem "map_validator", git: "https://github.com/hudmol/map_validator.git", branch: "master"
-
+if ENV['RELEASE_BRANCH'] == 'qa'
+  gem "map_validator", git: "https://github.com/hudmol/map_validator.git", branch: "qa"
+else
+  gem "map_validator", git: "https://github.com/hudmol/map_validator.git", branch: "master"
+end

@@ -17,6 +17,13 @@ fi
 
 MODULES="api ui"
 
+if [ "$RELEASE_BRANCH" = "" ]; then
+    export RELEASE_BRANCH="qa"
+fi
+
+echo "Building release for branch $RELEASE_BRANCH"
+
+
 for module in $MODULES; do
     echo "================================================================================"
     echo "== Preparing $module"
