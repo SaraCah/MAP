@@ -73,6 +73,9 @@ class DB
 
     wrapped_exception = (exception.wrapped_exception.cause or exception.wrapped_exception)
 
+    # < means "subclass of in this context..."
+    return true if wrapped_exception.class < java.sql.SQLRecoverableException
+
     # Connection failures (SQL_STATE_COMMUNICATION_LINK_FAILURE)
     return true if (wrapped_exception.class == java.sql.SQLException && wrapped_exception.getSQLState() =~ /^80/)
 
