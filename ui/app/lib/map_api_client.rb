@@ -71,7 +71,11 @@ class MAPAPIClient
     end
 
     def current_agency_roles
-      self.agency_roles.select{|role| role.agency_id == Ctx.get.current_location.agency_id}
+      if Ctx.get.current_location
+        self.agency_roles.select{|role| role.agency_id == Ctx.get.current_location.agency_id}
+      else
+        []
+      end
     end
 
     def current_location_roles
