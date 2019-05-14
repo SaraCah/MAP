@@ -28,9 +28,32 @@ class Templates
   class TemplateRenderError < StandardError
     attr_reader :cause
 
-    def initialize(msg, cause)
+    def initialize(msg, cause, template_file)
+      unless msg =~ /error in.*around line/
+        template_error_line_number = try_extract_error_line(cause)
+
+        if template_error_line_number
+          msg += " (error in #{template_file} around line ##{template_error_line_number})"
+        end
+      end
+
       super(msg)
       @cause = cause
+    end
+
+    def try_extract_error_line(cause)
+      begin
+        line_number = nil
+        cause.backtrace.each do |line|
+          if line =~ /erubis:([0-9]+):/
+            return Integer($1)
+          end
+        end
+
+        return nil
+      rescue
+        nil
+      end
     end
   end
 
@@ -63,7 +86,8 @@ class Templates
         $LOG.error("Original error: #{$@.join("\n")}")
         $LOG.error("Args were: #{args.pretty_inspect}")
         raise TemplateRenderError.new("Failure rendering template: #{@name} (#{@erb_file}): #{$!}",
-                                     $!)
+                                     $!,
+                                     @erb_file)
       end
     end
 
