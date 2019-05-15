@@ -1,27 +1,23 @@
-<p>Hello, <%= name %>!</p>
-
 <% if agency %>
-
-<h3><%= agency.label %></h3>
-<h4><%= location.name %></h4>
-
-    Controlled Records:
-    <table>
-    <thead>
-        <tr>
+  <div class="card">
+    <div class="card-content">
+      <span class="card-title"><%= agency.label %> - <%= location.name %></span>
+      <table>
+        <thead>
+          <tr>
             <th>Record</th>
             <th></th>
             <th>QSA Identifier</th>
-        </tr>
-    </thead>
-    <tbody>
-      <% agency.controlled_records.each do |record| %>
-        <tr>
-            <td><%= record['title'] %></td>
-            <td><%= record['end_date'] ? 'under movement' : '' %></td>
-            <td><%= record['type'] + ' ' + record['qsa_id'] %></td>
-        </tr>
-      <% end %>
-    </tbody>
-    </table>
+          </tr>
+        </thead>
+        <tbody>
+          <% agency.controlled_records.each do |record| %>
+            <tr>
+              <td><%= record['title'] %></td>
+              <td><%= record['end_date'] ? 'under movement' : '' %></td>
+              <td><%= record['type'] + ' ' + record['qsa_id'] %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
 <% end %>
