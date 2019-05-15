@@ -71,5 +71,19 @@ Sequel.migration do
       add_foreign_key(:file_issue_request_id, :file_issue_request, null: true)
       add_foreign_key(:file_issue_id, :file_issue, null: true)
     end
+
+    create_table(:index_feed) do
+      primary_key :id
+
+      Integer :lock_version, :null => false
+      Integer :record_id, :null => false
+      Integer :repo_id, :null => false
+      String :record_type, :null => false
+      String :record_uri, :size => 64, :null => false
+      File :blob, :size => :medium, :null => false
+
+      unique [:record_uri, :lock_version]
+    end
   end
+
 end

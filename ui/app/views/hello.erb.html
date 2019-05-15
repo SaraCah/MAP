@@ -1,4 +1,4 @@
-<% if false && agency %>
+<% if agency %>
   <div class="card">
     <div class="card-content">
       <span class="card-title"><%= agency.label %> - <%= location.name %></span>
@@ -8,6 +8,7 @@
             <th>Record</th>
             <th></th>
             <th>QSA Identifier</th>
+            <th>Representations</th>
           </tr>
         </thead>
         <tbody>
@@ -16,6 +17,13 @@
               <td><%= record['title'] %></td>
               <td><%= record['end_date'] ? 'under movement' : '' %></td>
               <td><%= record['type'] + ' ' + record['qsa_id'] %></td>
+              <td>
+                <%=
+                ['physical', 'digital']
+                .map {|rep_type| Array(record["#{rep_type}_representations"]).count.to_s + " #{rep_type}" }
+                .join('; ')
+                %>
+              </td>
             </tr>
           <% end %>
         </tbody>

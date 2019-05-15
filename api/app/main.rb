@@ -56,6 +56,7 @@ require 'lib/endpoint'
 require 'lib/ctx'
 require 'lib/watch_dir_reloader'
 require 'lib/search'
+require 'lib/solr_indexer'
 
 require 'storage/base_storage'
 require 'storage/db_auth'
@@ -113,6 +114,8 @@ class MAPTheAPI < Sinatra::Base
       end
     end
 
+    # Start the indexer thread
+    SolrIndexer.start
   end
 
   configure :development do

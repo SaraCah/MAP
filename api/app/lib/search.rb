@@ -66,7 +66,7 @@ class Search
       raise response.body unless response.code.start_with?('2')
 
       JSON.parse(response.body).fetch('response').fetch('docs').map {|hit| {'id' => hit.fetch('id'),
-                                                                            'label' => hit.fetch('display_string')}}
+                                                                            'label' => hit.fetch('title')}}
     end
   end
 
@@ -129,12 +129,9 @@ class Search
 
 
   def self.record_hash(record)
-    {
-      'uri' => record['uri'],
-      'type' => record['primary_type'] == 'resource' ? 'Series' : 'Record',
-      'title' => record['title'],
-      'qsa_id' => record['qsa_id__u_sint'].first.to_s
-    }
+    record.merge({
+                   'type' => record['primary_type'] == 'resource' ? 'Series' : 'Record',
+                 })
   end
 
 
@@ -142,14 +139,13 @@ class Search
     # FIXME: starting to feel modelly ... refactorme
 
     agency_uri = "/agents/corporate_entities/#{agency_id}"
-
-    out = execute(query('responsible_agency_u_sstr' => agency_uri)).fetch('docs')
+    out = execute(query('responsible_agency' => agency_uri)).fetch('docs')
       .map{|record| record_hash(record) }
 
     # FIXME: hardcoded 90 days
     cutoff_date = Time.now() - (60*60*24 * 90)
 
-    execute(query('recent_responsible_agencies_u_sstr' => agency_uri)).fetch('docs').map do |record|
+    execute(query('recent_responsible_agencies' => agency_uri)).fetch('docs').map do |record|
       json = JSON.parse(record['json'])
       not_too_old = json['recent_responsible_agencies'].select{|rh|
         rh['ref'] == agency_uri && Time.new(*rh['end_date'].split('-')) >= cutoff_date
