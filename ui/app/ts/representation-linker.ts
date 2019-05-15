@@ -15,7 +15,7 @@ interface Representation {
     label: string,
 }
 
-class RepresentationRequest {
+export default class RepresentationRequest {
     public static fromRepresentation(rep: Representation): RepresentationRequest {
         return new RepresentationRequest(rep.id, rep.label, 'DIGITAL');
     }
@@ -87,7 +87,6 @@ Vue.component('representation-linker', {
                 <th>Title</th>
                 <th>Start Date</th>
                 <th>End Date</th>
-                <th>Record Details</th>
                 <th>Representation ID</th>
                 <th>Agency Assigned ID</th>
                 <th>Previous System ID</th>
@@ -111,7 +110,6 @@ Vue.component('representation-linker', {
                 <td><!-- title -->{{representation.label}}</td>
                 <td><!-- start date --></td>
                 <td><!-- end date --></td>
-                <td><!-- record details --></td>
                 <td><!-- representation id-->{{representation.id}}</td>
                 <td><!-- agency assigned id--></td>
                 <td><!-- previous system id--></td>
@@ -121,7 +119,7 @@ Vue.component('representation-linker', {
                 <td><!-- other restrictions--></td>
                 <td><!-- processing/handling notes --></td>
                 <td>
-                  <select class="browser-default" :name="buildPath('request_type')" v-model="representation.request_type">
+                  <select class="browser-default" :name="buildPath('request_type')" v-model="representation.request_type" v-on:change="handleRequestTypeChange()">
                     <option value="DIGITAL">Digital</option>
                     <option value="PHYSICAL">Physical</option>
                   </select>
@@ -148,14 +146,22 @@ Vue.component('representation-linker', {
     },
     props: ['input_path', 'representations'],
     methods: {
+        getSelected: function() {
+            return this.selected;
+        },
         addSelected: function(representation:RepresentationRequest) {
             const selectedRepresentation: RepresentationRequest = RepresentationRequest.fromRepresentation(representation);
             this.selected.push(selectedRepresentation);
+            this.$emit('change');
         },
         removeSelected: function(representationToRemove:RepresentationRequest) {
             this.selected = Utils.filter(this.selected, (representation: RepresentationRequest) => {
-                return representation.id !== representationToRemove.id;
+                return !(representation.id === representationToRemove.id && representation.request_type === representationToRemove.request_type); 
             });
+            this.$emit('change');
+        },
+        handleRequestTypeChange: function() {
+            this.$emit('change');
         },
         buildPath(field: string) {
             return this.input_path + "[" + field + "]";

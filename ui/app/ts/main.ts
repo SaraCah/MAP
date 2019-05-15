@@ -9,6 +9,7 @@ import 'file-uploader';
 import 'linker';
 import 'transfer-proposal-series';
 import 'representation-linker';
+import 'file-issue-form';
 
 declare var M: any; // Materialize on the window context
 
