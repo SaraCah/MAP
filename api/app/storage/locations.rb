@@ -132,6 +132,7 @@ class Locations < BaseStorage
     # check for uniqueness
     if db[:agency_location][:name => location.fetch('name'), :agency_id => agency_id].nil?
       db[:agency_location].insert(:name => location.fetch('name'),
+                                  :delivery_address => location.fetch('delivery_address', nil),
                                   :agency_id => agency_id,
                                   :create_time => java.lang.System.currentTimeMillis,
                                   :modified_time => java.lang.System.currentTimeMillis)
@@ -153,6 +154,7 @@ class Locations < BaseStorage
       db[:agency_location]
         .filter(id: location.fetch('id'))
         .update(:name => location.fetch('name'),
+                :delivery_address => location.fetch('delivery_address', nil),
                 :modified_time => java.lang.System.currentTimeMillis)
 
       []
