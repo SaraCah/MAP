@@ -7,7 +7,7 @@ class FileIssueRequest
   define_field(:urgent, Boolean, default: false)
   define_field(:deliver_to_reading_room, Boolean, default: false)
   define_field(:delivery_authorizer, String, validator: proc {|s, request| !request.fetch('deliver_to_reading_room') && (s.nil? || s.empty?) ? "Delivery Authorizer can't be blank" : nil })
-  define_field(:items, [FileIssueRequestItem], default: [])
+  define_field(:items, [FileIssueRequestItem], default: [], validator: proc {|arr| arr.empty? ? "Items can't be empty" : nil })
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)
   define_field(:agency_id, Integer, required: false)

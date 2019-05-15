@@ -39,7 +39,12 @@ class FileIssues < BaseStorage
 
     db[:handle].insert(file_issue_request_id: file_issue_request_id)
 
-    # FIXME do items
+    file_issue_request.fetch('items').each do |item|
+      db[:file_issue_request_item]
+        .insert(file_issue_request_id: file_issue_request_id,
+                record_uri: item.fetch('record_uri'),
+                request_type: item.fetch('request_type'))
+    end
 
     errors
   end
@@ -69,7 +74,16 @@ class FileIssues < BaseStorage
     # FIXME update request has changed? So need to drop previous quote as we're
     # back to QUOTE_REQUEST_SUBMITTED.
 
-    # FIXME items
+    db[:file_issue_request_item]
+      .filter(file_issue_request_id: file_issue_request_id)
+      .delete
+
+    file_issue_request.fetch('items').each do |item|
+      db[:file_issue_request_item]
+        .insert(file_issue_request_id: file_issue_request_id,
+                record_uri: item.fetch('record_uri'),
+                request_type: item.fetch('request_type'))
+    end
 
     errors
   end

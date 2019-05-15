@@ -10,7 +10,6 @@
             <thead>
             <tr>
                 <th style="width:20%">Request Type</th>
-                <th style="width:5%"># of Items</th>
                 <th style="width:5%">Urgent?</th>
                 <th style="width:15%">Status</th>
                 <th style="width:10%">Created By</th>
@@ -29,7 +28,6 @@
             %>
             <tr class="<%= rowCSSClass %>">
                 <td><%= file_issue_request.fetch('request_type') %></td>
-                <td><%= file_issue_request.fetch('items').length %></td>
                 <td><% if file_issue_request.fetch('urgent') %>Yes<% else %>No<% end %></td>
                 <td><%= file_issue_request.fetch('status') %></td>
                 <td><%= file_issue_request.fetch('created_by') %></td>

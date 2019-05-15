@@ -216,6 +216,11 @@ class MAPAPIClient
     get('/search/agencies', q: q)
   end
 
+
+  def representation_typeahead(q)
+    get('/search/representations', q: q)
+  end
+
   def get_current_agency
     return nil if Ctx.get.permissions.is_admin?
 

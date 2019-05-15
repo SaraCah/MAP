@@ -4,6 +4,7 @@ class FileIssueRequestItem
   define_field(:id, Integer, required: false)
   define_field(:record_uri, String, required: true)
   define_field(:request_type, String, required: true)
+  define_field(:record_label, String, required: false)
 
   def self.from_row(row)
     new(id: row[:id],

@@ -8,6 +8,7 @@ import 'current-location-selector';
 import 'file-uploader';
 import 'linker';
 import 'transfer-proposal-series';
+import 'representation-linker';
 
 declare var M: any; // Materialize on the window context
 

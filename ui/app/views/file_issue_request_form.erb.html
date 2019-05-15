@@ -32,6 +32,12 @@
                 <input type="hidden" name="file_issue_request[agency_location_id]" value="<%= request.fetch('agency_location_id') %>">
             <% end %>
 
+            <section id="items" class="scrollspy section card">
+                <div class="card-content">
+                    <representation-linker input_path="file_issue_request[items][]" representations="<%= request.fetch('items').to_json %>"></representation-linker>
+                </div>
+            </section>
+
             <section id="details" class="scrollspy section">
                 <div class="row">
                     <div class="input-field col s12">
@@ -123,8 +129,8 @@
                 <% if errors %>
                 <li><a href="#errors">Errors</a></li>
                 <% end %>
-                <li><a href="#items">Items</a></li>
                 <li><a href="#status">Status</a></li>
+                <li><a href="#items">Items</a></li>
                 <li><a href="#details">Details</a></li>
                 <% unless is_readonly %>
                 <li><a href="#actions">Form Actions</a></li>

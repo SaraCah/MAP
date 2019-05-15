@@ -521,4 +521,14 @@ class MAPTheApp < Sinatra::Base
                                  :layout, title: "File Issue Request", context: ['file_issues', 'file_issue_requests'])
     end
   end
+
+  Endpoint.get('/search/representations')
+    .param(:q, String, "Search string") do
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      Ctx.client.representation_typeahead(params[:q]).to_json
+    ]
+  end
+
 end
