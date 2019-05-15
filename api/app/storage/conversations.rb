@@ -1,21 +1,22 @@
 class Conversations < BaseStorage
 
   RECORD_TYPE_TO_COLUMN = {
-    :transfer => :handle_id
+    :transfer => :handle_id,
+    :transfer => :handle_id,
   }
 
-  def self.messages_for(record_type, id)
+  def self.messages_for(handle_id)
     db[:conversation]
-      .filter(RECORD_TYPE_TO_COLUMN.fetch(record_type.intern) => id)
+      .filter(:handle_id => handle_id)
       .order(:id)
       .map do |row|
       ConversationMessage.from_row(row)
     end
   end
 
-  def self.create(record_type, id, message)
+  def self.create(handle_id, message)
     db[:conversation]
-      .insert(RECORD_TYPE_TO_COLUMN.fetch(record_type.intern) => id,
+      .insert(handle_id: handle_id,
               message: message,
               created_by: Ctx.username,
               create_time: java.lang.System.currentTimeMillis)

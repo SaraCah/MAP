@@ -133,8 +133,7 @@
         <section id="conversation" class="scrollspy section">
             <div class="row vue-enabled">
                 <div class="col s12">
-                    <conversation record_type="transfer"
-                                  id="<%= transfer.fetch('handle_id') %>"
+                    <conversation handle_id="<%= transfer.fetch('handle_id') %>"
                                   csrf_token="<%= FormHelper.csrf_token %>"
                                   title="Comments/Discussion">
                     </conversation>

@@ -331,18 +331,16 @@ class MAPAPIClient
     end
   end
 
-  def get_messages(record_type, id)
+  def get_messages(handle_id)
     get('/get-messages', {
-      'record_type' => record_type,
-      'id' => id,
+      'handle_id' => handle_id,
     }).map do |json|
       ConversationMessage.from_json(json)
     end
   end
 
-  def post_message(record_type, id, message)
-    post('/post-message', record_type: record_type,
-                          id: id,
+  def post_message(handle_id, message)
+    post('/post-message', handle_id: handle_id,
                           message: message)
   end
 

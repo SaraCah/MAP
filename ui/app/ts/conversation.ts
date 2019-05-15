@@ -47,8 +47,7 @@ Vue.component('conversation', {
             };
     },
     props: {
-        record_type: String,
-        id: String,
+        handle_id: String,
         csrf_token: String,
         title: {
             type: String,
@@ -57,7 +56,7 @@ Vue.component('conversation', {
     },
     methods: {
         loadMessages: function() {
-            this.$http.get('/get-messages?record_type=' + this.record_type + '&id=' + this.id)
+            this.$http.get('/get-messages?handle_id=' + this.handle_id)
                 .then((response: any) => response.json())
                 .then((json: any) => {
                     this.messages = json.messages;
@@ -77,8 +76,7 @@ Vue.component('conversation', {
             this.$http.post(
                 '/post-message',
                 {
-                    record_type: this.record_type,
-                    id: this.id,
+                    handle_id: this.handle_id,
                     message: this.message,
                     authenticity_token: this.csrf_token,
                 },

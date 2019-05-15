@@ -340,10 +340,9 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.get('/get-messages')
-    .param(:record_type, String, "Record type")
-    .param(:id, String, "Record id") do
+    .param(:handle_id, Integer, "Handle id") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_view_conversations?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id) 
-      json_response(Conversations.messages_for(params[:record_type], params[:id]))
+      json_response(Conversations.messages_for(params[:handle_id]))
     else
       json_response({})
     end
@@ -351,10 +350,9 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/post-message')
     .param(:message, String, "Message")
-    .param(:record_type, String, "Record Type")
-    .param(:id, Integer, "Record ID") do
+    .param(:handle_id, Integer, "Handle ID") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_view_conversations?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      Conversations.create(params[:record_type], params[:id], params[:message])
+      Conversations.create(params[:handle_id], params[:message])
       json_response(status: 'created')
     else
       [404]

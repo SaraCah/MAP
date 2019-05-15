@@ -401,27 +401,25 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/get-messages')
-    .param(:record_type, String, "Record Type")
-    .param(:id, Integer, "Record ID") do
+    .param(:handle_id, Integer, "Handle ID") do
 
     # FIXME permissions check!
     [
       200,
       {'Content-type' => 'text/json'},
       {
-        'messages' => Ctx.client.get_messages(params[:record_type], params[:id]),
+        'messages' => Ctx.client.get_messages(params[:handle_id]),
       }.to_json
     ]
   end
 
   Endpoint.post('/post-message')
     .param(:message, String, "Message")
-    .param(:record_type, String, "Record Type")
-    .param(:id, Integer, "Record ID") do
+    .param(:handle_id, Integer, "Handle ID") do
 
     # FIXME check permissions, error handling
 
-    Ctx.client.post_message(params[:record_type], params[:id], params[:message])
+    Ctx.client.post_message(params[:handle_id], params[:message])
 
     [
       200,
