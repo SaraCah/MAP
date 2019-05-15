@@ -1,0 +1,139 @@
+<div class="row">
+    <div class="col s12 m9 l10">
+        <div class="row vue-enabled">
+            <% if errors %>
+            <section id="errors" class="scroll-spy">
+                <pre><%= errors %></pre>
+            </section>
+            <% end %>
+            <section id="status" class="scrollspy section">
+                <div class="col s12">
+                    <div class="row">
+                        <div class="col s12">
+                            <ul class="status-infomatic">
+                                <li class="first <% if request.new? %>current<% end %>">Add Request Details</li>
+                                <li class="<% if request.fetch('status', '') == 'QUOTE_REQUEST_SUBMITTED' %>current<% end %>">Quote Request Submitted</li>
+                                <li class="<% if request.fetch('status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Quote Provided</li>
+                                <li class="last <% if request.fetch('status', '') == 'FILE_ISSUE_CREATED' %>current<% end %>">File Issue(s) Created</li>
+                                <li class="stand-alone <% if request.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled<br>By User</li>
+                                <li class="stand-alone <% if request.fetch('status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled<br>By QSA</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <form id="fileIssueForm" class="col s12" <% if is_readonly %>disabled<% else %>action="<%= request.new? ? '/file-issue-requests/create' : '/file-issue-requests/update' %>" method="post"<% end %>>
+            <%== FormHelper.hidden_authenticity_token %>
+
+            <% unless request.new? %>
+                <input type="hidden" name="file_issue_request[id]" value="<%= request.fetch('id') %>">
+                <input type="hidden" name="file_issue_request[handle_id]" value="<%= request.fetch('handle_id') %>">
+                <input type="hidden" name="file_issue_request[agency_id]" value="<%= request.fetch('agency_id') %>">
+                <input type="hidden" name="file_issue_request[agency_location_id]" value="<%= request.fetch('agency_location_id') %>">
+            <% end %>
+
+            <section id="details" class="scrollspy section">
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="agency" type="text" value="<%= Ctx.get.current_location.agency.label %>" disabled>
+                        <label for="agency">Agency</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="agency_location" type="text" value="<%= Ctx.get.current_location.name %>" disabled>
+                        <label for="agency_location">Agency Location</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col s12">
+                        <label for="request_type">Request Type</label>
+                        <select id="request_type" name="file_issue_request[request_type]" class="browser-default">
+                            <option value="RIGHT_TO_INFORMATION" <% if request.fetch('request_type', 'RIGHT_TO_INFORMATION') == 'RIGHT_TO_INFORMATION' %>selected<% end %>>Right to Information</option>
+                            <option value="NATIONAL_REDRESS_SCHEME" <% if request.fetch('request_type', 'NATIONAL_REDRESS_SCHEME') == 'NATIONAL_REDRESS_SCHEME' %>selected<% end %>>National Redress Scheme</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col s12">
+                        <label>
+                            <input name="file_issue_request[urgent]" value="yes" type="checkbox" <% if request.fetch('urgent', false) %>checked<% end %> />
+                            <span>Urgent?</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <textarea id="notes" name="file_issue_request[notes]" class="materialize-textarea"><%= request.fetch('notes', '') %></textarea>
+                        <label for="notes">Notes</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col s12">
+                        <label for="deliver_to_reading_room">Delivery Location</label>
+                        <select id="deliver_to_reading_room" name="file_issue_request[deliver_to_reading_room]" class="browser-default">
+                            <option value="no" <% unless request.fetch('deliver_to_reading_room', false) %>selected<% end %>><%= Ctx.get.current_location.agency.label %>: <%= Ctx.get.current_location.name %></option>
+                            <option value="yes" <% if request.fetch('deliver_to_reading_room', false) %>selected<% end %>>Reading Room</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="delivery_authorizer" type="text" name="file_issue_request[delivery_authorizer]" value="<%= request.fetch('delivery_authorizer', '') %>"/>
+                        <label for="delivery_authorizer">Delivery Authorizer</label>
+                    </div>
+                </div>
+            </section>
+
+            <% unless is_readonly %>
+                <section id="actions" class="scrollspy section">
+                    <div class="row">
+                        <br>
+                        <br>
+                        <div class="col s12">
+                            <button id="save_transfer_btn" class="btn">Save Request</button>
+                        </div>
+                    </div>
+                </section>
+            <% end %>
+            </form>
+        </div>
+        <% unless request.new? %>
+        <section id="conversation" class="scrollspy section">
+            <div class="row vue-enabled">
+                <div class="col s12">
+                    <conversation record_type="file_issue"
+                                  id="<%= request.fetch('handle_id') %>"
+                                  csrf_token="<%= FormHelper.csrf_token %>"
+                                  title="Comments/Discussion">
+                    </conversation>
+                </div>
+            </div>
+        </section>
+        <% end %>
+    </div>
+    <div class="col hide-on-small-only m3 l2">
+        <div class="toc-wrapper pinned">
+            <ul class="section table-of-contents">
+                <% if errors %>
+                <li><a href="#errors">Errors</a></li>
+                <% end %>
+                <li><a href="#items">Items</a></li>
+                <li><a href="#status">Status</a></li>
+                <li><a href="#details">Details</a></li>
+                <% unless is_readonly %>
+                <li><a href="#actions">Form Actions</a></li>
+                <% end %>
+                <% unless request.new? %>
+                <li><a href="#conversation">Comments/Discussion</a></li>
+                <% end %>
+            </ul>
+        </div>
+    </div>
+</div>

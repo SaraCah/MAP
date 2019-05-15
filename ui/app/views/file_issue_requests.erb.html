@@ -1,0 +1,59 @@
+<div class="row">
+    <div class="col s12">
+        <a class="btn waves-effect" href="/file-issue-requests/new">Create Request</a>
+    </div>
+</div>
+
+<div class="row vue-enabled">
+    <div class="col s12">
+        <table class="highlight responsive-table">
+            <thead>
+            <tr>
+                <th style="width:20%">Request Type</th>
+                <th style="width:5%"># of Items</th>
+                <th style="width:5%">Urgent?</th>
+                <th style="width:15%">Status</th>
+                <th style="width:10%">Created By</th>
+                <th style="width:15%">Date Created</th>
+                <th style="width:20%"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <% paged_results.results.each do |file_issue_request|
+                rowCSSClass = ""
+                if file_issue_request.fetch('status') == 'SUBMITTED'
+                    rowCSSClass = "light-green lighten-5"
+                elsif file_issue_request.fetch('status').start_with?('CANCELLED')
+                    rowCSSClass = "red lighten-5"
+                end
+            %>
+            <tr class="<%= rowCSSClass %>">
+                <td><%= file_issue_request.fetch('request_type') %></td>
+                <td><%= file_issue_request.fetch('items').length %></td>
+                <td><% if file_issue_request.fetch('urgent') %>Yes<% else %>No<% end %></td>
+                <td><%= file_issue_request.fetch('status') %></td>
+                <td><%= file_issue_request.fetch('created_by') %></td>
+                <td><%= Time.at(file_issue_request.fetch('create_time') / 1000)%></td>
+                <td>
+                    <a class="btn" href="/file-issue-requests/<%= file_issue_request.fetch('id') %>">View</a>
+                    <% if file_issue_request.fetch('status') == 'SUBMITTED' %>
+                        <confirmable-action action="/file-issue-requests/<%= file_issue_request.fetch('id') %>/cancel"
+                                            csrf_token="<%= FormHelper.csrf_token %>"
+                                            css="btn red lighten-2"
+                                            label="Cancel"
+                                            message="Are you sure you want to cancel this request?">
+                        </confirmable-action>
+                    <% end %>
+                </td>
+            </tr>
+            <% end %>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12 center-align">
+        <% if paged_results.current_page > 0 %><a href="?page=<%= paged_results.current_page - 1 %>"><i class="fa fa-chevron-left"></i> Previous</a><% end %>
+        <% if paged_results.current_page < paged_results.max_page - 1 %><a href="?page=<%= paged_results.current_page + 1 %>">Next <i class="fa fa-chevron-right"></i></a><% end %>
+    </div>
+</div>

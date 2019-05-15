@@ -25,6 +25,10 @@ AgencyRole = Struct.new(:id, :role, :agency_id, :aspace_agency_id, :agency_locat
     permissions.include?(:allow_transfers)
   end
 
+  def allow_file_issue?
+    permissions.include?(:allow_file_issue)
+  end
+
   def to_json(*args)
     to_h.to_json
   end

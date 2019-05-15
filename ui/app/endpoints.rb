@@ -472,4 +472,55 @@ class MAPTheApp < Sinatra::Base
       result.to_json
     ]
   end
+
+  Endpoint.get('/file-issue-requests')
+    .param(:page, Integer, "Page to return", optional: true) do
+
+    Templates.emit_with_layout(:file_issue_requests, {paged_results: Ctx.client.file_issue_requests(params[:page] || 0)},
+                               :layout, title: "File Issue Requests", context: ['file_issues', 'file_issue_requests'])
+  end
+
+  Endpoint.get('/file-issue-requests/new') do
+    Templates.emit_with_layout(:file_issue_request_new, {request: FileIssueRequest.new, is_readonly: false},
+                               :layout, title: "New Request", context: ['file_issues', 'file_issue_requests'])
+  end
+
+  Endpoint.post('/file-issue-requests/create')
+    .param(:file_issue_request, FileIssueRequest, "The file issue request to create") do
+
+    errors = Ctx.client.create_file_issue_request(params[:file_issue_request])
+
+    if errors.empty?
+      redirect '/file-issue-requests'
+    else
+      Templates.emit_with_layout(:file_issue_request_new, {request: params[:file_issue_request], errors: errors},
+                                 :layout, title: "New Request", context: ['file_issues', 'file_issue_requests'])
+    end
+  end
+
+  Endpoint.get('/file-issue-requests/:id')
+    .param(:id, Integer, "ID of file issue request") do
+    file_issue_request = Ctx.client.get_file_issue_request(params[:id])
+
+    Templates.emit_with_layout(:file_issue_request_view, {request: file_issue_request, is_readonly: (file_issue_request.fetch('status') == 'FILE_ISSUE_CREATED')},
+                               :layout, title: "File Issue Request", context: ['file_issues', 'file_issue_requests'])
+  end
+
+  Endpoint.post('/file-issue-requests/update')
+    .param(:file_issue_request, FileIssueRequest, "The file issue request to update") do
+
+    errors = Ctx.client.update_file_issue_request(params[:file_issue_request])
+
+    if errors.empty?
+      redirect '/file-issue-requests'
+    else
+      Templates.emit_with_layout(:file_issue_request_view,
+                                 {
+                                   request: params[:file_issue_request],
+                                   errors: errors,
+                                   is_readonly: false,
+                                 },
+                                 :layout, title: "File Issue Request", context: ['file_issues', 'file_issue_requests'])
+    end
+  end
 end

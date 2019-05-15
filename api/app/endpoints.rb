@@ -430,4 +430,65 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.get('/file-issue-requests')
+    .param(:page, Integer, "Page to return") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      json_response(FileIssues.requests(params[:page], 10))
+    else
+      [404]
+    end
+  end
+
+  Endpoint.post('/file-issue-requests/create')
+    .param(:file_issue_request, FileIssueRequest, "File Issue Request to create") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      if (errors = params[:file_issue_request].validate).empty?
+        if (errors = FileIssues.create_request_from_dto(params[:file_issue_request])).empty?
+          json_response(status: 'created')
+        else
+          json_response(errors: errors)
+        end
+      else
+        json_response(errors: errors)
+      end
+    else
+      [404]
+    end
+  end
+
+  Endpoint.get('/file-issue-requests/:id')
+    .param(:id, Integer, "ID of file issue request") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      file_issue_request = FileIssues.request_dto_for(params[:id])
+      if file_issue_request && Ctx.get.permissions.can_manage_file_issues?(file_issue_request.fetch('agency_id'), file_issue_request.fetch('agency_location_id'))
+        json_response(file_issue_request.to_hash)
+      else
+        [404]
+      end
+    else
+      [404]
+    end
+  end
+
+  Endpoint.post('/file-issue-requests/update')
+    .param(:file_issue_request, FileIssueRequest, "File issue request to update") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      if (errors = params[:file_issue_request].validate).empty?
+        existing_file_issue_request = FileIssues.request_dto_for(params[:file_issue_request].fetch('id'))
+        if existing_file_issue_request && Ctx.get.permissions.can_manage_transfers?(existing_file_issue_request.fetch('agency_id'), existing_file_issue_request.fetch('agency_location_id'))
+          if (errors = FileIssues.update_request_from_dto(params[:file_issue_request])).empty?
+            json_response(status: 'updated')
+          else
+            json_response(errors: errors)
+          end
+        else
+          json_response(errors: [{code: 'INSUFFICIENT_PRIVILEGES', field: 'agency_location_id'}])
+        end
+      else
+        json_response(errors: errors)
+      end
+    else
+      [404]
+    end
+  end
 end

@@ -11,10 +11,7 @@ Sequel.migration do
       Integer :urgent, null: false, default: 0
       String :notes, text: true, null: false
 
-      # Delivery address can be either the reading room or the user's
-      # current agency location
       Integer :deliver_to_reading_room, null: false, default: 0
-      foreign_key :delivery_location_id, :agency_location
       String :delivery_authorizer
 
       String :status, null: false
@@ -68,6 +65,11 @@ Sequel.migration do
       Integer :overdue, null: false, default: 0
       Integer :extension_requested, null: false, default: 0
       String :request_extension_date
+    end
+
+    alter_table(:handle) do
+      add_foreign_key(:file_issue_request_id, :file_issue_request, null: true)
+      add_foreign_key(:file_issue_id, :file_issue, null: true)
     end
   end
 end

@@ -55,6 +55,13 @@ AgencyPermissions = Struct.new(:is_admin, :agency_roles) do
     agency_roles.any?{|agency_role| agency_role.agency_id == agency_id && agency_role.agency_location_id == agency_location_id && agency_role.allow_transfers?}
   end
 
+  def can_manage_file_issues?(agency_id, agency_location_id)
+    return true if is_senior_agency_admin?(agency_id)
+    return true if is_agency_admin?(agency_id, agency_location_id)
+
+    agency_roles.any?{|agency_role| agency_role.agency_id == agency_id && agency_role.agency_location_id == agency_location_id && agency_role.allow_file_issue?}
+  end
+
   def can_view_conversations?(agency_id, agency_location_id)
     return true if is_admin?
     return true if is_senior_agency_admin?(agency_id)

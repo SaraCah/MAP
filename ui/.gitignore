@@ -4,3 +4,5 @@
 /config/config.local.rb
 /app/ts/node_modules
 /.typescript_last_output.txt
+node_modules
+package-lock.json

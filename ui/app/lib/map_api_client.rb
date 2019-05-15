@@ -50,6 +50,10 @@ class MAPAPIClient
     def allow_transfers?
       self.permissions.include?('allow_transfers')
     end
+
+    def allow_file_issue?
+      self.permissions.include?('allow_file_issue')
+    end
   end
 
   Permissions = Struct.new(:is_admin, :agency_roles) do
@@ -84,6 +88,10 @@ class MAPAPIClient
 
     def allow_manage_transfers?
       is_senior_agency_admin? || current_location_roles.any?{|role| role.allow_transfers?}
+    end
+
+    def allow_manage_file_issues?
+      is_senior_agency_admin? || current_location_roles.any?{|role| role.allow_file_issue?}
     end
 
     def is_senior_agency_admin?
@@ -355,6 +363,28 @@ class MAPAPIClient
     get("/csv-validate", :key => key)
   end
 
+
+  def file_issue_requests(page = 0)
+    PagedResults.from_json(get('/file-issue-requests', page: page), FileIssueRequest)
+  end
+
+  def create_file_issue_request(file_issue_request)
+    response = post('/file-issue-requests/create', file_issue_request: file_issue_request.to_json)
+    response['errors'] || []
+  end
+
+  def get_file_issue_request(file_issue_request_id)
+    json = get("/file-issue-requests/#{file_issue_request_id}")
+
+    return nil if json.nil?
+
+    FileIssueRequest.from_hash(json)
+  end
+
+  def update_file_issue_request(file_issue_request)
+    response = post('/file-issue-requests/update', file_issue_request: file_issue_request.to_json)
+    response['errors'] || []
+  end
 
   private
 

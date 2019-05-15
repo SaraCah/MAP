@@ -17,6 +17,9 @@
             <% if Ctx.permissions.allow_manage_transfers? %>
                 <li class="tab"><a href="/transfer-proposals" <% if context.include?('transfers') %> class='active'<% end %>>My Transfers</a></li>
             <% end %>
+            <% if Ctx.permissions.allow_manage_file_issues? %>
+                <li class="tab"><a href="/file-issue-requests" <% if context.include?('file_issues') %> class='active'<% end %>>My File Issues</a></li>
+            <% end %>
             <% unless Ctx.permissions.is_admin %>
                 <li class="vue-enabled right">
                     <%
@@ -38,6 +41,14 @@
             <ul class="tabs tabs-transparent">
                 <li class="tab col s3"><a <% if context.include?('transfer_proposals') %>class="active"<% end %> href="/transfer-proposals">Proposals</a></li>
                 <li class="tab col s3"><a <% if context.include?('initiated_transfers') %>class="active"<% end %> href="/transfers">Transfers</a></li>
+            </ul>
+        </div>
+    <% end %>
+    <% if context.include?('file_issues') %>
+        <div class="nav-content blue-grey lighten-3">
+            <ul class="tabs tabs-transparent">
+                <li class="tab col s3"><a <% if context.include?('file_issue_requests') %>class="active"<% end %> href="/file-issue-requests">Requests</a></li>
+                <li class="tab col s3"><a <% if context.include?('initiated_file_issues') %>class="active"<% end %> href="/file-issues">File Issues</a></li>
             </ul>
         </div>
     <% end %>
