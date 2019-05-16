@@ -41,7 +41,6 @@ class Agencies < BaseStorage
         .filter(:end_date => nil)
         .group_and_count(:agent_corporate_entity_id_0).map do |row|
         result[row[:agent_corporate_entity_id_0]].series_count = row[:count]
-        result[row[:agent_corporate_entity_id_0]].controlled_records = Search.controlled_records(row[:agent_corporate_entity_id_0])
       end
     end
 
