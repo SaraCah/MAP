@@ -491,8 +491,8 @@ class MAPTheApp < Sinatra::Base
     if errors.empty?
       redirect '/file-issue-requests'
     else
-      # FIXME RESOLVE!
-      Templates.emit_with_layout(:file_issue_request_new, {request: params[:file_issue_request], resolved_representations: [], errors: errors},
+      resolved_representations = Ctx.client.resolve_representations(params[:file_issue_request].fetch('items').collect{|item| item.fetch('record_ref')})
+      Templates.emit_with_layout(:file_issue_request_new, {request: params[:file_issue_request], resolved_representations: resolved_representations, errors: errors},
                                  :layout, title: "New Request", context: ['file_issues', 'file_issue_requests'])
     end
   end
@@ -500,7 +500,7 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/file-issue-requests/:id')
     .param(:id, Integer, "ID of file issue request") do
     file_issue_request = Ctx.client.get_file_issue_request(params[:id])
-    resolved_representations = Ctx.client.resolve_representations(file_issue_request.fetch('items').collect{|item| item.fetch('record_uri')}) 
+    resolved_representations = Ctx.client.resolve_representations(file_issue_request.fetch('items').collect{|item| item.fetch('record_ref')}) 
 
     Templates.emit_with_layout(:file_issue_request_view, {request: file_issue_request, resolved_representations: resolved_representations, is_readonly: (file_issue_request.fetch('status') == 'FILE_ISSUE_CREATED')},
                                :layout, title: "File Issue Request", context: ['file_issues', 'file_issue_requests'])
@@ -534,11 +534,11 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/resolve/representations')
-    .param(:uri, [String], "URIs to resolve") do
+    .param(:ref, [String], "Record refs to resolve") do
     [
       200,
       {'Content-type' => 'text/json'},
-      Ctx.client.resolve_representations(params[:uri]).to_json
+      Ctx.client.resolve_representations(params[:ref]).to_json
     ]
   end
 

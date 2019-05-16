@@ -389,8 +389,10 @@ class MAPAPIClient
     response['errors'] || []
   end
 
-  def resolve_representations(uris)
-    get("/resolve/representations", { 'uri[]' => uris })
+  def resolve_representations(refs)
+    return [] if refs.empty?
+
+    get("/resolve/representations", { 'ref[]' => refs })
   end
 
   private

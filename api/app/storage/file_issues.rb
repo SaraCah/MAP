@@ -40,9 +40,11 @@ class FileIssues < BaseStorage
     db[:handle].insert(file_issue_request_id: file_issue_request_id)
 
     file_issue_request.fetch('items').each do |item|
+      (record_type, record_id) = item.fetch('record_ref').split(':')
       db[:file_issue_request_item]
         .insert(file_issue_request_id: file_issue_request_id,
-                record_uri: item.fetch('record_uri'),
+                aspace_record_type: record_type,
+                aspace_record_id: record_id,
                 request_type: item.fetch('request_type'),
                 record_details: item.fetch('record_details'))
     end
@@ -80,9 +82,11 @@ class FileIssues < BaseStorage
       .delete
 
     file_issue_request.fetch('items').each do |item|
+      (record_type, record_id) = item.fetch('record_ref').split(':')
       db[:file_issue_request_item]
         .insert(file_issue_request_id: file_issue_request_id,
-                record_uri: item.fetch('record_uri'),
+                aspace_record_type: record_type,
+                aspace_record_id: record_id,
                 request_type: item.fetch('request_type'),
                 record_details: item.fetch('record_details'))
     end

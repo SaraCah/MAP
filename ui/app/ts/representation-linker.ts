@@ -105,7 +105,7 @@ Vue.component('representation-linker', {
             <tr>
                 <td>
                     {{representation.metadata.series_id}}
-                    <input type="hidden" :name="buildPath('record_uri')" v-bind:value="representation.id"/>
+                    <input type="hidden" :name="buildPath('record_ref')" v-bind:value="representation.id"/>
                     <input type="hidden" :name="buildPath('record_label')" v-bind:value="representation.label"/>
                 </td>
                 <td>{{representation.metadata.record_id}}</td>
@@ -153,11 +153,12 @@ Vue.component('representation-linker', {
         const resolved:any = JSON.parse(this.resolved_representations);
 
         JSON.parse(this.representations).forEach((representationBlob: any) => {
-            const rep: RepresentationRequest = new RepresentationRequest(representationBlob.record_uri, "FIXME need to refetch", representationBlob.request_type);
+            const rep: RepresentationRequest = new RepresentationRequest(representationBlob.record_ref, '', representationBlob.request_type);
             rep.record_details = representationBlob.record_details;
             rep.metadata = Utils.find(resolved, (item:any) => {
-                return item.uri == representationBlob.record_uri;
+                return item.ref == representationBlob.record_ref;
             });
+            rep.label = rep.metadata.title;
             prepopulated.push(rep);
         });
 
@@ -175,11 +176,12 @@ Vue.component('representation-linker', {
             this.$http.get('/resolve/representations', {
                 method: 'GET',
                 params: {
-                    'uri[]': selectedRepresentation.id
+                    'ref[]': selectedRepresentation.id
                 },
             }).then((response: any) => response.json())
               .then((json: any) => {
                   selectedRepresentation.metadata = json[0];
+                  selectedRepresentation.label = selectedRepresentation.metadata.title; 
                   this.selected.push(selectedRepresentation);
                   this.$emit('change');
               });

@@ -29,8 +29,11 @@ Sequel.migration do
 
       foreign_key :file_issue_request_id, :file_issue_request, null: false
 
-      String :record_uri, null: false
+      String :aspace_record_type, null: false
+      String :aspace_record_id, null: false
+
       String :request_type, null: false # digital or physical
+
       String :record_details, text: true, null: false
     end
 

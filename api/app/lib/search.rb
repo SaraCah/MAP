@@ -97,7 +97,7 @@ class Search
 
       raise response.body unless response.code.start_with?('2')
 
-      JSON.parse(response.body).fetch('response').fetch('docs').map {|hit| {'id' => hit.fetch('uri'),
+      JSON.parse(response.body).fetch('response').fetch('docs').map {|hit| {'id' => hit.fetch('id'),
                                                                             'label' => hit.fetch('title')}}
     end
   end
