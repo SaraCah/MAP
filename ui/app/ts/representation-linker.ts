@@ -98,7 +98,7 @@ Vue.component('representation-linker', {
                 <th>File Issue Allowed</th>
                 <th>Intended Use</th>
                 <th>Other Restrictions</th>
-                <th>Processing/ Handling Notes</th>
+<!--                <th>Processing/ Handling Notes</th>-->
             </tr>
         </thead>
         <tbody v-for="representation in selected">
@@ -110,16 +110,16 @@ Vue.component('representation-linker', {
                 </td>
                 <td>{{representation.metadata.record_id}}</td>
                 <td>{{representation.metadata.title}}</td>
-                <td><!-- start date --></td>
-                <td><!-- end date --></td>
+                <td>{{representation.metadata.start_date}}</td>
+                <td>{{representation.metadata.end_date}}</td>
                 <td>{{representation.metadata.representation_id}}</td>
-                <td><!-- agency assigned id--></td>
+                <td>{{representation.metadata.agency_assigned_id}}</td>
                 <td><!-- previous system id--></td>
-                <td><!-- format--></td>
-                <td><!-- file issue allowed--></td>
-                <td><!-- intended use--></td>
-                <td><!-- other restrictions--></td>
-                <td><!-- processing/handling notes --></td>
+                <td>{{representation.metadata.format}}</td>
+                <td>{{representation.metadata.file_issue_allowed}}</td>
+                <td>{{representation.metadata.intended_use}}</td>
+                <td>{{representation.metadata.other_restrictions}}</td>
+<!--                <td></td>-->
             </tr>
             <tr>
                 <td colspan="13">

@@ -7,27 +7,51 @@ class Representations
     AspaceDB.open do |aspace_db|
       parsed_refs.values.group_by {|data| data.fetch(:type)}.each do |jsonmodel_type, grouped_refs|
         ids = grouped_refs.collect{|u| u.fetch(:id)}
-        aspace_db[jsonmodel_type]
+        dataset = aspace_db[jsonmodel_type]
           .join(:archival_object, Sequel[:archival_object][:id] => Sequel[jsonmodel_type][:archival_object_id])
           .join(:resource, Sequel[:resource][:id] => Sequel[:archival_object][:root_record_id])
+          .left_join(Sequel.as(:enumeration, :intended_use_enum), Sequel[:intended_use_enum][:name] => 'runcorn_intended_use')
+          .left_join(Sequel.as(:enumeration_value, :intended_use_enum_value),
+                    Sequel.&(Sequel[:intended_use_enum][:id] => Sequel[:intended_use_enum_value][:enumeration_id],
+                             Sequel[:intended_use_enum_value][:id] => Sequel[jsonmodel_type][:intended_use_id]))
           .select_all(Sequel[jsonmodel_type])
           .select_append(Sequel.as(Sequel[:archival_object][:qsa_id], :archival_object_id),
-                         Sequel.as(Sequel[:resource][:qsa_id], :resource_id))
+                         Sequel.as(Sequel[:resource][:qsa_id], :resource_id),
+                         Sequel.as(Sequel[:intended_use_enum_value][:value], :intended_use_enum_value))
+
+        if jsonmodel_type === :physical_representation
+          dataset = dataset
+                     .left_join(Sequel.as(:enumeration, :format_enum), Sequel[:format_enum][:name] => 'runcorn_format')
+                     .left_join(Sequel.as(:enumeration_value, :format_enum_value),
+                                Sequel.&(Sequel[:format_enum][:id] => Sequel[:format_enum_value][:enumeration_id],
+                                         Sequel[:format_enum_value][:id] => Sequel[jsonmodel_type][:format_id]))
+                      .select_append(Sequel.as(Sequel[:format_enum_value][:value], :format_enum_value))
+        end
+        if jsonmodel_type === :digital_representation
+          dataset = dataset
+                      .left_join(Sequel.as(:enumeration, :file_type_enum), Sequel[:file_type_enum][:name] => 'runcorn_digital_file_type')
+                      .left_join(Sequel.as(:enumeration_value, :file_type_enum_value),
+                                 Sequel.&(Sequel[:file_type_enum][:id] => Sequel[:file_type_enum_value][:enumeration_id],
+                                          Sequel[:file_type_enum_value][:id] => Sequel[jsonmodel_type][:file_type_id]))
+                      .select_append(Sequel.as(Sequel[:file_type_enum_value][:value], :format_enum_value))
+        end
+
+        dataset
           .filter(Sequel[jsonmodel_type][:id] => ids).map do |row|
-          results[row[:id]] = Representation.new(parsed_refs.fetch(row[:id]).fetch(:ref),  # ref
-                                                 row[:resource_id],                       # series_id
-                                                 row[:archival_object_id],                # record_id
-                                                 row[:title],                             # title
-                                                 nil,                                     # start_datae
-                                                 nil,                                     # end_date
-                                                 row[:qsa_id],                            # representation_id
-                                                 nil,                                     # agency_assigned_id
-                                                 nil,                                     # previous_system_id
-                                                 nil,                                     # format
-                                                 nil,                                     # file_issue_allowed
-                                                 nil,                                     # intended_use
-                                                 nil,                                     # other_restrictions
-                                                 nil)                                     # processing_notes
+            results[row[:id]] = Representation.new(parsed_refs.fetch(row[:id]).fetch(:ref),  # ref
+                                                   row[:resource_id],                       # series_id
+                                                   row[:archival_object_id],                # record_id
+                                                   row[:title],                             # title
+                                                   nil,                                     # start_date
+                                                   nil,                                     # end_date
+                                                   row[:qsa_id],                            # representation_id
+                                                   row[:agency_assigned_id],                # agency_assigned_id
+                                                   nil,                                     # previous_system_id
+                                                   row[:format_enum_value],                 # format
+                                                   row[:file_issue_allowed] == 1,           # file_issue_allowed
+                                                   row[:intended_use_enum_value],           # intended_use
+                                                   row[:other_restrictions_notes],          # other_restrictions
+                                                   nil)                                     # processing_notes
         end
       end
     end

@@ -51,7 +51,7 @@
                                 <label for="request_type">Request Type</label>
                                 <select id="request_type" name="file_issue_request[request_type]" class="browser-default">
                                     <option value="RIGHT_TO_INFORMATION" <% if request.fetch('request_type', 'RIGHT_TO_INFORMATION') == 'RIGHT_TO_INFORMATION' %>selected<% end %>>Right to Information</option>
-                                    <option value="NATIONAL_REDRESS_SCHEME" <% if request.fetch('request_type', 'NATIONAL_REDRESS_SCHEME') == 'NATIONAL_REDRESS_SCHEME' %>selected<% end %>>National Redress Scheme</option>
+                                    <option value="NATIONAL_REDRESS_SCHEME" <% if request.fetch('request_type', 'RIGHT_TO_INFORMATION') == 'NATIONAL_REDRESS_SCHEME' %>selected<% end %>>National Redress Scheme</option>
                                 </select>
                             </div>
                         </div>
