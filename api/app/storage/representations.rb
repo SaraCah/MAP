@@ -15,8 +15,9 @@ class Representations
                     Sequel.&(Sequel[:intended_use_enum][:id] => Sequel[:intended_use_enum_value][:enumeration_id],
                              Sequel[:intended_use_enum_value][:id] => Sequel[jsonmodel_type][:intended_use_id]))
           .select_all(Sequel[jsonmodel_type])
-          .select_append(Sequel.as(Sequel[:archival_object][:qsa_id], :archival_object_id),
-                         Sequel.as(Sequel[:resource][:qsa_id], :resource_id),
+          .select_append(Sequel.as(Sequel[:archival_object][:qsa_id], :archival_object_qsa_id),
+                         Sequel.as(Sequel[:archival_object][:id], :archival_object_id),
+                         Sequel.as(Sequel[:resource][:qsa_id], :resource_qsa_id),
                          Sequel.as(Sequel[:intended_use_enum_value][:value], :intended_use_enum_value))
 
         if jsonmodel_type === :physical_representation
@@ -36,11 +37,13 @@ class Representations
                       .select_append(Sequel.as(Sequel[:file_type_enum_value][:value], :format_enum_value))
         end
 
+        archival_object_to_representations = {}
+
         dataset
           .filter(Sequel[jsonmodel_type][:id] => ids).map do |row|
-            results[row[:id]] = Representation.new(parsed_refs.fetch(row[:id]).fetch(:ref),  # ref
-                                                   row[:resource_id],                       # series_id
-                                                   row[:archival_object_id],                # record_id
+            results[row[:id]] = Representation.new(parsed_refs.fetch(row[:id]).fetch(:ref), # ref
+                                                   row[:resource_qsa_id],                   # series_id
+                                                   row[:archival_object_qsa_id],            # record_id
                                                    row[:title],                             # title
                                                    nil,                                     # start_date
                                                    nil,                                     # end_date
@@ -52,6 +55,25 @@ class Representations
                                                    row[:intended_use_enum_value],           # intended_use
                                                    row[:other_restrictions_notes],          # other_restrictions
                                                    nil)                                     # processing_notes
+
+            archival_object_to_representations[row[:archival_object_id]] ||= []
+            archival_object_to_representations[row[:archival_object_id]] << results[row[:id]]
+        end
+
+        # find any existence dates for the items linked to the representations
+        existence_label_id = aspace_db[:enumeration_value]
+                              .filter(enumeration_id: aspace_db[:enumeration].filter(name: 'date_label').select(:id),
+                                      value: 'existence')
+                              .select(:id)
+
+        aspace_db[:date]
+          .filter(archival_object_id: archival_object_to_representations.keys,
+                  label_id: existence_label_id)
+          .map do |row|
+          archival_object_to_representations.fetch(row[:archival_object_id]).each do |representation|
+            representation.start_date = row[:begin]
+            representation.end_date = row[:end]
+          end
         end
       end
     end
