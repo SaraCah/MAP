@@ -389,6 +389,10 @@ class MAPAPIClient
     response['errors'] || []
   end
 
+  def resolve_representations(uris)
+    get("/resolve/representations", { 'uri[]' => uris })
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

@@ -32,4 +32,4 @@ Templates.define(:transfer_view, [:transfer, :errors?, :is_readonly], "views/tra
 
 Templates.define(:file_issue_requests, [:paged_results], "views/file_issue_requests.erb.html")
 Templates.define(:file_issue_request_new, [:request, :errors?, :is_readonly?], "views/file_issue_request_form.erb.html")
-Templates.define(:file_issue_request_view, [:request, :errors?, :is_readonly?], "views/file_issue_request_form.erb.html")
+Templates.define(:file_issue_request_view, [:request, :resolved_representations, :errors?, :is_readonly?], "views/file_issue_request_form.erb.html")

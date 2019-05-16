@@ -18,7 +18,7 @@ class MAPTheApp < Sinatra::Base
   STATIC_JS_FILES = {
     'require.js' => 'ts/node_modules/requirejs/require.js',
     'materialize.min.js' => 'ts/node_modules/materialize-css/dist/js/materialize.min.js',
-    'vue.js' => (MAPTheApp.production? ? 'ts/node_modules/vue/dist/vue.min.js' : 'ts/node_modules/vue/dist/vue.js'),
+    'vue.js' => (MAPTheApp.production? ? 'ts/node_modules/vjson_responseue/dist/vue.min.js' : 'ts/node_modules/vue/dist/vue.js'),
     'vue-resource.js' => 'ts/node_modules/vue-resource/dist/vue-resource.min.js',
   }
 
@@ -499,8 +499,9 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/file-issue-requests/:id')
     .param(:id, Integer, "ID of file issue request") do
     file_issue_request = Ctx.client.get_file_issue_request(params[:id])
+    resolved_representations = Ctx.client.resolve_representations(file_issue_request.fetch('items').collect{|item| item.fetch('record_uri')}) 
 
-    Templates.emit_with_layout(:file_issue_request_view, {request: file_issue_request, is_readonly: (file_issue_request.fetch('status') == 'FILE_ISSUE_CREATED')},
+    Templates.emit_with_layout(:file_issue_request_view, {request: file_issue_request, resolved_representations: resolved_representations, is_readonly: (file_issue_request.fetch('status') == 'FILE_ISSUE_CREATED')},
                                :layout, title: "File Issue Request", context: ['file_issues', 'file_issue_requests'])
   end
 

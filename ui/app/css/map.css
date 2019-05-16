@@ -7,7 +7,8 @@
     padding: 20px;
 }
 
-.user-role-table tbody tr:first-child {
+.user-role-table tbody tr:first-child,
+.representation-linker-table tbody tr:first-child {
     border-bottom: none;
 }
 

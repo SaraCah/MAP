@@ -69,6 +69,7 @@ require 'storage/transfers'
 require 'storage/files'
 require 'storage/conversations'
 require 'storage/file_issues'
+require 'storage/representations'
 
 require 'endpoints/upload_file'
 require 'endpoints'

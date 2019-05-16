@@ -495,4 +495,14 @@ class MAPTheAPI < Sinatra::Base
       [404]
     end
   end
+
+  Endpoint.get('/resolve/representations')
+    .param(:uri, [String], "URIs to resolve") do
+    if Ctx.user_logged_in?
+      # FIXME permissions -- can only return representations controlled by the current agency context
+      json_response(Representations.for(params[:uri]))
+    else
+      [404]
+    end
+  end
 end

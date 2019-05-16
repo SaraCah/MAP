@@ -43,7 +43,8 @@ class FileIssues < BaseStorage
       db[:file_issue_request_item]
         .insert(file_issue_request_id: file_issue_request_id,
                 record_uri: item.fetch('record_uri'),
-                request_type: item.fetch('request_type'))
+                request_type: item.fetch('request_type'),
+                record_details: item.fetch('record_details'))
     end
 
     errors
@@ -82,7 +83,8 @@ class FileIssues < BaseStorage
       db[:file_issue_request_item]
         .insert(file_issue_request_id: file_issue_request_id,
                 record_uri: item.fetch('record_uri'),
-                request_type: item.fetch('request_type'))
+                request_type: item.fetch('request_type'),
+                record_details: item.fetch('record_details'))
     end
 
     errors
