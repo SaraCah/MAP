@@ -79,10 +79,8 @@ Sequel.migration do
       Integer :record_id, :null => false
       Integer :repo_id, :null => false
       String :record_type, :null => false
-      String :record_uri, :size => 64, :null => false
+      String :record_uri, :size => 64, :null => false, :unique => true
       File :blob, :size => :medium, :null => false
-
-      unique [:record_uri, :lock_version]
     end
   end
 

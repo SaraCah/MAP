@@ -7,6 +7,7 @@
   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="uri" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="primary_type" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  <field name="types" type="string" indexed="true" stored="true" required="true" multiValued="true" />
   <field name="title" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="qsa_id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
 
