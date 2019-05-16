@@ -4,7 +4,7 @@ AgencyLocation = Struct.new(:id, :name, :agency_id, :create_time, :agency) do
              row[:name],
              row[:agency_id],
              row[:create_time],
-             agency)
+             agency ? Utils.hash_keys_to_strings(agency.to_h) : nil)
   end
 
   def self.from_hash(hash)

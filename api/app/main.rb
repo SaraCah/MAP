@@ -36,6 +36,8 @@ require 'net/http'
 
 Dir["models/*.rb"].sort.each {|file| require file }
 
+require 'util/utils'
+
 require 'dto/dto'
 require 'dto/transfer_file'
 require 'dto/transfer_proposal_series'
