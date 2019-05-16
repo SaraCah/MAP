@@ -479,7 +479,7 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/file-issue-requests/new') do
-    Templates.emit_with_layout(:file_issue_request_new, {request: FileIssueRequest.new, is_readonly: false},
+    Templates.emit_with_layout(:file_issue_request_new, {request: FileIssueRequest.new, resolved_representations: [], is_readonly: false},
                                :layout, title: "New Request", context: ['file_issues', 'file_issue_requests'])
   end
 
@@ -491,7 +491,8 @@ class MAPTheApp < Sinatra::Base
     if errors.empty?
       redirect '/file-issue-requests'
     else
-      Templates.emit_with_layout(:file_issue_request_new, {request: params[:file_issue_request], errors: errors},
+      # FIXME RESOLVE!
+      Templates.emit_with_layout(:file_issue_request_new, {request: params[:file_issue_request], resolved_representations: [], errors: errors},
                                  :layout, title: "New Request", context: ['file_issues', 'file_issue_requests'])
     end
   end
@@ -529,6 +530,15 @@ class MAPTheApp < Sinatra::Base
       200,
       {'Content-type' => 'text/json'},
       Ctx.client.representation_typeahead(params[:q]).to_json
+    ]
+  end
+
+  Endpoint.get('/resolve/representations')
+    .param(:uri, [String], "URIs to resolve") do
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      Ctx.client.resolve_representations(params[:uri]).to_json
     ]
   end
 

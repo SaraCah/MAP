@@ -31,7 +31,7 @@ Sequel.migration do
 
       String :record_uri, null: false
       String :request_type, null: false # digital or physical
-      String :request_details, text: true, null: false
+      String :record_details, text: true, null: false
     end
 
     create_table(:file_issue) do

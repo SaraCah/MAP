@@ -34,11 +34,12 @@ class Search
 
 
   def self.build_representations_permissions_filter(permissions)
+    return "*:*" if true
     return "*:*" if permissions.is_admin
 
     (_, aspace_agency_id) = Ctx.get.current_location.agency.fetch('id').split(':')
 
-    return "responsible_agency_u_sstr:(\"%s\")" % ["/agents/corporate_entities/#{aspace_agency_id}"]
+    return "responsible_agency:(\"%s\")" % ["/agents/corporate_entities/#{aspace_agency_id}"]
   end
 
 
@@ -81,13 +82,13 @@ class Search
 
     keyword_query = build_keyword_query(q)
 
-    # FIXME need to search title, series/item title etc
-    solr_query = "title:(#{keyword_query})^3 OR ngrams:#{solr_escape(q)}^1 OR edge_ngrams:#{solr_escape(q)}^2"
+    solr_query = "keywords:(#{keyword_query})"
+
+    filter = [build_representations_permissions_filter(permissions),
+              'types:representation']
 
     uri = URI.join(solr_url, 'select')
-    uri.query = URI.encode_www_form(q: solr_query, qt: 'json', fq: build_representations_permissions_filter(permissions))
-
-    p uri.query
+    uri.query = URI.encode_www_form(q: solr_query, qt: 'json', fq: filter)
 
     request = Net::HTTP::Get.new(uri)
 
@@ -96,7 +97,7 @@ class Search
 
       raise response.body unless response.code.start_with?('2')
 
-      JSON.parse(response.body).fetch('response').fetch('docs').map {|hit| {'id' => hit.fetch('id'),
+      JSON.parse(response.body).fetch('response').fetch('docs').map {|hit| {'id' => hit.fetch('uri'),
                                                                             'label' => hit.fetch('title')}}
     end
   end

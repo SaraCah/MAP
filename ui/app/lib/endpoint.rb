@@ -57,7 +57,11 @@ class Endpoint
                         if params[param] && !params[param].is_a?(Array)
                           raise "Parameter #{param} must be an array.  Please send as #{param}[]"
                         else
-                          Array(params[param]).map {|val| type[0].parse(val)}
+                          if type[0].is_a?(Class) && Kernel.respond_to?(type[0].name.intern)
+                            Array(params[param]).map {|val| Kernel.send(type[0].name.intern, val)}
+                          else
+                            Array(params[param]).map {|val| type[0].parse(val)}
+                          end
                         end
                       elsif type.included_modules.include?(DTO)
                         type.from_hash(params[param])

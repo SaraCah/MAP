@@ -172,8 +172,17 @@ Vue.component('representation-linker', {
         },
         addSelected: function(representation:RepresentationRequest) {
             const selectedRepresentation: RepresentationRequest = RepresentationRequest.fromRepresentation(representation);
-            this.selected.push(selectedRepresentation);
-            this.$emit('change');
+            this.$http.get('/resolve/representations', {
+                method: 'GET',
+                params: {
+                    'uri[]': selectedRepresentation.id
+                },
+            }).then((response: any) => response.json())
+              .then((json: any) => {
+                  selectedRepresentation.metadata = json[0];
+                  this.selected.push(selectedRepresentation);
+                  this.$emit('change');
+              });
         },
         removeSelected: function(representationToRemove:RepresentationRequest) {
             this.selected = Utils.filter(this.selected, (representation: RepresentationRequest) => {
