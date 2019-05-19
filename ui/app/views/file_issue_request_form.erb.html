@@ -48,11 +48,13 @@
                         </div>
                         <div class="row">
                             <div class="col s12">
-                                <label for="request_type">Request Type</label>
-                                <select id="request_type" name="file_issue_request[request_type]" class="browser-default">
-                                    <option value="RIGHT_TO_INFORMATION" <% if request.fetch('request_type', 'RIGHT_TO_INFORMATION') == 'RIGHT_TO_INFORMATION' %>selected<% end %>>Right to Information</option>
-                                    <option value="NATIONAL_REDRESS_SCHEME" <% if request.fetch('request_type', 'RIGHT_TO_INFORMATION') == 'NATIONAL_REDRESS_SCHEME' %>selected<% end %>>National Redress Scheme</option>
-                                </select>
+                                <select-with-other-option
+                                    input_id="request_type"
+                                    input_name="file_issue_request[request_type]"
+                                    input_label="Request Type"
+                                    options_json="<%= [{value: 'RIGHT_TO_INFORMATION', label: 'Right to Information'}, {value: 'NATIONAL_REDRESS_SCHEME', label: 'National Redress Scheme'}].to_json %>"
+                                    current_selection="<%= request.fetch('request_type', 'RIGHT_TO_INFORMATION') %>">
+                                </select-with-other-option>
                             </div>
                         </div>
                         <div class="row">

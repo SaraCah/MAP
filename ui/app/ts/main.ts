@@ -10,6 +10,7 @@ import 'linker';
 import 'transfer-proposal-series';
 import 'representation-linker';
 import 'file-issue-form';
+import 'select-with-other-option';
 
 declare var M: any; // Materialize on the window context
 
