@@ -91,11 +91,11 @@ Vue.component('representation-linker', {
                 <th>Series ID</th>
                 <th>Record ID</th>
                 <th>Title</th>
+                <th>Control Number</th>
+                <th>Previous System ID</th>
                 <th>Start Date</th>
                 <th>End Date</th>
                 <th>Representation ID</th>
-                <th>Agency Assigned ID</th>
-                <th>Previous System ID</th>
                 <th>Format</th>
                 <th>File Issue Allowed</th>
                 <th>Intended Use</th>
@@ -112,11 +112,11 @@ Vue.component('representation-linker', {
                 </td>
                 <td>{{representation.metadata.record_id}}</td>
                 <td>{{representation.metadata.title}}</td>
+                <td>{{representation.metadata.agency_assigned_id}}</td>
+                <td>{{representation.metadata.previous_system_id}}</td>
                 <td>{{representation.metadata.start_date}}</td>
                 <td>{{representation.metadata.end_date}}</td>
                 <td>{{representation.metadata.representation_id}}</td>
-                <td>{{representation.metadata.agency_assigned_id}}</td>
-                <td><!-- previous system id--></td>
                 <td>{{representation.metadata.format}}</td>
                 <td>{{representation.metadata.file_issue_allowed}}</td>
                 <td>{{representation.metadata.intended_use}}</td>

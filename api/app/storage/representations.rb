@@ -75,6 +75,13 @@ class Representations
             representation.end_date = row[:end]
           end
         end
+
+        foreign_key_column = "#{jsonmodel_type}_id".intern
+        aspace_db[:external_id]
+          .filter(foreign_key_column => results.keys)
+          .map do |row|
+          results.fetch(row[foreign_key_column]).previous_system_id = row[:external_id] 
+        end
       end
     end
 
