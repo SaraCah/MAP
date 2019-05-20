@@ -12,6 +12,8 @@ class SolrIndexer
     end
 
     @state_file = AppConfig[:solr_indexer_state_file]
+    @state_file_deletes = AppConfig[:solr_indexer_state_file] + ".deletes"
+
     FileUtils.mkdir_p(File.dirname(@state_file))
   end
 
@@ -29,11 +31,13 @@ class SolrIndexer
   end
 
   def run_index_round
-    last_indexed_id = load_last_indexed_id
+    last_indexed_id = load_last_id(@state_file)
+    last_deleted_id = load_last_id(@state_file_deletes)
 
     needs_commit = false
 
     DB.open do |db|
+      # Handle updates
       db[:index_feed].filter { id > last_indexed_id }.map(:id).sort.each_slice(RECORD_BATCH_SIZE) do |id_set|
         batch = []
 
@@ -46,13 +50,33 @@ class SolrIndexer
 
         last_indexed_id = id_set.last
       end
+
+      # Handle deletes
+      db[:index_feed_deletes].filter { id > last_deleted_id }.map(:id).sort.each_slice(RECORD_BATCH_SIZE) do |id_set|
+        record_uris = []
+
+        db[:index_feed_deletes].filter(:id => id_set).each do |row|
+          record_uris << row[:record_uri]
+        end
+
+        delete_query = {'delete' =>
+                        {'query' => 'uri:(%s)' % record_uris.map {|uri| '"%s"' % [uri]}.join(' OR ')}}
+
+        $LOG.info("Deleting #{record_uris.length} records")
+
+        send_batch(delete_query)
+        needs_commit = true
+
+        last_deleted_id = id_set.last
+      end
     end
 
     if needs_commit
       send_commit
     end
 
-    save_last_indexed_id(last_indexed_id)
+    save_last_id(@state_file, last_indexed_id)
+    save_last_id(@state_file_deletes, last_deleted_id)
   end
 
   def self.start
@@ -63,10 +87,10 @@ class SolrIndexer
 
   private
 
-  def load_last_indexed_id
-    if File.exist?(@state_file)
+  def load_last_id(file)
+    if File.exist?(file)
       begin
-        Integer(File.read(@state_file))
+        Integer(File.read(file))
       rescue
         0
       end
@@ -75,10 +99,10 @@ class SolrIndexer
     end
   end
 
-  def save_last_indexed_id(new_value)
-    tmp = "#{@state_file}.tmp.#{SecureRandom.hex}"
+  def save_last_id(file, new_value)
+    tmp = "#{file}.tmp.#{SecureRandom.hex}"
     File.write(tmp, new_value.to_s)
-    File.rename(tmp, @state_file)
+    File.rename(tmp, file)
   end
 
 

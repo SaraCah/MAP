@@ -101,6 +101,13 @@ Sequel.migration do
       String :record_uri, :size => 64, :null => false, :unique => true
       File :blob, :size => :medium, :null => false
     end
+
+    create_table(:index_feed_deletes) do
+      primary_key :id
+
+      String :record_uri, :size => 64, :null => false, :unique => true
+    end
+
   end
 
 end
