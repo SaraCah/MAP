@@ -541,4 +541,27 @@ class MAPTheAPI < Sinatra::Base
       [404]
     end
   end
+
+  Endpoint.get('/file-issues')
+    .param(:page, Integer, "Page to return") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      json_response(FileIssues.file_issues(params[:page], 10))
+    else
+      [404]
+    end
+  end
+
+  Endpoint.get('/file-issues/:id')
+    .param(:id, Integer, "ID of file issue") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      file_issue = FileIssues.file_issue_dto_for(params[:id])
+      if file_issue && Ctx.get.permissions.can_manage_file_issues?(file_issue.fetch('agency_id'), file_issue.fetch('agency_location_id'))
+        json_response(file_issue.to_hash)
+      else
+        [404]
+      end
+    else
+      [404]
+    end
+  end
 end

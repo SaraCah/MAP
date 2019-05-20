@@ -11,6 +11,7 @@ class FileIssueRequest
 
   define_field(:id, Integer, required: false)
   define_field(:request_type, String)
+  define_field(:request_notes, String)
   define_field(:digital_request_status, String, required: false, default: NON_REQUESTED)
   define_field(:physical_request_status, String, required: false, default: NON_REQUESTED)
   define_field(:urgent, Boolean, default: false)

@@ -127,4 +127,32 @@ class FileIssues < BaseStorage
       .update("#{request_type.downcase}_request_status" => FileIssueRequest::CANCELLED_BY_AGENCY,
               system_mtime: Time.now)
   end
+
+  def self.file_issues(page, page_size)
+    dataset = db[:file_issue]
+
+    unless Ctx.get.permissions.is_admin?
+      current_location = Ctx.get.current_location
+      dataset = dataset
+                  .filter(Sequel[:file_issue][:agency_id] => current_location.agency_id)
+                  .filter(Sequel[:file_issue][:agency_location_id] => current_location.id)
+    end
+
+    max_page = (dataset.count / page_size.to_f).ceil
+
+    dataset = dataset.limit(page_size, page * page_size)
+
+    dataset = dataset.order(Sequel.desc(Sequel[:file_issue][:create_time]))
+
+    PagedResults.new(dataset.map{|row| FileIssue.from_row(row)},
+                     page,
+                     max_page)
+  end
+
+  def self.file_issue_dto_for(file_issue_id)
+    handle_id = db[:handle][file_issue_id: file_issue_id][:id]
+    FileIssue.from_row(db[:file_issue][id: file_issue_id],
+                      handle_id,
+                      db[:file_issue_item].filter(file_issue_id: file_issue_id))
+  end
 end

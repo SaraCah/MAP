@@ -558,4 +558,19 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
+  Endpoint.get('/file-issues')
+    .param(:page, Integer, "Page to return", optional: true) do
+
+    Templates.emit_with_layout(:file_issues, {paged_results: Ctx.client.file_issues(params[:page] || 0)},
+                               :layout, title: "File Issues", context: ['file_issues', 'initiated_file_issues'])
+  end
+
+  Endpoint.get('/file-issues/:id')
+    .param(:id, Integer, "ID of file issue") do
+    file_issue = Ctx.client.get_file_issue(params[:id])
+    resolved_representations = Ctx.client.resolve_representations(file_issue.fetch('items').collect{|item| item.fetch('record_ref')})
+
+    Templates.emit_with_layout(:file_issue_view, {file_issue: file_issue, resolved_representations: resolved_representations, is_readonly: true},
+                               :layout, title: "File Issue", context: ['file_issues', 'initiated_file_issues'])
+  end
 end

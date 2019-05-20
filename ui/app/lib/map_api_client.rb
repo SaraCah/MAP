@@ -403,6 +403,18 @@ class MAPAPIClient
     post('/file-issue-requests/cancel', id: file_issue_request_id, request_type: request_type)
   end
 
+  def file_issues(page = 0)
+    PagedResults.from_json(get('/file-issues', page: page), FileIssue)
+  end
+
+  def get_file_issue(file_issue_id)
+    json = get("/file-issues/#{file_issue_id}")
+
+    return nil if json.nil?
+
+    FileIssue.from_hash(json)
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

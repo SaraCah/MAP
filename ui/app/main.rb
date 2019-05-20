@@ -56,6 +56,8 @@ require 'dto/user_dto'
 require 'dto/agency_location_dto'
 require 'dto/file_issue_request_item'
 require 'dto/file_issue_request'
+require 'dto/file_issue_item'
+require 'dto/file_issue'
 
 require 'endpoints/upload_file'
 require 'endpoints'
