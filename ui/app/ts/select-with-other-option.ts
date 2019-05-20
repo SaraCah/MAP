@@ -15,12 +15,12 @@ Vue.component('select-with-other-option', {
     template: `
 <div>
     <label :for="input_id">{{input_label}}</label>
-    <select id="request_type" :name="input_name" class="browser-default" v-model="selected_value">
+    <select id="request_type" :name="input_name" class="browser-default" v-model="selected_value" :disabled="readonly">
         <option v-for="option in options" :value="option.value">{{option.label}}</option>
         <option value="OTHER">Other</option>
     </select>
     <template v-if="selected_value === 'OTHER'">
-        <input type="text" :name="input_name" v-model="otherText" :placeholder="'Please enter your ' + input_label + '...'"/>
+        <input type="text" :name="input_name" v-model="otherText" :placeholder="'Please enter your ' + input_label + '...'"  :disabled="readonly" />
     </template>
 </div>
 `,
@@ -28,6 +28,7 @@ Vue.component('select-with-other-option', {
             otherText:string,
             options: Array<SelectOption>,
             selected_value: string,
+            readonly: boolean,
         } {
 
         let parsedOptions:Array<SelectOption> = JSON.parse(this.options_json);
@@ -43,9 +44,10 @@ Vue.component('select-with-other-option', {
             otherText: other_text,
             options: parsedOptions,
             selected_value: selected_value,
+            readonly: this.is_readonly == 'true',
         };
     },
-    props: ['input_id', 'input_name', 'input_label', 'options_json', 'current_selection'],
+    props: ['input_id', 'input_name', 'input_label', 'options_json', 'current_selection', 'is_readonly'],
     mounted: function() {
 
     } 

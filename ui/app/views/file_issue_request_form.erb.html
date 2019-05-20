@@ -46,7 +46,7 @@
                     <input type="hidden" name="file_issue_request[agency_location_id]" value="<%= request.fetch('agency_location_id') %>">
                 <% end %>
 
-                <file-issue-form representations="<%= request.fetch('items').to_json %>" resolved_representations="<%= resolved_representations.to_json %>">
+                <file-issue-form representations="<%= request.fetch('items').to_json %>" resolved_representations="<%= resolved_representations.to_json %>" is_readonly="<%= is_readonly %>">
                     <section id="details" class="scrollspy section">
                         <div class="row">
                             <div class="input-field col s12">
@@ -67,28 +67,29 @@
                                     input_name="file_issue_request[request_type]"
                                     input_label="Request Type"
                                     options_json="<%= [{value: 'RIGHT_TO_INFORMATION', label: 'Right to Information'}, {value: 'NATIONAL_REDRESS_SCHEME', label: 'National Redress Scheme'}].to_json %>"
-                                    current_selection="<%= request.fetch('request_type', 'RIGHT_TO_INFORMATION') %>">
+                                    current_selection="<%= request.fetch('request_type', 'RIGHT_TO_INFORMATION') %>"
+                                    is_readonly="<%= is_readonly %>">
                                 </select-with-other-option>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col s12">
                                 <label>
-                                    <input name="file_issue_request[urgent]" value="yes" type="checkbox" <% if request.fetch('urgent', false) %>checked<% end %> />
+                                    <input name="file_issue_request[urgent]" value="yes" type="checkbox" <% if request.fetch('urgent', false) %>checked<% end %> <% if is_readonly %>disabled<% end %> />
                                     <span>Urgent?</span>
                                 </label>
                             </div>
                         </div>
                         <div class="row">
                             <div class="input-field col s12">
-                                <textarea id="request_notes" name="file_issue_request[request_notes]" class="materialize-textarea"><%= request.fetch('request_notes', '') %></textarea>
+                                <textarea id="request_notes" name="file_issue_request[request_notes]" class="materialize-textarea" <% if is_readonly %>disabled<% end %>><%= request.fetch('request_notes', '') %></textarea>
                                 <label for="request_notes">Notes</label>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col s12">
                                 <label for="deliver_to_reading_room">Delivery Location</label>
-                                <select id="deliver_to_reading_room" name="file_issue_request[deliver_to_reading_room]" class="browser-default">
+                                <select id="deliver_to_reading_room" name="file_issue_request[deliver_to_reading_room]" class="browser-default" <% if is_readonly %>disabled<% end %> >
                                     <option value="no" <% unless request.fetch('deliver_to_reading_room', false) %>selected<% end %>><%= Ctx.get.current_location.agency.label %>: <%= Ctx.get.current_location.name %></option>
                                     <option value="yes" <% if request.fetch('deliver_to_reading_room', false) %>selected<% end %>>Reading Room</option>
                                 </select>
@@ -96,7 +97,7 @@
                         </div>
                         <div class="row">
                             <div class="input-field col s12">
-                                <input id="delivery_authorizer" type="text" name="file_issue_request[delivery_authorizer]" value="<%= request.fetch('delivery_authorizer', '') %>"/>
+                                <input id="delivery_authorizer" type="text" name="file_issue_request[delivery_authorizer]" value="<%= request.fetch('delivery_authorizer', '') %>" <% if is_readonly %>disabled<% end %> />
                                 <label for="delivery_authorizer">Please Authorise to Receive Delivery</label>
                             </div>
                         </div>

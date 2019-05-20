@@ -502,8 +502,7 @@ class MAPTheApp < Sinatra::Base
     file_issue_request = Ctx.client.get_file_issue_request(params[:id])
     resolved_representations = Ctx.client.resolve_representations(file_issue_request.fetch('items').collect{|item| item.fetch('record_ref')}) 
 
-    # FIXME readonly view based on states
-    Templates.emit_with_layout(:file_issue_request_view, {request: file_issue_request, resolved_representations: resolved_representations, is_readonly: false},
+    Templates.emit_with_layout(:file_issue_request_view, {request: file_issue_request, resolved_representations: resolved_representations, is_readonly: !file_issue_request.can_edit?},
                                :layout, title: "File Issue Request", context: ['file_issues', 'file_issue_requests'])
   end
 

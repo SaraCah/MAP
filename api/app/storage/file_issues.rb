@@ -1,13 +1,5 @@
 class FileIssues < BaseStorage
 
-  NON_REQUESTED = 'NON_REQUESTED'
-  QUOTE_REQUESTED = 'QUOTE_REQUESTED'
-  QUOTE_PROVIDED = 'QUOTE_PROVIDED'
-  QUOTE_ACCEPTED = 'QUOTE_ACCEPTED'
-  FILE_ISSUE_CREATED = 'FILE_ISSUE_CREATED'
-  CANCELLED_BY_QSA = 'CANCELLED_BY_QSA'
-  CANCELLED_BY_AGENCY = 'CANCELLED_BY_AGENCY'
-
   def self.requests(page, page_size)
     dataset = db[:file_issue_request]
 
@@ -33,13 +25,13 @@ class FileIssues < BaseStorage
   def self.create_request_from_dto(file_issue_request)
     errors = []
 
-    digital_request_status = NON_REQUESTED
-    physical_request_status = NON_REQUESTED
+    digital_request_status = FileIssueRequest::NON_REQUESTED
+    physical_request_status = FileIssueRequest::NON_REQUESTED
     if file_issue_request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'}
-      digital_request_status = QUOTE_REQUESTED
+      digital_request_status = FileIssueRequest::QUOTE_REQUESTED
     end
     if file_issue_request.fetch('items').any?{|item| item.fetch('request_type') == 'PHYSICAL'}
-      physical_request_status = QUOTE_REQUESTED
+      physical_request_status = FileIssueRequest::QUOTE_REQUESTED
     end
 
     file_issue_request_id = db[:file_issue_request].insert(request_type: file_issue_request.fetch('request_type'),
@@ -82,13 +74,13 @@ class FileIssues < BaseStorage
 
     file_issue_request_id = file_issue_request.fetch('id')
 
-    digital_request_status = NON_REQUESTED
-    physical_request_status = NON_REQUESTED
+    digital_request_status = FileIssueRequest::NON_REQUESTED
+    physical_request_status = FileIssueRequest::NON_REQUESTED
     if file_issue_request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'}
-      digital_request_status = QUOTE_REQUESTED
+      digital_request_status = FileIssueRequest::QUOTE_REQUESTED
     end
     if file_issue_request.fetch('items').any?{|item| item.fetch('request_type') == 'PHYSICAL'}
-      physical_request_status = QUOTE_REQUESTED
+      physical_request_status = FileIssueRequest::QUOTE_REQUESTED
     end
 
     db[:file_issue_request]

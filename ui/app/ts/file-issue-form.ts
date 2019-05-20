@@ -15,7 +15,7 @@ Vue.component('file-issue-form', {
 <div>
     <section id="items" class="scrollspy section card">
         <div class="card-content">
-            <representation-linker input_path="file_issue_request[items][]" ref="linker" :representations="representations" :resolved_representations="resolved_representations" @change="refreshSummaries()"></representation-linker>
+            <representation-linker input_path="file_issue_request[items][]" ref="linker" :representations="representations" :resolved_representations="resolved_representations" @change="refreshSummaries()" :readonly="readonly"></representation-linker>
         </div>
     </section>
 
@@ -32,10 +32,12 @@ Vue.component('file-issue-form', {
     </section>
 </div>
 `,
-    data: function(): {} {
-        return {};
+    data: function(): {readonly: boolean} {
+        return {
+            readonly: this.is_readonly == 'true',
+        };
     },
-    props: ['representations', 'resolved_representations'],
+    props: ['representations', 'resolved_representations', 'is_readonly'],
     methods: {
         refreshSummaries: function() {
             // FIXME type?

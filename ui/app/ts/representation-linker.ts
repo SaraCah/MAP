@@ -82,7 +82,9 @@ Vue.component('representation-typeahead', {
 Vue.component('representation-linker', {
     template: `
 <div>
-    <representation-typeahead v-on:selected="addSelected"></representation-typeahead>
+    <template v-if="!readonly">
+        <representation-typeahead v-on:selected="addSelected"></representation-typeahead>
+    </template>
     <table class="representation-linker-table">
         <thead>
             <tr>
@@ -126,19 +128,26 @@ Vue.component('representation-linker', {
                     <div class="row">
                         <div class="col s2">
                             <label>Request Type</label>
-                            <select class="browser-default" :name="buildPath('request_type')" v-model="representation.request_type" v-on:change="handleRequestTypeChange()">
-                                <option value="DIGITAL">Digital</option>
-                                <option value="PHYSICAL">Physical</option>
-                            </select>
+                            <template v-if="readonly">
+                                <input type="text" :name="buildPath('request_type')" v-model="representation.request_type" readonly />
+                            </template>
+                            <template v-else>
+                                <select class="browser-default" :name="buildPath('request_type')" v-model="representation.request_type" v-on:change="handleRequestTypeChange()">
+                                    <option value="DIGITAL">Digital</option>
+                                    <option value="PHYSICAL">Physical</option>
+                                </select>
+                            </template>
                         </div>
                         <div class="col s8">
                             <label>Record Details</label>
-                            <textarea class="materialize-textarea" :name="buildPath('record_details')" v-model="representation.record_details"></textarea>
+                            <textarea class="materialize-textarea" :name="buildPath('record_details')" v-model="representation.record_details" :readonly="readonly"></textarea>
                         </div>
                         <div class="col s2">
-                            <div class="right-align">
-                                <button class="btn" v-on:click="removeSelected(representation)">Remove</button>
-                            </div>
+                            <template v-if="!readonly">
+                                <div class="right-align">
+                                    <button class="btn" v-on:click="removeSelected(representation)">Remove</button>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </td>
@@ -166,7 +175,7 @@ Vue.component('representation-linker', {
             selected: prepopulated
         };
     },
-    props: ['input_path', 'representations', 'resolved_representations'],
+    props: ['input_path', 'representations', 'resolved_representations', 'readonly'],
     methods: {
         getSelected: function() {
             return this.selected;

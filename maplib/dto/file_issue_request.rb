@@ -1,6 +1,14 @@
 class FileIssueRequest
   include DTO
 
+  NON_REQUESTED = 'NON_REQUESTED'
+  QUOTE_REQUESTED = 'QUOTE_REQUESTED'
+  QUOTE_PROVIDED = 'QUOTE_PROVIDED'
+  QUOTE_ACCEPTED = 'QUOTE_ACCEPTED'
+  FILE_ISSUE_CREATED = 'FILE_ISSUE_CREATED'
+  CANCELLED_BY_QSA = 'CANCELLED_BY_QSA'
+  CANCELLED_BY_AGENCY = 'CANCELLED_BY_AGENCY'
+
   define_field(:id, Integer, required: false)
   define_field(:request_type, String)
   define_field(:digital_request_status, String, required: false)
@@ -42,5 +50,12 @@ class FileIssueRequest
         create_time: row[:create_time],
         items: item_rows.map{|item_row| FileIssueRequestItem.from_row(item_row)},
         handle_id: handle_id)
+  end
+
+  def can_edit?
+    return false if [QUOTE_ACCEPTED, FILE_ISSUE_CREATED].include?(fetch('digital_request_status'))
+    return false if [QUOTE_ACCEPTED, FILE_ISSUE_CREATED].include?(fetch('physical_request_status'))
+
+    true
   end
 end
