@@ -13,7 +13,7 @@
                             <% if request.new? || request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'} %>
                                 <ul class="status-infomatic">
                                     <li class="first <% if request.new? %>current<% end %>">Add Digital Request Details</li>
-                                    <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_REQUEST_SUBMITTED' %>current<% end %>">Quote Request Submitted</li>
+                                    <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_REQUESTED' %>current<% end %>">Quote Request Submitted</li>
                                     <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Digital Quote Provided</li>
                                     <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">Digital Quote Accepted</li>
                                     <li class="last <% if request.fetch('digital_request_status', '') == 'FILE_ISSUE_CREATED' %>current<% end %>">File Issue Created</li>
@@ -24,7 +24,7 @@
                             <% if request.fetch('items').any?{|item| item.fetch('request_type') == 'PHYSICAL'} %>
                                 <ul class="status-infomatic">
                                     <li class="first <% if request.new? %>current<% end %>">Add Physical Request Details</li>
-                                    <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_REQUEST_SUBMITTED' %>current<% end %>">Quote Request Submitted</li>
+                                    <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_REQUESTED' %>current<% end %>">Quote Request Submitted</li>
                                     <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Physical Quote Provided</li>
                                     <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">Physical Quote Accepted</li>
                                     <li class="last <% if request.fetch('physical_request_status', '') == 'FILE_ISSUE_CREATED' %>current<% end %>">File Issue Created</li>

@@ -30,8 +30,8 @@ class FileIssueRequest
   def self.from_row(row, handle_id = nil, item_rows = [])
     new(id: row[:id],
         request_type: row[:request_type],
-        digital_request_status: row[:digital_request_status] == 1,
-        physical_request_status: row[:physical_request_status] == 1,
+        digital_request_status: row[:digital_request_status],
+        physical_request_status: row[:physical_request_status],
         urgent: row[:urgent] == 1,
         deliver_to_reading_room: row[:deliver_to_reading_room] == 1,
         delivery_authorizer: row[:delivery_authorizer],

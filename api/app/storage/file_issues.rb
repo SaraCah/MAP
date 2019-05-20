@@ -1,5 +1,6 @@
 class FileIssues < BaseStorage
 
+  NON_REQUESTED = 'NON_REQUESTED'
   QUOTE_REQUESTED = 'QUOTE_REQUESTED'
   QUOTE_PROVIDED = 'QUOTE_PROVIDED'
   QUOTE_ACCEPTED = 'QUOTE_ACCEPTED'
@@ -32,13 +33,22 @@ class FileIssues < BaseStorage
   def self.create_request_from_dto(file_issue_request)
     errors = []
 
+    digital_request_status = NON_REQUESTED
+    physical_request_status = NON_REQUESTED
+    if file_issue_request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'}
+      digital_request_status = QUOTE_REQUESTED
+    end
+    if file_issue_request.fetch('items').any?{|item| item.fetch('request_type') == 'PHYSICAL'}
+      physical_request_status = QUOTE_REQUESTED
+    end
+
     file_issue_request_id = db[:file_issue_request].insert(request_type: file_issue_request.fetch('request_type'),
                                                            urgent: file_issue_request.fetch('urgent') ? 1 : 0,
                                                            deliver_to_reading_room: file_issue_request.fetch('deliver_to_reading_room') ? 1 : 0,
                                                            delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
                                                            request_notes: file_issue_request.fetch('request_notes', nil),
-                                                           digital_request_status: QUOTE_REQUESTED,
-                                                           physical_request_status: QUOTE_REQUESTED,
+                                                           digital_request_status: digital_request_status,
+                                                           physical_request_status: physical_request_status,
                                                            agency_id: Ctx.get.current_location.agency_id,
                                                            agency_location_id: Ctx.get.current_location.id,
                                                            created_by: Ctx.username,
@@ -72,12 +82,21 @@ class FileIssues < BaseStorage
 
     file_issue_request_id = file_issue_request.fetch('id')
 
+    digital_request_status = NON_REQUESTED
+    physical_request_status = NON_REQUESTED
+    if file_issue_request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'}
+      digital_request_status = QUOTE_REQUESTED
+    end
+    if file_issue_request.fetch('items').any?{|item| item.fetch('request_type') == 'PHYSICAL'}
+      physical_request_status = QUOTE_REQUESTED
+    end
+
     db[:file_issue_request]
       .filter(id: file_issue_request_id)
       .update(request_type: file_issue_request.fetch('request_type'),
               urgent: file_issue_request.fetch('urgent') ? 1 : 0,
-              digital_request_status: QUOTE_REQUESTED, # assume any change forces a quote redo
-              physical_request_status: QUOTE_REQUESTED, # assume any change forces a quote redo
+              digital_request_status: digital_request_status, # assume any change forces a quote redo
+              physical_request_status: physical_request_status, # assume any change forces a quote redo
               deliver_to_reading_room: file_issue_request.fetch('deliver_to_reading_room') ? 1 : 0,
               delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
               request_notes: file_issue_request.fetch('request_notes', nil),

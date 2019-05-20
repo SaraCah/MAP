@@ -11,37 +11,24 @@
             <tr>
                 <th style="width:20%">Request Type</th>
                 <th style="width:5%">Urgent?</th>
-                <th style="width:15%">Status</th>
+                <th style="width:15%">Digital Request Status</th>
+                <th style="width:15%">Physical Request Status</th>
                 <th style="width:10%">Created By</th>
                 <th style="width:15%">Date Created</th>
                 <th style="width:20%"></th>
             </tr>
             </thead>
             <tbody>
-            <% paged_results.results.each do |file_issue_request|
-                rowCSSClass = ""
-                if file_issue_request.fetch('status') == 'SUBMITTED'
-                    rowCSSClass = "light-green lighten-5"
-                elsif file_issue_request.fetch('status').start_with?('CANCELLED')
-                    rowCSSClass = "red lighten-5"
-                end
-            %>
-            <tr class="<%= rowCSSClass %>">
+            <% paged_results.results.each do |file_issue_request| %>
+            <tr>
                 <td><%= file_issue_request.fetch('request_type') %></td>
                 <td><% if file_issue_request.fetch('urgent') %>Yes<% else %>No<% end %></td>
-                <td><%= file_issue_request.fetch('status') %></td>
+                <td><%= file_issue_request.fetch('digital_request_status') %></td>
+                <td><%= file_issue_request.fetch('physical_request_status') %></td>
                 <td><%= file_issue_request.fetch('created_by') %></td>
                 <td><%= Time.at(file_issue_request.fetch('create_time') / 1000)%></td>
                 <td>
                     <a class="btn" href="/file-issue-requests/<%= file_issue_request.fetch('id') %>">View</a>
-                    <% if file_issue_request.fetch('status') == 'SUBMITTED' %>
-                        <confirmable-action action="/file-issue-requests/<%= file_issue_request.fetch('id') %>/cancel"
-                                            csrf_token="<%= FormHelper.csrf_token %>"
-                                            css="btn red lighten-2"
-                                            label="Cancel"
-                                            message="Are you sure you want to cancel this request?">
-                        </confirmable-action>
-                    <% end %>
                 </td>
             </tr>
             <% end %>
