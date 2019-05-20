@@ -45,6 +45,7 @@
                         <table class="representation-linker-table">
                             <thead>
                                 <tr>
+                                    <th>File Issue<br>Rep ID</th>
                                     <th>Series ID</th>
                                     <th>Record ID</th>
                                     <th>Title</th>
@@ -67,6 +68,7 @@
                                 <% metadata = resolved_representations.find{|rep| rep['ref'] == item.fetch('record_ref')} %>
                                 <tbody>
                                     <tr>
+                                        <td><%= file_issue.id_for_display %>-<%= metadata.fetch('representation_id') %></td>
                                         <td><%= metadata.fetch('series_id') %></td>
                                         <td><%= metadata.fetch('record_id') %></td>
                                         <td><%= metadata.fetch('title') %></td>
@@ -98,6 +100,24 @@
                 </section>
 
                 <section id="details" class="scrollspy section">
+                    <% unless file_issue.new? %>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="file_issue_id" type="text" value="<%= file_issue.id_for_display %>" disabled>
+                            <label for="file_issue_id">File Issue ID</label>
+                        </div>
+                    </div>
+                    <% end %>
+
+                    <% unless file_issue.new? %>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="request_id" type="text" value="<%= FileIssueRequest.id_for_display(file_issue.fetch('file_issue_request_id')) %>" disabled>
+                            <label for="request_id">File Issue ID</label>
+                        </div>
+                    </div>
+                    <% end %>
+
                     <div class="row">
                         <div class="input-field col s12">
                             <input id="agency" type="text" value="<%= Ctx.get.current_location.agency.label %>" disabled>

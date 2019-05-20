@@ -9,6 +9,7 @@
         <table class="highlight responsive-table">
             <thead>
             <tr>
+                <th style="width:5%">ID</th>
                 <th style="width:20%">Request Type</th>
                 <th style="width:5%">Urgent?</th>
                 <th style="width:15%">Digital Request Status</th>
@@ -21,6 +22,7 @@
             <tbody>
             <% paged_results.results.each do |file_issue_request| %>
             <tr>
+                <td><%= file_issue_request.id_for_display %></td>
                 <td><%= file_issue_request.fetch('request_type') %></td>
                 <td><% if file_issue_request.fetch('urgent') %>Yes<% else %>No<% end %></td>
                 <td><%= file_issue_request.fetch('digital_request_status') %></td>

@@ -7,6 +7,7 @@ class FileIssue
   STATUS_FILE_ISSUE_COMPLETE = 'COMPLETE'
 
   define_field(:id, Integer, required: false)
+  define_field(:file_issue_request_id, Integer, required: false)
   define_field(:request_type, String)
   define_field(:issue_type, String)
   define_field(:status, String)
@@ -26,6 +27,7 @@ class FileIssue
 
   def self.from_row(row, handle_id = nil, item_rows = [])
     new(id: row[:id],
+        file_issue_request_id: row[:file_issue_request_id],
         request_type: row[:request_type],
         issue_type: row[:issue_type],
         status: row[:status],
@@ -44,4 +46,13 @@ class FileIssue
         handle_id: handle_id)
   end
 
+  def id_for_display
+    return '' if new?
+
+    self.class.id_for_display(fetch('id'), fetch('issue_type'))
+  end
+
+  def self.id_for_display(id, issue_type)
+    "FI#{issue_type[0]}#{id}"
+  end
 end

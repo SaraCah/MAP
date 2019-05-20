@@ -64,6 +64,14 @@
                                  csrf_token="<%= FormHelper.csrf_token %>"
                                  is_readonly="<%= is_readonly %>">
                     <section id="details" class="scrollspy section">
+                        <% unless request.new? %>
+                            <div class="row">
+                                <div class="input-field col s12">
+                                    <input id="request_id" type="text" value="<%= request.id_for_display %>" disabled>
+                                    <label for="request_id">Request ID</label>
+                                </div>
+                            </div>
+                        <% end %>
                         <div class="row">
                             <div class="input-field col s12">
                                 <input id="agency" type="text" value="<%= Ctx.get.current_location.agency.label %>" disabled>

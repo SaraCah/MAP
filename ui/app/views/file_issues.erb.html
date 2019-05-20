@@ -3,7 +3,9 @@
         <table class="highlight responsive-table">
             <thead>
             <tr>
+                <th style="width:5%">ID</th>
                 <th style="width:20%">Request Type</th>
+                <th style="width:20%">Issue Type</th>
                 <th style="width:15%">Status</th>
                 <th style="width:10%">Created By</th>
                 <th style="width:15%">Date Created</th>
@@ -13,12 +15,15 @@
             <tbody>
             <% paged_results.results.each do |file_issue| %>
             <tr>
+                <td><%= file_issue.id_for_display %></td>
                 <td><%= file_issue.fetch('request_type') %></td>
+                <td><%= file_issue.fetch('issue_type') %></td>
                 <td><%= file_issue.fetch('status') %></td>
                 <td><%= file_issue.fetch('created_by') %></td>
                 <td><%= Time.at(file_issue.fetch('create_time') / 1000)%></td>
                 <td>
                     <a class="btn" href="/file-issues/<%= file_issue.fetch('id') %>">View</a>
+                    <a class="btn" href="/file-issue-requests/<%= file_issue.fetch('file_issue_request_id') %>">View Request</a>
                 </td>
             </tr>
             <% end %>
