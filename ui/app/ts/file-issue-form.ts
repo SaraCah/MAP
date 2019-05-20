@@ -167,7 +167,7 @@ Vue.component('file-issue-request-summary', {
             items: [],
         };
     },
-    props: ['status', 'request_type'],
+    props: ['status', 'request_type', 'request_id', 'csrf_token'],
     methods: {
         syncItems: function(reps:RepresentationRequest[]) {
             this.items = reps;

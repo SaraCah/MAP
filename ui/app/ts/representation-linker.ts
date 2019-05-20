@@ -145,7 +145,7 @@ Vue.component('representation-linker', {
                         <div class="col s2">
                             <template v-if="!readonly">
                                 <div class="right-align">
-                                    <button class="btn" v-on:click="removeSelected(representation)">Remove</button>
+                                    <a class="btn" v-on:click="removeSelected(representation)">Remove</a>
                                 </div>
                             </template>
                         </div>
