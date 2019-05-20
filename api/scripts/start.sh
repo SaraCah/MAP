@@ -72,7 +72,7 @@ trap "stop_solr" INT TERM EXIT
 
 function run() {
     mkdir -p data/solr
-    solr_dist/bin/solr start -p $solr_port -s solr -a "-Dsolr.data.home=$PWD/data/solr -Djava.security.egd=file:/dev/./urandom"
+    solr_dist/bin/solr start -f -p $solr_port -s solr -a "-Dsolr.data.home=$PWD/data/solr -Djava.security.egd=file:/dev/./urandom" &
     scripts/jruby.sh distlibs/gems/bin/fishwife app/config.ru --quiet --host $listen_address --port $listen_port -E "$MAP_ENV" -O request_body_max=134217728
 }
 
