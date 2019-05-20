@@ -524,6 +524,22 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  Endpoint.post('/file-issue-requests/:id/accept')
+    .param(:id, Integer, "ID of file issue request")
+    .param(:request_type, String, "Request type this action applies to") do
+    Ctx.client.accept_file_issue_request(params[:id], params[:request_type])
+
+    redirect "/file-issue-requests/#{params[:id]}"
+  end
+
+  Endpoint.post('/file-issue-requests/:id/cancel')
+    .param(:id, Integer, "ID of file issue request")
+    .param(:request_type, String, "Request type this action applies to") do
+    Ctx.client.cancel_file_issue_request(params[:id], params[:request_type])
+
+    redirect "/file-issue-requests/#{params[:id]}"
+  end
+
   Endpoint.get('/search/representations')
     .param(:q, String, "Search string") do
     [

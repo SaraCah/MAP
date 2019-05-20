@@ -395,6 +395,14 @@ class MAPAPIClient
     get("/resolve/representations", { 'ref[]' => refs })
   end
 
+  def accept_file_issue_request(file_issue_request_id, request_type)
+    post('/file-issue-requests/accept', id: file_issue_request_id, request_type: request_type)
+  end
+
+  def cancel_file_issue_request(file_issue_request_id, request_type)
+    post('/file-issue-requests/cancel', id: file_issue_request_id, request_type: request_type)
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

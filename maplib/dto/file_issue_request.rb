@@ -56,6 +56,9 @@ class FileIssueRequest
     return false if [QUOTE_ACCEPTED, FILE_ISSUE_CREATED].include?(fetch('digital_request_status'))
     return false if [QUOTE_ACCEPTED, FILE_ISSUE_CREATED].include?(fetch('physical_request_status'))
 
+    return false if [CANCELLED_BY_QSA, CANCELLED_BY_AGENCY].include?(fetch('digital_request_status')) && fetch('physical_request_status') == NON_REQUESTED 
+    return false if [CANCELLED_BY_QSA, CANCELLED_BY_AGENCY].include?(fetch('physical_request_status')) && fetch('digital_request_status') == NON_REQUESTED 
+
     true
   end
 end

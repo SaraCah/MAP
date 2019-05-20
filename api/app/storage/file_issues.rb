@@ -113,4 +113,18 @@ class FileIssues < BaseStorage
 
     errors
   end
+
+  def self.accept_request_quote(file_issue_request_id, request_type)
+    db[:file_issue_request]
+      .filter(id: file_issue_request_id)
+      .update("#{request_type.downcase}_request_status" => FileIssueRequest::QUOTE_ACCEPTED,
+              system_mtime: Time.now)
+  end
+
+  def self.cancel_request(file_issue_request_id, request_type)
+    db[:file_issue_request]
+      .filter(id: file_issue_request_id)
+      .update("#{request_type.downcase}_request_status" => FileIssueRequest::CANCELLED_BY_AGENCY,
+              system_mtime: Time.now)
+  end
 end

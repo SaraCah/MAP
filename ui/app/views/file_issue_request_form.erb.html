@@ -46,7 +46,13 @@
                     <input type="hidden" name="file_issue_request[agency_location_id]" value="<%= request.fetch('agency_location_id') %>">
                 <% end %>
 
-                <file-issue-form representations="<%= request.fetch('items').to_json %>" resolved_representations="<%= resolved_representations.to_json %>" is_readonly="<%= is_readonly %>">
+                <file-issue-form representations="<%= request.fetch('items').to_json %>"
+                                 resolved_representations="<%= resolved_representations.to_json %>"
+                                 digital_request_status="<%= request.fetch('digital_request_status') %>"
+                                 physical_request_status="<%= request.fetch('physical_request_status') %>"
+                                 request_id="<%= request.fetch('id', 'new') %>"
+                                 csrf_token="<%= FormHelper.csrf_token %>"
+                                 is_readonly="<%= is_readonly %>">
                     <section id="details" class="scrollspy section">
                         <div class="row">
                             <div class="input-field col s12">
