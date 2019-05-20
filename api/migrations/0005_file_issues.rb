@@ -14,7 +14,8 @@ Sequel.migration do
       Integer :deliver_to_reading_room, null: false, default: 0
       String :delivery_authorizer
 
-      String :status, null: false
+      String :digital_request_status
+      String :physical_request_status
 
       String :created_by, null: false
       Bignum :create_time, null: false

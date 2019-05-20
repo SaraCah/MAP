@@ -72,11 +72,29 @@ Vue.component('file-issue-physical-request', {
         No physical items requested
     </template>
     <template v-else>
-        <ul>
-            <li v-for="item in items">
-                {{item.label}}
-            </li>
-        </ul>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px;">Series ID</th>
+                    <th style="width: 60px;">Record ID</th>
+                    <th>Title</th>
+                    <th>Record Details</th>
+                    <th style="width: 60px;">Representation ID</th>
+                    <th style="width: 100px;">Format</th>
+                    <!-- <th>Processing/ Handling Notes</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="representation in items">
+                    <td>{{representation.metadata.series_id}}</td>
+                    <td>{{representation.metadata.record_id}}</td>
+                    <td>{{representation.metadata.title}}</td>
+                    <td>{{representation.record_details}}</td>
+                    <td>{{representation.metadata.representation_id}}</td>
+                    <td>{{representation.metadata.format}}</td>
+                </tr>
+            </tbody>
+        </table>
     </template>
 </div>
 `,
@@ -102,11 +120,29 @@ Vue.component('file-issue-digital-request', {
         No digital items requested
     </template>
     <template v-else>
-        <ul>
-            <li v-for="item in items">
-                {{item.label}}
-            </li>
-        </ul>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px;">Series ID</th>
+                    <th style="width: 60px;">Record ID</th>
+                    <th>Title</th>
+                    <th>Record Details</th>
+                    <th style="width: 60px;">Representation ID</th>
+                    <th style="width: 100px;">Format</th>
+                    <!-- <th>Processing/ Handling Notes</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="representation in items">
+                    <td>{{representation.metadata.series_id}}</td>
+                    <td>{{representation.metadata.record_id}}</td>
+                    <td>{{representation.metadata.title}}</td>
+                    <td>{{representation.record_details}}</td>
+                    <td>{{representation.metadata.representation_id}}</td>
+                    <td>{{representation.metadata.format}}</td>
+                </tr>
+            </tbody>
+        </table>
     </template>
 </div>
 `,

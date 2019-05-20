@@ -10,14 +10,28 @@
                 <div class="col s12">
                     <div class="row">
                         <div class="col s12">
-                            <ul class="status-infomatic">
-                                <li class="first <% if request.new? %>current<% end %>">Add Request Details</li>
-                                <li class="<% if request.fetch('status', '') == 'QUOTE_REQUEST_SUBMITTED' %>current<% end %>">Quote Request Submitted</li>
-                                <li class="<% if request.fetch('status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Quote Provided</li>
-                                <li class="last <% if request.fetch('status', '') == 'FILE_ISSUE_CREATED' %>current<% end %>">File Issue(s) Created</li>
-                                <li class="stand-alone <% if request.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled<br>By User</li>
-                                <li class="stand-alone <% if request.fetch('status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled<br>By QSA</li>
-                            </ul>
+                            <% if request.new? || request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'} %>
+                                <ul class="status-infomatic">
+                                    <li class="first <% if request.new? %>current<% end %>">Add Digital Request Details</li>
+                                    <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_REQUEST_SUBMITTED' %>current<% end %>">Quote Request Submitted</li>
+                                    <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Digital Quote Provided</li>
+                                    <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">Digital Quote Accepted</li>
+                                    <li class="last <% if request.fetch('digital_request_status', '') == 'FILE_ISSUE_CREATED' %>current<% end %>">File Issue Created</li>
+                                    <li class="stand-alone <% if request.fetch('digital_request_status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled by Agency</li>
+                                    <li class="stand-alone <% if request.fetch('digital_request_status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled by QSA</li>
+                                </ul>
+                            <% end %>
+                            <% if request.fetch('items').any?{|item| item.fetch('request_type') == 'PHYSICAL'} %>
+                                <ul class="status-infomatic">
+                                    <li class="first <% if request.new? %>current<% end %>">Add Physical Request Details</li>
+                                    <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_REQUEST_SUBMITTED' %>current<% end %>">Quote Request Submitted</li>
+                                    <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Physical Quote Provided</li>
+                                    <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">Physical Quote Accepted</li>
+                                    <li class="last <% if request.fetch('physical_request_status', '') == 'FILE_ISSUE_CREATED' %>current<% end %>">File Issue Created</li>
+                                    <li class="stand-alone <% if request.fetch('physical_request_status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled by Agency</li>
+                                    <li class="stand-alone <% if request.fetch('physical_request_status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled by QSA</li>
+                                </ul>
+                            <% end %>
                         </div>
                     </div>
                 </div>

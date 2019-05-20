@@ -1,5 +1,12 @@
 class FileIssues < BaseStorage
 
+  QUOTE_REQUESTED = 'QUOTE_REQUESTED'
+  QUOTE_PROVIDED = 'QUOTE_PROVIDED'
+  QUOTE_ACCEPTED = 'QUOTE_ACCEPTED'
+  FILE_ISSUE_CREATED = 'FILE_ISSUE_CREATED'
+  CANCELLED_BY_QSA = 'CANCELLED_BY_QSA'
+  CANCELLED_BY_AGENCY = 'CANCELLED_BY_AGENCY'
+
   def self.requests(page, page_size)
     dataset = db[:file_issue_request]
 
@@ -30,7 +37,8 @@ class FileIssues < BaseStorage
                                                            deliver_to_reading_room: file_issue_request.fetch('deliver_to_reading_room') ? 1 : 0,
                                                            delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
                                                            request_notes: file_issue_request.fetch('request_notes', nil),
-                                                           status: 'QUOTE_REQUEST_SUBMITTED',
+                                                           digital_request_status: QUOTE_REQUESTED,
+                                                           physical_request_status: QUOTE_REQUESTED,
                                                            agency_id: Ctx.get.current_location.agency_id,
                                                            agency_location_id: Ctx.get.current_location.id,
                                                            created_by: Ctx.username,
@@ -68,10 +76,11 @@ class FileIssues < BaseStorage
       .filter(id: file_issue_request_id)
       .update(request_type: file_issue_request.fetch('request_type'),
               urgent: file_issue_request.fetch('urgent') ? 1 : 0,
+              digital_request_status: QUOTE_REQUESTED, # assume any change forces a quote redo
+              physical_request_status: QUOTE_REQUESTED, # assume any change forces a quote redo
               deliver_to_reading_room: file_issue_request.fetch('deliver_to_reading_room') ? 1 : 0,
               delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
               request_notes: file_issue_request.fetch('request_notes', nil),
-              status: 'QUOTE_REQUEST_SUBMITTED',
               system_mtime: Time.now)
 
     # FIXME update request has changed? So need to drop previous quote as we're

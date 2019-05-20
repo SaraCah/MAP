@@ -3,7 +3,8 @@ class FileIssueRequest
 
   define_field(:id, Integer, required: false)
   define_field(:request_type, String)
-  define_field(:status, String, required: false)
+  define_field(:digital_request_status, String, required: false)
+  define_field(:physical_request_status, String, required: false)
   define_field(:urgent, Boolean, default: false)
   define_field(:deliver_to_reading_room, Boolean, default: false)
   define_field(:delivery_authorizer, String, validator: proc {|s, request| !request.fetch('deliver_to_reading_room') && (s.nil? || s.empty?) ? "Delivery Authorizer can't be blank" : nil })
@@ -29,7 +30,8 @@ class FileIssueRequest
   def self.from_row(row, handle_id = nil, item_rows = [])
     new(id: row[:id],
         request_type: row[:request_type],
-        status: row[:status],
+        digital_request_status: row[:digital_request_status] == 1,
+        physical_request_status: row[:physical_request_status] == 1,
         urgent: row[:urgent] == 1,
         deliver_to_reading_room: row[:deliver_to_reading_room] == 1,
         delivery_authorizer: row[:delivery_authorizer],
