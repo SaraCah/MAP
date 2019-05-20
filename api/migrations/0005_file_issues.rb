@@ -9,7 +9,7 @@ Sequel.migration do
 
       String :request_type, null: false
       Integer :urgent, null: false, default: 0
-      String :notes, text: true, null: false
+      String :request_notes, text: true, null: false
 
       Integer :deliver_to_reading_room, null: false, default: 0
       String :delivery_authorizer

@@ -33,7 +33,7 @@ class FileIssueRequest
         urgent: row[:urgent] == 1,
         deliver_to_reading_room: row[:deliver_to_reading_room] == 1,
         delivery_authorizer: row[:delivery_authorizer],
-        notes: row[:notes],
+        request_notes: row[:request_notes],
         agency_id: row[:agency_id],
         agency_location_id: row[:agency_location_id],
         created_by: row[:created_by],

@@ -29,7 +29,7 @@ class FileIssues < BaseStorage
                                                            urgent: file_issue_request.fetch('urgent') ? 1 : 0,
                                                            deliver_to_reading_room: file_issue_request.fetch('deliver_to_reading_room') ? 1 : 0,
                                                            delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
-                                                           notes: file_issue_request.fetch('notes', nil),
+                                                           request_notes: file_issue_request.fetch('request_notes', nil),
                                                            status: 'QUOTE_REQUEST_SUBMITTED',
                                                            agency_id: Ctx.get.current_location.agency_id,
                                                            agency_location_id: Ctx.get.current_location.id,
@@ -70,7 +70,7 @@ class FileIssues < BaseStorage
               urgent: file_issue_request.fetch('urgent') ? 1 : 0,
               deliver_to_reading_room: file_issue_request.fetch('deliver_to_reading_room') ? 1 : 0,
               delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
-              notes: file_issue_request.fetch('notes', nil),
+              request_notes: file_issue_request.fetch('request_notes', nil),
               status: 'QUOTE_REQUEST_SUBMITTED',
               system_mtime: Time.now)
 
