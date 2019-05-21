@@ -134,7 +134,16 @@
                             <br>
                             <br>
                             <div class="col s12">
-                                <button class="btn">Save Request</button>
+                                <% if request.new? || (request.fetch('digital_request_status') == 'QUOTE_REQUESTED' && request.fetch('physical_request_status') == 'QUOTE_REQUESTED') %>
+                                    <button class="btn">Save Request</button>
+                                <% else %>
+                                    <confirmable-action
+                                            target_form_id="fileIssueForm"
+                                            css="btn green lighten-2"
+                                            label="Save Request"
+                                            message="<p>Please be aware saving this request will invalidate any provided quotes.</p><p>Are you sure you want to save this request?</p>">
+                                    </confirmable-action>
+                                <% end %>
                             </div>
                         </div>
                     </section>

@@ -31,7 +31,7 @@ Vue.component('confirmable-action', {
                 </div>
             </div>
 
-            <p>{{message}}</p>
+            <p v-html="message"></p>
         </div>
         <div class="modal-footer">
             <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
@@ -45,7 +45,7 @@ Vue.component('confirmable-action', {
             active: false,
         };
     },
-    props: ['action', 'css', 'label', 'message', 'csrf_token'],
+    props: ['action', 'css', 'label', 'message', 'csrf_token', 'target_form_id'],
     methods: {
         show: function() {
             const modal: any = M.Modal.init(this.$refs.modal, {
@@ -59,13 +59,20 @@ Vue.component('confirmable-action', {
 
             this.active = true;
 
-            (this.$refs.spinner as Element).classList.remove('hide');
-            this.$http.post(this.action,
-                            {authenticity_token: this.csrf_token},
-                            {emulateJSON: true})
-            .then(() => {
-                location.reload();
-            });
+            if (this.action !== undefined) {
+                (this.$refs.spinner as Element).classList.remove('hide');
+                this.$http.post(this.action,
+                    {authenticity_token: this.csrf_token},
+                    {emulateJSON: true})
+                    .then(() => {
+                        location.reload();
+                    });
+            } else if (this.target_form_id !== undefined) {
+                const formEl:HTMLElement|null = document.getElementById(this.target_form_id);
+                if (formEl) {
+                    (<HTMLFormElement>formEl).submit();
+                }
+            }
         },
     },
 });
