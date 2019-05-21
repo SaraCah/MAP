@@ -564,4 +564,13 @@ class MAPTheAPI < Sinatra::Base
       [404]
     end
   end
+
+  Endpoint.get('/file-issue-fee-schedule') do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      chargeable_services = FileIssues.chargeable_services
+      json_response(chargeable_services)
+    else
+      [404]
+    end
+  end
 end

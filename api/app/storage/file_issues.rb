@@ -155,4 +155,40 @@ class FileIssues < BaseStorage
                       handle_id,
                       db[:file_issue_item].filter(file_issue_id: file_issue_id))
   end
+
+  def self.chargeable_services
+    service_by_id = {}
+
+    AspaceDB.open do |aspace_db|
+      aspace_db[:chargeable_service]
+        .join(:chargeable_service_item_rlshp, Sequel[:chargeable_service_item_rlshp][:chargeable_service_id] => Sequel[:chargeable_service][:id])
+        .join(:chargeable_item, Sequel[:chargeable_item][:id] => Sequel[:chargeable_service_item_rlshp][:chargeable_item_id])
+        .join(Sequel.as(:enumeration, :charge_quantity_unit_enum), Sequel[:charge_quantity_unit_enum][:name] => 'runcorn_charge_quantity_unit')
+        .join(Sequel.as(:enumeration_value, :charge_quantity_unit_enum_value),
+                   Sequel.&(Sequel[:charge_quantity_unit_enum][:id] => Sequel[:charge_quantity_unit_enum_value][:enumeration_id],
+                            Sequel[:charge_quantity_unit_enum_value][:id] => Sequel[:chargeable_item][:charge_quantity_unit_id]))
+        .order(Sequel[:chargeable_service_item_rlshp][:chargeable_service_id], Sequel[:chargeable_service_item_rlshp][:aspace_relationship_position])
+        .select(
+          Sequel.as(Sequel[:chargeable_service][:id], :chargeable_service_id),
+          Sequel.as(Sequel[:chargeable_service][:name], :chargeable_service_name),
+          Sequel.as(Sequel[:chargeable_service][:description], :chargeable_service_description),
+          Sequel.as(Sequel[:chargeable_item][:id], :chargeable_item_id),
+          Sequel.as(Sequel[:chargeable_item][:name], :chargeable_item_name),
+          Sequel.as(Sequel[:chargeable_item][:description], :chargeable_item_description),
+          Sequel.as(Sequel[:chargeable_item][:price_cents], :chargeable_item_price_cents),
+          Sequel.as(Sequel[:charge_quantity_unit_enum_value][:value], :chargeable_item_charge_unit))
+        .map do |row|
+          service_by_id[row[:chargeable_service_id]] ||= ChargeableService.new(row[:chargeable_service_id],
+                                                                               row[:chargeable_service_name],
+                                                                               row[:chargeable_service_description], [])
+          service_by_id[row[:chargeable_service_id]].items << ChargeableItem.new(row[:chargeable_item_id],
+                                                                                 row[:chargeable_item_name],
+                                                                                 row[:chargeable_item_description],
+                                                                                 row[:chargeable_item_price_cents],
+                                                                                 row[:chargeable_item_charge_unit])
+        end
+    end
+
+    service_by_id.values
+  end
 end

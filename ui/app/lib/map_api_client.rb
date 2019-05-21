@@ -415,6 +415,10 @@ class MAPAPIClient
     FileIssue.from_hash(json)
   end
 
+  def get_file_issue_fee_schedule
+    get("/file-issue-fee-schedule")
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

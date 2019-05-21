@@ -88,6 +88,11 @@ Vue.component('file-issue-request-summary', {
         </div>
     </template>
     <template v-else>
+        <div class="row">
+            <div class="col s12">
+                <a target="_blank" href="/file-issue-fee-schedule">View Fee Schedule</a>
+            </div>
+        </div>
         <table>
             <thead>
                 <tr>

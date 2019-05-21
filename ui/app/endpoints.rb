@@ -573,4 +573,11 @@ class MAPTheApp < Sinatra::Base
     Templates.emit_with_layout(:file_issue_view, {file_issue: file_issue, resolved_representations: resolved_representations, is_readonly: true},
                                :layout, title: "File Issue", context: ['file_issues', 'initiated_file_issues'])
   end
+
+  Endpoint.get('/file-issue-fee-schedule') do
+    chargeable_services = Ctx.client.get_file_issue_fee_schedule
+
+    Templates.emit_with_layout(:file_issue_fee_schedule, {chargeable_services: chargeable_services},
+                               :layout, title: "Fee Schedule", context: ['file_issues', 'fee_schedule'])
+  end
 end

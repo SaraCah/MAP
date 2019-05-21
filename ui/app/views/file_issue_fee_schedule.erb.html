@@ -1,0 +1,39 @@
+<div class="row">
+    <div class="col s12">
+        <% chargeable_services.each do |chargeable_service| %>
+            <section>
+                <h3><%= chargeable_service.fetch('name') %></h3>
+                <p><%= chargeable_service.fetch('description') %></p>
+                <div class="row">
+                    <div class="col s12 m9 l6">
+                        <table class="striped">
+                            <thead>
+                                <tr>
+                                    <th>Unit Description</th>
+                                    <th>Unit Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% chargeable_service.fetch('items').each do |chargeable_item| %>
+                                    <tr>
+                                        <td><%= chargeable_item.fetch('description') %></td>
+                                        <td>
+                                            $<%= chargeable_item.fetch('price_cents').to_s.insert(-3, '.') %>
+                                            per
+                                            <%# FIXME I18n %>
+                                            <% if chargeable_item.fetch('charge_quantity_unit') == 'qtr_hour' %>
+                                                15min
+                                            <% else %>
+                                                <%= chargeable_item.fetch('charge_quantity_unit') %>
+                                            <% end %>
+                                        </td>
+                                    </tr>
+                                <% end %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        <% end %>
+    </div>
+</div>
