@@ -17,6 +17,9 @@ Sequel.migration do
       String :digital_request_status
       String :physical_request_status
 
+      Integer :aspace_digital_quote_id
+      Integer :aspace_physical_quote_id
+
       String :created_by, null: false
       Bignum :create_time, null: false
 
