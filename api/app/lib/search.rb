@@ -88,7 +88,11 @@ class Search
 
     solr_query = "keywords:(#{keyword_query})^3 OR ngrams:#{solr_escape(q)}^1 OR edge_ngrams:#{solr_escape(q)}^2"
 
-    solr_handle_search(q: solr_query, fq: [build_controlled_records_filter(permissions), 'types:representation'])
+    fq = [build_controlled_records_filter(permissions),
+          'types:representation',
+          'file_issue_allowed:true']
+
+    solr_handle_search(q: solr_query, fq: fq)
       .map {|hit| {'id' => hit.fetch('id'),
                    'label' => hit.fetch('title')}}
 
