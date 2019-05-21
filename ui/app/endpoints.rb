@@ -478,8 +478,18 @@ class MAPTheApp < Sinatra::Base
                                :layout, title: "File Issue Requests", context: ['file_issues', 'file_issue_requests'])
   end
 
-  Endpoint.get('/file-issue-requests/new') do
-    Templates.emit_with_layout(:file_issue_request_new, {request: FileIssueRequest.new, resolved_representations: [], is_readonly: false},
+  Endpoint.get('/file-issue-requests/new')
+    .param(:record_ref, String, "Populate request items from this record", optional: true) do
+
+    request = FileIssueRequest.new
+    resolved_representations = []
+
+    if params[:record_ref]
+      # FIXME WIP
+      raise params[:record_ref].inspect
+    end
+
+    Templates.emit_with_layout(:file_issue_request_new, {request: request, resolved_representations: resolved_representations, is_readonly: false},
                                :layout, title: "New Request", context: ['file_issues', 'file_issue_requests'])
   end
 

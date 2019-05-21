@@ -9,6 +9,7 @@
             <th></th>
             <th>QSA Identifier</th>
             <th>Representations</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -23,6 +24,11 @@
                 .map {|rep_type| record["#{rep_type}_representations_count"].to_s + " #{rep_type}" }
                 .join('; ')
                 %>
+              </td>
+              <td>
+                <% if record['file_issue_allowed'] %>
+                  <a class="btn" href="/file-issue-requests/new?record_ref=<%= record['id'] %>">Request</a>
+                <% end %>
               </td>
             </tr>
           <% end %>
