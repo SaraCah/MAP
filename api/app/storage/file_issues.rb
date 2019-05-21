@@ -167,6 +167,7 @@ class FileIssues < BaseStorage
         .join(Sequel.as(:enumeration_value, :charge_quantity_unit_enum_value),
                    Sequel.&(Sequel[:charge_quantity_unit_enum][:id] => Sequel[:charge_quantity_unit_enum_value][:enumeration_id],
                             Sequel[:charge_quantity_unit_enum_value][:id] => Sequel[:chargeable_item][:charge_quantity_unit_id]))
+        .filter(Sequel[:chargeable_service][:name] => ['File Issue Physical', 'File Issue Digital'])
         .order(Sequel[:chargeable_service_item_rlshp][:chargeable_service_id], Sequel[:chargeable_service_item_rlshp][:aspace_relationship_position])
         .select(
           Sequel.as(Sequel[:chargeable_service][:id], :chargeable_service_id),
