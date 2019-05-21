@@ -15,7 +15,7 @@
           <% agency.controlled_records.each do |record| %>
             <tr>
               <td><%= record['title'] %></td>
-              <td><%= record['end_date'] ? 'under movement' : '' %></td>
+              <td><%= record['under_movement'] ? 'under movement' : '' %></td>
               <td><%= record['type'] + ' ' + record['qsa_id'] %></td>
               <td>
                 <%=

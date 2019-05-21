@@ -96,8 +96,12 @@ class Search
 
 
   def self.record_hash(record)
+    (_, aspace_agency_id) = Ctx.get.current_location.agency.fetch('id').split(':')
+    this_agency_uri = "/agents/corporate_entities/#{aspace_agency_id}"
+
     record.merge({
                    'type' => record['primary_type'] == 'resource' ? 'Series' : 'Record',
+                   'under_movement' => record['responsible_agency'] != this_agency_uri,
                  })
   end
 
