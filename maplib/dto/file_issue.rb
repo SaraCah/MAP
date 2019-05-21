@@ -11,10 +11,11 @@ class FileIssue
   define_field(:request_type, String)
   define_field(:issue_type, String)
   define_field(:status, String)
-  define_field(:checklist_request_submitted, Boolean, default: false)
-  define_field(:checklist_files_dispatched, Boolean, default: false)
-  define_field(:checklist_file_issue_summary_sent, Boolean, default: false)
-  define_field(:checklist_loan_completed, Boolean, default: false)
+  define_field(:checklist_submitted, Boolean, default: false)
+  define_field(:checklist_dispatched, Boolean, default: false)
+  define_field(:checklist_summary_sent, Boolean, default: false)
+  define_field(:checklist_completed, Boolean, default: false)
+  define_field(:date_completed, String, required: false)
   define_field(:items, [FileIssueItem], default: [])
   define_field(:urgent, Boolean, default: false)
   define_field(:deliver_to_reading_room, Boolean, default: false)
@@ -31,10 +32,10 @@ class FileIssue
         request_type: row[:request_type],
         issue_type: row[:issue_type],
         status: row[:status],
-        checklist_request_submitted: row[:checklist_request_submitted] == 1,
-        checklist_files_dispatched: row[:checklist_files_dispatched] == 1,
-        checklist_file_issue_summary_sent: row[:checklist_file_issue_summary_sent] == 1,
-        checklist_loan_completed: row[:checklist_loan_completed] == 1,
+        checklist_submitted: row[:checklist_submitted] == 1,
+        checklist_dispatched: row[:checklist_dispatched] == 1,
+        checklist_summary_sent: row[:checklist_summary_sent] == 1,
+        checklist_completed: row[:checklist_completed] == 1,
         urgent: row[:urgent] == 1,
         deliver_to_reading_room: row[:deliver_to_reading_room] == 1,
         delivery_authorizer: row[:delivery_authorizer],

@@ -55,10 +55,12 @@ Sequel.migration do
 
       String :status, null: false
 
-      Integer :checklist_request_submitted, null: false, default: 0
-      Integer :checklist_files_dispatched, null: false, default: 0
-      Integer :checklist_file_issue_summary_sent, null: false, default: 0
-      Integer :checklist_loan_completed, null: false, default: 0 # link expired or load returned
+      Integer :checklist_submitted, null: false, default: 1
+      Integer :checklist_dispatched, null: false, default: 0
+      Integer :checklist_summary_sent, null: false, default: 0
+      Integer :checklist_completed, null: false, default: 0 # link expired or load returned
+
+      String :date_completed
 
       String :created_by, null: false
       Bignum :create_time, null: false
@@ -78,12 +80,12 @@ Sequel.migration do
 
       String :record_details, text: true
 
-      String :dispatch_date
-      String :loan_expiry_date
+      String :dispatch_date # upload for digital
+      String :dispatched_by # uploaded by for digital
+      String :expiry_date
       String :returned_date
+      String :received_by # QSA user accepts the return
       Integer :overdue, null: false, default: 0
-      Integer :extension_requested, null: false, default: 0
-      String :requested_extension_date
     end
 
     alter_table(:handle) do

@@ -11,11 +11,11 @@
                     <div class="row">
                         <div class="col s12">
                             <ul class="status-infomatic">
-                                <li class="first <% if file_issue.fetch('checklist_request_submitted', false) %>checked<% end %>">Request<br>Submitted</li>
+                                <li class="first <% if file_issue.fetch('checklist_submitted', false) %>checked<% end %>">Request<br>Submitted</li>
                                 <li class="empty"></li>
-                                <li class="<% if file_issue.fetch('checklist_files_dispatched', false) %>checked<% end %>">Files<br>Dispatched/Uploaded</li>
-                                <li class="<% if file_issue.fetch('checklist_file_issue_summary_sent', false) %>checked<% end %>">File Issue<br>Summary Sent</li>
-                                <li class="last <% if file_issue.fetch('checklist_loan_completed', false) %>checked<% end %>">Link Expired/Loan Returned</li>
+                                <li class="<% if file_issue.fetch('checklist_dispatched', false) %>checked<% end %>">Files<br>Dispatched/Uploaded</li>
+                                <li class="<% if file_issue.fetch('checklist_summary_sent', false) %>checked<% end %>">File Issue<br>Summary Sent</li>
+                                <li class="last <% if file_issue.fetch('checklist_completed', false) %>checked<% end %>">Link Expired/Loan Returned</li>
                             </ul>
                         </div>
                     </div>
@@ -77,10 +77,10 @@
                                         <% if file_issue.fetch('issue_type') == 'DIGITAL' %>
                                             <td><%= item.fetch('dispatch_date','') %></td>
                                             <td><!-- FIXME add link to file --></td>
-                                            <td><%= item.fetch('loan_expiry_date', '') %></td>
+                                            <td><%= item.fetch('expiry_date', '') %></td>
                                         <% else %>
                                             <td><%= item.fetch('dispatch_date','') %></td>
-                                            <td><%= item.fetch('loan_expiry_date','') %></td>
+                                            <td><%= item.fetch('expiry_date','') %></td>
                                             <td><%= item.fetch('returned_date','') %></td>
                                             <td><%= item.fetch('overdue',0) == 1 ? 'Yes' : 'No' %></td>
                                         <% end %>
@@ -170,6 +170,13 @@
                         <div class="input-field col s12">
                             <input id="delivery_authorizer" type="text" name="file_issue_request[delivery_authorizer]" value="<%= file_issue.fetch('delivery_authorizer', '') %>" disabled />
                             <label for="delivery_authorizer">Authorised to Receive Delivery</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="date_completed" type="text" name="file_issue_request[date_completed]" value="<%= file_issue.fetch('date_completed', '') %>" disabled />
+                            <label for="date_completed">Date Completed</label>
                         </div>
                     </div>
                 </section>
