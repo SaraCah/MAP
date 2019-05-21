@@ -25,8 +25,8 @@ class FileIssues < BaseStorage
   def self.create_request_from_dto(file_issue_request)
     errors = []
 
-    digital_request_status = FileIssueRequest::NON_REQUESTED
-    physical_request_status = FileIssueRequest::NON_REQUESTED
+    digital_request_status = FileIssueRequest::NONE_REQUESTED
+    physical_request_status = FileIssueRequest::NONE_REQUESTED
     if file_issue_request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'}
       digital_request_status = FileIssueRequest::QUOTE_REQUESTED
     end
@@ -74,8 +74,8 @@ class FileIssues < BaseStorage
 
     file_issue_request_id = file_issue_request.fetch('id')
 
-    digital_request_status = FileIssueRequest::NON_REQUESTED
-    physical_request_status = FileIssueRequest::NON_REQUESTED
+    digital_request_status = FileIssueRequest::NONE_REQUESTED
+    physical_request_status = FileIssueRequest::NONE_REQUESTED
     if file_issue_request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'}
       digital_request_status = FileIssueRequest::QUOTE_REQUESTED
     end
