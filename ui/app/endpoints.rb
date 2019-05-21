@@ -485,8 +485,27 @@ class MAPTheApp < Sinatra::Base
     resolved_representations = []
 
     if params[:record_ref]
-      # FIXME WIP
-      raise params[:record_ref].inspect
+      record = Ctx.client.find_record(params[:record_ref])
+      representation_refs_for_record = []
+      if record && record.fetch('primary_type') == 'archival_object'
+        all_representations = record.fetch('all_representations', [])
+        unless all_representations.empty?
+          representation_refs_for_record = all_representations.map do |uri|
+            if uri =~ /^.*(digital_representation|physical_representation)s\/([0-9]+)$/
+              "#{$1}:#{$2}"
+            end
+          end.compact
+        end
+      elsif record && record.fetch('types',[]).include?('representation')
+        representation_refs_for_record = [params[:record_ref]]
+      end
+
+      Ctx.client.resolve_representations(representation_refs_for_record).map do |representation|
+        if representation.fetch('file_issue_allowed', false)
+          request.fetch('items') << FileIssueRequestItem.from_solr_doc(representation)
+          resolved_representations << representation
+        end
+      end
     end
 
     Templates.emit_with_layout(:file_issue_request_new, {request: request, resolved_representations: resolved_representations, is_readonly: false},

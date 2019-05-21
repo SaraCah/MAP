@@ -7,6 +7,12 @@ class FileIssueRequestItem
   define_field(:record_details, String, required: false)
   define_field(:record_label, String, required: false)
 
+  def self.from_solr_doc(solr_doc)
+    new(id: solr_doc.fetch('ref').split(':').last,
+        record_ref: solr_doc.fetch('ref'),
+        request_type: 'DIGITAL')
+  end
+
   def self.from_row(row)
     new(id: row[:id],
         record_ref: "#{row[:aspace_record_type]}:#{row[:aspace_record_id]}",

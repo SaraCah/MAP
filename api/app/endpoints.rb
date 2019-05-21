@@ -91,6 +91,17 @@ class MAPTheAPI < Sinatra::Base
     json_response(Search.representation_typeahead(params[:q], permissions))
   end
 
+  Endpoint.get('/search/get_record')
+    .param(:record_ref, String, "Record reference (SOLR doc id)") do
+    permissions = Users.permissions_for_user(Ctx.username)
+    record = Search.get_record(params[:record_ref], permissions)
+    if (record)
+      json_response(record)
+    else
+      [404]
+    end
+  end
+
   Endpoint.get('/my-permissions') do
     if Ctx.user_logged_in?
       json_response(Users.permissions_for_user(Ctx.username))

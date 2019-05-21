@@ -221,6 +221,10 @@ class MAPAPIClient
     get('/search/representations', q: q)
   end
 
+  def find_record(record_ref)
+    get('/search/get_record', record_ref: record_ref)
+  end
+
   def get_current_agency
     return nil if Ctx.get.permissions.is_admin?
 

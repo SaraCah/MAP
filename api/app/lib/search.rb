@@ -115,4 +115,11 @@ class Search
       .map {|result| record_hash(result)}
   end
 
+  def self.get_record(record_ref, permissions)
+    solr_handle_search(q: "id:#{solr_escape(record_ref)}", fq: build_controlled_records_filter(permissions))
+      .map do |result|
+      return record_hash(result)
+    end
+  end
+
 end
