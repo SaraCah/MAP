@@ -25,6 +25,9 @@
   <field name="digital_representations" type="string" indexed="true" stored="true" multiValued="true" />
   <field name="all_representations" type="string" indexed="true" stored="true" multiValued="true" />
 
+  <field name="physical_representations_count" type="pint" stored="true" multiValued="false" />
+  <field name="digital_representations_count" type="pint" stored="true" multiValued="false" />
+
   <copyField source="physical_representations" dest="all_representations" />
   <copyField source="digital_representations" dest="all_representations" />
 

@@ -15,12 +15,12 @@
           <% agency.controlled_records.each do |record| %>
             <tr>
               <td><%= record['title'] %></td>
-              <td><%= record['under_movement'] ? 'under movement' : '' %></td>
+              <td><span class="badge"><%= record['under_movement'] ? 'under movement' : '' %></span></td>
               <td><%= record['type'] + ' ' + record['qsa_id'] %></td>
               <td>
                 <%=
                 ['physical', 'digital']
-                .map {|rep_type| Array(record["#{rep_type}_representations"]).count.to_s + " #{rep_type}" }
+                .map {|rep_type| record["#{rep_type}_representations_count"].to_s + " #{rep_type}" }
                 .join('; ')
                 %>
               </td>
