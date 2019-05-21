@@ -28,11 +28,11 @@ class MAPTheAPI < Sinatra::Base
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in?
       if Ctx.get.permissions.is_admin?
-        json_response(Users.all(params[:page], 10))
+        json_response(Users.all(params[:page], AppConfig[:page_size]))
       elsif Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)
-        json_response(Users.for_agency(params[:page], 10, Ctx.get.current_location.agency_id))
+        json_response(Users.for_agency(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id))
       elsif Ctx.get.permissions.is_agency_admin?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-        json_response(Users.for_agency_location(params[:page], 10, Ctx.get.current_location.agency_id, Ctx.get.current_location.id))
+        json_response(Users.for_agency_location(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id, Ctx.get.current_location.id))
       else
         [404]
       end
@@ -103,11 +103,11 @@ class MAPTheAPI < Sinatra::Base
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in?
       if Ctx.get.permissions.is_admin?
-        json_response(Locations.all(params[:page], 10))
+        json_response(Locations.all(params[:page], AppConfig[:page_size]))
       elsif Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)
-        json_response(Locations.for_agency(params[:page], 10, Ctx.get.current_location.agency_id))
+        json_response(Locations.for_agency(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id))
       elsif Ctx.get.permissions.is_agency_admin?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-        json_response(Locations.for_agency_location(params[:page], 10, Ctx.get.current_location.agency_id, Ctx.get.current_location.id))
+        json_response(Locations.for_agency_location(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id, Ctx.get.current_location.id))
       else
         [404]
       end
@@ -243,7 +243,7 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/transfer-proposals')
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(Transfers.proposals(params[:page], 10))
+      json_response(Transfers.proposals(params[:page], AppConfig[:page_size]))
     else
       [404]
     end
@@ -252,7 +252,7 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/transfers')
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(Transfers.transfers(params[:page], 10))
+      json_response(Transfers.transfers(params[:page], AppConfig[:page_size]))
     else
       json_response([])
     end
@@ -441,7 +441,7 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/file-issue-requests')
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(FileIssues.requests(params[:page], 10))
+      json_response(FileIssues.requests(params[:page], AppConfig[:page_size]))
     else
       [404]
     end
@@ -545,7 +545,7 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/file-issues')
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(FileIssues.file_issues(params[:page], 10))
+      json_response(FileIssues.file_issues(params[:page], AppConfig[:page_size]))
     else
       [404]
     end

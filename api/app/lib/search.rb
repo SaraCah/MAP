@@ -56,6 +56,7 @@ class Search
     end
 
     query_params = {qt: 'json'}.merge(query_params)
+    query_params = {rows: AppConfig[:page_size]}.merge(query_params)
 
     search_uri = URI.join(solr_url, 'select')
     search_uri.query = URI.encode_www_form(query_params)
