@@ -134,14 +134,14 @@ Vue.component('file-issue-request-summary', {
         <template v-if="status === 'QUOTE_ACCEPTED'">
             <div class="row">
                 <div class="col s12 m6 l3">
-                    <div class="card-panel green lighten-4">Quote Accepted! Awaiting creating of a new File Transfer.</div>
+                    <div class="card-panel green lighten-4">Quote Accepted! Awaiting creating of a new File Issue.</div>
                 </div>
             </div>
         </template>
-        <template v-if="status === 'FILE_TRANSFER_CREATED'">
+        <template v-if="status === 'FILE_ISSUE_CREATED'">
             <div class="row">
                 <div class="col s12 m6 l3">
-                    <div class="card-panel green lighten-4">File transfer created! FIXME add link here.</div>
+                    <div class="card-panel green lighten-4">File issue created! FIXME add link here.</div>
                 </div>
             </div>
         </template>

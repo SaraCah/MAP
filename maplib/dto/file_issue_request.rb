@@ -1,7 +1,7 @@
 class FileIssueRequest
   include DTO
 
-  NON_REQUESTED = 'NON_REQUESTED'
+  NONE_REQUESTED = 'NONE_REQUESTED'
   QUOTE_REQUESTED = 'QUOTE_REQUESTED'
   QUOTE_PROVIDED = 'QUOTE_PROVIDED'
   QUOTE_ACCEPTED = 'QUOTE_ACCEPTED'
@@ -12,8 +12,8 @@ class FileIssueRequest
   define_field(:id, Integer, required: false)
   define_field(:request_type, String)
   define_field(:request_notes, String)
-  define_field(:digital_request_status, String, required: false, default: NON_REQUESTED)
-  define_field(:physical_request_status, String, required: false, default: NON_REQUESTED)
+  define_field(:digital_request_status, String, required: false, default: NONE_REQUESTED)
+  define_field(:physical_request_status, String, required: false, default: NONE_REQUESTED)
   define_field(:urgent, Boolean, default: false)
   define_field(:deliver_to_reading_room, Boolean, default: false)
   define_field(:delivery_authorizer, String, validator: proc {|s, request| !request.fetch('deliver_to_reading_room') && (s.nil? || s.empty?) ? "Delivery Authorizer can't be blank" : nil })
