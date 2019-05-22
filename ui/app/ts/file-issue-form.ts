@@ -102,7 +102,7 @@ Vue.component('file-issue-request-summary', {
                     <th>Record Details</th>
                     <th style="width: 60px;">Representation ID</th>
                     <th style="width: 100px;">Format</th>
-                    <!-- <th>Processing/ Handling Notes</th> -->
+                    <th>Processing/<br>Handling Notes</th>  
                 </tr>
             </thead>
             <tbody>
@@ -113,6 +113,7 @@ Vue.component('file-issue-request-summary', {
                     <td>{{representation.record_details}}</td>
                     <td>{{representation.metadata.representation_id}}</td>
                     <td>{{representation.metadata.format}}</td>
+                    <td>{{representation.metadata.processing_handling_notes}}</td>
                 </tr>
             </tbody>
         </table>

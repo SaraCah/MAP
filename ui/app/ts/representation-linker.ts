@@ -100,7 +100,7 @@ Vue.component('representation-linker', {
                 <th>File Issue Allowed</th>
                 <th>Intended Use</th>
                 <th>Other Restrictions</th>
-<!--                <th>Processing/ Handling Notes</th>-->
+                <th>Processing/<br>Handling Notes</th>
             </tr>
         </thead>
         <tbody v-for="representation in selected">
@@ -121,7 +121,7 @@ Vue.component('representation-linker', {
                 <td>{{representation.metadata.file_issue_allowed}}</td>
                 <td>{{representation.metadata.intended_use}}</td>
                 <td>{{representation.metadata.other_restrictions}}</td>
-<!--                <td></td>-->
+                <td>{{representation.metadata.processing_handling_notes}}</td>
             </tr>
             <tr>
                 <td colspan="13">

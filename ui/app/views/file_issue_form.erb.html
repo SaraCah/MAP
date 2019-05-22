@@ -51,7 +51,7 @@
                                     <th>Title</th>
                                     <th>Representation ID</th>
                                     <th>Format</th>
-                                    <!-- <th>Processing/ Handling Notes</th>-->
+                                    <th>Processing/ Handling Notes</th>
                                     <% if file_issue.fetch('issue_type') == 'DIGITAL' %>
                                         <th>Upload Date</th>
                                         <th>Link to File</th>
@@ -74,6 +74,7 @@
                                         <td><%= metadata.fetch('title') %></td>
                                         <td><%= metadata.fetch('representation_id') %></td>
                                         <td><%= metadata.fetch('format') %></td>
+                                        <td><%= metadata.fetch('processing_handling_notes', '') %></td>
                                         <% if file_issue.fetch('issue_type') == 'DIGITAL' %>
                                             <td><%= item.fetch('dispatch_date','') %></td>
                                             <td><!-- FIXME add link to file --></td>

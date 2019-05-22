@@ -45,16 +45,16 @@ class Representations
                                                    row[:resource_qsa_id],                   # series_id
                                                    row[:archival_object_qsa_id],            # record_id
                                                    row[:title],                             # title
-                                                   nil,                                     # start_date
-                                                   nil,                                     # end_date
+                                                   nil,                                     # start_date (calculated below)
+                                                   nil,                                     # end_date (calculated below)
                                                    row[:qsa_id],                            # representation_id
                                                    row[:agency_assigned_id],                # agency_assigned_id
-                                                   nil,                                     # previous_system_id
+                                                   nil,                                     # previous_system_id (calculated below)
                                                    row[:format_enum_value],                 # format
                                                    row[:file_issue_allowed] == 1,           # file_issue_allowed
                                                    row[:intended_use_enum_value],           # intended_use
                                                    row[:other_restrictions_notes],          # other_restrictions
-                                                   nil)                                     # processing_notes
+                                                   row[:processing_handling_notes])         # processing_handling_notes
 
             archival_object_to_representations[row[:archival_object_id]] ||= []
             archival_object_to_representations[row[:archival_object_id]] << results[row[:id]]
