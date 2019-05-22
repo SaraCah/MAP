@@ -88,40 +88,61 @@ Vue.component('representation-linker', {
     <table class="representation-linker-table">
         <thead>
             <tr>
-                <th>Series ID</th>
-                <th>Record ID</th>
+                <th>Identifiers</th>
                 <th>Title</th>
-                <th>Control Number</th>
-                <th>Previous System ID</th>
                 <th>Start Date</th>
                 <th>End Date</th>
-                <th>Representation ID</th>
                 <th>Format</th>
                 <th>File Issue Allowed</th>
-                <th>Intended Use</th>
-                <th>Other Restrictions</th>
-                <th>Processing/<br>Handling Notes</th>
+                <th>Extra Information</th>
             </tr>
         </thead>
         <tbody v-for="representation in selected">
             <tr>
                 <td>
-                    {{representation.metadata.series_id}}
-                    <input type="hidden" :name="buildPath('record_ref')" v-bind:value="representation.id"/>
-                    <input type="hidden" :name="buildPath('record_label')" v-bind:value="representation.label"/>
-                </td>
-                <td>{{representation.metadata.record_id}}</td>
+                  <input type="hidden" :name="buildPath('record_ref')" v-bind:value="representation.id"/>
+                  <input type="hidden" :name="buildPath('record_label')" v-bind:value="representation.label"/>
+
+                  <div class="identifier">Series:&nbsp;<span class="id">{{representation.metadata.series_id}}</span></div>
+                  <div class="identifier">Record:&nbsp;<span class="id">{{representation.metadata.record_id}}</span></div>
+
+                  <div class="identifier" v-if="representation.metadata.agency_assigned_id">
+                    Control&nbsp;Number:&nbsp;<span class="id">{{representation.metadata.agency_assigned_id}}</span>
+                  </div>
+                  <div class="identifier" v-if="representation.metadata.previous_system_id">
+                    Previous&nbsp;System:&nbsp;<span class="id">{{representation.metadata.previous_system_id}}</span>
+                  </div>
+                  <div class="identifier" v-if="representation.metadata.representation_id">
+                    Representation:&nbsp;<span class="id">{{representation.metadata.representation_id}}</span>
+                  </div>
+
                 <td>{{representation.metadata.title}}</td>
-                <td>{{representation.metadata.agency_assigned_id}}</td>
-                <td>{{representation.metadata.previous_system_id}}</td>
+
                 <td>{{representation.metadata.start_date}}</td>
                 <td>{{representation.metadata.end_date}}</td>
-                <td>{{representation.metadata.representation_id}}</td>
+
                 <td>{{representation.metadata.format}}</td>
-                <td>{{representation.metadata.file_issue_allowed}}</td>
-                <td>{{representation.metadata.intended_use}}</td>
-                <td>{{representation.metadata.other_restrictions}}</td>
-                <td>{{representation.metadata.processing_handling_notes}}</td>
+                <td>
+                  <span v-if="representation.metadata.file_issue_allowed">yes</span>
+                  <span v-else>no</span>
+                </td>
+
+                <td>
+                  <section class="extra-info" v-if="representation.metadata.intended_use">
+                    <h2>Intended Use</h2>
+                    <p>{{representation.metadata.intended_use}}</p>
+                  </section>
+
+                  <section class="extra-info" v-if="representation.metadata.other_restrictions">
+                    <h2>Other Restrictions</h2>
+                    <p>{{representation.metadata.other_restrictions}}</p>
+                  </section>
+
+                  <section class="extra-info" v-if="representation.metadata.processing_handling_notes">
+                    <h2>Processing/Handling Notes</h2>
+                    <p>{{representation.metadata.processing_handling_notes}}</p>
+                  </section>
+                </td>
             </tr>
             <tr>
                 <td colspan="13">
