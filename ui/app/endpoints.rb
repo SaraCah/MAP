@@ -531,7 +531,24 @@ class MAPTheApp < Sinatra::Base
     file_issue_request = Ctx.client.get_file_issue_request(params[:id])
     resolved_representations = Ctx.client.resolve_representations(file_issue_request.fetch('items').collect{|item| item.fetch('record_ref')}) 
 
-    Templates.emit_with_layout(:file_issue_request_view, {request: file_issue_request, resolved_representations: resolved_representations, is_readonly: !file_issue_request.can_edit?},
+    digital_request_quote = nil
+    physical_request_quote = nil
+
+    if file_issue_request.show_digital_quote?
+      digital_request_quote = Ctx.client.get_file_issue_quote(file_issue_request.fetch('aspace_digital_quote_id'))
+    end
+
+    if file_issue_request.show_physical_quote?
+      physical_request_quote = Ctx.client.get_file_issue_quote(file_issue_request.fetch('aspace_physical_quote_id'))
+    end
+
+    Templates.emit_with_layout(:file_issue_request_view, {
+                                 request: file_issue_request,
+                                 resolved_representations: resolved_representations,
+                                 is_readonly: !file_issue_request.can_edit?,
+                                 digital_request_quote: digital_request_quote,
+                                 physical_request_quote: physical_request_quote,
+                               },
                                :layout, title: "File Issue Request", context: ['file_issues', 'file_issue_requests'])
   end
 

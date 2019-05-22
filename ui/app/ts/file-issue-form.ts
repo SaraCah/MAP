@@ -10,6 +10,21 @@ Vue.use(VueResource);
 // import Utils from "./utils";
 import RepresentationRequest from "./representation-linker";
 
+interface QuoteLineItem {
+    description: string,
+    quantity: number;
+    charge_per_unit_cents: number;
+    charge_quantity_unit: string;
+    charge_cents: number;
+}
+
+interface Quote {
+    id: number;
+    issued_date: string;
+    total_charge_cents: string;
+    line_items: QuoteLineItem[];
+}
+
 Vue.component('file-issue-form', {
     template: `
 <div>
@@ -27,7 +42,8 @@ Vue.component('file-issue-form', {
                                     :status="digital_request_status"
                                     :csrf_token="csrf_token"
                                     :request_id="request_id"
-                                    request_type="digital">
+                                    request_type="digital"
+                                    :quote_blob="digital_request_quote">
         </file-issue-request-summary>
     </section>
 
@@ -37,7 +53,8 @@ Vue.component('file-issue-form', {
                                     :status="physical_request_status"
                                     :csrf_token="csrf_token"
                                     :request_id="request_id"
-                                    request_type="physical">
+                                    request_type="physical"
+                                    :quote_blob="physical_request_quote">
         </file-issue-request-summary>
     </section>
 </div>
@@ -47,7 +64,15 @@ Vue.component('file-issue-form', {
             readonly: this.is_readonly == 'true',
         };
     },
-    props: ['representations', 'resolved_representations', 'is_readonly', 'digital_request_status', 'physical_request_status', 'csrf_token', 'request_id'],
+    props: ['representations',
+            'resolved_representations',
+            'is_readonly',
+            'digital_request_status',
+            'physical_request_status',
+            'csrf_token',
+            'request_id',
+            'digital_request_quote',
+            'physical_request_quote'],
     methods: {
         refreshSummaries: function() {
             // FIXME type?
@@ -72,7 +97,6 @@ Vue.component('file-issue-form', {
         },
     },
     mounted: function() {
-        console.log("MOUNTED: file-issue-form");
         this.refreshSummaries();
     }
 });
@@ -93,6 +117,7 @@ Vue.component('file-issue-request-summary', {
                 <a target="_blank" href="/file-issue-fee-schedule">View Fee Schedule</a>
             </div>
         </div>
+        <h5>Items Requested</h5>
         <table>
             <thead>
                 <tr>
@@ -117,9 +142,35 @@ Vue.component('file-issue-request-summary', {
                 </tr>
             </tbody>
         </table>
+        <template v-if="quote != null">
+            <h5>Quote</h5>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Unit Description</th>
+                        <th>Unit Cost</th>
+                        <th>No. of Units</th>
+                        <th>Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in quote.line_items">
+                        <td>{{item.description}}</td>
+                        <td>{{formatCents(item.charge_per_unit_cents)}} per {{formatUnit(item.charge_quantity_unit)}}</td>
+                        <td>{{item.quantity}}</td>
+                        <td class="right-align">{{formatCents(item.charge_cents)}}</td>
+                    </tr>
+                    <tr class="grey lighten-4">
+                        <td colspan="3"><strong>TOTAL</strong></td>
+                        <td class="right-align">{{formatCents(quote.total_charge_cents)}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Issued: {{quote.issued_date}}</p>
+        </template>
         <template v-if="status === 'QUOTE_PROVIDED'">
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col s12">
                     <confirmable-action
                         :action="'/file-issue-requests/'+request_id+'/accept?request_type='+request_type"
                         :csrf_token="csrf_token"
@@ -168,15 +219,40 @@ Vue.component('file-issue-request-summary', {
     </template>
 </div>
 `,
-    data: function(): {items: RepresentationRequest[]} {
+    data: function(): {items: RepresentationRequest[], quote: Quote|null} {
+        let quote = null;
+
+        if (this.quote_blob != 'null') {
+            quote = JSON.parse(this.quote_blob);
+        }
+
         return {
             items: [],
+            quote: quote,
         };
     },
-    props: ['status', 'request_type', 'request_id', 'csrf_token'],
+    props: ['status', 'request_type', 'request_id', 'csrf_token', 'quote_blob'],
     methods: {
         syncItems: function(reps:RepresentationRequest[]) {
             this.items = reps;
+        },
+        formatCents: function(cents:number) {
+            return (cents / 100).toLocaleString(undefined, {style: 'currency', currency: 'AUD'});
+        },
+        formatUnit: function (unit:string) {
+            if (unit === 'qtr_hour') {
+                return '15min';
+            }
+            return unit;
         }
-    }
+    },
+    updated: function() {
+        this.$el.querySelectorAll('input,textarea,select').forEach(function (el) {
+            if ((el as HTMLFormElement).value !== "") {
+                if (el.nextElementSibling) {
+                    el.nextElementSibling.classList.add('active');
+                }
+            }
+        });
+    },
 });
