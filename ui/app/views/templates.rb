@@ -26,12 +26,10 @@ Templates.define(:header, [:title, [:context]], "views/header.erb.html")
 
 Templates.define(:transfer_proposals, [:paged_results], "views/transfer_proposals.erb.html")
 Templates.define(:transfers, [:paged_results], "views/transfers.erb.html")
-Templates.define(:transfer_proposal_new, [:transfer, :errors?, :is_readonly?], "views/transfer_proposal_form.erb.html")
 Templates.define(:transfer_proposal_view, [:transfer, :errors?, :is_readonly], "views/transfer_proposal_form.erb.html")
 Templates.define(:transfer_view, [:transfer, :errors?, :is_readonly], "views/transfer_form.erb.html")
 
 Templates.define(:file_issue_requests, [:paged_results], "views/file_issue_requests.erb.html")
-Templates.define(:file_issue_request_new, [:request, :resolved_representations?, :errors?, :is_readonly?], "views/file_issue_request_form.erb.html")
 Templates.define(:file_issue_request_view, [:request, :resolved_representations?, :errors?, :is_readonly?, :digital_request_quote?, :physical_request_quote?], "views/file_issue_request_form.erb.html")
 Templates.define(:file_issues, [:paged_results], "views/file_issues.erb.html")
 Templates.define(:file_issue_view, [:file_issue, :resolved_representations?, :errors?, :is_readonly?], "views/file_issue_form.erb.html")

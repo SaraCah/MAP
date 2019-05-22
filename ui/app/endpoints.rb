@@ -302,7 +302,7 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/transfer-proposals/new') do
-    Templates.emit_with_layout(:transfer_proposal_new, {transfer: TransferProposal.new, is_readonly: false},
+    Templates.emit_with_layout(:transfer_proposal_view, {transfer: TransferProposal.new, is_readonly: false},
                                :layout, title: "New Transfer Proposal", context: ['transfers', 'transfer_proposals'])
   end
 
@@ -314,7 +314,7 @@ class MAPTheApp < Sinatra::Base
     if errors.empty?
       redirect '/transfer-proposals'
     else
-      Templates.emit_with_layout(:transfer_proposal_new, {transfer: params[:transfer], errors: errors},
+      Templates.emit_with_layout(:transfer_proposal_view, {transfer: params[:transfer], errors: errors},
                                  :layout, title: "New Transfer Proposal", context: ['transfers', 'transfer_proposals'])
     end
   end
@@ -508,7 +508,7 @@ class MAPTheApp < Sinatra::Base
       end
     end
 
-    Templates.emit_with_layout(:file_issue_request_new, {request: request, resolved_representations: resolved_representations, is_readonly: false},
+    Templates.emit_with_layout(:file_issue_request_view, {request: request, resolved_representations: resolved_representations, is_readonly: false},
                                :layout, title: "New Request", context: ['file_issues', 'file_issue_requests'])
   end
 
@@ -521,7 +521,7 @@ class MAPTheApp < Sinatra::Base
       redirect '/file-issue-requests'
     else
       resolved_representations = Ctx.client.resolve_representations(params[:file_issue_request].fetch('items').collect{|item| item.fetch('record_ref')})
-      Templates.emit_with_layout(:file_issue_request_new, {request: params[:file_issue_request], resolved_representations: resolved_representations, errors: errors},
+      Templates.emit_with_layout(:file_issue_request_view, {request: params[:file_issue_request], resolved_representations: resolved_representations, errors: errors},
                                  :layout, title: "New Request", context: ['file_issues', 'file_issue_requests'])
     end
   end
