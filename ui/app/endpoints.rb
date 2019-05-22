@@ -102,7 +102,7 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/users/new') do
-    Templates.emit_with_layout(:user_new, {user: UserDTO.new},
+    Templates.emit_with_layout(:user_edit, {user: UserDTO.new},
                                :layout, title: "New User", context: ['users'])
   end
 
@@ -130,7 +130,7 @@ class MAPTheApp < Sinatra::Base
     if errors.empty?
       redirect '/users'
     else
-      Templates.emit_with_layout(:user_new, {user: params[:user], errors: errors},
+      Templates.emit_with_layout(:user_edit, {user: params[:user], errors: errors},
                                  :layout, title: "New User", context: ['users'])
     end
   end
@@ -205,7 +205,7 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/locations/new') do
     if Ctx.permissions.allow_manage_locations?
-      Templates.emit_with_layout(:location_new, {location: AgencyLocationDTO.new},
+      Templates.emit_with_layout(:location_edit, {location: AgencyLocationDTO.new},
                                  :layout, title: "New Location", context: ['locations'])
     else
       [404]
@@ -226,7 +226,7 @@ class MAPTheApp < Sinatra::Base
     if errors.empty?
       redirect '/locations'
     else
-      Templates.emit_with_layout(:location_new, {location: params[:location], errors: errors},
+      Templates.emit_with_layout(:location_edit, {location: params[:location], errors: errors},
                                  :layout, title: "New Location", context: ['locations'])
     end
   end

@@ -7,6 +7,12 @@ class Templates
   @templates = {}
 
   def self.define(name, argspecs, erb_file)
+    existing_template = @templates.keys.find {|key| @templates[key].erb_file == erb_file}
+
+    if existing_template && existing_template != name
+      raise "Error in template '#{name}': File '#{erb_file}' is already used by template: #{existing_template}"
+    end
+
     @templates[name] = TemplateDef.new(name, argspecs, erb_file)
   end
 
@@ -58,6 +64,8 @@ class Templates
   end
 
   class TemplateDef
+    attr_reader :erb_file
+
     def initialize(name, argspecs, erb_file)
       @name = name
       @argspecs = argspecs.map {|a| parse_argspec(a)}.map {|argspec| [argspec.name, argspec]}.to_h
