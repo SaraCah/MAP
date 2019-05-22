@@ -23,6 +23,8 @@ class FileIssueRequest
   define_field(:agency_id, Integer, required: false)
   define_field(:agency_location_id, Integer, required: false)
   define_field(:handle_id, Integer, required: false)
+  define_field(:aspace_digital_quote_id, Integer, required: false)
+  define_field(:aspace_physical_quote_id, Integer, required: false)
 
   def self.from_hash(hash)
     if ['yes', 'no'].include?(hash[:deliver_to_reading_room])
@@ -50,6 +52,8 @@ class FileIssueRequest
         created_by: row[:created_by],
         create_time: row[:create_time],
         items: item_rows.map{|item_row| FileIssueRequestItem.from_row(item_row)},
+        aspace_digital_quote_id: row[:aspace_digital_quote_id],
+        aspace_physical_quote_id: row[:aspace_physical_quote_id],
         handle_id: handle_id)
   end
 
@@ -61,6 +65,14 @@ class FileIssueRequest
     return false if [CANCELLED_BY_QSA, CANCELLED_BY_AGENCY].include?(fetch('physical_request_status')) && fetch('digital_request_status') == NONE_REQUESTED
 
     true
+  end
+
+  def show_digital_quote?
+    fetch('aspace_digital_quote_id', false) && [FileIssueRequest::QUOTE_PROVIDED, FileIssueRequest::QUOTE_ACCEPTED, FileIssueRequest::FILE_ISSUE_CREATED].include?(fetch('digital_request_status', false))
+  end
+
+  def show_physical_quote?
+    fetch('aspace_physical_quote_id', false) && [FileIssueRequest::QUOTE_PROVIDED, FileIssueRequest::QUOTE_ACCEPTED, FileIssueRequest::FILE_ISSUE_CREATED].include?(fetch('physical_request_status', false))
   end
 
   def id_for_display

@@ -76,7 +76,7 @@ class FileIssues < BaseStorage
     AspaceDB.open do |aspace_db|
       quote_row = aspace_db[:service_quote][id: quote_id]
 
-      quote = ServiceQuote.new(quote_row[:id], quote_row[:issued_date], '100000000', []) #FIXME total amount
+      quote = ServiceQuote.new(quote_row[:id], quote_row[:issued_date], 0, []) #FIXME total amount
 
       aspace_db[:service_quote_line]
         .join(Sequel.as(:enumeration, :charge_quantity_unit_enum), Sequel[:charge_quantity_unit_enum][:name] => 'runcorn_charge_quantity_unit')
@@ -95,7 +95,8 @@ class FileIssues < BaseStorage
                                                      line_item_row[:quantity],
                                                      line_item_row[:charge_per_unit_cents],
                                                      line_item_row[:charge_quantity_unit],
-                                                     line_item_row[:quantity].to_i * line_item_row[:charge_per_unit_cents].to_i)
+                                                     line_item_row[:quantity].to_i * line_item_row[:charge_per_unit_cents].to_i) # FIXME pull this from ASpace?
+        quote.total_charge_cents += line_item_row[:quantity].to_i * line_item_row[:charge_per_unit_cents].to_i # FIXME pull this from ASpace?
       end
 
       result = quote
