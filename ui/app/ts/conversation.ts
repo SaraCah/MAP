@@ -29,7 +29,7 @@ Vue.component('conversation', {
         </div>
         <div>
             <textarea ref="message" class="materialize-textarea" placeholder="Type your message!" v-model="message"></textarea>
-            <a class="btn" ref="postButton" v-on:click="post()">Post Message</a>
+            <a tabindex=0 class="btn" ref="postButton" v-on:click="post()" v-on:keyup.enter="post()">Post Message</a>
         </div>
     </div>
 </div>
@@ -67,7 +67,7 @@ Vue.component('conversation', {
                 return;
             }
 
-            if (this.message === '') {
+            if (this.message.trim() === '') {
                 return;
             }
 
@@ -77,7 +77,7 @@ Vue.component('conversation', {
                 '/post-message',
                 {
                     handle_id: this.handle_id,
-                    message: this.message,
+                    message: this.message.trim(),
                     authenticity_token: this.csrf_token,
                 },
                 {
