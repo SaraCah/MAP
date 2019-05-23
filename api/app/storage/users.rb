@@ -125,23 +125,23 @@ class Users < BaseStorage
       if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)
         Permissions.clear_roles(user.fetch('id'))
 
-        user.fetch('agency_roles').each do |agency_role|
-          agency_ref = agency_role.fetch('agency_ref')
-          role = agency_role.fetch('role')
-          location_id = agency_role.fetch('agency_location_id', nil)
-          permissions = agency_role.fetch('permissions')
+        unless user.fetch('is_admin')
+          user.fetch('agency_roles').each do |agency_role|
+            agency_ref = agency_role.fetch('agency_ref')
+            role = agency_role.fetch('role')
+            location_id = agency_role.fetch('agency_location_id', nil)
+            permissions = agency_role.fetch('permissions')
 
-          # FIXME ref
-          (_, aspace_agency_id) = agency_ref.split(':')
+            (_, aspace_agency_id) = agency_ref.split(':')
+            agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
 
-          agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
-
-          if role == 'SENIOR_AGENCY_ADMIN'
-            Permissions.add_agency_senior_admin(user.fetch('id'), agency_id)
-          elsif role == 'AGENCY_ADMIN'
-            Permissions.add_agency_admin(user.fetch('id'), agency_id, location_id, permissions)
-          elsif role == 'AGENCY_CONTACT'
-            Permissions.add_agency_contact(user.fetch('id'), agency_id, location_id, permissions)
+            if role == 'SENIOR_AGENCY_ADMIN'
+              Permissions.add_agency_senior_admin(user.fetch('id'), agency_id)
+            elsif role == 'AGENCY_ADMIN'
+              Permissions.add_agency_admin(user.fetch('id'), agency_id, location_id, permissions)
+            elsif role == 'AGENCY_CONTACT'
+              Permissions.add_agency_contact(user.fetch('id'), agency_id, location_id, permissions)
+            end
           end
         end
       else
@@ -149,7 +149,7 @@ class Users < BaseStorage
         # FIXME clean this up
         agency_role = user.fetch('agency_roles').first
         agency_ref = agency_role.fetch('agency_ref')
-        # FIXME ref
+
         (_, aspace_agency_id) = agency_ref.split(':')
         agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
         role = agency_role.fetch('role')
@@ -188,23 +188,23 @@ class Users < BaseStorage
                   self.create_user(user.fetch('username'), user.fetch('username'))
                 end
 
-      user.fetch('agency_roles', []).each do |agency_role|
-        agency_ref = agency_role.fetch('agency_ref')
-        role = agency_role.fetch('role')
-        location_id = agency_role.fetch('agency_location_id', nil)
-        permissions = agency_role.fetch('permissions')
+      unless user.fetch('is_admin')
+        user.fetch('agency_roles', []).each do |agency_role|
+          agency_ref = agency_role.fetch('agency_ref')
+          role = agency_role.fetch('role')
+          location_id = agency_role.fetch('agency_location_id', nil)
+          permissions = agency_role.fetch('permissions')
 
-        # FIXME ref
-        (_, aspace_agency_id) = agency_ref.split(':')
+          (_, aspace_agency_id) = agency_ref.split(':')
+          agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
 
-        agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
-
-        if role == 'SENIOR_AGENCY_ADMIN'
-          Permissions.add_agency_senior_admin(user_id, agency_id)
-        elsif role == 'AGENCY_ADMIN'
-          Permissions.add_agency_admin(user_id, agency_id, location_id, permissions)
-        elsif role == 'AGENCY_CONTACT'
-          Permissions.add_agency_contact(user_id, agency_id, location_id, permissions)
+          if role == 'SENIOR_AGENCY_ADMIN'
+            Permissions.add_agency_senior_admin(user_id, agency_id)
+          elsif role == 'AGENCY_ADMIN'
+            Permissions.add_agency_admin(user_id, agency_id, location_id, permissions)
+          elsif role == 'AGENCY_CONTACT'
+            Permissions.add_agency_contact(user_id, agency_id, location_id, permissions)
+          end
         end
       end
 
