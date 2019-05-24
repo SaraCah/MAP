@@ -68,9 +68,9 @@ Vue.component('confirmable-action', {
                         location.reload();
                     });
             } else if (this.target_form_id !== undefined) {
-                const formEl:HTMLElement|null = document.getElementById(this.target_form_id);
+                const formEl: HTMLElement|null = document.getElementById(this.target_form_id);
                 if (formEl) {
-                    (<HTMLFormElement>formEl).submit();
+                    (formEl as HTMLFormElement).submit();
                 }
             }
         },

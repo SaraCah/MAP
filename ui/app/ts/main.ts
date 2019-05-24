@@ -5,12 +5,12 @@ import Vue from "vue";
 import 'confirmable-action';
 import 'conversation';
 import 'current-location-selector';
+import 'file-issue-form';
 import 'file-uploader';
 import 'linker';
-import 'transfer-proposal-series';
 import 'representation-linker';
-import 'file-issue-form';
 import 'select-with-other-option';
+import 'transfer-proposal-series';
 
 declare var M: any; // Materialize on the window context
 

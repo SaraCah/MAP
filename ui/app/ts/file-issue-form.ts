@@ -11,18 +11,18 @@ Vue.use(VueResource);
 import RepresentationRequest from "./representation-linker";
 
 interface QuoteLineItem {
-    description: string,
+    description: string;
     quantity: number;
-    charge_per_unit_cents: number;
-    charge_quantity_unit: string;
-    charge_cents: number;
+    chargePerUnitCents: number;
+    chargeQuantityUnit: string;
+    chargeCents: number;
 }
 
 interface Quote {
     id: number;
-    issued_date: string;
-    total_charge_cents: string;
-    line_items: QuoteLineItem[];
+    issuedDate: string;
+    totalChargeCents: string;
+    lineItems: QuoteLineItem[];
 }
 
 Vue.component('file-issue-form', {
@@ -61,7 +61,7 @@ Vue.component('file-issue-form', {
 `,
     data: function(): {readonly: boolean} {
         return {
-            readonly: this.is_readonly == 'true',
+            readonly: this.is_readonly === 'true',
         };
     },
     props: ['representations',
@@ -76,29 +76,29 @@ Vue.component('file-issue-form', {
     methods: {
         refreshSummaries: function() {
             // FIXME type?
-            const digitalRequest:any = this.$refs.digitalRequest;
+            const digitalRequest: any = this.$refs.digitalRequest;
             digitalRequest.syncItems(this.getDigitalRepresentations());
-            const physicalRequest:any = this.$refs.physicalRequest;
+            const physicalRequest: any = this.$refs.physicalRequest;
             physicalRequest.syncItems(this.getPhysicalRepresentations());
         },
         getDigitalRepresentations: function() {
-            // FIXME type? 
-            const linker:any = this.$refs.linker;
-            return Utils.filter(linker.getSelected(), (rep:RepresentationRequest) => {
-                return rep.request_type == 'DIGITAL';
+            // FIXME type?
+            const linker: any = this.$refs.linker;
+            return Utils.filter(linker.getSelected(), (rep: RepresentationRequest) => {
+                return rep.requestType === 'DIGITAL';
             });
         },
         getPhysicalRepresentations: function() {
-            // FIXME type? 
-            const linker:any = this.$refs.linker;
-            return Utils.filter(linker.getSelected(), (rep:RepresentationRequest) => {
-                return rep.request_type == 'PHYSICAL';
+            // FIXME type?
+            const linker: any = this.$refs.linker;
+            return Utils.filter(linker.getSelected(), (rep: RepresentationRequest) => {
+                return rep.requestType === 'PHYSICAL';
             });
         },
     },
     mounted: function() {
         this.refreshSummaries();
-    }
+    },
 });
 
 Vue.component('file-issue-request-summary', {
@@ -127,7 +127,7 @@ Vue.component('file-issue-request-summary', {
                     <th>Record Details</th>
                     <th style="width: 60px;">Representation ID</th>
                     <th style="width: 100px;">Format</th>
-                    <th>Processing/<br>Handling Notes</th>  
+                    <th>Processing/<br>Handling Notes</th>
                 </tr>
             </thead>
             <tbody>
@@ -154,19 +154,19 @@ Vue.component('file-issue-request-summary', {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in quote.line_items">
+                    <tr v-for="item in quote.lineItems">
                         <td>{{item.description}}</td>
-                        <td>{{formatCents(item.charge_per_unit_cents)}} per {{formatUnit(item.charge_quantity_unit)}}</td>
+                        <td>{{formatCents(item.chargePerUnitCents)}} per {{formatUnit(item.chargeQuantityUnit)}}</td>
                         <td>{{item.quantity}}</td>
-                        <td class="right-align">{{formatCents(item.charge_cents)}}</td>
+                        <td class="right-align">{{formatCents(item.chargeCents)}}</td>
                     </tr>
                     <tr class="grey lighten-4">
                         <td colspan="3"><strong>TOTAL</strong></td>
-                        <td class="right-align">{{formatCents(quote.total_charge_cents)}}</td>
+                        <td class="right-align">{{formatCents(quote.totalChargeCents)}}</td>
                     </tr>
                 </tbody>
             </table>
-            <p>Issued: {{quote.issued_date}}</p>
+            <p>Issued: {{quote.issuedDate}}</p>
         </template>
         <template v-if="status === 'QUOTE_PROVIDED'">
             <div class="row">
@@ -222,7 +222,7 @@ Vue.component('file-issue-request-summary', {
     data: function(): {items: RepresentationRequest[], quote: Quote|null} {
         let quote = null;
 
-        if (this.quote_blob != 'null') {
+        if (this.quote_blob !== 'null') {
             quote = JSON.parse(this.quote_blob);
         }
 
@@ -233,21 +233,21 @@ Vue.component('file-issue-request-summary', {
     },
     props: ['status', 'request_type', 'request_id', 'csrf_token', 'quote_blob'],
     methods: {
-        syncItems: function(reps:RepresentationRequest[]) {
+        syncItems: function(reps: RepresentationRequest[]) {
             this.items = reps;
         },
-        formatCents: function(cents:number) {
+        formatCents: function(cents: number) {
             return (cents / 100).toLocaleString(undefined, {style: 'currency', currency: 'AUD'});
         },
-        formatUnit: function (unit:string) {
+        formatUnit: function(unit: string) {
             if (unit === 'qtr_hour') {
                 return '15min';
             }
             return unit;
-        }
+        },
     },
     updated: function() {
-        this.$el.querySelectorAll('input,textarea,select').forEach(function (el) {
+        this.$el.querySelectorAll('input,textarea,select').forEach(function(el) {
             if ((el as HTMLFormElement).value !== "") {
                 if (el.nextElementSibling) {
                     el.nextElementSibling.classList.add('active');

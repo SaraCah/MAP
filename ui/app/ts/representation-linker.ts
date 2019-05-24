@@ -11,8 +11,8 @@ Vue.use(VueResource);
 // import UI from "./ui";
 
 interface Representation {
-    id: string,
-    label: string,
+    id: string;
+    label: string;
 }
 
 export default class RepresentationRequest {
@@ -20,13 +20,13 @@ export default class RepresentationRequest {
         return new RepresentationRequest(rep.id, rep.label, 'DIGITAL');
     }
 
-    public record_details: string;
+    public recordDetails: string;
     public metadata: any;
 
     constructor(public id: string,
                 public label: string,
-                public request_type: string) {
-        this.record_details = ''
+                public requestType: string) {
+        this.recordDetails = '';
     }
 }
 
@@ -41,7 +41,7 @@ Vue.component('representation-typeahead', {
   </ul>
 </div>
 `,
-    data: function(): {matches: Representation[], text: string, handleInputTimeout:number|null} {
+    data: function(): {matches: Representation[], text: string, handleInputTimeout: number|null} {
         return {
             matches: [],
             text: '',
@@ -150,10 +150,10 @@ Vue.component('representation-linker', {
                         <div class="col s2">
                             <label>Request Type</label>
                             <template v-if="readonly">
-                                <input type="text" :name="buildPath('request_type')" v-model="representation.request_type" readonly />
+                                <input type="text" :name="buildPath('request_type')" v-model="representation.requestType" readonly />
                             </template>
                             <template v-else>
-                                <select class="browser-default" :name="buildPath('request_type')" v-model="representation.request_type" v-on:change="handleRequestTypeChange()">
+                                <select class="browser-default" :name="buildPath('request_type')" v-model="representation.requestType" v-on:change="handleRequestTypeChange()">
                                     <option value="DIGITAL">Digital</option>
                                     <option value="PHYSICAL">Physical</option>
                                 </select>
@@ -161,7 +161,7 @@ Vue.component('representation-linker', {
                         </div>
                         <div class="col s8">
                             <label>Record Details</label>
-                            <textarea class="materialize-textarea" :name="buildPath('record_details')" v-model="representation.record_details" :readonly="readonly"></textarea>
+                            <textarea class="materialize-textarea" :name="buildPath('record_details')" v-model="representation.recordDetails" :readonly="readonly"></textarea>
                         </div>
                         <div class="col s2">
                             <template v-if="!readonly">
@@ -180,20 +180,20 @@ Vue.component('representation-linker', {
     data: function(): {selected: RepresentationRequest[]} {
         const prepopulated: RepresentationRequest[] = [];
 
-        const resolved:any = JSON.parse(this.resolved_representations);
+        const resolved: any = JSON.parse(this.resolved_representations);
 
         JSON.parse(this.representations).forEach((representationBlob: any) => {
             const rep: RepresentationRequest = new RepresentationRequest(representationBlob.record_ref, '', representationBlob.request_type);
-            rep.record_details = representationBlob.record_details;
-            rep.metadata = Utils.find(resolved, (item:any) => {
-                return item.ref == representationBlob.record_ref;
+            rep.recordDetails = representationBlob.recordDetails;
+            rep.metadata = Utils.find(resolved, (item: any) => {
+                return item.ref === representationBlob.record_ref;
             });
             rep.label = rep.metadata.title;
             prepopulated.push(rep);
         });
 
         return {
-            selected: prepopulated
+            selected: prepopulated,
         };
     },
     props: ['input_path', 'representations', 'resolved_representations', 'readonly'],
@@ -201,24 +201,24 @@ Vue.component('representation-linker', {
         getSelected: function() {
             return this.selected;
         },
-        addSelected: function(representation:RepresentationRequest) {
+        addSelected: function(representation: RepresentationRequest) {
             const selectedRepresentation: RepresentationRequest = RepresentationRequest.fromRepresentation(representation);
             this.$http.get('/resolve/representations', {
                 method: 'GET',
                 params: {
-                    'ref[]': selectedRepresentation.id
+                    'ref[]': selectedRepresentation.id,
                 },
             }).then((response: any) => response.json())
               .then((json: any) => {
                   selectedRepresentation.metadata = json[0];
-                  selectedRepresentation.label = selectedRepresentation.metadata.title; 
+                  selectedRepresentation.label = selectedRepresentation.metadata.title;
                   this.selected.push(selectedRepresentation);
                   this.$emit('change');
               });
         },
-        removeSelected: function(representationToRemove:RepresentationRequest) {
+        removeSelected: function(representationToRemove: RepresentationRequest) {
             this.selected = Utils.filter(this.selected, (representation: RepresentationRequest) => {
-                return !(representation.id === representationToRemove.id && representation.request_type === representationToRemove.request_type); 
+                return !(representation.id === representationToRemove.id && representation.requestType === representationToRemove.requestType);
             });
             this.$emit('change');
         },
@@ -229,6 +229,4 @@ Vue.component('representation-linker', {
             return this.input_path + "[" + field + "]";
         },
     },
-    mounted: function() {
-    }
 });
