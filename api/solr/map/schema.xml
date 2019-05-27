@@ -32,6 +32,10 @@
   <copyField source="physical_representations" dest="all_representations" />
   <copyField source="digital_representations" dest="all_representations" />
 
+  <!-- This just here for CSV validator compat for the time being -->
+  <field name="identifier" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  <copyField source="qsa_id" dest="identifier" />
+
   <copyField source="title" dest="keywords" />
   <copyField source="title" dest="ngrams" />
   <copyField source="title" dest="edge_ngrams" />
