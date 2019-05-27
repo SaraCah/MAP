@@ -16,7 +16,7 @@ class FileIssueRequest
   define_field(:physical_request_status, String, required: false, default: NONE_REQUESTED)
   define_field(:urgent, Boolean, default: false)
   define_field(:deliver_to_reading_room, Boolean, default: false)
-  define_field(:delivery_authorizer, String, validator: proc {|s, request| !request.fetch('deliver_to_reading_room') && (s.nil? || s.empty?) ? "Delivery Authorizer can't be blank" : nil })
+  define_field(:delivery_authorizer, String, validator: proc {|s, request| request.is_delivery_authorizer_required? ? "Delivery Authorizer can't be blank" : nil })
   define_field(:items, [FileIssueRequestItem], default: [], validator: proc {|arr| arr.empty? ? "Items can't be empty" : nil })
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)
@@ -83,5 +83,14 @@ class FileIssueRequest
 
   def self.id_for_display(id)
     "R#{id}"
+  end
+
+  def is_delivery_authorizer_required?
+    return false if fetch('deliver_to_reading_room')
+    return false unless fetch('items').any?{|item| item.fetch('request_type').downcase == 'physical'}
+
+    s = fetch('delivery_authorizer', nil)
+
+    s.nil? || s.empty?
   end
 end
