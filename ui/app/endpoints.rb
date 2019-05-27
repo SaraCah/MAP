@@ -69,6 +69,10 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  Endpoint.get('/favicon.ico') do
+    send_file File.absolute_path('favicon.ico')
+  end
+
   Endpoint.get('/webfonts/*') do
     filename = request.path.split('/').last
     if File.exist?(file = File.join('webfonts', filename))
