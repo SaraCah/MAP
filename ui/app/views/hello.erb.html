@@ -5,6 +5,7 @@
       <table>
         <thead>
           <tr>
+            <th>Type</th>
             <th>Record</th>
             <th></th>
             <th>QSA Identifier</th>
@@ -15,15 +16,20 @@
         <tbody>
           <% agency.controlled_records.each do |record| %>
             <tr>
+              <td><%= record['type'] %></td>
               <td><%= record['title'] %></td>
               <td><span class="badge"><%= record['under_movement'] ? 'under movement' : '' %></span></td>
               <td><%= record['type'] + ' ' + record['qsa_id'] %></td>
               <td>
-                <%=
-                ['physical', 'digital']
-                .map {|rep_type| record["#{rep_type}_representations_count"].to_s + " #{rep_type}" }
-                .join('; ')
-                %>
+                <% if Array(record['types']).include?('representation') %>
+                  N/A
+                <% else %>
+                  <%=
+                  ['physical', 'digital']
+                  .map {|rep_type| record["#{rep_type}_representations_count"].to_s + " #{rep_type}" }
+                  .join('; ')
+                  %>
+                <% end %>
               </td>
               <td>
                 <% if record['file_issue_allowed'] %>

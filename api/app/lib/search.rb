@@ -99,12 +99,19 @@ class Search
   end
 
 
+  TYPE_LABELS = {
+    'resource' => 'Series',
+    'archival_object' => 'Record',
+    'physical_representation' => 'Physical Representation',
+    'digital_representation' => 'Digital Representation',
+  }
+
   def self.record_hash(record)
     (_, aspace_agency_id) = Ctx.get.current_location.agency.fetch('id').split(':')
     this_agency_uri = "/agents/corporate_entities/#{aspace_agency_id}"
 
     record.merge({
-                   'type' => record['primary_type'] == 'resource' ? 'Series' : 'Record',
+                   'type' => TYPE_LABELS.fetch(record['primary_type'], ''),
                    'under_movement' => record['responsible_agency'] != this_agency_uri,
                  })
   end
