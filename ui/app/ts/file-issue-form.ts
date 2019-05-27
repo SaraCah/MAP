@@ -220,10 +220,28 @@ Vue.component('file-issue-request-summary', {
 </div>
 `,
     data: function(): {items: RepresentationRequest[], quote: Quote|null} {
-        let quote = null;
+        let quote: Quote|null = null;
 
         if (this.quote_blob !== 'null') {
-            quote = JSON.parse(this.quote_blob);
+            const rawQuote = JSON.parse(this.quote_blob);
+            quote = {
+                id: rawQuote.id,
+                issuedDate: rawQuote.issued_date,
+                totalChargeCents: rawQuote.total_charge_cents,
+                lineItems: [],
+            };
+
+            rawQuote.line_items.forEach((rawItem: any) => {
+                if (quote) {
+                    quote.lineItems.push({
+                        description: rawItem.description,
+                        quantity: rawItem.quantity,
+                        chargePerUnitCents: rawItem.charge_per_unit_cents,
+                        chargeQuantityUnit: rawItem.charge_quantity_unit,
+                        chargeCents: rawItem.charge_cents,
+                    });
+                }
+            });
         }
 
         return {
