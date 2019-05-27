@@ -584,7 +584,7 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.post('/file-issue-requests/:id/cancel')
     .param(:id, Integer, "ID of file issue request")
-    .param(:request_type, String, "Request type this action applies to") do
+    .param(:request_type, String, "Request type this action applies to", optional: true) do
     Ctx.client.cancel_file_issue_request(params[:id], params[:request_type])
 
     redirect "/file-issue-requests/#{params[:id]}"

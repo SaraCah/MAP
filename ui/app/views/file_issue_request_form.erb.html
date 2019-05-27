@@ -142,6 +142,15 @@
                                             message="<p>Please be aware saving this request will invalidate any provided quotes.</p><p>Are you sure you want to save this request?</p>">
                                     </confirmable-action>
                                 <% end %>
+                                <% unless request.new? %>
+                                    <confirmable-action
+                                            action="/file-issue-requests/<%= request.fetch('id') %>/cancel"
+                                            csrf_token="<%= FormHelper.csrf_token %>"
+                                            css="btn red lighten-2"
+                                            label="Cancel Request"
+                                            message="Are you sure you want to cancel this request? ">
+                                    </confirmable-action>
+                                <% end %>
                             </div>
                         </div>
                     </section>

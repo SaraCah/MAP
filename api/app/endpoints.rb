@@ -539,7 +539,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/file-issue-requests/cancel')
     .param(:id, Integer, "ID of file issue request")
-    .param(:request_type, String, "Request type this action applies to") do
+    .param(:request_type, String, "Request type this action applies to", optional: true) do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       existing_file_issue_request = FileIssues.request_dto_for(params[:id])
       if existing_file_issue_request && Ctx.get.permissions.can_manage_file_issues?(existing_file_issue_request.fetch('agency_id'), existing_file_issue_request.fetch('agency_location_id'))

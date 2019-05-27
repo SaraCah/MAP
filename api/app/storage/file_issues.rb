@@ -158,10 +158,18 @@ class FileIssues < BaseStorage
   end
 
   def self.cancel_request(file_issue_request_id, request_type)
-    db[:file_issue_request]
-      .filter(id: file_issue_request_id)
-      .update("#{request_type.downcase}_request_status" => FileIssueRequest::CANCELLED_BY_AGENCY,
-              system_mtime: Time.now)
+    if request_type
+      db[:file_issue_request]
+        .filter(id: file_issue_request_id)
+        .update("#{request_type.downcase}_request_status" => FileIssueRequest::CANCELLED_BY_AGENCY,
+                system_mtime: Time.now)
+    else
+      db[:file_issue_request]
+        .filter(id: file_issue_request_id)
+        .update(digital_request_status: FileIssueRequest::CANCELLED_BY_AGENCY,
+                physical_request_status: FileIssueRequest::CANCELLED_BY_AGENCY,
+                system_mtime: Time.now)
+    end
   end
 
   def self.file_issues(page, page_size)
