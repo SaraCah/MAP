@@ -404,7 +404,11 @@ class MAPAPIClient
   end
 
   def cancel_file_issue_request(file_issue_request_id, request_type)
-    post('/file-issue-requests/cancel', id: file_issue_request_id, request_type: request_type)
+    if request_type
+      post('/file-issue-requests/cancel', id: file_issue_request_id, request_type: request_type)
+    else
+      post('/file-issue-requests/cancel', id: file_issue_request_id)
+    end
   end
 
   def file_issues(page = 0)

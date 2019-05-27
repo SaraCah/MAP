@@ -58,6 +58,9 @@ class FileIssueRequest
   end
 
   def can_edit?
+    return false if fetch('physical_request_status') == CANCELLED_BY_AGENCY && fetch('digital_request_status') == CANCELLED_BY_AGENCY
+    return false if fetch('physical_request_status') == CANCELLED_BY_QSA && fetch('digital_request_status') == CANCELLED_BY_QSA
+
     return false if [QUOTE_ACCEPTED, FILE_ISSUE_CREATED].include?(fetch('digital_request_status'))
     return false if [QUOTE_ACCEPTED, FILE_ISSUE_CREATED].include?(fetch('physical_request_status'))
 
