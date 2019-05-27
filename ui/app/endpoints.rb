@@ -18,7 +18,7 @@ class MAPTheApp < Sinatra::Base
   STATIC_JS_FILES = {
     'require.js' => 'ts/node_modules/requirejs/require.js',
     'materialize.min.js' => 'ts/node_modules/materialize-css/dist/js/materialize.min.js',
-    'vue.js' => (MAPTheApp.production? ? 'ts/node_modules/vjson_responseue/dist/vue.min.js' : 'ts/node_modules/vue/dist/vue.js'),
+    'vue.js' => (MAPTheApp.production? ? 'ts/node_modules/vue/dist/vue.min.js' : 'ts/node_modules/vue/dist/vue.js'),
     'vue-resource.js' => 'ts/node_modules/vue-resource/dist/vue-resource.min.js',
   }
 
