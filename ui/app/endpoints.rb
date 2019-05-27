@@ -28,13 +28,13 @@ class MAPTheApp < Sinatra::Base
     filename = request.path.split('/').last
 
     if JSBundle.has_bundle?(filename)
-      send_file JSBundle.filename_for_bundle(filename)
+      send_file File.absolute_path(JSBundle.filename_for_bundle(filename))
     elsif (match = STATIC_JS_FILES.fetch(filename, nil))
-      send_file match
+      send_file File.absolute_path(match)
     elsif File.exist?(file = File.join('js', filename))
-      send_file file
+      send_file File.absolute_path(file)
     elsif File.exist?(file = File.join('buildjs', filename))
-      send_file file
+      send_file File.absolute_path(file)
     else
       [404]
     end
@@ -48,7 +48,7 @@ class MAPTheApp < Sinatra::Base
       filename = request.path.split('/').last
 
       if File.exist?(file = File.join('ts', filename))
-        send_file file
+        send_file File.absolute_path(file)
       else
         [404]
       end
@@ -61,9 +61,9 @@ class MAPTheApp < Sinatra::Base
     filename = request.path.split('/').last
 
     if filename == 'materialize.min.css'
-      send_file 'ts/node_modules/materialize-css/dist/css/materialize.min.css'
+      send_file File.absolute_path('ts/node_modules/materialize-css/dist/css/materialize.min.css')
     elsif File.exist?(file = File.join('css', filename))
-      send_file file
+      send_file File.absolute_path(file)
     else
       [404]
     end
@@ -72,7 +72,7 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/webfonts/*') do
     filename = request.path.split('/').last
     if File.exist?(file = File.join('webfonts', filename))
-      send_file file
+      send_file File.absolute_path(File.absolute_path(file))
     else
       [404]
     end
