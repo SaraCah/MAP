@@ -5,6 +5,7 @@
     <% form_action = "/locations/" + (location.new? ? "create" : "update") %>
     <form class="col s12" action="<%= form_action %>" method="post">
         <%== FormHelper.hidden_authenticity_token %>
+        <%== FormHelper.lock_version(location, 'location') %>
 
         <% unless location.new? %>
             <input type="hidden" name="location[id]" value="<%= location.fetch('id') %>">

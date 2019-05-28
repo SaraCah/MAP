@@ -44,6 +44,7 @@
             </section>
             <form id="fileIssueForm" class="col s12" <% if is_readonly %>disabled<% else %>action="<%= request.new? ? '/file-issue-requests/create' : '/file-issue-requests/update' %>" method="post"<% end %>>
                 <%== FormHelper.hidden_authenticity_token %>
+                <%== FormHelper.lock_version(request, 'file_issue_request') %>
 
                 <% unless request.new? %>
                     <input type="hidden" name="file_issue_request[id]" value="<%= request.fetch('id') %>">
@@ -59,6 +60,7 @@
                                  digital_request_quote="<%= digital_request_quote.to_json %>"
                                  physical_request_quote="<%= physical_request_quote.to_json %>"
                                  request_id="<%= request.fetch('id', 'new') %>"
+                                 lock_version="<%= request.fetch('lock_version', 0) %>"
                                  csrf_token="<%= FormHelper.csrf_token %>"
                                  is_readonly="<%= is_readonly %>">
                     <section id="details" class="scrollspy section">
@@ -144,7 +146,7 @@
                                 <% end %>
                                 <% unless request.new? %>
                                     <confirmable-action
-                                            action="/file-issue-requests/<%= request.fetch('id') %>/cancel"
+                                            action="/file-issue-requests/<%= request.fetch('id') %>/cancel?lock_version=<%= request.fetch('lock_version') %>"
                                             csrf_token="<%= FormHelper.csrf_token %>"
                                             css="btn red lighten-2"
                                             label="Cancel Request"

@@ -119,16 +119,20 @@ class FileIssues < BaseStorage
       physical_request_status = FileIssueRequest::QUOTE_REQUESTED
     end
 
-    db[:file_issue_request]
-      .filter(id: file_issue_request_id)
-      .update(request_type: file_issue_request.fetch('request_type'),
-              urgent: file_issue_request.fetch('urgent') ? 1 : 0,
-              digital_request_status: digital_request_status, # assume any change forces a quote redo
-              physical_request_status: physical_request_status, # assume any change forces a quote redo
-              deliver_to_reading_room: file_issue_request.fetch('deliver_to_reading_room') ? 1 : 0,
-              delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
-              request_notes: file_issue_request.fetch('request_notes', nil),
-              system_mtime: Time.now)
+    updated = db[:file_issue_request]
+                .filter(id: file_issue_request_id)
+                .filter(lock_version: file_issue_request.fetch('lock_version'))
+                .update(request_type: file_issue_request.fetch('request_type'),
+                        urgent: file_issue_request.fetch('urgent') ? 1 : 0,
+                        digital_request_status: digital_request_status, # assume any change forces a quote redo
+                        physical_request_status: physical_request_status, # assume any change forces a quote redo
+                        deliver_to_reading_room: file_issue_request.fetch('deliver_to_reading_room') ? 1 : 0,
+                        delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
+                        request_notes: file_issue_request.fetch('request_notes', nil),
+                        lock_version: file_issue_request.fetch('lock_version') + 1,
+                        system_mtime: Time.now)
+
+    raise StaleRecordException.new if updated == 0
 
     # FIXME update request has changed? So need to drop previous quote as we're
     # back to QUOTE_REQUEST_SUBMITTED.
@@ -150,26 +154,36 @@ class FileIssues < BaseStorage
     errors
   end
 
-  def self.accept_request_quote(file_issue_request_id, request_type)
-    db[:file_issue_request]
-      .filter(id: file_issue_request_id)
-      .update("#{request_type.downcase}_request_status" => FileIssueRequest::QUOTE_ACCEPTED,
-              system_mtime: Time.now)
+  def self.accept_request_quote(file_issue_request_id, lock_version, request_type)
+    updated = db[:file_issue_request]
+                .filter(id: file_issue_request_id)
+                .filter(lock_version: lock_version)
+                .update("#{request_type.downcase}_request_status" => FileIssueRequest::QUOTE_ACCEPTED,
+                        lock_version: lock_version + 1,
+                        system_mtime: Time.now)
+
+    raise StaleRecordException.new if updated == 0
   end
 
-  def self.cancel_request(file_issue_request_id, request_type)
-    if request_type
-      db[:file_issue_request]
-        .filter(id: file_issue_request_id)
-        .update("#{request_type.downcase}_request_status" => FileIssueRequest::CANCELLED_BY_AGENCY,
-                system_mtime: Time.now)
-    else
-      db[:file_issue_request]
-        .filter(id: file_issue_request_id)
-        .update(digital_request_status: FileIssueRequest::CANCELLED_BY_AGENCY,
-                physical_request_status: FileIssueRequest::CANCELLED_BY_AGENCY,
-                system_mtime: Time.now)
-    end
+  def self.cancel_request(file_issue_request_id, lock_version, request_type)
+    updated = if request_type
+                db[:file_issue_request]
+                  .filter(id: file_issue_request_id)
+                  .filter(lock_version: lock_version)
+                  .update("#{request_type.downcase}_request_status" => FileIssueRequest::CANCELLED_BY_AGENCY,
+                          lock_version: lock_version + 1,
+                          system_mtime: Time.now)
+              else
+                db[:file_issue_request]
+                  .filter(id: file_issue_request_id)
+                  .filter(lock_version: lock_version)
+                  .update(digital_request_status: FileIssueRequest::CANCELLED_BY_AGENCY,
+                          physical_request_status: FileIssueRequest::CANCELLED_BY_AGENCY,
+                          lock_version: lock_version + 1,
+                          system_mtime: Time.now)
+              end
+
+    raise StaleRecordException.new if updated == 0
   end
 
   def self.file_issues(page, page_size)

@@ -576,16 +576,22 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.post('/file-issue-requests/:id/accept')
     .param(:id, Integer, "ID of file issue request")
+    .param(:lock_version, Integer, "Lock version of the file issue request")
     .param(:request_type, String, "Request type this action applies to") do
-    Ctx.client.accept_file_issue_request(params[:id], params[:request_type])
+    Ctx.client.accept_file_issue_request(params[:id],
+                                         params[:lock_version],
+                                         params[:request_type])
 
     redirect "/file-issue-requests/#{params[:id]}"
   end
 
   Endpoint.post('/file-issue-requests/:id/cancel')
     .param(:id, Integer, "ID of file issue request")
+    .param(:lock_version, Integer, "Lock version of the file issue request")
     .param(:request_type, String, "Request type this action applies to", optional: true) do
-    Ctx.client.cancel_file_issue_request(params[:id], params[:request_type])
+    Ctx.client.cancel_file_issue_request(params[:id],
+                                         params[:lock_version],
+                                         params[:request_type])
 
     redirect "/file-issue-requests/#{params[:id]}"
   end

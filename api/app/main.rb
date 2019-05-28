@@ -74,6 +74,7 @@ require 'storage/files'
 require 'storage/conversations'
 require 'storage/file_issues'
 require 'storage/representations'
+require 'storage/stale_record_exception'
 
 require 'endpoints/upload_file'
 require 'endpoints'

@@ -50,6 +50,8 @@ class Transfer
         agency_location_id: row[:agency_location_id],
         created_by: row[:created_by],
         create_time: row[:create_time],
+        lock_version: row[:lock_version],
+
         handle_id: handle,
         transfer_proposal_id: row[:transfer_proposal_id],
        )

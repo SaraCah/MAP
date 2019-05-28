@@ -151,11 +151,15 @@ class Locations < BaseStorage
     # check for uniqueness
     existing_location = db[:agency_location][name: location.fetch('name'), agency_id: agency_id]
     if existing_location.nil? || existing_location[:id] == Integer(location.fetch('id'))
-      db[:agency_location]
-        .filter(id: location.fetch('id'))
-        .update(:name => location.fetch('name'),
-                :delivery_address => location.fetch('delivery_address', nil),
-                :modified_time => java.lang.System.currentTimeMillis)
+      updated = db[:agency_location]
+                  .filter(id: location.fetch('id'))
+                  .filter(lock_version: location.fetch('lock_version'))
+                  .update(:name => location.fetch('name'),
+                          :delivery_address => location.fetch('delivery_address', nil),
+                          :lock_version => location.fetch('lock_version') + 1,
+                          :modified_time => java.lang.System.currentTimeMillis)
+
+      raise StaleRecordException.new if updated == 0
 
       []
     else

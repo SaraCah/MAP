@@ -1,0 +1,2 @@
+class StaleRecordException < Exception
+end

@@ -51,6 +51,7 @@ class FileIssueRequest
         agency_location_id: row[:agency_location_id],
         created_by: row[:created_by],
         create_time: row[:create_time],
+        lock_version: row[:lock_version],
         items: item_rows.map{|item_row| FileIssueRequestItem.from_row(item_row)},
         aspace_digital_quote_id: row[:aspace_digital_quote_id],
         aspace_physical_quote_id: row[:aspace_physical_quote_id],

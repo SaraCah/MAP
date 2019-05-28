@@ -53,6 +53,7 @@ Vue.component('file-issue-form', {
                                     :status="physical_request_status"
                                     :csrf_token="csrf_token"
                                     :request_id="request_id"
+                                    :lock_version="lock_version"
                                     request_type="physical"
                                     :quote_blob="physical_request_quote">
         </file-issue-request-summary>
@@ -71,6 +72,7 @@ Vue.component('file-issue-form', {
             'physical_request_status',
             'csrf_token',
             'request_id',
+            'lock_version',
             'digital_request_quote',
             'physical_request_quote'],
     methods: {
@@ -172,14 +174,14 @@ Vue.component('file-issue-request-summary', {
             <div class="row">
                 <div class="col s12">
                     <confirmable-action
-                        :action="'/file-issue-requests/'+request_id+'/accept?request_type='+request_type"
+                        :action="'/file-issue-requests/'+request_id+'/accept?request_type='+request_type+'&lock_version='+lock_version"
                         :csrf_token="csrf_token"
                         css="btn green lighten-2"
                         label="Accept Quote"
                         message="Are you sure you want to accept this quote?">
                     </confirmable-action>
                     <confirmable-action
-                        :action="'/file-issue-requests/'+request_id+'/cancel?request_type='+request_type"
+                        :action="'/file-issue-requests/'+request_id+'/cancel?request_type='+request_type+'&lock_version='+lock_version"
                         :csrf_token="csrf_token"
                         css="btn red lighten-2"
                         label="Cancel Request"
@@ -249,7 +251,7 @@ Vue.component('file-issue-request-summary', {
             quote: quote,
         };
     },
-    props: ['status', 'request_type', 'request_id', 'csrf_token', 'quote_blob'],
+    props: ['status', 'request_type', 'request_id', 'lock_version', 'csrf_token', 'quote_blob'],
     methods: {
         syncItems: function(reps: RepresentationRequest[]) {
             this.items = reps;

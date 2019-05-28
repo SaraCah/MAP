@@ -73,12 +73,15 @@ class Transfers < BaseStorage
     transfer_proposal_id = transfer.fetch('id')
     handle = db[:handle][transfer_proposal_id: transfer_proposal_id][:id]
 
-    db[:transfer_proposal]
-      .filter(id: transfer_proposal_id)
-      .update(title: transfer.fetch('title'),
-              estimated_quantity: transfer.fetch('estimated_quantity', nil),
-              system_mtime: Time.now)
+    updated = db[:transfer_proposal]
+                .filter(id: transfer_proposal_id)
+                .filter(lock_version: transfer.fetch('lock_version'))
+                .update(title: transfer.fetch('title'),
+                        estimated_quantity: transfer.fetch('estimated_quantity', nil),
+                        lock_version: transfer.fetch('lock_version') + 1,
+                        system_mtime: Time.now)
 
+    raise StaleRecordException.new if updated == 0
 
     db[:transfer_file]
       .filter(handle_id: handle)
@@ -188,6 +191,14 @@ class Transfers < BaseStorage
 
     transfer_id = transfer.fetch('id')
     handle = db[:handle][transfer_id: transfer_id][:id]
+
+    updated = db[:transfer]
+                .filter(id: transfer_id)
+                .filter(lock_version: transfer.fetch('lock_version'))
+                .update(lock_version: transfer.fetch('lock_version') + 1,
+                        system_mtime: Time.now)
+
+    raise StaleRecordException.new if updated == 0
 
     db[:transfer_file]
       .filter(handle_id: handle)

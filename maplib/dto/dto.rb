@@ -96,6 +96,7 @@ module DTO
 
     def self.extended(base)
       base.instance_variable_set(:"@dto_fields", {})
+      base.define_field(:lock_version, Integer, required: false)
     end
 
     def add_field(field)

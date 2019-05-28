@@ -32,6 +32,7 @@
             </section>
             <form id="transferProposalForm" class="col s12" <% if is_readonly %>disabled<% else %>action="<%= transfer.new? ? '/transfer-proposals/create' : '/transfer-proposals/update' %>" method="post" enctype="multipart/form-data"<% end %>>
                 <%== FormHelper.hidden_authenticity_token %>
+                <%== FormHelper.lock_version(transfer, 'transfer') %>
         
                 <% unless transfer.new? %>
                     <input type="hidden" name="transfer[id]" value="<%= transfer.fetch('id') %>">

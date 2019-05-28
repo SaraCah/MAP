@@ -100,14 +100,18 @@ class Users < BaseStorage
                      :modified_time => java.lang.System.currentTimeMillis)
   end
 
-  def self.update_user(user_id, username, name, is_admin, is_inactive)
-    db[:user]
-      .filter(:id => user_id)
-      .update(:username => username,
-              :name => name,
-              :admin => is_admin ? 1 : 0,
-              :inactive => is_inactive ? 1 : 0,
-              :modified_time => java.lang.System.currentTimeMillis)
+  def self.update_user(user_id, username, name, is_admin, is_inactive, lock_version)
+    updated = db[:user]
+                .filter(id: user_id)
+                .filter(lock_version: lock_version)
+                .update(username: username,
+                        name: name,
+                        admin: is_admin ? 1 : 0,
+                        inactive: is_inactive ? 1 : 0,
+                        lock_version: lock_version + 1,
+                        modified_time: java.lang.System.currentTimeMillis)
+
+    raise StaleRecordException.new if updated == 0
   end
 
   def self.id_for_username(username)
@@ -119,7 +123,12 @@ class Users < BaseStorage
     user_for_username = db[:user][:username => user.fetch('username')]
 
     if user_for_username.nil? || user_for_username[:id] == Integer(user.fetch('id'))
-      update_user(user.fetch('id'), user.fetch('username'), user.fetch('name'), user.fetch('is_admin'), user.fetch('is_inactive'))
+      update_user(user.fetch('id'),
+                  user.fetch('username'),
+                  user.fetch('name'),
+                  user.fetch('is_admin'),
+                  user.fetch('is_inactive'),
+                  user.fetch('lock_version'))
 
       # FIXME what to do about user_agency.mtime? currently clear_roles drops create_time
       if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)

@@ -399,16 +399,21 @@ class MAPAPIClient
     get("/resolve/representations", { 'ref[]' => refs })
   end
 
-  def accept_file_issue_request(file_issue_request_id, request_type)
-    post('/file-issue-requests/accept', id: file_issue_request_id, request_type: request_type)
+  def accept_file_issue_request(file_issue_request_id, lock_version, request_type)
+    post('/file-issue-requests/accept', id: file_issue_request_id,
+                                        lock_version: lock_version,
+                                        request_type: request_type)
   end
 
-  def cancel_file_issue_request(file_issue_request_id, request_type)
-    if request_type
-      post('/file-issue-requests/cancel', id: file_issue_request_id, request_type: request_type)
-    else
-      post('/file-issue-requests/cancel', id: file_issue_request_id)
-    end
+  def cancel_file_issue_request(file_issue_request_id, lock_version, request_type)
+    data = {
+      id: file_issue_request_id,
+      lock_version: lock_version
+    }
+
+    data[:request_type] = request_type if request_type
+
+    post('/file-issue-requests/cancel', data)
   end
 
   def file_issues(page = 0)

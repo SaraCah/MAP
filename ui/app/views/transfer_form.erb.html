@@ -45,6 +45,7 @@
             </section>
             <form id="transferProposalForm" class="col s12" <% if is_readonly %>disabled<% else %>action="/transfers/update" method="post"<% end %>>
                 <%== FormHelper.hidden_authenticity_token %>
+                <%== FormHelper.lock_version(transfer, 'transfer') %>
 
                 <input type="hidden" name="transfer[id]" value="<%= transfer.fetch('id') %>">
                 <input type="hidden" name="transfer[handle_id]" value="<%= transfer.fetch('handle_id') %>">

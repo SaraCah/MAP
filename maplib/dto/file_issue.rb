@@ -43,6 +43,7 @@ class FileIssue
         agency_location_id: row[:agency_location_id],
         created_by: row[:created_by],
         create_time: row[:create_time],
+        lock_version: row[:lock_version],
         items: item_rows.map{|item_row| FileIssueItem.from_row(item_row)},
         handle_id: handle_id)
   end

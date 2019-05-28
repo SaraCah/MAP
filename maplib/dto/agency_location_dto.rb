@@ -12,6 +12,7 @@ class AgencyLocationDTO
         name: row[:name],
         agency_ref: agency.id,
         agency_label: agency.label,
-        delivery_address: row[:delivery_address])
+        delivery_address: row[:delivery_address],
+        lock_version: row[:lock_version])
   end
 end

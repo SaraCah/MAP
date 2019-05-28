@@ -19,6 +19,7 @@ class UserDTO
         is_inactive: (row[:inactive] == 1),
         agency_roles: agency_roles.map{|agency_permission| AgencyRoleDTO.from_agency_role(agency_permission)},
         created_by: row[:created_by],
-        create_time: row[:create_time])
+        create_time: row[:create_time],
+        lock_version: row[:lock_version])
   end
 end

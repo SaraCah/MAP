@@ -4,6 +4,8 @@
     <% end %>
     <form class="col s12" action='/users/<%= user.new? ? "create" : "update/#{user.fetch('id')}" %>' method="post">
         <%== FormHelper.hidden_authenticity_token %>
+        <%== FormHelper.lock_version(user, 'user') %>
+
         <% unless user.new? %><input type="hidden" name="user[id]" value="<%= user.fetch('id') %>"><% end %>
         <div class="row">
             <div class="input-field col s12">
