@@ -32,7 +32,7 @@
                 <% end %>
               </td>
               <td>
-                <% if record['file_issue_allowed'] %>
+                <% if Ctx.permissions.allow_manage_file_issues? && record['file_issue_allowed'] %>
                   <a class="btn" href="/file-issue-requests/new?record_ref=<%= record['id'] %>">Request</a>
                 <% end %>
               </td>
