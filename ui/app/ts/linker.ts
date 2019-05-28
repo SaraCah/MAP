@@ -164,7 +164,7 @@ Vue.component('agency-role-linker', {
           </select>
         </td>
         <td>
-          <button class="btn" v-on:click="removeSelected(agency)">Remove</button>
+          <a class="btn" v-on:click="removeSelected(agency)">Remove</a>
         </td>
       </tr>
       <tr>
