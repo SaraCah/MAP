@@ -45,6 +45,7 @@ class FileIssues < BaseStorage
                                                            agency_location_id: Ctx.get.current_location.id,
                                                            created_by: Ctx.username,
                                                            create_time: java.lang.System.currentTimeMillis,
+                                                           version: 1,
                                                            system_mtime: Time.now)
 
     db[:handle].insert(file_issue_request_id: file_issue_request_id)
@@ -129,13 +130,11 @@ class FileIssues < BaseStorage
                         deliver_to_reading_room: file_issue_request.fetch('deliver_to_reading_room') ? 1 : 0,
                         delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
                         request_notes: file_issue_request.fetch('request_notes', nil),
+                        version: file_issue_request.fetch('version') + 1,
                         lock_version: file_issue_request.fetch('lock_version') + 1,
                         system_mtime: Time.now)
 
     raise StaleRecordException.new if updated == 0
-
-    # FIXME update request has changed? So need to drop previous quote as we're
-    # back to QUOTE_REQUEST_SUBMITTED.
 
     db[:file_issue_request_item]
       .filter(file_issue_request_id: file_issue_request_id)

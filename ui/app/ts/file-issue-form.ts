@@ -42,6 +42,7 @@ Vue.component('file-issue-form', {
                                     :status="digital_request_status"
                                     :csrf_token="csrf_token"
                                     :request_id="request_id"
+                                    :lock_version="lock_version"
                                     request_type="digital"
                                     :quote_blob="digital_request_quote">
         </file-issue-request-summary>
@@ -108,7 +109,7 @@ Vue.component('file-issue-request-summary', {
 <div>
     <template v-if="items.length == 0">
         <div class="row">
-            <div class="col s12 m6 l3">
+            <div class="col s12 m12 l6">
                 <div class="card-panel blue lighten-5">No {{request_type}} items requested.</div>
             </div>
         </div>
@@ -192,28 +193,28 @@ Vue.component('file-issue-request-summary', {
         </template>
         <template v-if="status === 'QUOTE_ACCEPTED'">
             <div class="row">
-                <div class="col s12 m6 l3">
+                <div class="col s12 m12 l6">
                     <div class="card-panel green lighten-4">Quote Accepted! Awaiting creating of a new File Issue.</div>
                 </div>
             </div>
         </template>
         <template v-if="status === 'FILE_ISSUE_CREATED'">
             <div class="row">
-                <div class="col s12 m6 l3">
+                <div class="col s12 m12 l6">
                     <div class="card-panel green lighten-4">File issue created! FIXME add link here.</div>
                 </div>
             </div>
         </template>
         <template v-if="status === 'CANCELLED_BY_AGENCY'">
             <div class="row">
-                <div class="col s12 m6 l3">
+                <div class="col s12 m12 l6">
                     <div class="card-panel red lighten-4">Request cancelled by Agency.</div>
                 </div>
             </div>
         </template>
         <template v-if="status === 'CANCELLED_BY_QSA'">
             <div class="row">
-                <div class="col s12 m6 l3">
+                <div class="col s12 m12 l6">
                     <div class="card-panel red lighten-4">Request cancelled by QSA.</div>
                 </div>
             </div>

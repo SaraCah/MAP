@@ -10,6 +10,8 @@ Sequel.migration do
 
     alter_table(:file_issue_request) do
       add_column(:version, Integer, null: false, default: 0)
+      add_column(:digital_quote_for_version, Integer, null: false, default: 0)
+      add_column(:physical_quote_for_version, Integer, null: false, default: 0)
     end
 
   end

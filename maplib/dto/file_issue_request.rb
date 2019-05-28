@@ -23,6 +23,7 @@ class FileIssueRequest
   define_field(:agency_id, Integer, required: false)
   define_field(:agency_location_id, Integer, required: false)
   define_field(:handle_id, Integer, required: false)
+  define_field(:version, Integer, required: false)
   define_field(:aspace_digital_quote_id, Integer, required: false)
   define_field(:aspace_physical_quote_id, Integer, required: false)
 
@@ -52,6 +53,7 @@ class FileIssueRequest
         created_by: row[:created_by],
         create_time: row[:create_time],
         lock_version: row[:lock_version],
+        version: row[:version],
         items: item_rows.map{|item_row| FileIssueRequestItem.from_row(item_row)},
         aspace_digital_quote_id: row[:aspace_digital_quote_id],
         aspace_physical_quote_id: row[:aspace_physical_quote_id],
