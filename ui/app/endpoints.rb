@@ -464,9 +464,9 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
-  Endpoint.get('/csv-validate')
+  Endpoint.get('/import-validate')
     .param(:key, String, "The file key to validate") do
-    result = Ctx.client.csv_validate(params[:key])
+    result = Ctx.client.import_validate(params[:key])
 
     [
       200,

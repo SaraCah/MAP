@@ -99,7 +99,7 @@
                 <%
                 locked_file_roles = []
                 locked_file_roles << 'RAP' if transfer.fetch('checklist_rap_received', false)
-                locked_file_roles << 'CSV' if (transfer.fetch('checklist_metadata_received', false) || transfer.fetch('checklist_metadata_approved', false))
+                locked_file_roles << 'IMPORT' if (transfer.fetch('checklist_metadata_received', false) || transfer.fetch('checklist_metadata_approved', false))
                 %>
 
                 <section id="files" class="scrollspy section">

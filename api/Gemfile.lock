@@ -1,9 +1,10 @@
 GIT
   remote: https://github.com/hudmol/map_validator.git
-  revision: be1820499b1bb75596d46da1f2796a0ceb1b2549
+  revision: a12d2a90732b7ffe73d9a236445362869d23c8f4
   branch: master
   specs:
     map_validator (0.0.1)
+      roo (= 2.8.2)
 
 GEM
   remote: https://rubygems.org/
@@ -18,6 +19,7 @@ GEM
     json (2.2.0-java)
     multi_json (1.13.1)
     mustermann (1.0.3)
+    nokogiri (1.10.3-java)
     rack (2.0.7)
     rack-protection (2.0.5)
       rack
@@ -25,6 +27,10 @@ GEM
     rjack-logback (1.9.0-java)
       rjack-slf4j (~> 1.7.16)
     rjack-slf4j (1.7.25.0-java)
+    roo (2.8.2)
+      nokogiri (~> 1)
+      rubyzip (>= 1.2.1, < 2.0.0)
+    rubyzip (1.2.3)
     sequel (5.19.0)
     sinatra (2.0.5)
       mustermann (~> 1.0)

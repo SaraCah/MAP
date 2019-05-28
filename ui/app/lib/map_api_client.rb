@@ -366,8 +366,8 @@ class MAPAPIClient
     response['errors'] || []
   end
 
-  def csv_validate(key)
-    get("/csv-validate", :key => key)
+  def import_validate(key)
+    get("/import-validate", :key => key)
   end
 
 

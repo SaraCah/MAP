@@ -78,7 +78,7 @@ Vue.component('file-uploader', {
                                     </template>
                                     <template v-else>
                                         <select :name="buildPath('role')" v-model="file.role" class="browser-default">
-                                            <option value="CSV">CSV</option>
+                                            <option value="IMPORT">Import</option>
                                             <option value="RAP">RAP Notice</option>
                                             <option value="OTHER">Other</option>
                                         </select>
@@ -88,7 +88,7 @@ Vue.component('file-uploader', {
                             <td>{{file.created_by}}</td>
                             <td>{{formatTime(file.create_time)}}</td>
                             <td>
-                              <template v-if="file.role !== 'CSV'">
+                              <template v-if="file.role !== 'IMPORT'">
                                   N/A
                               </template>
                               <template v-else-if="is_valid(file.key)">
@@ -157,8 +157,8 @@ Vue.component('file-uploader', {
                 }).then((json: UploadedFile[]) => {
                     for (const uploadedFile of json) {
                         if (uploadedFile.role == null) {
-                            if (uploadedFile.filename.toLowerCase().slice(-3) === 'csv' && this.is_role_enabled) {
-                                uploadedFile.role = 'CSV';
+                            if (/\.xlsx$/.test(uploadedFile.filename.toLowerCase()) && this.is_role_enabled) {
+                                uploadedFile.role = 'IMPORT';
                             } else {
                                 uploadedFile.role = 'OTHER';
                             }
@@ -234,8 +234,8 @@ Vue.component('file-uploader', {
         },
         setFileValidationStatus() {
             for (const file of this.uploaded) {
-                if (file.role === 'CSV' && !this.validation_status[file.key]) {
-                    this.$http.get('/csv-validate', { params: {key: file.key} }).then((response: any) => {
+                if (file.role === 'IMPORT' && !this.validation_status[file.key]) {
+                    this.$http.get('/import-validate', { params: {key: file.key} }).then((response: any) => {
                         return response.json();
                     }, () => {
                         UI.genericModal("Validation failed.  Please retry.");

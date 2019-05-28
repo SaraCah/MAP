@@ -174,7 +174,7 @@ class Transfers < BaseStorage
     original_transfer = transfer_dto_for(transfer.fetch('id'))
 
     needs_metadata = (original_transfer.fetch('checklist_metadata_received', false) || original_transfer.fetch('checklist_metadata_approved', false))
-    has_metadata = transfer.fetch('files', []).any? {|file| file.fetch('role') == 'CSV'}
+    has_metadata = transfer.fetch('files', []).any? {|file| file.fetch('role') == 'IMPORT'}
 
     needs_rap = original_transfer.fetch('checklist_rap_received', false)
     has_rap = transfer.fetch('files', []).any? {|file| file.fetch('role') == 'RAP'}
