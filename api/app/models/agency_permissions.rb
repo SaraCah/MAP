@@ -32,7 +32,7 @@ AgencyPermissions = Struct.new(:is_admin, :agency_roles) do
     is_admin? || is_senior_agency_admin?(agency_id) || agency_roles.any?{|agency_role| agency_role.agency_id == agency_id && agency_role.agency_location_id == agency_location_id}
   end
 
-  def can_create_users?
+  def can_create_users?(agency_ref = nil)
     is_admin? || agency_roles.any?{|role| role.agency_ref == agency_ref && role.is_agency_admin?}
   end
 

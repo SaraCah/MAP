@@ -43,7 +43,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/users/create')
     .param(:user, UserDTO, "User") do
-    if Ctx.user_logged_in? && Ctx.get.permissions.can_create_users?
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_create_users?(Ctx.get.current_location ? Ctx.get.current_location.agency_ref : nil)
       if (errors = params[:user].validate).empty?
         if !(errors = Users.validate_roles(params[:user])).empty?
           json_response(errors: errors)
