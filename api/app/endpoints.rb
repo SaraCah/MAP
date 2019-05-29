@@ -590,4 +590,12 @@ class MAPTheAPI < Sinatra::Base
       [404]
     end
   end
+
+  Endpoint.get('/file_issue_notifications') do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      json_response(FileIssues.get_notifications)
+    else
+      [404]
+    end
+  end
 end

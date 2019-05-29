@@ -249,4 +249,28 @@ class FileIssues < BaseStorage
 
     service_by_id.values
   end
+
+
+  def self.get_notifications
+    notifications_per_file_issue = {}
+
+    # find any overdue file issues
+    db[:file_issue]
+      .join(:file_issue_item, Sequel[:file_issue_item][:file_issue_id] => Sequel[:file_issue][:id])
+      .filter(Sequel[:file_issue][:agency_id] => Ctx.get.current_location.agency_id)
+      .filter(Sequel[:file_issue][:agency_location_id] => Ctx.get.current_location.id)
+      .filter(Sequel[:file_issue][:checklist_completed] => 0)
+      .filter(Sequel.~(Sequel[:file_issue_item][:dispatch_date] => nil))
+      .filter(Sequel[:file_issue_item][:returned_date] => nil)
+      .filter(Sequel.~(Sequel[:file_issue_item][:expiry_date] => nil))
+      .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today }
+      .select(Sequel[:file_issue][:id],
+              Sequel[:file_issue][:issue_type])
+      .map do |row|
+      identifier = "FI#{row[:issue_type][0]}#{row[:id]}"
+      notifications_per_file_issue[row[:id]] ||= Notification.new('file_issue', row[:id], identifier, "Has overdue items", "warning")
+    end
+
+    notifications_per_file_issue.values
+  end
 end

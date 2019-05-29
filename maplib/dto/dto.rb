@@ -1,3 +1,5 @@
+require 'date'
+
 module DTO
   class DTOTypeError < StandardError
   end
@@ -13,6 +15,7 @@ module DTO
     def self.Integer(val); Kernel.Integer(val); end
     def self.Array(val); Kernel.Array(val); end
     def self.Hash(val); Kernel.Hash(val); end
+    def self.Date(val); Kernel.const_get('Date').parse(val); end
   end
 
   def self.included(base)

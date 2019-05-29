@@ -436,6 +436,11 @@ class MAPAPIClient
     get("/file-issue-quotes/#{quote_id}")
   end
 
+  def file_issue_notifications
+    get("/file_issue_notifications")
+  end
+
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

@@ -636,4 +636,12 @@ class MAPTheApp < Sinatra::Base
     Templates.emit_with_layout(:file_issue_fee_schedule, {chargeable_services: chargeable_services},
                                :layout, title: "Fee Schedule", context: ['file_issues', 'fee_schedule'])
   end
+
+  Endpoint.get('/file_issue_notifications') do
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      Ctx.client.file_issue_notifications.to_json
+    ]
+  end
 end
