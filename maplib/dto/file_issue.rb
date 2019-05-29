@@ -6,6 +6,9 @@ class FileIssue
   STATUS_FILE_ISSUE_ACTIVE = 'ACTIVE'
   STATUS_FILE_ISSUE_COMPLETE = 'COMPLETE'
 
+  ISSUE_TYPE_DIGITAL = 'DIGITAL'
+  ISSUE_TYPE_PHYSICAL = 'PHYSICAL'
+
   define_field(:id, Integer, required: false)
   define_field(:file_issue_request_id, Integer, required: false)
   define_field(:request_type, String)

@@ -1,5 +1,13 @@
 <div class="row">
     <div class="col s12 m9 l10">
+        <% if file_issue.fetch('file_issue_request_id', false) %>
+        <div class="row">
+            <div class="input-field col s12">
+                <a target="_blank" class="btn-small" href="/file-issue-requests/<%= file_issue.fetch('file_issue_request_id') %>">View Request</a>
+            </div>
+        </div>
+        <% end %>
+
         <div class="row vue-enabled">
             <% if errors %>
                 <section id="errors" class="scrollspy section">

@@ -44,7 +44,8 @@ Vue.component('file-issue-form', {
                                     :request_id="request_id"
                                     :lock_version="lock_version"
                                     request_type="digital"
-                                    :quote_blob="digital_request_quote">
+                                    :quote_blob="digital_request_quote"
+                                    :file_issue_id="digital_file_issue_id">
         </file-issue-request-summary>
     </section>
 
@@ -56,7 +57,8 @@ Vue.component('file-issue-form', {
                                     :request_id="request_id"
                                     :lock_version="lock_version"
                                     request_type="physical"
-                                    :quote_blob="physical_request_quote">
+                                    :quote_blob="physical_request_quote"
+                                    :file_issue_id="physical_file_issue_id">
         </file-issue-request-summary>
     </section>
 </div>
@@ -75,7 +77,9 @@ Vue.component('file-issue-form', {
             'request_id',
             'lock_version',
             'digital_request_quote',
-            'physical_request_quote'],
+            'physical_request_quote',
+            'digital_file_issue_id',
+            'physical_file_issue_id'],
     methods: {
         refreshSummaries: function() {
             // FIXME type?
@@ -201,7 +205,10 @@ Vue.component('file-issue-request-summary', {
         <template v-if="status === 'FILE_ISSUE_CREATED'">
             <div class="row">
                 <div class="col s12 m12 l6">
-                    <div class="card-panel green lighten-4">File issue created! FIXME add link here.</div>
+                    <div class="card-panel green lighten-4">
+                        FI{{request_type[0].toUpperCase()}}{{file_issue_id}} created
+                        <a class="btn btn-small right" :href="'/file-issues/' + file_issue_id">View</a>
+                    </div>
                 </div>
             </div>
         </template>
@@ -252,7 +259,7 @@ Vue.component('file-issue-request-summary', {
             quote: quote,
         };
     },
-    props: ['status', 'request_type', 'request_id', 'lock_version', 'csrf_token', 'quote_blob'],
+    props: ['status', 'request_type', 'request_id', 'lock_version', 'csrf_token', 'quote_blob', 'file_issue_id'],
     methods: {
         syncItems: function(reps: RepresentationRequest[]) {
             this.items = reps;

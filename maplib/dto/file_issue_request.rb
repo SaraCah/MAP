@@ -26,6 +26,8 @@ class FileIssueRequest
   define_field(:version, Integer, required: false)
   define_field(:aspace_digital_quote_id, Integer, required: false)
   define_field(:aspace_physical_quote_id, Integer, required: false)
+  define_field(:digital_file_issue_id, Integer, required: false)
+  define_field(:physical_file_issue_id, Integer, required: false)
 
   def self.from_hash(hash)
     if ['yes', 'no'].include?(hash[:deliver_to_reading_room])
@@ -39,7 +41,7 @@ class FileIssueRequest
     super(hash)
   end
 
-  def self.from_row(row, handle_id = nil, item_rows = [])
+  def self.from_row(row, handle_id = nil, item_rows = [], digital_file_issue_id = nil, physical_file_issue_id = nil)
     new(id: row[:id],
         request_type: row[:request_type],
         digital_request_status: row[:digital_request_status],
@@ -57,7 +59,9 @@ class FileIssueRequest
         items: item_rows.map{|item_row| FileIssueRequestItem.from_row(item_row)},
         aspace_digital_quote_id: row[:aspace_digital_quote_id],
         aspace_physical_quote_id: row[:aspace_physical_quote_id],
-        handle_id: handle_id)
+        handle_id: handle_id,
+        digital_file_issue_id: digital_file_issue_id,
+        physical_file_issue_id: physical_file_issue_id)
   end
 
   def can_edit?

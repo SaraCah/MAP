@@ -66,9 +66,25 @@ class FileIssues < BaseStorage
   def self.request_dto_for(file_issue_request_id)
     handle_id = db[:handle][file_issue_request_id: file_issue_request_id][:id]
     row = db[:file_issue_request][id: file_issue_request_id]
-    file_issue_request = FileIssueRequest.from_row(row,
-                                                   handle_id,
-                                                   db[:file_issue_request_item].filter(file_issue_request_id: file_issue_request_id))
+
+    digital_request_id = nil
+    physical_request_id = nil
+
+    db[:file_issue]
+      .filter(file_issue_request_id: file_issue_request_id)
+      .map do |file_issue_row|
+      if file_issue_row[:issue_type] == FileIssue::ISSUE_TYPE_DIGITAL
+       digital_request_id = file_issue_row[:id]
+      elsif file_issue_row[:issue_type] == FileIssue::ISSUE_TYPE_PHYSICAL
+        physical_request_id = file_issue_row[:id]
+      end
+    end
+    
+    FileIssueRequest.from_row(row,
+                              handle_id,
+                              db[:file_issue_request_item].filter(file_issue_request_id: file_issue_request_id),
+                              digital_request_id,
+                              physical_request_id)
   end
 
   def self.get_quote(quote_id)
