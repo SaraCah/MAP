@@ -15,6 +15,7 @@ class FileIssue
   define_field(:issue_type, String)
   define_field(:status, String)
   define_field(:checklist_submitted, Boolean, default: false)
+  define_field(:checklist_retrieval_started, Boolean, default: false)
   define_field(:checklist_dispatched, Boolean, default: false)
   define_field(:checklist_summary_sent, Boolean, default: false)
   define_field(:checklist_completed, Boolean, default: false)
@@ -36,6 +37,7 @@ class FileIssue
         issue_type: row[:issue_type],
         status: row[:status],
         checklist_submitted: row[:checklist_submitted] == 1,
+        checklist_retrieval_started: row[:checklist_retrieval_started] == 1,
         checklist_dispatched: row[:checklist_dispatched] == 1,
         checklist_summary_sent: row[:checklist_summary_sent] == 1,
         checklist_completed: row[:checklist_completed] == 1,

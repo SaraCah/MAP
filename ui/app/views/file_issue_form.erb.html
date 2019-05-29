@@ -20,7 +20,7 @@
                         <div class="col s12">
                             <ul class="status-infomatic">
                                 <li class="first <% if file_issue.fetch('checklist_submitted', false) %>checked<% end %>">Request<br>Submitted</li>
-                                <li class="empty"></li>
+                                <li class="<% if file_issue.fetch('checklist_retrieval_started', false) %>checked<% end %>">Retrieval<br>Started</li>
                                 <li class="<% if file_issue.fetch('checklist_dispatched', false) %>checked<% end %>">Files<br>Dispatched/Uploaded</li>
                                 <li class="<% if file_issue.fetch('checklist_summary_sent', false) %>checked<% end %>">File Issue<br>Summary Sent</li>
                                 <li class="last <% if file_issue.fetch('checklist_completed', false) %>checked<% end %>">Link Expired/Loan Returned</li>
