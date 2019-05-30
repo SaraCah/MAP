@@ -45,7 +45,8 @@ Vue.component('file-issue-form', {
                                     :lock_version="lock_version"
                                     request_type="digital"
                                     :quote_blob="digital_request_quote"
-                                    :file_issue_id="digital_file_issue_id">
+                                    :file_issue_id="digital_file_issue_id"
+                                    :processing_estimate="digital_processing_estimate">
         </file-issue-request-summary>
     </section>
 
@@ -58,7 +59,8 @@ Vue.component('file-issue-form', {
                                     :lock_version="lock_version"
                                     request_type="physical"
                                     :quote_blob="physical_request_quote"
-                                    :file_issue_id="physical_file_issue_id">
+                                    :file_issue_id="physical_file_issue_id"
+                                    :processing_estimate="physical_processing_estimate">
         </file-issue-request-summary>
     </section>
 </div>
@@ -79,7 +81,9 @@ Vue.component('file-issue-form', {
             'digital_request_quote',
             'physical_request_quote',
             'digital_file_issue_id',
-            'physical_file_issue_id'],
+            'physical_file_issue_id',
+            'digital_processing_estimate',
+            'physical_processing_estimate'],
     methods: {
         refreshSummaries: function() {
             // FIXME type?
@@ -124,6 +128,12 @@ Vue.component('file-issue-request-summary', {
                 <a target="_blank" href="/file-issue-fee-schedule">View Fee Schedule</a>
             </div>
         </div>
+        <template v-if="processing_estimate">
+            <div class="input-field col s12">
+                <input type="text" disabled :value="processing_estimate"/>
+                <label>Estimated duration for processing, post-request confirmation and submission</label>
+            </div>
+        </template>
         <h5>Items Requested</h5>
         <table>
             <thead>
@@ -259,7 +269,14 @@ Vue.component('file-issue-request-summary', {
             quote: quote,
         };
     },
-    props: ['status', 'request_type', 'request_id', 'lock_version', 'csrf_token', 'quote_blob', 'file_issue_id'],
+    props: ['status',
+            'request_type',
+            'request_id',
+            'lock_version',
+            'csrf_token',
+            'quote_blob',
+            'file_issue_id',
+            'processing_estimate'],
     methods: {
         syncItems: function(reps: RepresentationRequest[]) {
             this.items = reps;

@@ -60,6 +60,8 @@
                                  physical_request_status="<%= request.fetch('physical_request_status') %>"
                                  digital_request_quote="<%= digital_request_quote.to_json %>"
                                  physical_request_quote="<%= physical_request_quote.to_json %>"
+                                 digital_processing_estimate="<%= request.fetch('digital_processing_estimate', 'Not Provided') %>"
+                                 physical_processing_estimate="<%= request.fetch('physical_processing_estimate', 'Not Provided') %>"
                                  digital_file_issue_id="<%= request.fetch('digital_file_issue_id', '') %>"
                                  physical_file_issue_id="<%= request.fetch('physical_file_issue_id', '') %>"
                                  request_id="<%= request.fetch('id', 'new') %>"

@@ -28,6 +28,8 @@ class FileIssueRequest
   define_field(:aspace_physical_quote_id, Integer, required: false)
   define_field(:digital_file_issue_id, Integer, required: false)
   define_field(:physical_file_issue_id, Integer, required: false)
+  define_field(:digital_processing_estimate, String, required: false)
+  define_field(:physical_processing_estimate, String, required: false)
 
   def self.from_hash(hash)
     if hash[:urgent] == 'yes'
@@ -55,6 +57,8 @@ class FileIssueRequest
         items: item_rows.map{|item_row| FileIssueRequestItem.from_row(item_row)},
         aspace_digital_quote_id: row[:aspace_digital_quote_id],
         aspace_physical_quote_id: row[:aspace_physical_quote_id],
+        digital_processing_estimate: row[:digital_processing_estimate] || 'Not Provided',
+        physical_processing_estimate: row[:physical_processing_estimate] || 'Not Provided',
         handle_id: handle_id,
         digital_file_issue_id: digital_file_issue_id,
         physical_file_issue_id: physical_file_issue_id)
