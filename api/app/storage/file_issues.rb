@@ -36,7 +36,7 @@ class FileIssues < BaseStorage
 
     file_issue_request_id = db[:file_issue_request].insert(request_type: file_issue_request.fetch('request_type'),
                                                            urgent: file_issue_request.fetch('urgent') ? 1 : 0,
-                                                           deliver_to_reading_room: file_issue_request.fetch('deliver_to_reading_room') ? 1 : 0,
+                                                           delivery_location: file_issue_request.fetch('delivery_location'),
                                                            delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
                                                            request_notes: file_issue_request.fetch('request_notes', nil),
                                                            digital_request_status: digital_request_status,
@@ -143,7 +143,7 @@ class FileIssues < BaseStorage
                         urgent: file_issue_request.fetch('urgent') ? 1 : 0,
                         digital_request_status: digital_request_status, # assume any change forces a quote redo
                         physical_request_status: physical_request_status, # assume any change forces a quote redo
-                        deliver_to_reading_room: file_issue_request.fetch('deliver_to_reading_room') ? 1 : 0,
+                        delivery_location: file_issue_request.fetch('delivery_location'),
                         delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
                         request_notes: file_issue_request.fetch('request_notes', nil),
                         version: file_issue_request.fetch('version') + 1,

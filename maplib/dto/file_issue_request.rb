@@ -15,7 +15,7 @@ class FileIssueRequest
   define_field(:digital_request_status, String, required: false, default: NONE_REQUESTED)
   define_field(:physical_request_status, String, required: false, default: NONE_REQUESTED)
   define_field(:urgent, Boolean, default: false)
-  define_field(:deliver_to_reading_room, Boolean, default: false)
+  define_field(:delivery_location, String)
   define_field(:delivery_authorizer, String, validator: proc {|s, request| request.is_delivery_authorizer_required? ? "Delivery Authorizer can't be blank" : nil })
   define_field(:items, [FileIssueRequestItem], default: [], validator: proc {|arr| arr.empty? ? "Items can't be empty" : nil })
   define_field(:created_by, String, required: false)
@@ -30,10 +30,6 @@ class FileIssueRequest
   define_field(:physical_file_issue_id, Integer, required: false)
 
   def self.from_hash(hash)
-    if ['yes', 'no'].include?(hash[:deliver_to_reading_room])
-      hash[:deliver_to_reading_room] = (hash[:deliver_to_reading_room] == 'yes')
-    end
-
     if hash[:urgent] == 'yes'
       hash[:urgent] = true
     end
@@ -47,7 +43,7 @@ class FileIssueRequest
         digital_request_status: row[:digital_request_status],
         physical_request_status: row[:physical_request_status],
         urgent: row[:urgent] == 1,
-        deliver_to_reading_room: row[:deliver_to_reading_room] == 1,
+        delivery_location: row[:delivery_location],
         delivery_authorizer: row[:delivery_authorizer],
         request_notes: row[:request_notes],
         agency_id: row[:agency_id],
@@ -96,7 +92,7 @@ class FileIssueRequest
   end
 
   def is_delivery_authorizer_required?
-    return false if fetch('deliver_to_reading_room')
+    return false if ['READING_ROOM', 'AGENCY_ARRANGED_COURIER'].include?(fetch('delivery_location', nil))
     return false unless fetch('items').any?{|item| item.fetch('request_type').downcase == 'physical'}
 
     s = fetch('delivery_authorizer', nil)

@@ -115,10 +115,11 @@
                         </div>
                         <div class="row">
                             <div class="col s12">
-                                <label for="deliver_to_reading_room">Delivery Location</label>
-                                <select id="deliver_to_reading_room" name="file_issue_request[deliver_to_reading_room]" class="browser-default" <% if is_readonly %>disabled<% end %> >
-                                    <option value="no" <% unless request.fetch('deliver_to_reading_room', false) %>selected<% end %>><%= Ctx.get.current_location.agency.label %>: <%= Ctx.get.current_location.name %></option>
-                                    <option value="yes" <% if request.fetch('deliver_to_reading_room', false) %>selected<% end %>>Reading Room</option>
+                                <label for="delivery_location">Delivery Location</label>
+                                <select id="delivery_location" name="file_issue_request[delivery_location]" class="browser-default" <% if is_readonly %>disabled<% end %> >
+                                    <option value="AGENCY_LOCATION" <% if request.fetch('delivery_location', 'AGENCY_LOCATION') == 'AGENCY_LOCATION' %>selected<% end %>><%= Ctx.get.current_location.agency.label %>: <%= Ctx.get.current_location.name %></option>
+                                    <option value="READING_ROOM" <% if request.fetch('delivery_location', 'AGENCY_LOCATION') == 'READING_ROOM' %>selected<% end %>>Reading Room</option>
+                                    <option value="AGENCY_ARRANGED_COURIER" <% if request.fetch('delivery_location', 'AGENCY_LOCATION') == 'AGENCY_ARRANGED_COURIER' %>selected<% end %>>Agency Arranged Courier</option>
                                 </select>
                             </div>
                         </div>

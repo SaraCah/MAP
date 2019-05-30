@@ -171,10 +171,10 @@
 
                     <div class="row">
                         <div class="col s12">
-                            <% if file_issue.fetch('deliver_to_reading_room', false) %>
-                                <textarea id="delivery_location" class="materialize-textarea" disabled>Reading Room</textarea> 
+                            <% if file_issue.fetch('delivery_location') == 'AGENCY_LOCATION' %>
+                                <textarea id="delivery_location" class="materialize-textarea" disabled><%= Ctx.get.current_location.agency.label %>: <%= Ctx.get.current_location.name %></textarea> 
                             <% else %>
-                                <textarea id="delivery_location" class="materialize-textarea" disabled><%= Ctx.get.current_location.agency.label %>: <%= Ctx.get.current_location.name %></textarea>
+                                <textarea id="delivery_location" class="materialize-textarea" disabled><%= file_issue.fetch('delivery_location') %></textarea>
                             <% end %>
                             <label for="delivery_location">Delivery Location</label>
                         </div>

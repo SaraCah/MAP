@@ -22,7 +22,7 @@ class FileIssue
   define_field(:date_completed, String, required: false)
   define_field(:items, [FileIssueItem], default: [])
   define_field(:urgent, Boolean, default: false)
-  define_field(:deliver_to_reading_room, Boolean, default: false)
+  define_field(:delivery_location, String)
   define_field(:delivery_authorizer, String)
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)
@@ -42,7 +42,7 @@ class FileIssue
         checklist_summary_sent: row[:checklist_summary_sent] == 1,
         checklist_completed: row[:checklist_completed] == 1,
         urgent: row[:urgent] == 1,
-        deliver_to_reading_room: row[:deliver_to_reading_room] == 1,
+        delivery_location: row[:delivery_location],
         delivery_authorizer: row[:delivery_authorizer],
         agency_id: row[:agency_id],
         agency_location_id: row[:agency_location_id],
