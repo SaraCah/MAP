@@ -14,5 +14,6 @@ File.open(File.join(File.dirname($0), '..', '.typescript_last_output.txt'), 'w')
     fh.puts line
     fh.flush
     puts line
+    STDOUT.flush
   end
 end
