@@ -8,8 +8,11 @@ class AspaceDB
   def self.open
     raise "Not connected" unless @connected
 
+    result = nil
     @pool.transaction(rollback: :always) do |db|
-      return yield db
+      result = yield db
     end
+
+    return result
   end
 end

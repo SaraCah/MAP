@@ -224,9 +224,18 @@ class FileIssues < BaseStorage
 
   def self.file_issue_dto_for(file_issue_id)
     handle_id = db[:handle][file_issue_id: file_issue_id][:id]
+
+    item_rows_with_tokens = db[:file_issue_item]
+                              .left_join(:file_issue_token,
+                                         Sequel[:file_issue_item][:file_issue_id] => Sequel[:file_issue_token][:file_issue_id],
+                                         Sequel[:file_issue_item][:aspace_record_id] => Sequel[:file_issue_token][:aspace_digital_representation_id])
+                              .filter(Sequel[:file_issue_item][:file_issue_id] => file_issue_id)
+                              .select_all(:file_issue_item)
+                              .select_append(Sequel.as(Sequel[:file_issue_token][:token_key], :file_issue_token))
+
     FileIssue.from_row(db[:file_issue][id: file_issue_id],
-                      handle_id,
-                      db[:file_issue_item].filter(file_issue_id: file_issue_id))
+                       handle_id,
+                       item_rows_with_tokens)
   end
 
   def self.chargeable_services
@@ -289,4 +298,51 @@ class FileIssues < BaseStorage
 
     notifications_per_file_issue.values
   end
+
+  KEY_LENGTH = 16
+
+  def self.dodgy_path_for_key(key)
+    key = key.to_s
+    raise "Key is not well-formed: #{key}" unless key =~ /\A[0-9a-f]{#{KEY_LENGTH * 2}}\z/
+
+    File.join(key[0...2], key[2...4], key)
+  end
+
+
+  def self.dodgy_hack_to_find_byte_stream_for_key(key)
+    File.open(File.join(AppConfig[:ill_advised_path_to_archivesspace_shared_directory],
+                        "representations",
+                        dodgy_path_for_key(key)),
+              "r")
+  end
+
+  def self.get_file_issue(token)
+    row = db[:file_issue_token][:token_key => token]
+
+    if row.nil?
+      {status: :missing}
+    elsif Time.now.to_i > row[:expire_date]
+      {status: :expired}
+    else
+      AspaceDB.open do |aspace_db|
+        representation_file = aspace_db[:representation_file][:digital_representation_id => row[:aspace_digital_representation_id]]
+
+        mime_type = representation_file[:mime_type]
+
+        begin
+          # FIXME: S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3
+          {
+            status: :found,
+            mime_type: mime_type,
+            stream: dodgy_hack_to_find_byte_stream_for_key(representation_file[:key])
+          }
+        rescue => e
+          $LOG.error("Failure while fetching token #{token}: #{e}")
+          {status: :missing}
+        end
+      end
+    end
+
+  end
+
 end

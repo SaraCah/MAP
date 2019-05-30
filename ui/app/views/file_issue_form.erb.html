@@ -77,7 +77,9 @@
                                 <% metadata = resolved_representations.find{|rep| rep['ref'] == item.fetch('record_ref')} %>
                                 <tbody class="<% if item.overdue? %>red lighten-5<% end %>">
                                     <tr>
-                                        <td><%= file_issue.id_for_display %>-<%= metadata.fetch('representation_id') %></td>
+                                        <% rep_id = [file_issue.id_for_display, metadata.fetch('representation_id')].join('-') %>
+                                        <% extension = "jpg" %>
+                                        <td><%= rep_id %></td>
                                         <td><%= metadata.fetch('series_id') %></td>
                                         <td><%= metadata.fetch('record_id') %></td>
                                         <td><%= metadata.fetch('title') %></td>
@@ -86,7 +88,11 @@
                                         <td><%= metadata.fetch('processing_handling_notes', '') %></td>
                                         <% if file_issue.fetch('issue_type') == 'DIGITAL' %>
                                             <td><%= item.fetch('dispatch_date','') %></td>
-                                            <td><!-- FIXME add link to file --></td>
+                                            <td>
+                                                <% if item.fetch('file_issue_token', nil) %>
+                                                    <a href="/file-issue-delivery?token=<%= item.fetch('file_issue_token', nil) %>&filename=<%= URI.escape(rep_id + ".#{extension}") %>">Download</a>
+                                                <% end %>
+                                            </td>
                                             <td><%= item.fetch('expiry_date', '') %></td>
                                             <td></td>
                                         <% else %>

@@ -606,4 +606,19 @@ class MAPTheAPI < Sinatra::Base
       [404]
     end
   end
+
+  Endpoint.get('/stream-file-issue', needs_session: false)
+    .param(:token, String, "File issue token") do
+    result = FileIssues.get_file_issue(params[:token])
+
+    if result[:status] == :found
+      [200, {"Content-Type" => result[:mime_type]}, result[:stream]]
+    elsif result[:status] == :missing
+      [404]
+    elsif result[:status] == :expired
+      [410]
+    else
+      raise "Unexpected status"
+    end
+  end
 end

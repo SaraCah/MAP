@@ -444,6 +444,19 @@ class MAPAPIClient
     get("/file_issue_notifications")
   end
 
+  def stream_file_issue(token, suggested_filename)
+    stream_get('/stream-file-issue', suggested_filename, { "token" => token })
+  end
+
+  class ClientError < StandardError
+    def initialize(json)
+      @json = json
+      super
+    end
+  end
+
+  class FileIssueExpired < StandardError; end
+  class FileIssueNotFound < StandardError; end
 
   private
 
@@ -486,6 +499,63 @@ class MAPAPIClient
     end
   end
 
+  # Deliberately doesn't respond to to_path to avoid Rack's stupid lint checks
+  # requiring the path actually exist.  Yeesh.
+  class FileStreamer
+    def initialize(file_io)
+      @io = file_io
+    end
+
+    def each(&block)
+      @io.each(&block)
+    end
+  end
+
+  # Net::HTTP's interface forces us to buffer to a file.  We'd like to just
+  # stream the chunks we get from the API back to the client, but as soon as we
+  # exit the Net::HTTP request block it closes our socket.
+  def spool_to_tempfile(http_response)
+    temp = Tempfile.new
+    http_response.read_body do |chunk|
+      temp << chunk
+    end
+
+    temp.flush
+    temp.rewind
+    temp.unlink
+
+    FileStreamer.new(temp)
+  end
+
+  def stream_get(url, suggested_filename = nil, params = {})
+    uri = build_url(url, params)
+
+    if !suggested_filename
+      suggested_filename = SecureRandom.hex
+    end
+
+    request = Net::HTTP::Get.new(uri)
+    request['X-MAP-SESSION'] = @session[:api_session_id] if @session[:api_session_id]
+
+    http_client.request(uri, request) do |response|
+      if response.code == '404'
+        raise FileIssueNotFound.new
+      elsif response.code == '410'
+        raise FileIssueExpired.new
+      elsif response.code == '200'
+        return [200,
+                {
+                  "Content-Type" => response['Content-Type'],
+                  "Content-Disposition" => "attachment; filename=\"#{suggested_filename}\"",
+                },
+                spool_to_tempfile(response)
+               ]
+      else
+        raise ClientError.new({:stream_error => response.code, :body => response.body})
+      end
+    end
+  end
+
   class SessionGoneError < StandardError
   end
 
@@ -508,13 +578,5 @@ class MAPAPIClient
       uri.query = URI.encode_www_form(params)
     end
     uri
-  end
-
-
-  class ClientError < StandardError
-    def initialize(json)
-      @json = json
-      super
-    end
   end
 end

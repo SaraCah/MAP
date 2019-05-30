@@ -630,6 +630,20 @@ class MAPTheApp < Sinatra::Base
                                :layout, title: "File Issue", context: ['file_issues', 'initiated_file_issues'])
   end
 
+  Endpoint.get('/file-issue-delivery')
+    .param(:filename, String, "Suggested filename", optional: true)
+    .param(:token, String, "Redemption token") do
+    begin
+      Ctx.client.stream_file_issue(params[:token], params[:filename])
+    rescue MAPAPIClient::FileIssueExpired => e
+      # Some helpful template (410 gone baby)
+      [410, {}, "Nope"]
+    rescue MAPAPIClient::FileIssueNotFound => e
+      # Something went wrong... 404?
+      [404, {}, "Missing"]
+    end
+  end
+
   Endpoint.get('/file-issue-fee-schedule') do
     chargeable_services = Ctx.client.get_file_issue_fee_schedule
 

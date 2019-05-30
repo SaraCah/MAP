@@ -8,6 +8,7 @@ class FileIssueItem
   define_field(:dispatch_date, Date, required: false)
   define_field(:expiry_date, Date, required: false)
   define_field(:returned_date, Date, required: false)
+  define_field(:file_issue_token, String, required: false)
 
   def self.from_row(row)
     new(id: row[:id],
@@ -15,7 +16,9 @@ class FileIssueItem
         record_details: row[:record_details],
         dispatch_date: row[:dispatch_date],
         expiry_date: row[:expiry_date],
-        returned_date: row[:returned_date])
+        returned_date: row[:returned_date],
+        file_issue_token: row[:file_issue_token],
+       )
   end
 
   def overdue?
