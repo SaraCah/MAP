@@ -117,8 +117,11 @@ class Search
   end
 
 
-  def self.controlled_records(permissions)
-    solr_handle_search(q: "*:*", fq: build_controlled_records_filter(permissions))
+  def self.controlled_records(permissions, page, page_size)
+    solr_handle_search(q: "*:*",
+                       fq: build_controlled_records_filter(permissions),
+                       rows: page_size,
+                       start: (page * page_size))
       .map {|result| record_hash(result)}
   end
 

@@ -215,13 +215,21 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/my-agency') do
     if Ctx.user_logged_in? && Ctx.get.current_location
-      permissions = Users.permissions_for_user(Ctx.username)
       agent_summary = Agencies.get_summary(Ctx.get.current_location.agency_id)
-      agent_summary.controlled_records = Search.controlled_records(permissions)
-
       json_response(agent_summary)
     else
       json_response({})
+    end
+  end
+
+  Endpoint.get('/controlled-records')
+    .param(:page, Integer, "Page to fetch (zero-indexed)")
+    .param(:page_size, Integer, "Size of each page") do
+    if Ctx.user_logged_in? && Ctx.get.current_location
+      permissions = Users.permissions_for_user(Ctx.username)
+      json_response(Search.controlled_records(permissions, params[:page], params[:page_size]))
+    else
+      json_response([])
     end
   end
 

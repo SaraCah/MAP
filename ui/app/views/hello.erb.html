@@ -1,50 +1,5 @@
-<% if agency %>
-  <div class="card">
-    <div class="card-content">
-      <span class="card-title"><%= agency.label %> - <%= location.name %></span>
-      <table>
-        <thead>
-          <tr>
-            <th>Type</th>
-            <th>Record</th>
-            <th></th>
-            <th>QSA Identifier</th>
-            <th>Representations</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% agency.controlled_records.each do |record| %>
-            <tr>
-              <td><%= record['type'] %></td>
-              <td><%= record['title'] %></td>
-              <td><span class="badge"><%= record['under_movement'] ? 'under movement' : '' %></span></td>
-              <td><%= record['type'] + ' ' + record['qsa_id'] %></td>
-              <td>
-                <% if Array(record['types']).include?('representation') %>
-                  N/A
-                <% else %>
-                  <%=
-                  ['physical', 'digital']
-                  .map {|rep_type| record["#{rep_type}_representations_count"].to_s + " #{rep_type}" }
-                  .join('; ')
-                  %>
-                <% end %>
-              </td>
-              <td>
-                <% if Ctx.permissions.allow_manage_file_issues? && record['file_issue_allowed'] %>
-                  <a class="btn" href="/file-issue-requests/new?record_ref=<%= record['id'] %>">Request</a>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-<% else %>
-      <div class="card">
-        <div class="card-content">
-          <span class="card-title">No controlled records</span>
-          <p>Your agency does not currently control any records.</p>
-        </div>
-      </div>
-<% end %>
+<div class="row vue-enabled">
+  <controlled-records title="<%= (agency && location) ? [agency.label, location.name].join(' - ') : '' %>"
+                      :file_issues_allowed="<%= Ctx.permissions.allow_manage_file_issues? %>">
+  </controlled-records>
+</div>

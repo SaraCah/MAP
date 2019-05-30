@@ -12,6 +12,7 @@ import 'representation-linker';
 import 'select-with-other-option';
 import 'transfer-proposal-series';
 import 'file-issue-notifications';
+import 'controlled-records';
 
 declare var M: any; // Materialize on the window context
 

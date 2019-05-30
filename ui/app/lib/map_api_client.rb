@@ -227,8 +227,12 @@ class MAPAPIClient
 
   def get_current_agency
     return nil if Ctx.get.permissions.is_admin?
-
     Agency.from_json(get('/my-agency', {}))
+  end
+
+  def get_controlled_records(page, page_size)
+    return [] if Ctx.get.permissions.is_admin?
+    get('/controlled-records', {page: page, page_size: page_size})
   end
 
   AgencyLocation = Struct.new(:id, :name, :agency_id, :create_time, :agency) do

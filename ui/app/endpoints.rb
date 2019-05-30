@@ -644,4 +644,18 @@ class MAPTheApp < Sinatra::Base
       Ctx.client.file_issue_notifications.to_json
     ]
   end
+
+  Endpoint.get('/controlled-records')
+    .param(:page, Integer, "Page to fetch")
+    .param(:page_size, Integer, "Elements per page") do
+    # Clamp to a sensible maximum
+    page_size = [params[:page_size], 200].min
+
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      Ctx.client.get_controlled_records(params[:page], page_size).to_json
+    ]
+  end
+
 end
