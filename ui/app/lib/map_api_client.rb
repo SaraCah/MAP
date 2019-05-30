@@ -499,33 +499,61 @@ class MAPAPIClient
     end
   end
 
-  # Deliberately doesn't respond to to_path to avoid Rack's stupid lint checks
-  # requiring the path actually exist.  Yeesh.
-  class FileStreamer
-    def initialize(file_io)
-      @io = file_io
+
+  class StreamHTTPRequest
+    def initialize(client, request, uri)
+      @client = client
+      @request = request
+      @uri = uri
+
+      @queue = java.util.concurrent.LinkedBlockingQueue.new(1)
+      @response_code_future = java.util.concurrent.CompletableFuture.new
+      @response_headers_future = java.util.concurrent.CompletableFuture.new
+
+      start_thread!
     end
 
-    def each(&block)
-      @io.each(&block)
+    def response_code
+      @response_code_future.get
+    end
+
+    def headers
+      @response_headers_future.get
+    end
+
+    def start_thread!
+      Thread.new do
+        begin
+          @client.request(@uri, @request) do |response|
+            @response_code_future.complete(response.code)
+            @response_headers_future.complete(response.to_hash)
+
+            if response.code == '200'
+              response.read_body do |chunk|
+                @queue.offer(chunk.bytes, 60, java.util.concurrent.TimeUnit::SECONDS)
+              end
+
+              @queue.offer(:done, 60, java.util.concurrent.TimeUnit::SECONDS)
+            end
+          end
+        rescue => e
+          $LOG.error("Failure in StreamHTTPRequest: #{e}")
+          @response_code_future.cancel
+          @response_headers_future.cancel
+        end
+      end
+    end
+
+    def each
+      loop do
+        elt = @queue.poll(60, java.util.concurrent.TimeUnit::SECONDS)
+        break if elt == :done
+
+        yield elt.pack('c*')
+      end
     end
   end
 
-  # Net::HTTP's interface forces us to buffer to a file.  We'd like to just
-  # stream the chunks we get from the API back to the client, but as soon as we
-  # exit the Net::HTTP request block it closes our socket.
-  def spool_to_tempfile(http_response)
-    temp = Tempfile.new
-    http_response.read_body do |chunk|
-      temp << chunk
-    end
-
-    temp.flush
-    temp.rewind
-    temp.unlink
-
-    FileStreamer.new(temp)
-  end
 
   def stream_get(url, suggested_filename = nil, params = {})
     uri = build_url(url, params)
@@ -537,22 +565,23 @@ class MAPAPIClient
     request = Net::HTTP::Get.new(uri)
     request['X-MAP-SESSION'] = @session[:api_session_id] if @session[:api_session_id]
 
-    http_client.request(uri, request) do |response|
-      if response.code == '404'
+    stream = StreamHTTPRequest.new(http_client, request, uri)
+
+    if stream.response_code == '404'
         raise FileIssueNotFound.new
-      elsif response.code == '410'
-        raise FileIssueExpired.new
-      elsif response.code == '200'
-        return [200,
-                {
-                  "Content-Type" => response['Content-Type'],
-                  "Content-Disposition" => "attachment; filename=\"#{suggested_filename}\"",
-                },
-                spool_to_tempfile(response)
-               ]
-      else
-        raise ClientError.new({:stream_error => response.code, :body => response.body})
-      end
+    elsif stream.response_code == '410'
+      raise FileIssueExpired.new
+    elsif stream.response_code == '200'
+      [
+        200,
+        {
+          "Content-Type" => stream.headers['Content-Type'],
+          "Content-Disposition" => "attachment; filename=\"#{suggested_filename}\"",
+        },
+        stream
+      ]
+    else
+      raise ClientError.new({:stream_error => stream.response_code})
     end
   end
 
