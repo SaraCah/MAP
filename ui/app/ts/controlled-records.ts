@@ -10,15 +10,15 @@ Vue.use(VueResource);
 // import UI from "./ui";
 
 interface Record {
-    type: string,
-    title: string,
-    under_movement: boolean,
-    types: string[],
-    file_issue_allowed: boolean,
-    id: string,
-    qsa_id: number,
-    physical_representations_count: number,
-    digital_representations_count: number,
+    type: string;
+    title: string;
+    under_movement: boolean;
+    types: string[];
+    file_issue_allowed: boolean;
+    id: string;
+    qsa_id: number;
+    physical_representations_count: number;
+    digital_representations_count: number;
 }
 
 Vue.component('controlled-records', {
@@ -105,7 +105,7 @@ Vue.component('controlled-records', {
                 params: {
                     page: this.currentPage,
                     page_size: this.pageSize + 1,
-                }
+                },
             }).then((response: any) => {
                 return response.json();
             }, () => {
@@ -124,7 +124,7 @@ Vue.component('controlled-records', {
         },
     },
     watch: {
-        currentPage: function () {
+        currentPage: function() {
             this.getRecords();
         },
     },

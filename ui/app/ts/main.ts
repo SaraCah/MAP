@@ -3,16 +3,16 @@
 import Vue from "vue";
 
 import 'confirmable-action';
+import 'controlled-records';
 import 'conversation';
 import 'current-location-selector';
 import 'file-issue-form';
+import 'file-issue-notifications';
 import 'file-uploader';
 import 'linker';
 import 'representation-linker';
 import 'select-with-other-option';
 import 'transfer-proposal-series';
-import 'file-issue-notifications';
-import 'controlled-records';
 
 declare var M: any; // Materialize on the window context
 
