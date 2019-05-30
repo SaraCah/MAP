@@ -81,12 +81,10 @@ Vue.component('controlled-records', {
         currentPage: number,
         records: Record[],
         initialised: boolean,
-        pageSize: number,
         showNextPage: boolean,
         showPrevPage: boolean,
     } {
         return {
-            pageSize: 5,
             initialised: false,
             currentPage: 0,
             records: [],
@@ -96,6 +94,7 @@ Vue.component('controlled-records', {
     },
     props: {
         file_issues_allowed: Boolean,
+        page_size: Number,
         title: String,
     },
     methods: {
@@ -104,7 +103,7 @@ Vue.component('controlled-records', {
                 method: 'GET',
                 params: {
                     page: this.currentPage,
-                    page_size: this.pageSize + 1,
+                    page_size: this.page_size + 1,
                 },
             }).then((response: any) => {
                 return response.json();
@@ -117,9 +116,9 @@ Vue.component('controlled-records', {
             }).then((json: any) => {
                 this.initialised = true;
 
-                this.records = json.slice(0, this.pageSize);
+                this.records = json.slice(0, this.page_size);
                 this.showPrevPage = (this.currentPage > 0);
-                this.showNextPage = (json.length > this.pageSize);
+                this.showNextPage = (json.length > this.page_size);
             });
         },
     },
