@@ -637,10 +637,22 @@ class MAPTheApp < Sinatra::Base
       Ctx.client.stream_file_issue(params[:token], params[:filename])
     rescue MAPAPIClient::FileIssueExpired => e
       # Some helpful template (410 gone baby)
-      [410, {}, "Nope"]
+      [
+        410,
+        {},
+        Templates.emit_with_layout(:file_issue_download_expired, {},
+                                   :layout, title: "Download expired")
+
+      ]
     rescue MAPAPIClient::FileIssueNotFound => e
       # Something went wrong... 404?
-      [404, {}, "Missing"]
+      [
+        404,
+        {},
+        Templates.emit_with_layout(:file_issue_download_missing, {},
+                                   :layout, title: "Download missing")
+
+      ]
     end
   end
 

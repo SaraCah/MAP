@@ -89,8 +89,8 @@
                                         <% if file_issue.fetch('issue_type') == 'DIGITAL' %>
                                             <td><%= item.fetch('dispatch_date','') %></td>
                                             <td>
-                                                <% if item.fetch('file_issue_token', nil) %>
-                                                    <a href="/file-issue-delivery?token=<%= item.fetch('file_issue_token', nil) %>&filename=<%= URI.escape(rep_id + ".#{extension}") %>">Download</a>
+                                                <% if item.downloadable? %>
+                                                    <a target="_blank" href="/file-issue-delivery?token=<%= item.fetch('file_issue_token', nil) %>&filename=<%= URI.escape(rep_id + ".#{extension}") %>">Download</a>
                                                 <% end %>
                                             </td>
                                             <td><%= item.fetch('expiry_date', '') %></td>
