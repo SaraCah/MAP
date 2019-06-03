@@ -26,18 +26,15 @@ Vue.component('file-issue-notifications', {
         <span class="yellow-text text-darken-3" :title="file_issues.length + ' file issue notifications'" v-on:click="showNotifications()"><i aria-hidden="true" class="fa fa-flag"></i></span>
         <div ref="modal" class="modal">
             <div class="modal-content">
-                <div class="card yellow lighten-4">
+                <div v-for="(file_issue, i) in file_issues" class="card yellow lighten-4">
                     <div class="card-content" style="max-height: 200px; overflow: auto;">
-                        <div v-for="(file_issue, i) in file_issues">
-                            <template v-if="i > 0"><hr></template>
-                            <a class="btn btn-small right" :href="'/file-issues/' + file_issue.record_id">View</a>
-                            <div><strong>{{file_issue.identifier}}</strong></div>
-                            <div v-for="notification in file_issue.notifications">
-                                <template v-if="notification.level === 'warning'">
-                                    <i aria-hidden="true" class="red-text darken-2 fa fa-exclamation-triangle"></i>
-                                </template>
-                                {{notification.message}}
-                            </div>
+                        <a class="btn btn-small right" :href="'/file-issues/' + file_issue.record_id">View</a>
+                        <span class="card-title">{{file_issue.identifier}}</span>
+                        <div v-for="notification in file_issue.notifications">
+                            <template v-if="notification.level === 'warning'">
+                                <i aria-hidden="true" class="red-text darken-2 fa fa-exclamation-triangle"></i>
+                            </template>
+                            {{notification.message}}
                         </div>
                     </div>
                 </div>
