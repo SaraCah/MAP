@@ -7,6 +7,11 @@ Vue.use(VueResource);
 
 declare var M: any; // Materialize on the window context
 
+interface FileIssueNotifications {
+    file_issue_id: string;
+    notifications: Notification[];
+}
+
 interface Notification {
     record_id: string;
     message: string;
@@ -17,19 +22,22 @@ interface Notification {
 Vue.component('file-issue-notifications', {
     template: `
 <span class="notification">
-    <template v-if="notifications.length > 0">
-        <span class="yellow-text text-darken-3" :title="notifications.length + ' file issue notifications'" v-on:click="showNotifications()"><i aria-hidden="true" class="fa fa-flag"></i></span>
+    <template v-if="file_issues.length > 0">
+        <span class="yellow-text text-darken-3" :title="file_issues.length + ' file issue notifications'" v-on:click="showNotifications()"><i aria-hidden="true" class="fa fa-flag"></i></span>
         <div ref="modal" class="modal">
             <div class="modal-content">
                 <div class="card yellow lighten-4">
                     <div class="card-content" style="max-height: 200px; overflow: auto;">
-                        <div v-for="notification in notifications">
-                            <template v-if="notification.level === 'warning'">
-                                <i aria-hidden="true" class="red-text darken-2 fa fa-exclamation-triangle"></i>
-                            </template>
-                            <strong>{{notification.identifier}}</strong>
-                            {{notification.message}}
-                            <a class="btn btn-small" :href="'/file-issues/' + notification.record_id">View</a>
+                        <div v-for="(file_issue, i) in file_issues">
+                            <template v-if="i > 0"><hr></template>
+                            <a class="btn btn-small right" :href="'/file-issues/' + file_issue.record_id">View</a>
+                            <div><strong>{{file_issue.identifier}}</strong></div>
+                            <div v-for="notification in file_issue.notifications">
+                                <template v-if="notification.level === 'warning'">
+                                    <i aria-hidden="true" class="red-text darken-2 fa fa-exclamation-triangle"></i>
+                                </template>
+                                {{notification.message}}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -41,9 +49,9 @@ Vue.component('file-issue-notifications', {
     </template>
 </span>
 `,
-    data: function(): {notifications: Notification[]} {
+    data: function(): {file_issues: FileIssueNotifications[]} {
         return {
-            notifications: [],
+            file_issues: [],
         };
     },
     props: [],
@@ -53,9 +61,9 @@ Vue.component('file-issue-notifications', {
             .then((response: any) => {
                 return response.json();
             }, () => {
-                this.notifications = [];
+                this.file_issues = [];
             }).then((json: any) => {
-                this.notifications = json;
+                this.file_issues = json;
             });
         },
         showNotifications: function() {
