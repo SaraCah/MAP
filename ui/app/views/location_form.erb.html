@@ -1,6 +1,6 @@
 <div class="row vue-enabled">
     <% if errors %>
-        <pre><%= errors %></pre>
+        <%== FormHelper.render_errors(errors) %>
     <% end %>
     <% form_action = "/locations/" + (location.new? ? "create" : "update") %>
     <form class="col s12" action="<%= form_action %>" method="post">

@@ -1,6 +1,6 @@
 <div class="row vue-enabled">
     <% if errors %>
-        <pre><%= errors %></pre>
+        <%== FormHelper.render_errors(errors) %>
     <% end %>
     <form class="col s12" action='/users/<%= user.new? ? "create" : "update/#{user.fetch('id')}" %>' method="post">
         <%== FormHelper.hidden_authenticity_token %>

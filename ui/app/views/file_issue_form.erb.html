@@ -11,7 +11,7 @@
         <div class="row vue-enabled">
             <% if errors %>
                 <section id="errors" class="scrollspy section">
-                    <pre><%= errors %></pre>
+                    <%== FormHelper.render_errors(errors) %>
                 </section>
             <% end %>
             <section id="status" class="scrollspy section">

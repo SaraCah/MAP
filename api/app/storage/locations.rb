@@ -127,6 +127,10 @@ class Locations < BaseStorage
   def self.create_location_from_dto(location)
     (_, aspace_agency_id) = location.fetch('agency_ref').split(':')
 
+    if !aspace_agency_id
+      return [{code: "AGENCY_NOT_FOUND", field: 'agency_ref', field_label: 'agency'}]
+    end
+
     agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
 
     # check for uniqueness

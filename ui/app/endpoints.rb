@@ -318,7 +318,7 @@ class MAPTheApp < Sinatra::Base
     if errors.empty?
       redirect '/transfer-proposals'
     else
-      Templates.emit_with_layout(:transfer_proposal_view, {transfer: params[:transfer], errors: errors},
+      Templates.emit_with_layout(:transfer_proposal_view, {transfer: params[:transfer], errors: errors, is_readonly: false},
                                  :layout, title: "New Transfer Proposal", context: ['transfers', 'transfer_proposals'])
     end
   end
@@ -525,7 +525,7 @@ class MAPTheApp < Sinatra::Base
       redirect '/file-issue-requests'
     else
       resolved_representations = Ctx.client.resolve_representations(params[:file_issue_request].fetch('items').collect{|item| item.fetch('record_ref')})
-      Templates.emit_with_layout(:file_issue_request_view, {request: params[:file_issue_request], resolved_representations: resolved_representations, errors: errors},
+      Templates.emit_with_layout(:file_issue_request_view, {request: params[:file_issue_request], resolved_representations: resolved_representations, errors: errors, is_readonly: false},
                                  :layout, title: "New Request", context: ['file_issues', 'file_issue_requests'])
     end
   end

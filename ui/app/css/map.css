@@ -145,3 +145,7 @@
 .tabs .notification i.fa {
     font-size: 1em;
 }
+
+.form-errors .error-field {
+    font-weight: bold;
+}
