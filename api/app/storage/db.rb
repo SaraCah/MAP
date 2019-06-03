@@ -1,5 +1,3 @@
-require 'logger'
-
 class DB
 
   def self.connect
