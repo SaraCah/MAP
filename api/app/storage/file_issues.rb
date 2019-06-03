@@ -276,16 +276,19 @@ class FileIssues < BaseStorage
   end
 
 
+  FILE_ISSUE_EXPIRY_WINDOW = 7 # days
+
   def self.get_notifications
     notifications_per_file_issue = {}
     file_issue_identifiers = {}
 
-    # find any overdue file issues
+    # find any overdue physical file issues
     db[:file_issue]
       .join(:file_issue_item, Sequel[:file_issue_item][:file_issue_id] => Sequel[:file_issue][:id])
       .filter(Sequel[:file_issue][:agency_id] => Ctx.get.current_location.agency_id)
       .filter(Sequel[:file_issue][:agency_location_id] => Ctx.get.current_location.id)
       .filter(Sequel[:file_issue][:checklist_completed] => 0)
+      .filter(Sequel[:file_issue][:issue_type] => FileIssue::ISSUE_TYPE_PHYSICAL)
       .filter(Sequel.~(Sequel[:file_issue_item][:dispatch_date] => nil))
       .filter(Sequel[:file_issue_item][:returned_date] => nil)
       .filter(Sequel.~(Sequel[:file_issue_item][:expiry_date] => nil))
@@ -300,6 +303,27 @@ class FileIssues < BaseStorage
       notifications_per_file_issue[row[:id]] << Notification.new("Has overdue items", "warning")
     end
 
+    # find any recently expired digital file issues
+    db[:file_issue]
+      .join(:file_issue_item, Sequel[:file_issue_item][:file_issue_id] => Sequel[:file_issue][:id])
+      .filter(Sequel[:file_issue][:agency_id] => Ctx.get.current_location.agency_id)
+      .filter(Sequel[:file_issue][:agency_location_id] => Ctx.get.current_location.id)
+      .filter(Sequel[:file_issue][:checklist_completed] => 0)
+      .filter(Sequel[:file_issue][:issue_type] => FileIssue::ISSUE_TYPE_DIGITAL)
+      .filter(Sequel.~(Sequel[:file_issue_item][:dispatch_date] => nil))
+      .filter(Sequel.~(Sequel[:file_issue_item][:expiry_date] => nil))
+      .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today }
+      .filter{ Sequel[:file_issue_item][:expiry_date] >= Date.today - FILE_ISSUE_EXPIRY_WINDOW }
+      .select(Sequel[:file_issue][:id],
+              Sequel[:file_issue][:issue_type])
+      .distinct
+      .map do |row|
+      identifier = "FI#{row[:issue_type][0]}#{row[:id]}"
+      file_issue_identifiers[row[:id]] = identifier
+      notifications_per_file_issue[row[:id]] ||= []
+      notifications_per_file_issue[row[:id]] << Notification.new("Has recently expired items", "info")
+    end
+
     # find any file issues nearing expiry
     db[:file_issue]
       .join(:file_issue_item, Sequel[:file_issue_item][:file_issue_id] => Sequel[:file_issue][:id])
@@ -310,7 +334,7 @@ class FileIssues < BaseStorage
       .filter(Sequel[:file_issue_item][:returned_date] => nil)
       .filter(Sequel.~(Sequel[:file_issue_item][:expiry_date] => nil))
       .filter{ Sequel[:file_issue_item][:expiry_date] >= Date.today }
-      .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today + 7 }
+      .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today + FILE_ISSUE_EXPIRY_WINDOW }
       .select(Sequel[:file_issue][:id],
               Sequel[:file_issue][:issue_type])
       .distinct
@@ -318,7 +342,11 @@ class FileIssues < BaseStorage
       identifier = "FI#{row[:issue_type][0]}#{row[:id]}"
       file_issue_identifiers[row[:id]] = identifier
       notifications_per_file_issue[row[:id]] ||= []
-      notifications_per_file_issue[row[:id]] << Notification.new("Has items nearing their expiry/return date", "info")
+      if row[:issue_type] == FileIssue::ISSUE_TYPE_DIGITAL
+        notifications_per_file_issue[row[:id]] << Notification.new("Has items nearing their expiry date", "info")
+      else
+        notifications_per_file_issue[row[:id]] << Notification.new("Has items nearing their return date", "info")
+      end
     end
 
     notifications_per_file_issue.map do |file_issue_id, notifications|
