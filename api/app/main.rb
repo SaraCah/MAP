@@ -53,7 +53,7 @@ require 'dto/file_issue_item'
 require 'dto/file_issue'
 
 require 'common/bootstrap'
-require 'storage/db_pool'
+require 'storage/db_connection'
 require 'storage/db'
 require 'storage/aspace_db'
 require 'lib/endpoint'
