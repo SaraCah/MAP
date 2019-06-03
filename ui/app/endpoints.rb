@@ -329,7 +329,7 @@ class MAPTheApp < Sinatra::Base
     Ctx.client.store_files(params[:file]).zip(params[:file]).map do |file_key, file|
       files << {
         'key' => file_key,
-        'mime_type' => file.mime_type,
+        'mime_type' => HTTPUtils.sanitise_mime_type(file.mime_type),
         'filename' => file.filename,
       }
     end
@@ -390,7 +390,7 @@ class MAPTheApp < Sinatra::Base
     [
       200,
       {
-        'Content-Type' => params[:mime_type],
+        'Content-Type' => HTTPUtils.sanitise_mime_type(params[:mime_type]),
         'Content-Disposition' => "attachment; filename=#{params[:filename]}"
       },
       Ctx.client.stream_file(params[:key])

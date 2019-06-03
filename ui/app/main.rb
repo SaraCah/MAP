@@ -44,6 +44,7 @@ require 'lib/url_helper'
 require 'lib/form_helper'
 require 'lib/typescript_helper'
 require 'lib/js_bundle'
+require 'lib/http_utils'
 
 require 'dto/dto'
 require 'dto/transfer_file'
