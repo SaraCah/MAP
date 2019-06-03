@@ -617,6 +617,8 @@ class MAPTheAPI < Sinatra::Base
       [404]
     elsif result[:status] == :expired
       [410]
+    elsif result[:status] == :not_dispatched
+      [425]
     else
       raise "Unexpected status"
     end

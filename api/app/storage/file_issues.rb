@@ -321,6 +321,8 @@ class FileIssues < BaseStorage
 
     if row.nil?
       {status: :missing}
+    elsif Time.now.to_i < row[:dispatch_date]
+      {status: :not_dispatched}
     elsif Time.now.to_i > row[:expire_date]
       {status: :expired}
     else

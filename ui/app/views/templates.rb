@@ -35,3 +35,4 @@ Templates.define(:file_issue_fee_schedule, [:chargeable_services], "views/file_i
 
 Templates.define(:file_issue_download_expired, [], "views/file_issue_download_expired.erb.html")
 Templates.define(:file_issue_download_missing, [], "views/file_issue_download_missing.erb.html")
+Templates.define(:file_issue_not_dispatched, [], "views/file_issue_not_dispatched.erb.html")

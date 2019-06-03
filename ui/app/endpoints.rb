@@ -653,6 +653,15 @@ class MAPTheApp < Sinatra::Base
                                    :layout, title: "Download missing")
 
       ]
+    rescue MAPAPIClient::FileIssueNotDispatched => e
+      # Something went wrong... 404?
+      [
+        404,
+        {},
+        Templates.emit_with_layout(:file_issue_not_dispatched, {},
+                                   :layout, title: "Download not yet available")
+
+      ]
     end
   end
 

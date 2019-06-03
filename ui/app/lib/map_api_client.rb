@@ -457,6 +457,7 @@ class MAPAPIClient
 
   class FileIssueExpired < StandardError; end
   class FileIssueNotFound < StandardError; end
+  class FileIssueNotDispatched < StandardError; end
 
   private
 
@@ -571,6 +572,8 @@ class MAPAPIClient
         raise FileIssueNotFound.new
     elsif stream.response_code == '410'
       raise FileIssueExpired.new
+    elsif stream.response_code == '425'
+      raise FileIssueNotDispatched.new
     elsif stream.response_code == '200'
       [
         200,
