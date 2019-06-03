@@ -62,4 +62,10 @@ class FileIssue
   def self.id_for_display(id, issue_type)
     "FI#{issue_type[0]}#{id}"
   end
+
+  def all_links_expired?
+    fetch('items', []).all? do |item|
+      item.expired?
+    end
+  end
 end

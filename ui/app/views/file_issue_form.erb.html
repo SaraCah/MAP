@@ -23,7 +23,11 @@
                                 <li class="<% if file_issue.fetch('checklist_retrieval_started', false) %>checked<% end %>">Retrieval<br>Started</li>
                                 <li class="<% if file_issue.fetch('checklist_dispatched', false) %>checked<% end %>">Files<br>Dispatched/Uploaded</li>
                                 <li class="<% if file_issue.fetch('checklist_summary_sent', false) %>checked<% end %>">File Issue<br>Summary Sent</li>
-                                <li class="last <% if file_issue.fetch('checklist_completed', false) %>checked<% end %>">Link Expired/Loan Returned</li>
+                                <% if file_issue.fetch('issue_type') == 'DIGITAL' %>
+                                    <li class="last <% if file_issue.all_links_expired? %>checked<% end %>">Link(s) Expired</li>
+                                <% else %>
+                                    <li class="last <% if file_issue.fetch('checklist_completed', false) %>checked<% end %>">Loan Returned</li>
+                                <% end %>
                             </ul>
                         </div>
                     </div>
