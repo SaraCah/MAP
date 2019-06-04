@@ -30,4 +30,14 @@ class TransferProposal
         handle_id: handle,
         transfer_id: transfer_id)
   end
+
+  def id_for_display
+    return '' if new?
+
+    self.class.id_for_display(fetch('id'))
+  end
+
+  def self.id_for_display(id)
+    "P#{id}"
+  end
 end

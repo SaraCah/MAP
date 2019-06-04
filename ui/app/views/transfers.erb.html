@@ -3,6 +3,7 @@
         <table class="highlight responsive-table">
             <thead>
             <tr>
+                <th style="width:40px">ID</th>
                 <th style="width:25%">Transfer Title</th>
                 <th style="width:15%">Status</th>
                 <th style="width:10%">Created By</th>
@@ -13,6 +14,7 @@
             <tbody>
             <% paged_results.results.each do |transfer| %>
             <tr>
+                <td><%= transfer.id_for_display %></td>
                 <td><%= transfer.fetch('title') %></td>
                 <td><%= transfer.fetch('status') %></td>
                 <td><%= transfer.fetch('created_by') %></td>

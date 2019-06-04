@@ -42,6 +42,15 @@
                 <% end %>
 
                 <section id="details" class="scrollspy section">
+                    <% unless transfer.new? %>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="proposal_id" type="text" value="<%= transfer.id_for_display %>" disabled>
+                                <label for="proposal_id">Proposal ID</label>
+                            </div>
+                        </div>
+                    <% end %>
+
                     <div class="row">
                         <div class="input-field col s12">
                             <input id="agency" type="text" value="<%= Ctx.get.current_location.agency.label %>" disabled>
