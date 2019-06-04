@@ -297,7 +297,7 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.post('/store-files')
     .param(:file, [UploadFile], "Files to store") do
     if Ctx.user_logged_in?
-      json_response(params[:file].map {|file| Files.store(file.tmp_file)})
+      json_response(params[:file].map {|file| ByteStorage.get.store(file.tmp_file)})
     else
       [404]
     end
@@ -342,11 +342,10 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/stream-file')
     .param(:key, String, "File key to stream") do
     if Ctx.user_logged_in?
-      # FIXME stream it
       [
         200,
         {'Content-Type' => 'application/octet-stream'},
-        StringIO.new(Files.read(params[:key]))
+        ByteStorage.get.to_enum(:get_stream, params[:key])
       ]
     else
       [404]
@@ -425,11 +424,14 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/import-validate')
     .param(:key, String, "The file key to validate") do
 
-    # All of this will be rejiggered when we switch to S3, so just spamming it in here for now...
     import_file = Tempfile.new(['import_validate', '.xlsx'])
     begin
-      import_file.write(Files.read(params[:key]))
+      ByteStorage.get.get_stream(params[:key]) do |chunk|
+        import_file.write(chunk)
+      end
+
       import_file.close
+
 
       errors = []
       import_validator = MapValidator.new
@@ -611,13 +613,13 @@ class MAPTheAPI < Sinatra::Base
     .param(:token, String, "File issue token") do
     result = FileIssues.get_file_issue(params[:token])
 
-    if result[:status] == :found
-      [200, {"Content-Type" => result[:mime_type]}, result[:stream]]
-    elsif result[:status] == :missing
+    if result.fetch(:status) == :found
+      [200, {"Content-Type" => result.fetch(:mime_type)}, result.fetch(:stream)]
+    elsif result.fetch(:status) == :missing
       [404]
-    elsif result[:status] == :expired
+    elsif result.fetch(:status) == :expired
       [410]
-    elsif result[:status] == :not_dispatched
+    elsif result.fetch(:status) == :not_dispatched
       [425]
     else
       raise "Unexpected status"

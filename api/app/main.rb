@@ -70,7 +70,9 @@ require 'storage/permissions'
 require 'storage/agencies'
 require 'storage/locations'
 require 'storage/transfers'
-require 'storage/files'
+require 'storage/byte_storage'
+require 'storage/file_storage'
+require 'storage/s3_storage'
 require 'storage/conversations'
 require 'storage/file_issues'
 require 'storage/representations'
@@ -134,6 +136,30 @@ class MAPTheAPI < Sinatra::Base
       end
     end
   end
+
+  # Validate config!
+  ByteStorage.get
+
+  # FIXME: If there are any entries in our old file blob table, migrate them
+  # now.  In the long term we won't need this and this can be deleted and the
+  # FILE table dropped.
+  DB.open do |db|
+    if db.table_exists?(:file)
+      migrated = []
+      db[:file].select(:key).each do |key|
+        $LOG.info("Migrating file #{key}")
+        begin
+          ByteStorage.get.store(StringIO.new(db[:file][:key => key][:blob]), key)
+          migrated << key
+        rescue
+          $LOG.error("Failed to migrate #{key}: #{$!}")
+        end
+      end
+
+      db[:file].filter(:key => migrated).delete
+    end
+  end
+
 
   error do
     $LOG.info("*** Caught unexpected exception: #{$!}")

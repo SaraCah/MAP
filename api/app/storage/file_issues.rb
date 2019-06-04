@@ -354,23 +354,6 @@ class FileIssues < BaseStorage
     end
   end
 
-  KEY_LENGTH = 16
-
-  def self.dodgy_path_for_key(key)
-    key = key.to_s
-    raise "Key is not well-formed: #{key}" unless key =~ /\A[0-9a-f]{#{KEY_LENGTH * 2}}\z/
-
-    File.join(key[0...2], key[2...4], key)
-  end
-
-
-  def self.dodgy_hack_to_find_byte_stream_for_key(key)
-    File.open(File.join(AppConfig[:ill_advised_path_to_archivesspace_shared_directory],
-                        "representations",
-                        dodgy_path_for_key(key)),
-              "r")
-  end
-
   def self.get_file_issue(token)
     row = db[:file_issue_token][:token_key => token]
 
@@ -381,25 +364,23 @@ class FileIssues < BaseStorage
     elsif Time.now.to_i > row[:expire_date]
       {status: :expired}
     else
-      AspaceDB.open do |aspace_db|
-        representation_file = aspace_db[:representation_file][:digital_representation_id => row[:aspace_digital_representation_id]]
+      representation_file = AspaceDB.open do |aspace_db|
+        aspace_db[:representation_file][:digital_representation_id => row[:aspace_digital_representation_id]]
+      end
 
-        mime_type = representation_file[:mime_type]
+      mime_type = representation_file[:mime_type]
 
-        begin
-          # FIXME: S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3 S3
-          {
-            status: :found,
-            mime_type: mime_type,
-            stream: dodgy_hack_to_find_byte_stream_for_key(representation_file[:key])
-          }
-        rescue => e
-          $LOG.error("Failure while fetching token #{token}: #{e}")
-          {status: :missing}
-        end
+      begin
+        {
+          status: :found,
+          mime_type: mime_type,
+          stream: ByteStorage.get.to_enum(:get_stream, representation_file[:key])
+        }
+      rescue => e
+        $LOG.error("Failure while fetching token #{token}: #{e}")
+        {status: :missing}
       end
     end
-
   end
 
 end

@@ -18,14 +18,16 @@ class DBConnection
       retries.times do |attempt|
         begin
           if transaction
+            result = nil
             @pool.transaction(isolation: opts.fetch(:isolation_level, :repeatable),
                               rollback: opts.fetch(:rollback, nil)) do |db|
-              return yield db
+              result = yield db
+              result
             end
 
             # Sometimes we'll make it to here.  That means we threw a
             # Sequel::Rollback which has been quietly caught.
-            return nil
+            return result
           else
             begin
               return yield @pool.pool
