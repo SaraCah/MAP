@@ -23,7 +23,6 @@
                 <td><%= Time.at(file_issue.fetch('create_time') / 1000)%></td>
                 <td>
                     <a class="btn" href="/file-issues/<%= file_issue.fetch('id') %>">View</a>
-                    <a class="btn" href="/file-issue-requests/<%= file_issue.fetch('file_issue_request_id') %>">View Request</a>
                 </td>
             </tr>
             <% end %>
