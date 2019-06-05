@@ -207,6 +207,10 @@ class Users < BaseStorage
           (_, aspace_agency_id) = agency_ref.split(':')
           agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
 
+          if location_id.nil? || location_id.empty?
+            location_id = Locations.locations_for_agency(aspace_agency_id).first.id
+          end
+
           if role == 'SENIOR_AGENCY_ADMIN'
             Permissions.add_agency_senior_admin(user_id, agency_id)
           elsif role == 'AGENCY_ADMIN'
