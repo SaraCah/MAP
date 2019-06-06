@@ -144,6 +144,10 @@ class Users < BaseStorage
             (_, aspace_agency_id) = agency_ref.split(':')
             agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
 
+            if location_id.nil? || location_id == ''
+              location_id = Locations.locations_for_agency(aspace_agency_id).first.id
+            end
+
             if role == 'SENIOR_AGENCY_ADMIN'
               Permissions.add_agency_senior_admin(user.fetch('id'), agency_id)
             elsif role == 'AGENCY_ADMIN'
@@ -155,14 +159,13 @@ class Users < BaseStorage
         end
       else
         # ensure permissions set by more senior user are not lost
-        # FIXME clean this up
         agency_role = user.fetch('agency_roles').first
         agency_ref = agency_role.fetch('agency_ref')
 
         (_, aspace_agency_id) = agency_ref.split(':')
         agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
         role = agency_role.fetch('role')
-        location_id = agency_role.fetch('aspace_location_id', nil)
+        location_id = agency_role.fetch('agency_location_id')
         permissions = agency_role.fetch('permissions')
 
         current_permissions = Permissions.permissions_for_agency_user(user.fetch('id'), agency_id, location_id)
@@ -207,7 +210,7 @@ class Users < BaseStorage
           (_, aspace_agency_id) = agency_ref.split(':')
           agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
 
-          if location_id.nil? || location_id.empty?
+          if location_id.nil? || location_id == ''
             location_id = Locations.locations_for_agency(aspace_agency_id).first.id
           end
 
