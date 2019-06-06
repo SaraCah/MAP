@@ -23,6 +23,38 @@
     opacity: 0.35;
 }
 
+.current-location-display .current-location-display-agency,
+.current-location-display .current-location-display-location {
+    text-overflow: ellipsis;
+    max-width: 240px;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.current-location-display .current-location-display-agency:before {
+    content: '\f19c';
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    padding: 0 4px 0;
+    display: inline-block;
+}
+
+.current-location-display .current-location-display-location:before {
+    content: '\f3c5';
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    padding: 0 4px 0 10px;
+    display: inline-block;
+}
+
+a .current-location-display:after {
+    content: '\f078';
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    float: right;
+    padding-left: 5px;
+}
+
 .status-infomatic {
     display: flex;
     align-items: stretch;
