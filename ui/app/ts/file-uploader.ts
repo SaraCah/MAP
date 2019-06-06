@@ -78,9 +78,7 @@ Vue.component('file-uploader', {
                                     </template>
                                     <template v-else>
                                         <select :name="buildPath('role')" v-model="file.role" class="browser-default">
-                                            <option value="IMPORT">Import</option>
-                                            <option value="RAP">RAP Notice</option>
-                                            <option value="OTHER">Other</option>
+                                            <option v-for="option in availableRoleOptions(file)" :value="option.value">{{option.label}}</option>
                                         </select>
                                     </template>
                                 </td>
@@ -130,6 +128,8 @@ Vue.component('file-uploader', {
             const uploadInput = this.$refs.upload as HTMLInputElement;
             const files: FileList|null = uploadInput.files;
 
+            let haveImportFile = Utils.find(this.uploaded, (file) => { return file.role === 'IMPORT' }) != null;
+
             if (files && files.length > 0) {
                 const formData = new FormData();
                 for (let i = 0; i < files.length; i++) {
@@ -157,8 +157,9 @@ Vue.component('file-uploader', {
                 }).then((json: UploadedFile[]) => {
                     for (const uploadedFile of json) {
                         if (uploadedFile.role == null) {
-                            if (/\.xlsx$/.test(uploadedFile.filename.toLowerCase()) && this.is_role_enabled) {
+                            if (/\.xlsx$/.test(uploadedFile.filename.toLowerCase()) && this.is_role_enabled && !haveImportFile) {
                                 uploadedFile.role = 'IMPORT';
+                                haveImportFile = true;
                             } else {
                                 uploadedFile.role = 'OTHER';
                             }
@@ -246,6 +247,21 @@ Vue.component('file-uploader', {
                 }
             }
         },
+        availableRoleOptions: function(file: UploadedFile) {
+            const importFile = Utils.find(this.uploaded, (file) => { return file.role === 'IMPORT' });
+
+            let availableOptions = [
+                { value: "RAP", label: "RAP Notice" },
+                { value: "OTHER", label: "Other" },
+            ];
+
+            if (!importFile || importFile.key === file.key) {
+                return [{ value: "IMPORT", label: "Import" }].concat(availableOptions);
+            } else {
+                return availableOptions;
+            }
+        },
+
     },
     watch: {
         uploaded: {
