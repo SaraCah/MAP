@@ -4,6 +4,10 @@
         <div class="nav-content grey darken-3">
             <ul class="tabs tabs-transparent">
                 <li class="tab"><a href="/" <% if context.include?('home') %> class='active'<% end %>>Home</a></li>
+                <% if Ctx.permissions.is_admin %>
+                    <li class="tab"><a href="/users" <% if context.include?('users') %> class='active'<% end %>>My Users</a></li>
+                    <li class="tab"><a href="/locations" <% if context.include?('locations') %> class='active'<% end %>>My Locations</a></li>
+                <% end %>
                 <% unless Ctx.permissions.is_admin %>
                     <li class="tab vue-enabled">
                         <%
@@ -23,6 +27,7 @@
                 </li>
             </ul>
         </div>
+        <% unless Ctx.permissions.is_admin %>
         <div class="nav-content">
             <ul class="tabs tabs-transparent grey darken-3">
                 <% if Ctx.permissions.allow_manage_users? %>
@@ -44,6 +49,7 @@
                 <% end %>
             </ul>
         </div>
+        <% end %>
         <% if context.include?('transfers') %>
             <div class="nav-content grey darken-2">
                 <ul class="tabs tabs-transparent">
@@ -62,7 +68,7 @@
             </div>
         <% end %>
     <% end %>
-</nav class="nav-extended">
+</nav>
 <div class="row">
     <div class="col s12">
         <h1><%= title %></h1>
