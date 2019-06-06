@@ -2,7 +2,7 @@
     <%== Templates.emit(:qgov_header) %>
     <% if Ctx.username %>
         <div class="nav-content grey darken-3">
-            <ul class="tabs tabs-transparent">
+            <ul class="tabs tabs-transparent" style="overflow:visible;">
                 <li class="tab"><a href="/" <% if context.include?('home') %> class='active'<% end %>><span class="sr-only">Home</span><i class="fa fa-home" aria-hidden="true" style="font-size:14px;"></i></a></li>
                 <% if Ctx.permissions.allow_manage_users? %>
                 <li class="tab"><a href="/users" <% if context.include?('users') %> class='active'<% end %>>My Users</a></li>
@@ -22,7 +22,7 @@
                 </li>
                 <% end %>
                 <li class="tab right">
-                    <a href="/logout">Logout (<%= Ctx.username %>)</a>
+                    <a id="userMenuTrigger" href="#" data-target="userMenu"><span class="sr-only">User menu</span><i aria-hidden="true" class="fa fa-user" style="font-size:16px;"></i></a>
                 </li>
                 <% unless Ctx.permissions.is_admin %>
                     <li class="tab vue-enabled right">
@@ -59,6 +59,10 @@
         <% end %>
     <% end %>
 </nav>
+<ul id="userMenu" class="dropdown-content grey darken-3 white-text">
+    <li><a href="/users/edit?username=<%= URI.escape(Ctx.username) %>" style="line-height: 50px;">Edit</a></li>
+    <li><a href="/logout" style="line-height: 50px;">Logout (<%= Ctx.username %>)</a></li>
+</ul>
 <div class="row">
     <div class="col s12">
         <h1><%= title %></h1>
