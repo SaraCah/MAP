@@ -2,8 +2,19 @@
 body {
     font-family: Lato,Helvetica,Arial,sans-serif
 }
+.qgov-header:before {
+    content: ' ';
+    display: block;
+    height: 32px;
+    width: 100%;
+    background: #FFFFFF;
+}
 .qgov-header {
-    padding: 20px;
+    overflow: hidden;
+}
+.qgov-header a {
+    float: left;
+    padding: 12px 20px;
 }
 .qgov-grey {
     background: #F6F6F6;
