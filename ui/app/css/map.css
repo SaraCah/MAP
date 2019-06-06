@@ -18,7 +18,8 @@ body {
 }
 .qgov-breadcrumb {
     background: #007eb1;
-    overflow: hidden;
+    overflow: scroll;
+    white-space: nowrap;
 }
 .qgov-breadcrumb ol {
     list-style: none;
@@ -27,7 +28,7 @@ body {
     font-size: 1.0625rem;
 }
 .qgov-breadcrumb ol li {
-    float: left;
+    display: inline-block;
     white-space: nowrap;
     padding: .2em .5em .3em;
 }
