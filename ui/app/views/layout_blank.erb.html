@@ -4,13 +4,22 @@
         <title><%= title %></title>
         <meta charset="utf-8" />
         <link rel="stylesheet" type="text/css" href="<%== URLHelper.css('materialize.min.css') %>">
+        <link rel="stylesheet" type="text/css" href="<%== URLHelper.css('fa.min.css') %>">
         <link rel="stylesheet" type="text/css" href="<%== URLHelper.css('map.css') %>">
 
     </head>
     <body>
+        <header>
+            <nav class="nav-extended">
+                <%== Templates.emit(:qgov_header) %>
+            </nav>
+        </header>
+
         <main>
             <%== Templates.emit(template, template_args) %>
         </main>
+
+        <%== Templates.emit(:qgov_footer) %>
 
         <script type="text/javascript" src="<%== URLHelper.js('/materialize.min.js') %>"></script>
     </body>

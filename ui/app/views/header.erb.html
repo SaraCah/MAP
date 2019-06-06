@@ -1,14 +1,8 @@
 <nav class="nav-extended">
-    <div class="nav-wrapper blue-grey darken-1">
-        <a href="/" class="brand-logo"><i class="logo-icon fa fa-key"></i><span class="logo-text">Master Access Portal</span></a>
-        <% if Ctx.username %>
-            <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="/logout">Logout (<%= Ctx.username %>)</a></li>
-            </ul>
-        <% end %>
-    </div>
+    <%== Templates.emit(:qgov_header) %>
+
     <% if Ctx.username %>
-        <div class="nav-content blue-grey lighten-1">
+        <div class="nav-content grey darken-3">
             <ul class="tabs tabs-transparent">
                 <li class="tab"><a href="/" <% if context.include?('home') %> class='active'<% end %>>Home</a></li>
                 <% if Ctx.permissions.allow_manage_users? %>
@@ -28,6 +22,9 @@
                         <file-issue-notifications></file-issue-notifications>
                     </li>
                 <% end %>
+                <li class="tab right">
+                    <a href="/logout">Logout (<%= Ctx.username %>)</a>
+                </li>
                 <% unless Ctx.permissions.is_admin %>
                     <li class="tab vue-enabled right">
                         <%
@@ -45,7 +42,7 @@
             </ul>
         </div>
         <% if context.include?('transfers') %>
-            <div class="nav-content blue-grey lighten-3">
+            <div class="nav-content grey darken-2">
                 <ul class="tabs tabs-transparent">
                     <li class="tab col s3"><a <% if context.include?('transfer_proposals') %>class="active"<% end %> href="/transfer-proposals">Proposals</a></li>
                     <li class="tab col s3"><a <% if context.include?('initiated_transfers') %>class="active"<% end %> href="/transfers">Transfers</a></li>
@@ -53,7 +50,7 @@
             </div>
         <% end %>
         <% if context.include?('file_issues') %>
-            <div class="nav-content blue-grey lighten-3">
+            <div class="nav-content grey darken-2">
                 <ul class="tabs tabs-transparent">
                     <li class="tab col s3"><a <% if context.include?('file_issue_requests') %>class="active"<% end %> href="/file-issue-requests">Requests</a></li>
                     <li class="tab col s3"><a <% if context.include?('initiated_file_issues') %>class="active"<% end %> href="/file-issues">File Issues</a></li>
