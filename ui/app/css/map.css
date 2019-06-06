@@ -1,5 +1,122 @@
+/* QGov Styles */
+body {
+    font-family: Lato,Helvetica,Arial,sans-serif
+}
+.qgov-header:before {
+    content: ' ';
+    display: block;
+    height: 32px;
+    width: 100%;
+    background: #FFFFFF;
+}
+.qgov-header {
+    overflow: hidden;
+}
+.qgov-header a {
+    float: left;
+    padding: 12px 20px;
+}
+.qgov-grey {
+    background: #F6F6F6;
+}
+.qgov-nav-text {
+    color: #005376 !important;
+}
+.qgov-header > a > img {
+    display: block;
+    width: 290px;
+    height: 55px;
+}
+.qgov-breadcrumb {
+    background: #007eb1;
+    overflow: scroll;
+    white-space: nowrap;
+}
+.qgov-breadcrumb ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 1.0625rem;
+}
+.qgov-breadcrumb ol li {
+    display: inline-block;
+    white-space: nowrap;
+    padding: .2em .5em .3em;
+}
+.qgov-breadcrumb ol li:before {
+    display: inline-block;
+    font-family: "Font Awesome 5 Free";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-style: normal;
+    font-weight: 900;
+    font-size: 11px;
+    font-size: .7rem;
+    line-height: 1;
+    padding-right: 6px;
+    padding-right: .4rem;
+    content: "\f054";
+    background: inherit;
+    color: inherit;
+}
+
+.qgov-breadcrumb ol li.qgov-breadcrumb-home:before {
+    content: '';
+}
+.qgov-breadcrumb-home a:before {
+    display: inline-block;
+    font-family: "Font Awesome 5 Free";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-style: normal;
+    font-weight: 900;
+    font-size: 21px;
+    font-size: 1.3rem;
+    line-height: 1.05;
+    padding-right: 11px;
+    padding-right: .7rem;
+    content: "\f19c";
+    background: inherit;
+    color: #fff;
+}
+/* MAP Things */
+.map-tabs {
+    display: flex;
+}
+.map-nav {
+    display: flex;
+    align-items: stretch;
+}
+.map-nav-left {
+    flex: 1;
+}
+.map-nav-right {
+    flex: 1;
+    justify-content: flex-end;
+}
+.map-tab {
+    line-height: 52px;
+    height: 52px;
+    display: flex;
+}
+.map-tab > a,
+.map-tab > span > a {
+    display: block;
+    white-space: nowrap;
+}
+.map-tab i.fa {
+    height: inherit;
+    line-height: inherit;
+}
+@media only screen and (max-width: 1000px) {
+    .map-nav {
+        flex-direction: column-reverse;
+    }
+}
+
+
 #login {
-    margin: 100px auto 0;
+    margin: 100px auto;
     max-width: 400px;
 }
 
@@ -21,6 +138,10 @@
 .logo-icon {
     font-size: 200%;
     opacity: 0.35;
+}
+
+.current-location-display {
+    display: flex;
 }
 
 .current-location-display .current-location-display-agency,
@@ -47,7 +168,8 @@
     display: inline-block;
 }
 
-a .current-location-display:after {
+a .current-location-display:after,
+a#userMenuTrigger:after {
     content: '\f078';
     font-family: "Font Awesome 5 Free";
     font-weight: 900;

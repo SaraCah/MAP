@@ -23,7 +23,7 @@ Vue.component('file-issue-notifications', {
     template: `
 <span class="notification">
     <template v-if="file_issues.length > 0">
-        <span class="yellow-text text-darken-3" :title="file_issues.length + ' file issue notifications'" v-on:click="showNotifications()"><i aria-hidden="true" class="fa fa-flag"></i></span>
+        <a class="yellow-text text-darken-3" :title="'You have ' + file_issues.length + ' notifications'" v-on:click="showNotifications()"><i aria-hidden="true" class="fa fa-flag" style="font-size:16px;"></i></a>
         <div ref="modal" class="modal">
             <div class="modal-content">
                 <div v-for="(file_issue, i) in file_issues" class="card yellow lighten-4">

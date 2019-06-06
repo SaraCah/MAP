@@ -14,6 +14,10 @@ Templates.define(:example_partial, [], "views/_partial.erb.html")
 
 Templates.define(:layout, [:title, :template, :template_args, :message?, [:context]], "views/layout.erb.html")
 Templates.define(:layout_blank, [:title, :template, :template_args, :message?], "views/layout_blank.erb.html")
+
+Templates.define(:qgov_header, [], "views/qgov_header.erb.html")
+Templates.define(:qgov_footer, [], "views/qgov_footer.erb.html")
+
 Templates.define(:login, [:username?, :message?], "views/login.erb.html")
 Templates.define(:users, [:paged_users], "views/users.erb.html")
 Templates.define(:user_edit, [:user, :errors?], "views/user_form.erb.html")
