@@ -1,10 +1,17 @@
 GIT
   remote: https://github.com/hudmol/map_validator.git
-  revision: 739e1135a499969bef8601a5dfbaa770446550d3
+  revision: faeae3fac8444593bf59ba3652741d55f655632a
   branch: master
   specs:
     map_validator (0.0.1)
-      roo (= 2.8.2)
+      xlsx_streaming_reader (= 0.0.1)
+
+GIT
+  remote: https://github.com/hudmol/xlsx_streaming_reader.git
+  revision: 2bf92f2c950d1416dd6fef6755eed25e8521d925
+  branch: master
+  specs:
+    xlsx_streaming_reader (0.0.1)
 
 GEM
   remote: https://rubygems.org/
@@ -19,7 +26,6 @@ GEM
     json (2.2.0-java)
     multi_json (1.13.1)
     mustermann (1.0.3)
-    nokogiri (1.10.3-java)
     rack (2.0.7)
     rack-protection (2.0.5)
       rack
@@ -27,10 +33,6 @@ GEM
     rjack-logback (1.9.0-java)
       rjack-slf4j (~> 1.7.16)
     rjack-slf4j (1.7.25.0-java)
-    roo (2.8.2)
-      nokogiri (~> 1)
-      rubyzip (>= 1.2.1, < 2.0.0)
-    rubyzip (1.2.3)
     sequel (5.19.0)
     sinatra (2.0.5)
       mustermann (~> 1.0)
@@ -59,6 +61,7 @@ DEPENDENCIES
   sequel (= 5.19.0)
   sinatra (= 2.0.5)
   sinatra-contrib (= 2.0.5)
+  xlsx_streaming_reader!
 
 BUNDLED WITH
    2.0.1
