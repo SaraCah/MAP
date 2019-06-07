@@ -18,7 +18,12 @@
             <tbody>
                 <% paged_users.results.each do |user| %>
                     <tr <% if user.is_inactive %>class="grey-text"<% end %>>
-                        <td><%= user.username %></td>
+                        <td>
+                            <% if user.username == Ctx.username %>
+                                <span title="You"><i aria-hidden="true" class="fa fa-user"></i></span>
+                            <% end %>
+                            <%= user.username %>
+                        </td>
                         <td><%= user.name %></td>
                         <td>
                             <% if user.is_admin %>

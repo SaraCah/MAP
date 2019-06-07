@@ -7,7 +7,7 @@ class UserDTO
   define_field(:password, String, required: false, validator: proc {|s, user| user.new? && s.empty? ? "Password can't be blank" : nil})
   define_field(:is_admin, Boolean, default: false)
   define_field(:is_inactive, Boolean, default: false)
-  define_field(:agency_roles, [AgencyRoleDTO], default: [], validator: proc {|arr, user| !user.fetch('is_admin', false) && arr.empty? ? "Agency Role can't be blank" : nil})
+  define_field(:agency_roles, [AgencyRoleDTO], default: [], validator: proc {|arr, user| user.agency_roles_valid?(arr) ? "Agency Role can't be blank" : nil})
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)
 
@@ -21,5 +21,20 @@ class UserDTO
         created_by: row[:created_by],
         create_time: row[:create_time],
         lock_version: row[:lock_version])
+  end
+
+  def is_admin?
+    fetch('is_admin', false)
+  end
+
+  def current_user?
+    !new? && Ctx.username == fetch('username')
+  end
+
+  def agency_roles_valid?(roles)
+    return false if is_admin?
+    return false if current_user?
+
+    roles.empty?
   end
 end
