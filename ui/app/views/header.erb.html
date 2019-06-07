@@ -1,31 +1,30 @@
 <nav class="nav-extended">
     <%== Templates.emit(:qgov_header) %>
     <% if Ctx.username %>
-        <div class="nav-content grey darken-3">
-            <ul class="tabs tabs-transparent" style="overflow:visible;">
-                <li class="tab"><a href="/" <% if context.include?('home') %> class='active'<% end %>><span class="sr-only">Home</span><i class="fa fa-home" aria-hidden="true" style="font-size:14px;"></i></a></li>
+        <div class="map-nav grey darken-3">
+            <ul class="map-tabs map-nav-left">
+                <li class="map-tab"><a href="/" <% if context.include?('home') %> class='active'<% end %>><span class="sr-only">Home</span><i class="fa fa-home" aria-hidden="true" style="font-size:14px;"></i></a></li>
                 <% if Ctx.permissions.allow_manage_users? %>
-                <li class="tab"><a href="/users" <% if context.include?('users') %> class='active'<% end %>>My Users</a></li>
+                <li class="map-tab"><a href="/users" <% if context.include?('users') %> class='active'<% end %>>My Users</a></li>
                 <% end %>
                 <% if Ctx.permissions.allow_manage_locations? %>
-                <li class="tab"><a href="/locations" <% if context.include?('locations') %> class='active'<% end %>>My Locations</a></li>
+                <li class="map-tab"><a href="/locations" <% if context.include?('locations') %> class='active'<% end %>>My Locations</a></li>
                 <% end %>
                 <% if Ctx.permissions.allow_manage_transfers? %>
-                <li class="tab"><a href="/transfer-proposals" <% if context.include?('transfers') %> class='active'<% end %>>My Transfers</a></li>
+                <li class="map-tab"><a href="/transfer-proposals" <% if context.include?('transfers') %> class='active'<% end %>>My Transfers</a></li>
                 <% end %>
                 <% if Ctx.permissions.allow_manage_file_issues? %>
-                <li class="tab vue-enabled">
+                <li class="map-tab vue-enabled">
                     <a href="/file-issue-requests" <% if context.include?('file_issues') %> class='active'<% end %>>
                     My File Issues
                     </a>
                     <file-issue-notifications></file-issue-notifications>
                 </li>
                 <% end %>
-                <li class="tab right">
-                    <a id="userMenuTrigger" href="#" data-target="userMenu"><span class="sr-only">User menu</span><i aria-hidden="true" class="fa fa-user" style="font-size:16px;"></i></a>
-                </li>
+            </ul>
+            <ul class="map-tabs map-nav-right">
                 <% unless Ctx.permissions.is_admin %>
-                    <li class="tab vue-enabled right">
+                    <li class="map-tab vue-enabled">
                         <%
                         available_locations = Ctx.get.available_locations
                         current_location = available_locations.find{|loc| loc['agency_id'] == Ctx.get.current_location.agency_id && loc['id'] == Ctx.get.current_location.id}
@@ -38,7 +37,11 @@
                         </current-location-selector>
                     </li>
                 <% end %>
+                <li class="map-tab">
+                    <a id="userMenuTrigger" href="#" data-target="userMenu"><span class="sr-only">User menu</span><i aria-hidden="true" class="fa fa-user" style="font-size:16px;"></i></a>
+                </li>
             </ul>
+            <div class="clearfix"></div>
         </div>
         <% if context.include?('transfers') %>
             <div class="nav-content grey darken-2">
@@ -60,8 +63,8 @@
     <% end %>
 </nav>
 <ul id="userMenu" class="dropdown-content grey darken-3 white-text">
-    <li><a href="/users/edit?username=<%= URI.escape(Ctx.username) %>" style="line-height: 50px;">Edit</a></li>
-    <li><a href="/logout" style="line-height: 50px;">Logout (<%= Ctx.username %>)</a></li>
+    <li><a href="/users/edit?username=<%= URI.escape(Ctx.username) %>" class="white-text">Edit</a></li>
+    <li><a href="/logout" class="white-text">Logout (<%= Ctx.username %>)</a></li>
 </ul>
 <div class="row">
     <div class="col s12">

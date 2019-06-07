@@ -80,6 +80,41 @@ body {
     color: #fff;
 }
 /* MAP Things */
+.map-tabs {
+    display: flex;
+}
+.map-nav {
+    display: flex;
+    align-items: stretch;
+}
+.map-nav-left {
+    flex: 1;
+}
+.map-nav-right {
+    flex: 1;
+    justify-content: flex-end;
+}
+.map-tab {
+    line-height: 52px;
+    height: 52px;
+    display: flex;
+}
+.map-tab > a,
+.map-tab > span > a {
+    display: block;
+    white-space: nowrap;
+}
+.map-tab i.fa {
+    height: inherit;
+    line-height: inherit;
+}
+@media only screen and (max-width: 1000px) {
+    .map-nav {
+        flex-direction: column-reverse;
+    }
+}
+
+
 #login {
     margin: 100px auto;
     max-width: 400px;
@@ -103,6 +138,10 @@ body {
 .logo-icon {
     font-size: 200%;
     opacity: 0.35;
+}
+
+.current-location-display {
+    display: flex;
 }
 
 .current-location-display .current-location-display-agency,
@@ -129,7 +168,8 @@ body {
     display: inline-block;
 }
 
-a .current-location-display:after {
+a .current-location-display:after,
+a#userMenuTrigger:after {
     content: '\f078';
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
