@@ -1,5 +1,9 @@
 class MAPTheAPI < Sinatra::Base
 
+  # Enforce a limit on how many validations are in flight at a time.  Keep
+  # memory under control.
+  VALIDATION_SEMAPHORE = java.util.concurrent.Semaphore.new(AppConfig[:max_concurrent_xlsx_validations])
+
   Endpoint.get('/') do
     if Ctx.user_logged_in?
       json_response(hello: "GREETINGS #{Ctx.username}")
@@ -434,15 +438,26 @@ class MAPTheAPI < Sinatra::Base
 
 
       errors = []
-      import_validator = MapValidator.new
-      import_validator.run_validations(import_file.path, import_validator.sample_validations)
-      import_validator.notifications.notification_list.each do |notification|
-        if notification.source.to_s.empty?
-          errors << "#{notification.type} - #{notification.message}"
-        else
-          errors << "#{notification.type} - [#{notification.source}] #{notification.message}"
+
+      if VALIDATION_SEMAPHORE.try_acquire(1, 60, java.util.concurrent.TimeUnit::SECONDS)
+        begin
+          import_validator = MapValidator.new
+          import_validator.run_validations(import_file.path, import_validator.sample_validations)
+          import_validator.notifications.notification_list.each do |notification|
+            if notification.source.to_s.empty?
+              errors << "#{notification.type} - #{notification.message}"
+            else
+              errors << "#{notification.type} - [#{notification.source}] #{notification.message}"
+            end
+          end
+        ensure
+          VALIDATION_SEMAPHORE.release
         end
+      else
+        $LOG.error("Timeout waiting for available XLSX validator slot")
+        errors << "SYSTEM_ERROR - Validation timeout"
       end
+
 
       json_response({'valid' => errors.empty?, 'errors' => errors})
     ensure
