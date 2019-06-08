@@ -146,7 +146,7 @@ class MAPTheAPI < Sinatra::Base
   DB.open do |db|
     if db.table_exists?(:file)
       migrated = []
-      db[:file].select(:key).each do |key|
+      db[:file].map(:key).each do |key|
         $LOG.info("Migrating file #{key}")
         begin
           ByteStorage.get.store(StringIO.new(db[:file][:key => key][:blob]), key)
