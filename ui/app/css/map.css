@@ -29,9 +29,10 @@ body {
 }
 .qgov-breadcrumb {
     background: #007eb1;
-    overflow: scroll;
+    overflow: auto;
     white-space: nowrap;
 }
+
 .qgov-breadcrumb ol {
     list-style: none;
     margin: 0;
