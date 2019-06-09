@@ -163,6 +163,8 @@ class MAPTheApp < Sinatra::Base
         params[:user].fetch('agency_roles', []).select! do |agency_role|
           Integer(agency_role.fetch('agency_location_id')) == Ctx.get.current_location.id && agency_role.fetch('role', '') != 'SENIOR_AGENCY_ADMIN'
         end
+      elsif Ctx.username == params[:user].fetch(:username)
+        # Ok! Update your own things (permission changes are ignored in the API)
       else
         # FIXME
         raise "Insufficient Privileges"
@@ -172,7 +174,11 @@ class MAPTheApp < Sinatra::Base
     errors = Ctx.client.update_user(params[:user])
 
     if errors.empty?
-      redirect '/users'
+      if Ctx.permissions.current_location_roles.all? {|agency_role| agency_role.role == 'AGENCY_CONTACT'}
+        redirect '/'
+      else
+        redirect '/users'
+      end
     else
       Templates.emit_with_layout(:user_edit, {user: params[:user], errors: errors},
                                  :layout, title: "Edit User", context: ['users'])

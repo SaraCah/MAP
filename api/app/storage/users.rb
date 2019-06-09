@@ -295,6 +295,8 @@ class Users < BaseStorage
             errors << {code: "INSUFFICIENT_PRIVILEGES", field: 'agency_roles'}
           end
         end
+      elsif Ctx.username == dto.fetch('username')
+        # Permissions are ignored in storage
       else
         errors << {code: "INSUFFICIENT_PRIVILEGES", field: 'agency_roles'}
       end
