@@ -27,7 +27,7 @@ class Search
 
 
   def self.build_agency_filter(permissions)
-    return "*:*" if permissions.is_admin
+    return "primary_type:agent_corporate_entity" if permissions.is_admin
     return "id:(%s)" % [solr_escape(Ctx.get.current_location.agency.fetch('id'))]
   end
 
