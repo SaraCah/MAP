@@ -35,7 +35,8 @@ class FileIssueItem
 
   def downloadable?
     return false if !fetch('file_issue_token', nil)
-    return false if fetch('dispatch_date', false) && fetch('dispatch_date') > Date.today
+    return false if fetch('dispatch_date', nil).nil?
+    return false if fetch('dispatch_date') > Date.today
     return false if expired?
 
     true
