@@ -32,11 +32,9 @@ Vue.component('current-location-selector', {
     template: `
 <span>
     <template v-if="available.length == 1">
-        <span style="line-height: 48px;padding-right: 10px;font-size: 14px;">
-            <span class="current-location-display">
-                <span class="current-location-display-agency" v-bind:title="current_location.agency_label">{{ current_location.agency_label }}</span>
-                <span class="current-location-display-location" v-bind:title="current_location.name">{{ current_location.name }}</span>
-            </span>
+        <span class="current-location-display">
+            <span class="current-location-display-agency" v-bind:title="current_location.agency_label">{{ current_location.agency_label }}</span>
+            <span class="current-location-display-location" v-bind:title="current_location.name">{{ current_location.name }}</span>
         </span>
     </template>
     <template v-else>
@@ -46,28 +44,28 @@ Vue.component('current-location-selector', {
                 <span class="current-location-display-location" v-bind:title="current_location.name">{{ current_location.name }}</span>
             </span>
         </a>
+        <div ref="modal" class="modal">
+            <div class="modal-content">
+                <div>
+                    <i class="fa fa-university left" style="line-height: 44px;margin: 0;width:20px;" aria-hidden="true"></i>
+                    <select class="browser-default" v-model.number="selected_agency_id" style="width: calc(100% - 20px);" aria-label="Select Agency">
+                        <option v-for="agency in agencyOptions" v-bind:value="agency.id">{{ agency.label }}</option>
+                    </select>
+                </div>
+                <div class="clearfix"></div>
+                <div>
+                    <i class="fa fa-map-marker-alt left" style="line-height: 44px;margin: 0;width:20px;" aria-hidden="true"></i>
+                    <select class="browser-default" v-model.number="selected_location_id" style="width: calc(100% - 20px);" aria-label="Select Agency Location">
+                        <option v-for="location in locationOptions" v-bind:value="location.id">{{ location.name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+                <button class="waves-effect waves-green btn-flat" v-on:click="updateCurrentLocation()">Change Agency/Location</button>
+            </div>
+        </div>
     </template>
-    <div ref="modal" class="modal">
-        <div class="modal-content">
-            <div>
-                <i class="fa fa-university left" style="line-height: 44px;margin: 0;width:20px;" aria-hidden="true"></i>
-                <select class="browser-default" v-model.number="selected_agency_id" style="width: calc(100% - 20px);" aria-label="Select Agency">
-                    <option v-for="agency in agencyOptions" v-bind:value="agency.id">{{ agency.label }}</option>
-                </select>
-            </div>
-            <div class="clearfix"></div>
-            <div>
-                <i class="fa fa-map-marker-alt left" style="line-height: 44px;margin: 0;width:20px;" aria-hidden="true"></i>
-                <select class="browser-default" v-model.number="selected_location_id" style="width: calc(100% - 20px);" aria-label="Select Agency Location">
-                    <option v-for="location in locationOptions" v-bind:value="location.id">{{ location.name }}</option>
-                </select>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
-            <button class="waves-effect waves-green btn-flat" v-on:click="updateCurrentLocation()">Change Agency/Location</button>
-        </div>
-    </div>
 </span>
 `,
     data: function(): SelectorState {
