@@ -10,6 +10,8 @@ gem "sequel", "5.19.0"
 gem "bcrypt", "3.1.12"
 gem "jdbc-mysql", "5.1.47"
 
+gem "aws-sdk-s3"
+
 if ENV['RELEASE_BRANCH'] == 'qa'
   gem "xlsx_streaming_reader", git: "https://github.com/hudmol/xlsx_streaming_reader.git", branch: "qa"
   gem "map_validator", git: "https://github.com/hudmol/map_validator.git", branch: "qa"
