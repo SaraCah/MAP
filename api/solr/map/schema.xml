@@ -10,12 +10,13 @@
   <field name="types" type="string" indexed="true" stored="true" required="true" multiValued="true" />
   <field name="title" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="qsa_id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  <field name="agency_assigned_id" type="string" indexed="true" stored="true" multiValued="false" />
+  <field name="agency_assigned_tokens" type="text_general" indexed="true" stored="true" multiValued="true" />
 
   <field name="responsible_agency" type="string" indexed="true" stored="true" multiValued="false" />
   <field name="recent_responsible_agencies" type="string" indexed="true" stored="true" multiValued="true" />
   <field name="other_responsible_agencies" type="string" indexed="true" stored="true" multiValued="true" />
-  <field name="recent_responsible_agency_filter" type="string" indexed="true" stored="false" multiValued = "true" />
-
+  <field name="recent_responsible_agency_filter" type="string" indexed="true" stored="false" multiValued="true" />
 
   <field name="keywords" type="text_general" indexed="true" stored="false" multiValued="true"/>
   <field name="ngrams" type="ngrams" indexed="true" stored="false" multiValued="true"/>
