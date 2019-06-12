@@ -68,11 +68,12 @@ Vue.component('agency-typeahead', {
     },
     methods: {
         handleInput() {
-            if (this.text.length > 3) {
+            const q = this.text;
+            if (q.length > 3) {
                 this.$http.get('/search/agencies', {
                     method: 'GET',
                     params: {
-                        q: this.text,
+                        q: q,
                     },
                 }).then((response: any) => {
                     return response.json();

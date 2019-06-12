@@ -50,7 +50,8 @@ Vue.component('representation-typeahead', {
     },
     methods: {
         handleInput() {
-            if (this.text.length > 0) {
+            const q = this.text;
+            if (q.length > 0) {
                 if (this.handleInputTimeout != null) {
                     clearTimeout(this.handleInputTimeout);
                 }
@@ -58,7 +59,7 @@ Vue.component('representation-typeahead', {
                     this.$http.get('/search/representations', {
                         method: 'GET',
                         params: {
-                            q: this.text,
+                            q: q,
                         },
                     }).then((response: any) => {
                         return response.json();
