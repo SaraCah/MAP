@@ -44,6 +44,9 @@
   <copyField source="agency_assigned_id" dest="keywords" />
   <copyField source="agency_assigned_tokens" dest="keywords" />
 
+  <copyField source="agency_assigned_id" dest="ngrams" />
+  <copyField source="agency_assigned_id" dest="edge_ngrams" />
+
   <copyField source="title" dest="keywords" />
   <copyField source="title" dest="ngrams" />
   <copyField source="title" dest="edge_ngrams" />
