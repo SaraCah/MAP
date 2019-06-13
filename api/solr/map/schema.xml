@@ -19,6 +19,7 @@
   <field name="recent_responsible_agency_filter" type="string" indexed="true" stored="false" multiValued="true" />
 
   <field name="keywords" type="text_general" indexed="true" stored="false" multiValued="true"/>
+  <field name="keywords_stemmed" type="text_en" indexed="true" stored="false" multiValued="true"/>
   <field name="ngrams" type="ngrams" indexed="true" stored="false" multiValued="true"/>
   <field name="edge_ngrams" type="edge_ngrams" indexed="true" stored="false" multiValued="true"/>
 
@@ -47,6 +48,7 @@
   <copyField source="agency_assigned_id" dest="edge_ngrams" />
 
   <copyField source="title" dest="keywords" />
+  <copyField source="title" dest="keywords_stemmed" />
   <copyField source="title" dest="ngrams" />
   <copyField source="title" dest="edge_ngrams" />
 

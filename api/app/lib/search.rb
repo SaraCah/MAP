@@ -164,7 +164,7 @@ class Search
                               page, page_size)
     solr_handle_search(q: q.to_s.empty? ? '*:*' : q,
                        defType: 'edismax',
-                       qf: 'agency_assigned_id^100 agency_assigned_tokens^10 keywords^1',
+                       qf: 'agency_assigned_id^100 agency_assigned_tokens^10 keywords^2 keywords_stemmed^1',
                        fq: [build_controlled_records_filter(permissions),
                             build_date_filter(start_date, end_date)],
                        rows: page_size,
