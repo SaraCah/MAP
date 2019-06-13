@@ -171,6 +171,8 @@ Vue.component('controlled-records', {
             this.startDate = (this.$el.querySelector('input[name="start_date"]') as HTMLInputElement).value;
             this.endDate = (this.$el.querySelector('input[name="end_date"]') as HTMLInputElement).value;
 
+            this.currentPage = 0;
+
             this.setHash();
         },
         reset: function() {
