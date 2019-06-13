@@ -145,7 +145,7 @@ Vue.component('controlled-records', {
             window.location.hash = key;
         },
         applyHashChange: function(_event: any) {
-            var split = window.location.hash.substring(1).split('&').map((s) => { return s.split("=") });
+            var split = decodeURIComponent(window.location.hash).substring(1).split('&').map((s) => { return s.split("=") });
             var map: any = {};
 
             for (let v of split) {
