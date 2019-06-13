@@ -534,7 +534,7 @@ class MAPAPIClient
         begin
           @client.request(@uri, @request) do |response|
             @response_code_future.complete(response.code)
-            @response_headers_future.complete(response.to_hash)
+            @response_headers_future.complete(response)
 
             if response.code == '200'
               response.read_body do |chunk|
