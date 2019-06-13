@@ -227,11 +227,16 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.get('/controlled-records')
+    .param(:q, String, "Query string", :optional => true)
+    .param(:start_date, DateString, "Start of date range", :optional => true)
+    .param(:end_date, DateString, "End of date range", :optional => true)
     .param(:page, Integer, "Page to fetch (zero-indexed)")
     .param(:page_size, Integer, "Size of each page") do
     if Ctx.user_logged_in? && Ctx.get.current_location
       permissions = Users.permissions_for_user(Ctx.username)
-      json_response(Search.controlled_records(permissions, params[:page], params[:page_size]))
+      json_response(Search.controlled_records(permissions,
+                                              params[:q], params[:start_date], params[:end_date],
+                                              params[:page], params[:page_size]))
     else
       json_response([])
     end

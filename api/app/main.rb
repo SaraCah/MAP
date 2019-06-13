@@ -80,6 +80,7 @@ require 'storage/representations'
 require 'storage/stale_record_exception'
 
 require 'endpoints/upload_file'
+require 'endpoints/date_string'
 require 'endpoints'
 
 require 'rack/map_logger'

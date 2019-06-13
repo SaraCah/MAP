@@ -687,6 +687,9 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/controlled-records')
+    .param(:q, String, "Query string", :optional => true)
+    .param(:start_date, String, "Start of date range", :optional => true)
+    .param(:end_date, String, "End of date range", :optional => true)
     .param(:page, Integer, "Page to fetch")
     .param(:page_size, Integer, "Elements per page") do
     # Clamp to a sensible maximum
@@ -695,7 +698,11 @@ class MAPTheApp < Sinatra::Base
     [
       200,
       {'Content-type' => 'text/json'},
-      Ctx.client.get_controlled_records(params[:page], page_size).to_json
+      Ctx.client
+        .get_controlled_records(params[:q],
+                                params[:start_date], params[:end_date],
+                                params[:page], page_size)
+        .to_json
     ]
   end
 

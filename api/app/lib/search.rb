@@ -117,12 +117,65 @@ class Search
   end
 
 
-  def self.controlled_records(permissions, page, page_size)
-    solr_handle_search(q: "*:*",
-                       fq: build_controlled_records_filter(permissions),
+  def self.date_pad_start(s)
+    default = ['0000', '01', '01']
+    bits = s.split('-')
+
+    full_date = (0...3).map {|i| bits.fetch(i, default.fetch(i))}.join('-')
+
+    "#{full_date}T00:00:00Z"
+  end
+
+
+  def self.date_pad_end(s)
+    default = ['9999', '12', '31']
+    bits = s.split('-')
+
+    full_date = (0...3).map {|i| bits.fetch(i, default.fetch(i))}.join('-')
+
+    "#{full_date}T23:59:59Z"
+  end
+
+
+  # Either of these parameters might be nil or empty
+  def self.build_date_filter(start_date, end_date)
+    # A record is NOT in range if its start date is after our end date, OR its
+    # end date is before our start date.
+
+    clauses = []
+
+    unless end_date.to_s.empty?
+      clauses << "start_date:[#{date_pad_end(end_date)} TO *]"
+    end
+
+    unless start_date.to_s.empty?
+      clauses << "end_date:[* TO #{date_pad_start(start_date)}]"
+    end
+
+    if clauses.empty?
+      '*:*'
+    else
+      "NOT (#{clauses.join(' OR ')})"
+    end
+  end
+
+  def self.controlled_records(permissions,
+                              q, start_date, end_date,
+                              page, page_size)
+    solr_handle_search(q: q.to_s.empty? ? '*:*' : q,
+                       defType: 'edismax',
+                       qf: 'agency_assigned_id^100 agency_assigned_tokens^10 keywords^1',
+                       fq: [build_controlled_records_filter(permissions),
+                            build_date_filter(start_date, end_date)],
                        rows: page_size,
                        start: (page * page_size))
-      .map {|result| record_hash(result)}
+      .map {|result|
+
+      # result
+      require 'pp';$stderr.puts("\n*** DEBUG #{(Time.now.to_f * 1000).to_i} [search.rb:175 139c67]: " + {%Q^result^ => result}.pretty_inspect + "\n")
+
+      record_hash(result)
+    }
   end
 
   def self.get_record(record_ref, permissions)
