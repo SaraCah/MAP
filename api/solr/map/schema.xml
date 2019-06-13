@@ -42,7 +42,6 @@
 
   <copyField source="qsa_id" dest="keywords" />
   <copyField source="agency_assigned_id" dest="keywords" />
-  <copyField source="agency_assigned_tokens" dest="keywords" />
 
   <copyField source="agency_assigned_id" dest="ngrams" />
   <copyField source="agency_assigned_id" dest="edge_ngrams" />
