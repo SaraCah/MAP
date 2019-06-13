@@ -23,6 +23,7 @@ interface Record {
 
 interface SearchState {
     currentPage: number;
+    facets: object;
     records: Record[];
     initialised: boolean;
     showNextPage: boolean;
@@ -34,7 +35,7 @@ interface SearchState {
 
 Vue.component('controlled-records', {
     template: `
-<div>
+<div class="record-search">
   <div class="card" v-if="!initialised">
   </div>
   <div class="card" v-else-if="records.length === 0 && browseMode">
@@ -74,42 +75,86 @@ Vue.component('controlled-records', {
         </div>
 
         <template v-if="records.length === 0">
+          <div class="no-results">
           <span class="card-title">No results found</span>
           <p>Your search did not match any results.</p>
+          </div>
         </template>
         <template v-else>
-          <table>
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Record</th>
-                <th></th>
-                <th>Agency Identifier</th>
-                <th>QSA Identifier</th>
-                <th>Representations</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="record in records">
-                <td>{{record.type}}</td>
-                <td>{{record.title}}</td>
-                <td><span class="badge" v-if="record.under_movement">under movement</span></td>
-                <td>{{record.agency_assigned_id}}</td>
-                <td>{{record.type}} {{record.qsa_id}}</td>
-                <td>
-                  <span v-if="record.types.indexOf('representation') < 0">
-                    {{record.physical_representations_count}} physical; {{record.digital_representations_count}} digital
-                  </span>
-                </td>
-                <td>
-                  <a v-if="file_issues_allowed && record.file_issue_allowed"
-                     class="btn"
-                     :href="'/file-issue-requests/new?record_ref=' + record.id">Request</a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="row">
+            <div class="col s12 m12 l2 search-tools">
+              <section class="sort-selector">
+                <p>Sort by</p>
+                <select id="select_sort" class="browser-default">
+                  <option>Relevance</option>
+                  <option>Title A-Z</option>
+                  <option>Title Z-A</option>
+                  <option>Agency Identifier A-Z</option>
+                  <option>Agency Identifier Z-A</option>
+                  <option>QSA Identifier A-Z</option>
+                  <option>QSA Identifier Z-A</option>
+                </select>
+              </section>
+              <section>
+                <p class="facet-title">Record types</p>
+                <table class="facets-table">
+                  <tr v-for="(count, type) in this.facets.primary_type">
+                    <td class="facet-value">
+                      <a href="javascript:void(0);">{{type}}</a>
+                    </td>
+                    <td class="facet-count">{{count}}</td>
+                  </tr>
+                </table>
+              </section>
+
+              <section>
+                <p class="facet-title">Series</p>
+                <table class="facets-table">
+                  <tr v-for="(count, series) in this.facets.series">
+                    <td class="facet-value">
+                      <a href="javascript:void(0);">{{series}}</a>
+                    </td>
+                    <td class="facet-count">{{count}}</td>
+                  </tr>
+                </table>
+              </section>
+
+            </div>
+            <div class="col s12 m12 l9 search-results">
+              <table class="responsive-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th></th>
+                    <th>Agency Identifier</th>
+                    <th>QSA Identifier</th>
+                    <th>Representations</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="record in records">
+                    <td>{{record.type}}</td>
+                    <td>{{record.title}}</td>
+                    <td><span class="badge" v-if="record.under_movement">under movement</span></td>
+                    <td>{{record.agency_assigned_id}}</td>
+                    <td>{{record.type}} {{record.qsa_id}}</td>
+                    <td>
+                      <span v-if="record.types.indexOf('representation') < 0">
+                        {{record.physical_representations_count}} physical; {{record.digital_representations_count}} digital
+                      </span>
+                    </td>
+                    <td>
+                      <a v-if="false && file_issues_allowed && record.file_issue_allowed"
+                         class="btn"
+                         :href="'/file-issue-requests/new?record_ref=' + record.id">Request</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </template>
       </div>
       <div class="row">
@@ -127,6 +172,7 @@ Vue.component('controlled-records', {
             initialised: false,
             currentPage: 0,
             records: [],
+            facets: [],
             showNextPage: false,
             showPrevPage: false,
             queryString: '',
@@ -206,9 +252,10 @@ Vue.component('controlled-records', {
             }).then((json: any) => {
                 this.initialised = true;
 
-                this.records = json.slice(0, this.page_size);
+                this.records = json.results.slice(0, this.page_size);
+                this.facets = json.facets;
                 this.showPrevPage = (this.currentPage > 0);
-                this.showNextPage = (json.length > this.page_size);
+                this.showNextPage = (json.results.length > this.page_size);
             });
         },
         nextPage: function() {
@@ -227,7 +274,9 @@ Vue.component('controlled-records', {
             (this.$el.querySelector('input[name="end_date"]') as HTMLInputElement).value = this.endDate;
 
             this.$el.querySelectorAll('label').forEach((elt) => {
-                elt.classList.add('active');
+                if ((elt.control as HTMLInputElement).value) {
+                  elt.classList.add('active');
+                }
             });
         }
     },

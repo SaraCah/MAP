@@ -308,12 +308,53 @@ a#userMenuTrigger:after {
 
 .search-box {
     padding: 0 1em 1em 1em;
-    border-bottom: 1px solid #9e9e9e;
-    margin-bottom: 2em;
+    border-bottom: 2px solid #efefef;
 }
 
 .search-box .sample-date-formats {
     color: #9e9e9e;
     font-size: 80%;
     padding-left: 1em;
+}
+
+.search-tools {
+    margin-top: 2em;
+}
+
+.search-results {
+    border-left: 2px solid #efefef;
+}
+
+.search-tools section {
+    margin-bottom: 1em;
+}
+
+.search-tools .facet-title {
+    font-weight: bold;
+}
+
+.search-tools .sort-selector {
+    max-width: 20em;
+}
+
+.search-tools .facets-table {
+    max-width: 20em;
+}
+
+.search-tools .facets-table tr, .search-tools .facets-table td {
+    border: none;
+    padding: 0;
+}
+
+.search-tools .facets-table .facet-value {
+    padding-left: 0.5em;
+}
+
+.search-tools .facets-table .facet-count {
+    text-align: right;
+    color: #9e9e9e;
+}
+
+.record-search .no-results {
+    margin-top: 2em;
 }

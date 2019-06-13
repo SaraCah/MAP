@@ -686,6 +686,13 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
+  TYPE_LABELS = {
+    'resource' => 'Series',
+    'archival_object' => 'Record',
+    'physical_representation' => 'Physical Representation',
+    'digital_representation' => 'Digital Representation',
+  }
+
   Endpoint.get('/controlled-records')
     .param(:q, String, "Query string", :optional => true)
     .param(:start_date, String, "Start of date range", :optional => true)
@@ -695,14 +702,40 @@ class MAPTheApp < Sinatra::Base
     # Clamp to a sensible maximum
     page_size = [params[:page_size], 200].min
 
+    controlled_records = Ctx.client
+                           .get_controlled_records(params[:q],
+                                                   params[:start_date], params[:end_date],
+                                                   params[:page], page_size)
+
+    # Map types to their labels
+    controlled_records.fetch('results', []).each do |result|
+      result['type'] = TYPE_LABELS.fetch(result['primary_type'])
+    end
+
+    # Turn facets from ['val1', count1, 'val2', count2, ...] into an (ordered) hash
+    controlled_records['facets'] = controlled_records.fetch('facets', {}).map {|field, facet_arr|
+      [field, facet_arr.each_slice(2).map(&:to_a).to_h]
+    }.to_h
+
+
+    # Translate types to labels in the facets too
+    controlled_records['facets']['primary_type'] =
+      controlled_records
+        .fetch('facets')
+        .fetch('primary_type', {})
+        .map {|type, count| [TYPE_LABELS.fetch(type), count]}
+        .to_h
+
+    # In the facets too
+    # type_facets = controlled_records.fetch('facets', {}).fetch('primary_type', [])
+    # (0...type_facets.length).step(2).each do |i|
+    #   type_facets[i] = TYPE_LABELS.fetch(type_facets[i], type_facets[i])
+    # end
+
     [
       200,
       {'Content-type' => 'text/json'},
-      Ctx.client
-        .get_controlled_records(params[:q],
-                                params[:start_date], params[:end_date],
-                                params[:page], page_size)
-        .to_json
+      controlled_records.to_json
     ]
   end
 

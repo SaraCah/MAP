@@ -68,7 +68,7 @@ class Search
 
       raise SolrSearchFailure.new(response) unless response.code.start_with?('2')
 
-      return JSON.parse(response.body).fetch('response').fetch('docs')
+      return JSON.parse(response.body)
     end
   end
 
@@ -78,6 +78,8 @@ class Search
     solr_query = "keywords:(#{keyword_query})^3 OR ngrams:#{solr_escape(q)}^1 OR edge_ngrams:#{solr_escape(q)}^2"
 
     solr_handle_search(q: solr_query, fq: build_agency_filter(permissions))
+      .fetch('response')
+      .fetch('docs')
       .map {|hit| {'id' => hit.fetch('id'),
                    'label' => hit.fetch('title')}}
   end
@@ -93,25 +95,19 @@ class Search
           'file_issue_allowed:true']
 
     solr_handle_search(q: solr_query, fq: fq)
+      .fetch('response')
+      .fetch('docs')
       .map {|hit| {'id' => hit.fetch('id'),
                    'label' => hit.fetch('title')}}
 
   end
 
 
-  TYPE_LABELS = {
-    'resource' => 'Series',
-    'archival_object' => 'Record',
-    'physical_representation' => 'Physical Representation',
-    'digital_representation' => 'Digital Representation',
-  }
-
   def self.record_hash(record)
     (_, aspace_agency_id) = Ctx.get.current_location.agency.fetch('id').split(':')
     this_agency_uri = "/agents/corporate_entities/#{aspace_agency_id}"
 
     record.merge({
-                   'type' => TYPE_LABELS.fetch(record['primary_type'], ''),
                    'under_movement' => record['responsible_agency'] != this_agency_uri,
                  })
   end
@@ -162,24 +158,29 @@ class Search
   def self.controlled_records(permissions,
                               q, start_date, end_date,
                               page, page_size)
-    solr_handle_search(q: q.to_s.empty? ? '*:*' : q,
-                       defType: 'edismax',
-                       qf: 'agency_assigned_id^100 agency_assigned_tokens^10 keywords^2 keywords_stemmed^1',
-                       fq: [build_controlled_records_filter(permissions),
-                            build_date_filter(start_date, end_date)],
-                       rows: page_size,
-                       start: (page * page_size))
-      .map {|result|
-
-      # result
-      require 'pp';$stderr.puts("\n*** DEBUG #{(Time.now.to_f * 1000).to_i} [search.rb:175 139c67]: " + {%Q^result^ => result}.pretty_inspect + "\n")
-
-      record_hash(result)
+    results = solr_handle_search('q' => q.to_s.empty? ? '*:*' : q,
+                                 'defType' => 'edismax',
+                                 'qf' => 'agency_assigned_id^100 agency_assigned_tokens^10 keywords^2 keywords_stemmed^1',
+                                 'fq' => [build_controlled_records_filter(permissions),
+                                          build_date_filter(start_date, end_date)],
+                                 'rows' => page_size,
+                                 'start' => (page * page_size),
+                                 'facet' => 'true',
+                                 'facet.field' => ['primary_type', 'series'],
+                                 'facet.mincount' => 1,
+                                )
+    {
+      :results => results.fetch('response').fetch('docs').map {|result|
+        record_hash(result)
+      },
+      :facets => results.fetch('facet_counts', {}).fetch('facet_fields', {})
     }
   end
 
   def self.get_record(record_ref, permissions)
     solr_handle_search(q: "id:#{solr_escape(record_ref)}", fq: build_controlled_records_filter(permissions))
+      .fetch('response')
+      .fetch('docs')
       .map do |result|
       return record_hash(result)
     end
