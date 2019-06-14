@@ -128,7 +128,7 @@ Vue.component('file-uploader', {
             const uploadInput = this.$refs.upload as HTMLInputElement;
             const files: FileList|null = uploadInput.files;
 
-            let haveImportFile = Utils.find(this.uploaded, (file) => { return file.role === 'IMPORT' }) != null;
+            let haveImportFile = Utils.find(this.uploaded, (file) => file.role === 'IMPORT') != null;
 
             if (files && files.length > 0) {
                 const formData = new FormData();
@@ -248,9 +248,9 @@ Vue.component('file-uploader', {
             }
         },
         availableRoleOptions: function(file: UploadedFile) {
-            const importFile = Utils.find(this.uploaded, (file) => { return file.role === 'IMPORT' });
+            const importFile = Utils.find(this.uploaded, (f) => f.role === 'IMPORT');
 
-            let availableOptions = [
+            const availableOptions = [
                 { value: "RAP", label: "RAP Notice" },
                 { value: "OTHER", label: "Other" },
             ];

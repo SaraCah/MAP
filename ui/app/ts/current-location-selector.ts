@@ -132,6 +132,6 @@ Vue.component('current-location-selector', {
             });
             document.body.appendChild(this.$refs.modal as Element);
             modal.open();
-        }
+        },
     },
 });

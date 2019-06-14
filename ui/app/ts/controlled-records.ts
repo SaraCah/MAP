@@ -44,8 +44,8 @@ interface SearchState {
     queryString: string;
     startDate: string;
     endDate: string;
-    availableFilters: Array<object>;
-    appliedFilters: Array<Filter>;
+    availableFilters: object[];
+    appliedFilters: Filter[];
     selectedSort: string;
     selectedSeriesId?: string;
     selectedSeriesLabel?: string;
@@ -217,19 +217,18 @@ Vue.component('controlled-records', {
                 ['appliedFilters', this.serializedFilters],
                 ['sort', this.selectedSort],
                 ['series', this.selectedSeriesId],
-            ]
+            ];
 
-            const key = encodeURIComponent(JSON.stringify(Utils.filter(keyComponents, (bits) => !!bits[1])))
+            const key = encodeURIComponent(JSON.stringify(Utils.filter(keyComponents, (bits) => !!bits[1])));
 
             window.location.hash = key;
         },
-        applyHashChange: function(_event: any) {
-            let map: any = {};
-
+        applyHashChange: function() {
+            const map: any = {};
             const hash = decodeURIComponent(window.location.hash).substring(1);
 
             if (hash.length > 0) {
-                for (let v of JSON.parse(hash)) {
+                for (const v of JSON.parse(hash)) {
                     map[v[0]] = v[1];
                 }
             }
@@ -246,7 +245,6 @@ Vue.component('controlled-records', {
             this.getRecords();
         },
         searchWithinSeries: function(record: Record) {
-            console.log(record);
             this.selectedSeriesId = record.uri;
             this.setHash();
         },
@@ -256,12 +254,12 @@ Vue.component('controlled-records', {
         },
         removeFilter: function(facet: Facet) {
             this.appliedFilters = Utils.filter(this.appliedFilters,
-                                               (elt: Filter) => { return !((elt.field === facet.field) && (elt.value === facet.value)) })
+                                               (elt: Filter) => !((elt.field === facet.field) && (elt.value === facet.value)));
             this.setHash();
         },
         isFilterApplied: function(facet: Facet): boolean {
             return !!Utils.find(this.appliedFilters,
-                                (elt: Filter) => { return (elt.field === facet.field) && (elt.value === facet.value) })
+                                (elt: Filter) => (elt.field === facet.field) && (elt.value === facet.value));
         },
         search: function() {
 
@@ -340,15 +338,15 @@ Vue.component('controlled-records', {
         },
         loadFilters: function(s: string) {
             try {
-                this.appliedFilters = JSON.parse(s).map((parsed: Array<string>) => {
-                    return {field: parsed[0], value: parsed[1]}
+                this.appliedFilters = JSON.parse(s).map((parsed: string[]) => {
+                    return {field: parsed[0], value: parsed[1]};
                 });
-            } catch(error) {
+            } catch (error) {
                 this.appliedFilters = [];
             }
         },
     },
-    updated: function () {
+    updated: function() {
         if (this.initialised) {
             (this.$el.querySelector('input[name="q"]') as HTMLInputElement).value = this.queryString;
             (this.$el.querySelector('input[name="start_date"]') as HTMLInputElement).value = this.startDate;
@@ -389,7 +387,7 @@ Vue.component('controlled-records', {
                         }
                     });
                 }
-            }
+            },
         },
     },
     computed: {
@@ -398,11 +396,11 @@ Vue.component('controlled-records', {
         },
         serializedFilters: function(): string {
             return JSON.stringify(this.appliedFilters.map((filter) => [filter.field, filter.value]));
-        }
+        },
     },
     mounted: function() {
         // Hash changes drive the actual search, which gives us sensible back/forward button behaviour and bookmarkability.
-        this.applyHashChange(null);
-        window.addEventListener('hashchange', (event) => { this.applyHashChange(event); });
+        this.applyHashChange();
+        window.addEventListener('hashchange', () => { this.applyHashChange(); });
     },
 });
