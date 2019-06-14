@@ -693,44 +693,49 @@ class MAPTheApp < Sinatra::Base
     'digital_representation' => 'Digital Representation',
   }
 
+  def label_for_field_value(field, value)
+    if field == 'primary_type'
+      TYPE_LABELS.fetch(value)
+    else
+      value
+    end
+  end
+
   Endpoint.get('/controlled-records')
     .param(:q, String, "Query string", :optional => true)
+    .param(:filters, String, "Filters to apply [[field1, val1], [field2, val2]]", :optional => true)
     .param(:start_date, String, "Start of date range", :optional => true)
     .param(:end_date, String, "End of date range", :optional => true)
     .param(:page, Integer, "Page to fetch")
     .param(:page_size, Integer, "Elements per page") do
+
     # Clamp to a sensible maximum
     page_size = [params[:page_size], 200].min
 
     controlled_records = Ctx.client
                            .get_controlled_records(params[:q],
+                                                   JSON.parse(params[:filters] || '[]'),
                                                    params[:start_date], params[:end_date],
                                                    params[:page], page_size)
 
     # Map types to their labels
     controlled_records.fetch('results', []).each do |result|
-      result['type'] = TYPE_LABELS.fetch(result['primary_type'])
+      result['type'] = label_for_field_value('primary_type', result.fetch('primary_type'))
     end
 
-    # Turn facets from ['val1', count1, 'val2', count2, ...] into an (ordered) hash
+    # Turn facets from ['val1', count1, 'val2', count2, ...] into an array of maps
     controlled_records['facets'] = controlled_records.fetch('facets', {}).map {|field, facet_arr|
-      [field, facet_arr.each_slice(2).map(&:to_a).to_h]
+      [field,
+       facet_arr.each_slice(2).map {|value, count|
+         {
+           field: field,
+           value: value,
+           label: label_for_field_value(field, value),
+           count: count,
+         }
+       }
+      ]
     }.to_h
-
-
-    # Translate types to labels in the facets too
-    controlled_records['facets']['primary_type'] =
-      controlled_records
-        .fetch('facets')
-        .fetch('primary_type', {})
-        .map {|type, count| [TYPE_LABELS.fetch(type), count]}
-        .to_h
-
-    # In the facets too
-    # type_facets = controlled_records.fetch('facets', {}).fetch('primary_type', [])
-    # (0...type_facets.length).step(2).each do |i|
-    #   type_facets[i] = TYPE_LABELS.fetch(type_facets[i], type_facets[i])
-    # end
 
     [
       200,

@@ -155,14 +155,30 @@ class Search
     end
   end
 
+  def self.build_supplied_filters(filters)
+    return '*:*' if filters.empty?
+
+    clauses = []
+
+    filters.each do |field, value|
+      clauses << '%s:%s' % [solr_escape(field), solr_escape(value)]
+    end
+
+    clauses.join(' AND ')
+  end
+
   def self.controlled_records(permissions,
-                              q, start_date, end_date,
+                              q,
+                              filters,
+                              start_date, end_date,
                               page, page_size)
+
     results = solr_handle_search('q' => q.to_s.empty? ? '*:*' : q,
                                  'defType' => 'edismax',
                                  'qf' => 'agency_assigned_id^100 agency_assigned_tokens^10 keywords^2 keywords_stemmed^1',
                                  'fq' => [build_controlled_records_filter(permissions),
-                                          build_date_filter(start_date, end_date)],
+                                          build_date_filter(start_date, end_date),
+                                          build_supplied_filters(filters)],
                                  'rows' => page_size,
                                  'start' => (page * page_size),
                                  'facet' => 'true',

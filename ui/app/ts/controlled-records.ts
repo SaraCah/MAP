@@ -3,7 +3,7 @@
 
 import Vue from "vue";
 import VueResource from "vue-resource";
-// import Utils from "./utils";
+import Utils from "./utils";
 
 Vue.use(VueResource);
 
@@ -21,6 +21,18 @@ interface Record {
     digital_representations_count: number;
 }
 
+interface Facet {
+    value: string;
+    label: string;
+    field: string;
+    count: number;
+}
+
+interface Filter {
+    field: string;
+    value: string;
+}
+
 interface SearchState {
     currentPage: number;
     facets: object;
@@ -31,6 +43,8 @@ interface SearchState {
     queryString: string;
     startDate: string;
     endDate: string;
+    availableFilters: Array<object>;
+    appliedFilters: Array<Filter>;
 }
 
 Vue.component('controlled-records', {
@@ -95,26 +109,19 @@ Vue.component('controlled-records', {
                   <option>QSA Identifier Z-A</option>
                 </select>
               </section>
-              <section>
-                <p class="facet-title">Record types</p>
-                <table class="facets-table">
-                  <tr v-for="(count, type) in this.facets.primary_type">
-                    <td class="facet-value">
-                      <a href="javascript:void(0);">{{type}}</a>
-                    </td>
-                    <td class="facet-count">{{count}}</td>
-                  </tr>
-                </table>
-              </section>
 
-              <section>
-                <p class="facet-title">Series</p>
+              <section v-for="filter in this.availableFilters">
+                <p class="facet-title">{{filter.title}}</p>
                 <table class="facets-table">
-                  <tr v-for="(count, series) in this.facets.series">
-                    <td class="facet-value">
-                      <a href="javascript:void(0);">{{series}}</a>
+                  <tr v-for="(facet, idx) in facets[filter.field]">
+                    <td v-if="isFilterApplied(facet)" class="facet-value">
+                        {{facet.label}}
                     </td>
-                    <td class="facet-count">{{count}}</td>
+                    <td v-else class="facet-value">
+                      <a href="javascript:void(0);" @click.prevent.default="addFilter(facet)">{{facet.label}}</a>
+                    </td>
+                    <td class="facet-count" v-if="isFilterApplied(facet)"><a href="javascript:void(0)" @click.prevent.default="removeFilter(facet)"><i class="fa fa-times"></i></a></td>
+                    <td v-else class="facet-count">{{facet.count}}</td>
                   </tr>
                 </table>
               </section>
@@ -178,6 +185,9 @@ Vue.component('controlled-records', {
             queryString: '',
             startDate: '',
             endDate: '',
+            availableFilters: [{field: 'primary_type', title: 'Record Types'},
+                               {field: 'series', title: 'Series'}],
+            appliedFilters: [],
         };
     },
     props: {
@@ -187,12 +197,16 @@ Vue.component('controlled-records', {
     },
     methods: {
         setHash: function() {
-            const key = `#q=${this.queryString}&startDate=${this.startDate}&endDate=${this.endDate}&currentPage=${this.currentPage}`;
+            const key = `#q=${this.queryString}&startDate=${this.startDate}&endDate=${this.endDate}&currentPage=${this.currentPage}&appliedFilters=${this.serializedFilters}`;
             window.location.hash = key;
         },
         applyHashChange: function(_event: any) {
-            var split = decodeURIComponent(window.location.hash).substring(1).split('&').map((s) => { return s.split("=") });
-            var map: any = {};
+            const split = decodeURIComponent(window.location.hash)
+                .substring(1)
+                .split('&')
+                .map((s) => { return s.split("=") });
+
+            let map: any = {};
 
             for (let v of split) {
                 map[v[0]] = v[1];
@@ -203,9 +217,25 @@ Vue.component('controlled-records', {
             this.endDate = map.endDate || '';
             this.currentPage = map.currentPage ? Number(map.currentPage) : 0;
 
+            this.loadFilters(map.appliedFilters || '[]');
+
             this.getRecords();
         },
+        addFilter: function(facet: Facet) {
+            this.appliedFilters.push(facet);
+            this.setHash();
+        },
+        removeFilter: function(facet: Facet) {
+            this.appliedFilters = Utils.filter(this.appliedFilters,
+                                               (elt: Filter) => { return !((elt.field === facet.field) && (elt.value === facet.value)) })
+            this.setHash();
+        },
+        isFilterApplied: function(facet: Facet): boolean {
+            return !!Utils.find(this.appliedFilters,
+                                (elt: Filter) => { return (elt.field === facet.field) && (elt.value === facet.value) })
+        },
         search: function() {
+
             // We defer reading from the inputs (rather than binding them
             // directly to model values) because the user's search isn't "locked
             // in" until they fire the search.
@@ -217,6 +247,7 @@ Vue.component('controlled-records', {
             this.startDate = (this.$el.querySelector('input[name="start_date"]') as HTMLInputElement).value;
             this.endDate = (this.$el.querySelector('input[name="end_date"]') as HTMLInputElement).value;
 
+            this.appliedFilters = [];
             this.currentPage = 0;
 
             this.setHash();
@@ -226,6 +257,7 @@ Vue.component('controlled-records', {
             this.startDate = '';
             this.endDate = '';
             this.currentPage = 0;
+            this.appliedFilters = [];
 
             this.setHash();
         },
@@ -236,6 +268,7 @@ Vue.component('controlled-records', {
                 method: 'GET',
                 params: {
                     q: this.queryString,
+                    filters: this.serializedFilters,
                     start_date: this.startDate,
                     end_date: this.endDate,
                     page: this.currentPage,
@@ -266,6 +299,11 @@ Vue.component('controlled-records', {
             this.currentPage -= 1;
             this.setHash();
         },
+        loadFilters: function(s: string) {
+            this.appliedFilters = JSON.parse(s).map((parsed: Array<string>) => {
+                return {field: parsed[0], value: parsed[1]}
+            });
+        },
     },
     updated: function () {
         if (this.initialised) {
@@ -284,6 +322,9 @@ Vue.component('controlled-records', {
         browseMode: function(): boolean {
             return this.queryString === '' && this.startDate === '' && this.endDate === '';
         },
+        serializedFilters: function(): string {
+            return JSON.stringify(this.appliedFilters.map((filter) => [filter.field, filter.value]));
+        }
     },
     mounted: function() {
         // Hash changes drive the actual search, which gives us sensible back/forward button behaviour and bookmarkability.
