@@ -85,14 +85,14 @@ Vue.component('representation-typeahead', {
 Vue.component('representation-browse', {
     template: `
 <div>
-    <a href="javascript:void(0);" class="btn right" @click.prevent.default="showModal()">Add Records to Request</a>
+    <a href="javascript:void(0);" class="btn right" @click.prevent.default="showModal()"><i class="fa fa-plus-circle" style="font-size: 1em;"></i> Add Records to Request</a>
     <template v-if="show_modal">
         <div ref="modal" class="modal representation-browse-modal">
             <div class="modal-content">
                 <controlled-records title="Add Records to Request">
                     <template v-slot:record_actions="slotProps">
                         <template v-if="isAlreadySelected(slotProps.record)">
-                            <button class="btn btn-small red" @click="removeSelected(slotProps.record)"><i class="fa fa-minus-circle" style="font-size: 1em;"></i> Remove</button>
+                            <button class="btn btn-small red darken-1" @click="removeSelected(slotProps.record)"><i class="fa fa-minus-circle" style="font-size: 1em;"></i> Remove</button>
                         </template>
                         <template v-else-if="isSelectable(slotProps.record)">
                             <button class="btn btn-small" @click="addSelected(slotProps.record)"><i class="fa fa-plus-circle" style="font-size: 1em;"></i> Add</button>
@@ -236,7 +236,7 @@ Vue.component('representation-linker', {
                         <div class="col s2">
                             <template v-if="!readonly">
                                 <div class="right-align">
-                                    <a class="btn" v-on:click="removeSelected(representation)">Remove</a>
+                                    <a class="btn btn-small red darken-1" v-on:click="removeSelected(representation)"><i class="fa fa-minus-circle" style="font-size: 1em;"></i> Remove</a>
                                 </div>
                             </template>
                         </div>
