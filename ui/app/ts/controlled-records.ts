@@ -124,7 +124,7 @@ Vue.component('controlled-records', {
                 <p class="facet-title">{{filter.title}}</p>
                 <table class="facets-table">
                   <tr v-for="(facet, idx) in facets[filter.field]">
-                    <td v-if="isFilterApplied(facet)" class="facet-value">
+                    <td v-if="isFilterApplied(facet) || facets[filter.field].length === 1" class="facet-value">
                         {{facet.label}}
                     </td>
                     <td v-else class="facet-value">
