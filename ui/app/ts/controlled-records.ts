@@ -146,7 +146,7 @@ Vue.component('controlled-records', {
 
             </div>
             <div class="col s12 m12 l9 search-results">
-              <table class="responsive-table">
+              <table>
                 <thead>
                   <tr>
                     <th>Type</th>
