@@ -55,8 +55,8 @@ class Search
       solr_url += '/'
     end
 
-    query_params = {qt: 'json'}.merge(query_params)
-    query_params = {rows: AppConfig[:page_size]}.merge(query_params)
+    query_params = {'qt' => 'json'}.merge(query_params)
+    query_params = {'rows' => AppConfig[:page_size]}.merge(query_params)
 
     search_uri = URI.join(solr_url, 'select')
     search_uri.query = URI.encode_www_form(query_params)
@@ -195,7 +195,7 @@ class Search
                                  'fq' => [build_controlled_records_filter(permissions),
                                           build_date_filter(start_date, end_date),
                                           build_supplied_filters(filters)],
-                                 'rows' => page_size,
+                                 'rows' => page_size + 1,
                                  'start' => (page * page_size),
                                  'facet' => 'true',
                                  'facet.field' => ['primary_type', 'series'],
@@ -204,8 +204,9 @@ class Search
     {
       :results => results.fetch('response').fetch('docs').map {|result|
         record_hash(result)
-      },
-      :facets => results.fetch('facet_counts', {}).fetch('facet_fields', {})
+      }[0...page_size],
+      :facets => results.fetch('facet_counts', {}).fetch('facet_fields', {}),
+      :has_next_page => results.fetch('response').fetch('docs').length > page_size,
     }
   end
 

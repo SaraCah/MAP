@@ -317,6 +317,10 @@ a#userMenuTrigger:after {
     padding-left: 1em;
 }
 
+.search-box section {
+    margin-bottom: 1em;
+}
+
 .search-tools {
     margin-top: 2em;
 }

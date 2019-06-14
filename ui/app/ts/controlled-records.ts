@@ -16,6 +16,7 @@ interface Record {
     types: string[];
     file_issue_allowed: boolean;
     id: string;
+    uri: string;
     qsa_id: number;
     physical_representations_count: number;
     digital_representations_count: number;
@@ -46,6 +47,8 @@ interface SearchState {
     availableFilters: Array<object>;
     appliedFilters: Array<Filter>;
     selectedSort: string;
+    selectedSeriesId?: string;
+    selectedSeriesLabel?: string;
 }
 
 Vue.component('controlled-records', {
@@ -66,12 +69,18 @@ Vue.component('controlled-records', {
 
         <div class="search-box">
           <form v-on:submit.stop.prevent="search()">
-            <div class="input-field">
-              <label for="q">Search for keywords/identifiers</label>
-              <input type="text" id="q" name="q"></input>
-            </div>
+            <section class="row" v-if="this.selectedSeriesId && this.selectedSeriesLabel">
+              <blockquote>Searching within series: {{selectedSeriesLabel}} [<a href="javascript:void(0);" @click="reset()">reset</a>]</blockquote>
+            </section>
 
-            <section>
+            <section class="row">
+              <div class="input-field">
+                <label for="q">Search for keywords/identifiers</label>
+                <input type="text" id="q" name="q"></input>
+              </div>
+            </section>
+
+            <section class="row">
               <p>Limit to dates <span class="sample-date-formats">(YYYY, YYYY-MM, YYYY-MM-DD)</span></p>
               <div class="input-field inline">
                 <label for="start_date">Start date</label>
@@ -154,9 +163,7 @@ Vue.component('controlled-records', {
                       </span>
                     </td>
                     <td>
-                      <a v-if="false && file_issues_allowed && record.file_issue_allowed"
-                         class="btn"
-                         :href="'/file-issue-requests/new?record_ref=' + record.id">Request</a>
+                        <a href="javascript:void(0);" @click="searchWithinSeries(record)" v-if="record.primary_type === 'resource' && !selectedSeriesId">Search&nbsp;within&nbsp;series</a>
                     </td>
                   </tr>
                 </tbody>
@@ -190,6 +197,9 @@ Vue.component('controlled-records', {
                                {field: 'series', title: 'Series'}],
             appliedFilters: [],
             selectedSort: 'relevance',
+
+            selectedSeriesId: undefined,
+            selectedSeriesLabel: undefined,
         };
     },
     props: {
@@ -206,6 +216,7 @@ Vue.component('controlled-records', {
                 `currentPage=${this.currentPage}`,
                 `appliedFilters=${this.serializedFilters}`,
                 `sort=${this.selectedSort}`,
+                `series=${this.selectedSeriesId || ''}`,
             ].join('&');
 
             window.location.hash = key;
@@ -227,12 +238,16 @@ Vue.component('controlled-records', {
             this.endDate = map.endDate || '';
             this.currentPage = map.currentPage ? Number(map.currentPage) : 0;
             this.selectedSort = map.sort || 'relevance';
+            this.selectedSeriesId = map.series || undefined;
 
             this.loadFilters(map.appliedFilters || '[]');
 
             this.getRecords();
         },
-        setSort: function() {
+        searchWithinSeries: function(record: Record) {
+            console.log(record);
+            this.selectedSeriesId = record.uri;
+            this.setHash();
         },
         addFilter: function(facet: Facet) {
             this.appliedFilters.push(facet);
@@ -273,21 +288,27 @@ Vue.component('controlled-records', {
             this.currentPage = 0;
             this.appliedFilters = [];
             this.selectedSort = 'relevance';
+            this.selectedSeriesId = undefined;
 
             this.setHash();
         },
         getRecords: function() {
             this.initialised = false;
 
+            let mergedFilters = JSON.parse(this.serializedFilters);
+            if (this.selectedSeriesId) {
+                mergedFilters = mergedFilters.concat([['series_id', this.selectedSeriesId]]);
+            }
+
             this.$http.get('/controlled-records', {
                 method: 'GET',
                 params: {
                     q: this.queryString,
-                    filters: this.serializedFilters,
+                    filters: JSON.stringify(mergedFilters),
                     start_date: this.startDate,
                     end_date: this.endDate,
                     page: this.currentPage,
-                    page_size: this.page_size + 1,
+                    page_size: this.page_size,
                     sort: this.selectedSort,
                 },
             }).then((response: any) => {
@@ -301,10 +322,11 @@ Vue.component('controlled-records', {
             }).then((json: any) => {
                 this.initialised = true;
 
-                this.records = json.results.slice(0, this.page_size);
-                this.facets = json.facets;
                 this.showPrevPage = (this.currentPage > 0);
-                this.showNextPage = (json.results.length > this.page_size);
+                this.showNextPage = json.has_next_page;
+
+                this.records = json.results;
+                this.facets = json.facets;
             });
         },
         nextPage: function() {
@@ -339,7 +361,31 @@ Vue.component('controlled-records', {
             handler() {
                 this.setHash();
             },
-        }
+        },
+        selectedSeriesId: {
+            handler() {
+                if (this.selectedSeriesId) {
+                    this.$http.get('/controlled-records', {
+                        params: {
+                            q: '*:*',
+                            filters: JSON.stringify([["uri", this.selectedSeriesId]]),
+                            page: 0,
+                            page_size: 1,
+                        },
+                    }).then((response: any) => {
+                        return response.json();
+                    }, () => {
+                        this.selectedSeriesLabel = this.selectedSeriesId;
+                    }).then((json: any) => {
+                        if (json && json.results[0]) {
+                            this.selectedSeriesLabel = json.results[0].title;
+                        } else {
+                            this.selectedSeriesLabel = this.selectedSeriesId;
+                        }
+                    });
+                }
+            }
+        },
     },
     computed: {
         browseMode: function(): boolean {

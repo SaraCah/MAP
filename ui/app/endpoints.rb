@@ -706,7 +706,7 @@ class MAPTheApp < Sinatra::Base
     .param(:filters, String, "Filters to apply [[field1, val1], [field2, val2]]", :optional => true)
     .param(:start_date, String, "Start of date range", :optional => true)
     .param(:end_date, String, "End of date range", :optional => true)
-    .param(:sort, String, "Sort key", :default => "relevance")
+    .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to fetch")
     .param(:page_size, Integer, "Elements per page") do
 
@@ -716,7 +716,7 @@ class MAPTheApp < Sinatra::Base
     controlled_records = Ctx.client
                            .get_controlled_records(params[:q],
                                                    JSON.parse(params[:filters] || '[]'),
-                                                   params[:sort],
+                                                   (params[:sort] || "relevance"),
                                                    params[:start_date], params[:end_date],
                                                    params[:page], page_size)
 

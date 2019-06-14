@@ -14,6 +14,7 @@
   <field name="agency_assigned_tokens" type="text_general" indexed="true" stored="true" multiValued="true" />
 
   <field name="series" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+  <field name="series_id" type="string" indexed="true" stored="true" required="false" multiValued="false" />
 
   <field name="responsible_agency" type="string" indexed="true" stored="true" multiValued="false" />
   <field name="recent_responsible_agencies" type="string" indexed="true" stored="true" multiValued="true" />
