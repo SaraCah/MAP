@@ -366,5 +366,6 @@ a#userMenuTrigger:after {
 .representation-browse-modal {
     width: 95%;
     max-height: 90%;
+    height: 90%;
     top: 5% !important;
 }
