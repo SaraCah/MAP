@@ -7,7 +7,7 @@ import Utils from "./utils";
 
 Vue.use(VueResource);
 
-// import UI from "./ui";
+declare var AppConfig: any;
 
 export default interface Record {
     type: string;
@@ -212,7 +212,6 @@ Vue.component('controlled-records', {
         };
     },
     props: {
-        page_size: Number,
         title: String,
     },
     methods: {
@@ -319,7 +318,7 @@ Vue.component('controlled-records', {
                     start_date: this.startDate,
                     end_date: this.endDate,
                     page: this.currentPage,
-                    page_size: this.page_size,
+                    page_size: AppConfig.page_size,
                     sort: this.selectedSort,
                 },
             }).then((response: any) => {

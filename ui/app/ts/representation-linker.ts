@@ -10,12 +10,12 @@ Vue.use(VueResource);
 
 import Record from "./controlled-records";
 
-declare var M: any; // Materialize on the window context
-
 interface Representation {
     id: string;
     label: string;
 }
+
+declare var M: any; // Materialize on the window context
 
 export default class RepresentationRequest {
     public static fromRepresentation(rep: Representation): RepresentationRequest {
@@ -89,7 +89,7 @@ Vue.component('representation-browse', {
     <template v-if="show_modal">
         <div ref="modal" class="modal representation-browse-modal">
             <div class="modal-content">
-                <controlled-records title="Add Records to Request" :page_size="10">
+                <controlled-records title="Add Records to Request">
                     <template v-slot:record_actions="slotProps">
                         <template v-if="isAlreadySelected(slotProps.record)">
                             <button class="btn btn-small red" @click="removeSelected(slotProps.record)"><i class="fa fa-minus-circle" style="font-size: 1em;"></i> Remove</button>
