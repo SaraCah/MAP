@@ -338,9 +338,13 @@ Vue.component('controlled-records', {
             this.setHash();
         },
         loadFilters: function(s: string) {
-            this.appliedFilters = JSON.parse(s).map((parsed: Array<string>) => {
-                return {field: parsed[0], value: parsed[1]}
-            });
+            try {
+                this.appliedFilters = JSON.parse(s).map((parsed: Array<string>) => {
+                    return {field: parsed[0], value: parsed[1]}
+                });
+            } catch(error) {
+                this.appliedFilters = [];
+            }
         },
     },
     updated: function () {
