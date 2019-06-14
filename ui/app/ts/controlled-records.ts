@@ -219,20 +219,19 @@ Vue.component('controlled-records', {
                 ['series', this.selectedSeriesId],
             ]
 
-            const key = Utils.filter(keyComponents, (bits) => !!bits[1]).map((bits) => bits.join('=')).join('&');
+            const key = encodeURIComponent(JSON.stringify(Utils.filter(keyComponents, (bits) => !!bits[1])))
 
             window.location.hash = key;
         },
         applyHashChange: function(_event: any) {
-            const split = decodeURIComponent(window.location.hash)
-                .substring(1)
-                .split('&')
-                .map((s) => { return s.split("=") });
-
             let map: any = {};
 
-            for (let v of split) {
-                map[v[0]] = v[1];
+            const hash = decodeURIComponent(window.location.hash).substring(1);
+
+            if (hash.length > 0) {
+                for (let v of JSON.parse(hash)) {
+                    map[v[0]] = v[1];
+                }
             }
 
             this.queryString = map.q || '';
