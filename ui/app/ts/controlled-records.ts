@@ -256,6 +256,9 @@ Vue.component('controlled-records', {
             this.getRecords();
         },
         searchWithinSeries: function(record: Record) {
+            this.reset({
+                setHash: false,
+            });
             this.selectedSeriesId = record.uri;
             this.setHash();
         },
@@ -291,7 +294,9 @@ Vue.component('controlled-records', {
 
             this.setHash();
         },
-        reset: function() {
+        reset: function(opts?: any) {
+            opts = opts ? opts : {}
+
             this.queryString = '';
             this.startDate = '';
             this.endDate = '';
@@ -300,7 +305,9 @@ Vue.component('controlled-records', {
             this.selectedSort = 'relevance';
             this.selectedSeriesId = undefined;
 
-            this.setHash();
+            if (opts.setHash !== false) {
+                this.setHash();
+            }
         },
         getRecords: function() {
             let mergedFilters = JSON.parse(this.serializedFilters);
