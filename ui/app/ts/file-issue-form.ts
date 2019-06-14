@@ -58,9 +58,12 @@ Vue.component('file-issue-form', {
         </file-issue-request-summary>
     </section>
 
-    <section id="items" class="scrollspy section card">
-        <div class="card-content">
-            <representation-linker input_path="file_issue_request[items][]" ref="linker" :representations="representations" :resolved_representations="resolved_representations" @change="refreshSummaries()" :readonly="readonly"></representation-linker>
+    <section id="items" class="scrollspy section">
+        <h4>Requested Items</h4>
+        <div class="card">
+            <div class="card-content">
+                <representation-linker input_path="file_issue_request[items][]" ref="linker" :representations="representations" :resolved_representations="resolved_representations" @change="refreshSummaries()" :readonly="readonly"></representation-linker>
+            </div>
         </div>
     </section>
 </div>

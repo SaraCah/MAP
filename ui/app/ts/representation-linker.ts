@@ -85,11 +85,11 @@ Vue.component('representation-typeahead', {
 Vue.component('representation-browse', {
     template: `
 <div>
-    <a href="javascript:void(0);" class="btn" @click.prevent.default="showModal()">Browse</a>
+    <a href="javascript:void(0);" class="btn right" @click.prevent.default="showModal()">Add Records to Request</a>
     <template v-if="show_modal">
         <div ref="modal" class="modal representation-browse-modal">
             <div class="modal-content">
-                <controlled-records title="Select representations for request" :page_size="10">
+                <controlled-records title="Add Records to Request" :page_size="10">
                     <template v-slot:record_actions="slotProps">
                         <template v-if="isAlreadySelected(slotProps.record)">
                             <button class="btn btn-small red" @click="removeSelected(slotProps.record)"><i class="fa fa-minus-circle" style="font-size: 1em;"></i> Remove</button>
@@ -153,7 +153,6 @@ Vue.component('representation-linker', {
     template: `
 <div>
     <template v-if="!readonly">
-        <representation-typeahead v-on:selected="addSelected"></representation-typeahead>
         <representation-browse v-on:selected="addSelected" :selected="selected"></representation-browse>
     </template>
     <table class="representation-linker-table">
