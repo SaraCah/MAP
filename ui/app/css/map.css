@@ -362,3 +362,9 @@ a#userMenuTrigger:after {
 .record-search .no-results {
     margin-top: 2em;
 }
+
+.representation-browse-modal {
+    width: 95%;
+    max-height: 90%;
+    top: 5% !important;
+}

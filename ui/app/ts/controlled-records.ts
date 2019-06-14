@@ -9,7 +9,7 @@ Vue.use(VueResource);
 
 // import UI from "./ui";
 
-interface Record {
+export default interface Record {
     type: string;
     title: string;
     under_movement: boolean;
@@ -147,7 +147,7 @@ Vue.component('controlled-records', {
                     <th>Agency Identifier</th>
                     <th>QSA Identifier</th>
                     <th>Representations</th>
-                    <th></th>
+                    <th style="width: 180px"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -164,6 +164,7 @@ Vue.component('controlled-records', {
                     </td>
                     <td>
                         <a href="javascript:void(0);" @click="searchWithinSeries(record)" v-if="record.primary_type === 'resource' && !selectedSeriesId">Search&nbsp;within&nbsp;series</a>
+                        <slot name="record_actions" v-bind:record="record"></slot>
                     </td>
                   </tr>
                 </tbody>
@@ -203,7 +204,6 @@ Vue.component('controlled-records', {
         };
     },
     props: {
-        file_issues_allowed: Boolean,
         page_size: Number,
         title: String,
     },
@@ -228,8 +228,12 @@ Vue.component('controlled-records', {
             const hash = decodeURIComponent(window.location.hash).substring(1);
 
             if (hash.length > 0) {
-                for (const v of JSON.parse(hash)) {
-                    map[v[0]] = v[1];
+                try {
+                    for (const v of JSON.parse(hash)) {
+                        map[v[0]] = v[1];
+                    }
+                } catch (e) {
+                    // something not right, take defaults
                 }
             }
 

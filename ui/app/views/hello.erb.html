@@ -1,6 +1,5 @@
 <div class="vue-enabled">
   <controlled-records title="<%= (agency && location) ? [agency.label, location.name].join(' - ') : '' %>"
-                      :file_issues_allowed="<%= Ctx.permissions.allow_manage_file_issues? %>"
                       :page_size="<%= AppConfig[:page_size] %>">
   </controlled-records>
 </div>

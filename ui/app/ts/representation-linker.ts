@@ -7,8 +7,10 @@ import Utils from "./utils";
 // import Utils from "./utils";
 // import UI from "./ui";
 Vue.use(VueResource);
-// import Utils from "./utils";
-// import UI from "./ui";
+
+import Record from "./controlled-records";
+
+declare var M: any; // Materialize on the window context
 
 interface Representation {
     id: string;
@@ -80,11 +82,79 @@ Vue.component('representation-typeahead', {
     },
 });
 
+Vue.component('representation-browse', {
+    template: `
+<div>
+    <a href="javascript:void(0);" class="btn" @click.prevent.default="showModal()">Browse</a>
+    <template v-if="show_modal">
+        <div ref="modal" class="modal representation-browse-modal">
+            <div class="modal-content">
+                <controlled-records title="Select representations for request" :page_size="10">
+                    <template v-slot:record_actions="slotProps">
+                        <template v-if="isAlreadySelected(slotProps.record)">
+                            <button class="btn btn-small red" @click="removeSelected(slotProps.record)"><i class="fa fa-minus-circle" style="font-size: 1em;"></i> Remove</button>
+                        </template>
+                        <template v-else-if="isSelectable(slotProps.record)">
+                            <button class="btn btn-small" @click="addSelected(slotProps.record)"><i class="fa fa-plus-circle" style="font-size: 1em;"></i> Add</button>
+                        </template>
+                    </template>
+                </controlled-records>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+            </div>
+        </div>
+    </template>
+</div>
+`,
+    data: function(): {show_modal: boolean} {
+        return {
+            show_modal: false,
+        };
+    },
+    props: ['selected'],
+    methods: {
+        select(representations: Representation[]) {
+            this.$emit('selected', representations);
+        },
+        showModal: function() {
+            this.show_modal = true;
+            this.$nextTick(() => {
+                const modal: any = M.Modal.init(this.$refs.modal, {
+                });
+                document.body.appendChild(this.$refs.modal as Element);
+                modal.open();
+            });
+        },
+        isAlreadySelected: function(record: Record) {
+            return !!Utils.find(this.selected, (representation: RepresentationRequest) => {
+                return representation.id === record.id;
+            })
+        },
+        removeSelected: function(record: Record) {
+            this.selected.forEach((representation: RepresentationRequest) => {
+                if (representation.id === record.id) {
+                    (this.$parent as any).removeSelected(representation);
+                }
+            });
+        },
+        addSelected: function(record: Record) {
+            (this.$parent as any).addSelected(new RepresentationRequest(record.id, record.title, 'DIGITAL'));
+        },
+        isSelectable: function(record: Record) {
+            return !!Utils.find(record.types, (type: string) => {
+                return type === 'representation';  
+            });
+        },
+    },
+});
+
 Vue.component('representation-linker', {
     template: `
 <div>
     <template v-if="!readonly">
         <representation-typeahead v-on:selected="addSelected"></representation-typeahead>
+        <representation-browse v-on:selected="addSelected" :selected="selected"></representation-browse>
     </template>
     <table class="representation-linker-table">
         <thead>

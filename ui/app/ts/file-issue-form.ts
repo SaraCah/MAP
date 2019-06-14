@@ -28,12 +28,6 @@ interface Quote {
 Vue.component('file-issue-form', {
     template: `
 <div>
-    <section id="items" class="scrollspy section card">
-        <div class="card-content">
-            <representation-linker input_path="file_issue_request[items][]" ref="linker" :representations="representations" :resolved_representations="resolved_representations" @change="refreshSummaries()" :readonly="readonly"></representation-linker>
-        </div>
-    </section>
-
     <slot></slot>
 
     <section id="digitalRequest" class="scrollspy section">
@@ -62,6 +56,12 @@ Vue.component('file-issue-form', {
                                     :file_issue_id="physical_file_issue_id"
                                     :processing_estimate="physical_processing_estimate">
         </file-issue-request-summary>
+    </section>
+
+    <section id="items" class="scrollspy section card">
+        <div class="card-content">
+            <representation-linker input_path="file_issue_request[items][]" ref="linker" :representations="representations" :resolved_representations="resolved_representations" @change="refreshSummaries()" :readonly="readonly"></representation-linker>
+        </div>
     </section>
 </div>
 `,
