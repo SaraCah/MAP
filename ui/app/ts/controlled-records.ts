@@ -303,8 +303,6 @@ Vue.component('controlled-records', {
             this.setHash();
         },
         getRecords: function() {
-            this.initialised = false;
-
             let mergedFilters = JSON.parse(this.serializedFilters);
             if (this.selectedSeriesId) {
                 mergedFilters = mergedFilters.concat([['series_id', this.selectedSeriesId]]);
@@ -358,7 +356,7 @@ Vue.component('controlled-records', {
         },
     },
     updated: function() {
-        if (this.initialised) {
+        if (this.$el.querySelector('.search-box') != null) {
             (this.$el.querySelector('input[name="q"]') as HTMLInputElement).value = this.queryString;
             (this.$el.querySelector('input[name="start_date"]') as HTMLInputElement).value = this.startDate;
             (this.$el.querySelector('input[name="end_date"]') as HTMLInputElement).value = this.endDate;
