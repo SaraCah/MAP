@@ -70,31 +70,39 @@ Vue.component('controlled-records', {
         <div class="search-box">
           <form v-on:submit.stop.prevent="search()">
             <section class="row" v-if="this.selectedSeriesId && this.selectedSeriesLabel">
-              <blockquote>Searching within series: {{selectedSeriesLabel}} [<a href="javascript:void(0);" @click="reset()">reset</a>]</blockquote>
+                <div class="col s12">
+                    <blockquote>Searching within series: {{selectedSeriesLabel}} [<a href="javascript:void(0);" @click="reset()">reset</a>]</blockquote>
+                </div>
             </section>
 
             <section class="row">
-              <div class="input-field">
-                <label for="q">Search for keywords/identifiers</label>
-                <input type="text" id="q" name="q"></input>
-              </div>
+                <div class="col s12 m6">
+                    <div class="input-field">
+                        <label for="q">Search for keywords/identifiers</label>
+                        <input type="text" id="q" name="q"></input>
+                    </div>
+                </div>
+                <div class="col s12 m6">
+                  <span>between</span>
+                  <div class="input-field inline">
+                    <label for="start_date">Start date</label>
+                    <input type="text" id="start_date" name="start_date"></input>
+                    <span class="helper-text">YYYY-MM-DD</span>
+                  </div>
+                  <div class="input-field inline">
+                    <label for="end_date">End date</label>
+                    <input type="text" id="end_date" name="end_date"></input>
+                    <span class="helper-text">YYYY-MM-DD</span>
+                  </div>
+                </div>
             </section>
 
-            <section class="row">
-              <p>Limit to dates <span class="sample-date-formats">(YYYY, YYYY-MM, YYYY-MM-DD)</span></p>
-              <div class="input-field inline">
-                <label for="start_date">Start date</label>
-                <input type="text" id="start_date" name="start_date"></input>
-              </div>
-
-              <div class="input-field inline">
-                <label for="end_date">End date</label>
-                <input type="text" id="end_date" name="end_date"></input>
-              </div>
-            </section>
-
-            <button class="btn">Search</button>
-            <button class="btn" v-on:click.stop.prevent="reset()">Reset</button>
+            <div class="row">
+                <div class="col s12">
+                    <button class="btn">Search</button>
+                    <button class="btn" v-on:click.stop.prevent="reset()">Reset</button>
+                </div>
+            </div>
           </form>
         </div>
 
