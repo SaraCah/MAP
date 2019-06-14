@@ -209,15 +209,17 @@ Vue.component('controlled-records', {
     },
     methods: {
         setHash: function() {
-            const key = [
-                `q=${this.queryString}`,
-                `startDate=${this.startDate}`,
-                `endDate=${this.endDate}`,
-                `currentPage=${this.currentPage}`,
-                `appliedFilters=${this.serializedFilters}`,
-                `sort=${this.selectedSort}`,
-                `series=${this.selectedSeriesId || ''}`,
-            ].join('&');
+            const keyComponents = [
+                ['q', this.queryString],
+                ['startDate', this.startDate],
+                ['endDate', this.endDate],
+                ['currentPage', this.currentPage],
+                ['appliedFilters', this.serializedFilters],
+                ['sort', this.selectedSort],
+                ['series', this.selectedSeriesId],
+            ]
+
+            const key = Utils.filter(keyComponents, (bits) => !!bits[1]).map((bits) => bits.join('=')).join('&');
 
             window.location.hash = key;
         },
