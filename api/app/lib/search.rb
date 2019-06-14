@@ -167,14 +167,30 @@ class Search
     clauses.join(' AND ')
   end
 
+  VALID_SORTS = {
+    'relevance' => 'score desc',
+    'title_asc' => 'title_sort asc',
+    'title_desc' => 'title_sort desc',
+    'agency_asc' => 'agency_sort asc',
+    'agency_desc' => 'agency_sort desc',
+    'qsaid_asc' => 'qsaid_sort asc',
+    'qsaid_desc' => 'qsaid_sort desc',
+  }
+
+  def self.parse_sort(sort_spec)
+    VALID_SORTS.fetch(sort_spec)
+  end
+
   def self.controlled_records(permissions,
                               q,
                               filters,
+                              sort,
                               start_date, end_date,
                               page, page_size)
 
     results = solr_handle_search('q' => q.to_s.empty? ? '*:*' : q,
                                  'defType' => 'edismax',
+                                 'sort' => parse_sort(sort),
                                  'qf' => 'agency_assigned_id^100 agency_assigned_tokens^10 keywords^2 keywords_stemmed^1',
                                  'fq' => [build_controlled_records_filter(permissions),
                                           build_date_filter(start_date, end_date),

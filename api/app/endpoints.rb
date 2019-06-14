@@ -229,6 +229,7 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/controlled-records')
     .param(:q, String, "Query string", :optional => true)
     .param(:filters, String, "Filters to apply [[field1, val1], [field2, val2]]", :optional => true)
+    .param(:sort, String, "Sort key", :default => "relevance")
     .param(:start_date, DateString, "Start of date range", :optional => true)
     .param(:end_date, DateString, "End of date range", :optional => true)
     .param(:page, Integer, "Page to fetch (zero-indexed)")
@@ -238,6 +239,7 @@ class MAPTheAPI < Sinatra::Base
       json_response(Search.controlled_records(permissions,
                                               params[:q],
                                               JSON.parse(params[:filters] || '[]'),
+                                              params[:sort],
                                               params[:start_date], params[:end_date],
                                               params[:page], params[:page_size]))
     else

@@ -45,6 +45,7 @@ interface SearchState {
     endDate: string;
     availableFilters: Array<object>;
     appliedFilters: Array<Filter>;
+    selectedSort: string;
 }
 
 Vue.component('controlled-records', {
@@ -99,14 +100,14 @@ Vue.component('controlled-records', {
             <div class="col s12 m12 l2 search-tools">
               <section class="sort-selector">
                 <p>Sort by</p>
-                <select id="select_sort" class="browser-default">
-                  <option>Relevance</option>
-                  <option>Title A-Z</option>
-                  <option>Title Z-A</option>
-                  <option>Agency Identifier A-Z</option>
-                  <option>Agency Identifier Z-A</option>
-                  <option>QSA Identifier A-Z</option>
-                  <option>QSA Identifier Z-A</option>
+                <select id="select_sort" v-model='selectedSort' class="browser-default">
+                  <option value="relevance">Relevance</option>
+                  <option value="title_asc">Title A-Z</option>
+                  <option value="title_desc">Title Z-A</option>
+                  <option value="agency_asc">Agency Identifier A-Z</option>
+                  <option value="agency_desc">Agency Identifier Z-A</option>
+                  <option value="qsaid_asc">QSA Identifier A-Z</option>
+                  <option value="qsaid_desc">QSA Identifier Z-A</option>
                 </select>
               </section>
 
@@ -188,6 +189,7 @@ Vue.component('controlled-records', {
             availableFilters: [{field: 'primary_type', title: 'Record Types'},
                                {field: 'series', title: 'Series'}],
             appliedFilters: [],
+            selectedSort: 'relevance',
         };
     },
     props: {
@@ -197,7 +199,15 @@ Vue.component('controlled-records', {
     },
     methods: {
         setHash: function() {
-            const key = `#q=${this.queryString}&startDate=${this.startDate}&endDate=${this.endDate}&currentPage=${this.currentPage}&appliedFilters=${this.serializedFilters}`;
+            const key = [
+                `q=${this.queryString}`,
+                `startDate=${this.startDate}`,
+                `endDate=${this.endDate}`,
+                `currentPage=${this.currentPage}`,
+                `appliedFilters=${this.serializedFilters}`,
+                `sort=${this.selectedSort}`,
+            ].join('&');
+
             window.location.hash = key;
         },
         applyHashChange: function(_event: any) {
@@ -216,10 +226,13 @@ Vue.component('controlled-records', {
             this.startDate = map.startDate || '';
             this.endDate = map.endDate || '';
             this.currentPage = map.currentPage ? Number(map.currentPage) : 0;
+            this.selectedSort = map.sort || 'relevance';
 
             this.loadFilters(map.appliedFilters || '[]');
 
             this.getRecords();
+        },
+        setSort: function() {
         },
         addFilter: function(facet: Facet) {
             this.appliedFilters.push(facet);
@@ -249,6 +262,7 @@ Vue.component('controlled-records', {
 
             this.appliedFilters = [];
             this.currentPage = 0;
+            this.selectedSort = 'relevance';
 
             this.setHash();
         },
@@ -258,6 +272,7 @@ Vue.component('controlled-records', {
             this.endDate = '';
             this.currentPage = 0;
             this.appliedFilters = [];
+            this.selectedSort = 'relevance';
 
             this.setHash();
         },
@@ -273,6 +288,7 @@ Vue.component('controlled-records', {
                     end_date: this.endDate,
                     page: this.currentPage,
                     page_size: this.page_size + 1,
+                    sort: this.selectedSort,
                 },
             }).then((response: any) => {
                 return response.json();
@@ -316,6 +332,13 @@ Vue.component('controlled-records', {
                   elt.classList.add('active');
                 }
             });
+        }
+    },
+    watch: {
+        selectedSort: {
+            handler() {
+                this.setHash();
+            },
         }
     },
     computed: {

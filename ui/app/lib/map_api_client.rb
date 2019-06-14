@@ -230,13 +230,14 @@ class MAPAPIClient
     Agency.from_json(get('/my-agency', {}))
   end
 
-  def get_controlled_records(q, filters, start_date, end_date, page, page_size)
+  def get_controlled_records(q, filters, sort, start_date, end_date, page, page_size)
     return [] if Ctx.get.permissions.is_admin?
 
     params = {page: page, page_size: page_size}
 
     params[:q] = q unless q.to_s.empty?
     params[:filters] = JSON.dump(filters)
+    params[:sort] = sort
     params[:start_date] = start_date unless start_date.to_s.empty?
     params[:end_date] = end_date unless end_date.to_s.empty?
 
