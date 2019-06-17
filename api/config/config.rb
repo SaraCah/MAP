@@ -9,7 +9,7 @@
 AppConfig[:map_indexer_interval_seconds] = 5
 AppConfig[:solr_url] = "http://localhost:8984/solr/map/"
 AppConfig[:solr_indexer_state_file] = File.join(File.dirname(__FILE__), "..", "data/solr_indexer_state.dat")
-AppConfig[:page_size] = 20
+AppConfig[:page_size] = 10
 
 AppConfig[:max_concurrent_xlsx_validations] = 10
 
