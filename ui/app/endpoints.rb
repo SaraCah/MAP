@@ -477,6 +477,13 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
+  Endpoint.get('/transfers/template') do
+    send_file(File.absolute_path('static/transfer_template.xlsx'),
+              :disposition => 'attachment',
+              :filename => 'qsa_agency_transfer_template.xlsx',
+              :type => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+  end
+
   Endpoint.get('/transfers/:id')
     .param(:id, Integer, "ID of transfer") do
     transfer = Ctx.client.get_transfer(params[:id])
