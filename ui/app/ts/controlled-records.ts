@@ -129,8 +129,8 @@ Vue.component('controlled-records', {
                 </select>
               </section>
 
-              <section v-for="filter in this.availableFilters">
-                <template v-if="facets[filter.field] && facets[filter.field].length > 0">
+              <template v-for="filter in this.availableFilters">
+                <section v-if="facets[filter.field] && facets[filter.field].length > 0">
                   <p class="facet-title">{{filter.title}}</p>
                   <table class="facets-table">
                     <tr v-for="(facet, idx) in facets[filter.field]">
@@ -144,8 +144,8 @@ Vue.component('controlled-records', {
                       <td v-else class="facet-count">{{facet.count}}</td>
                     </tr>
                   </table>
-                </template>
-              </section>
+                </section>
+              </template>
 
             </div>
             <div class="col s12 m12 l9 search-results">
