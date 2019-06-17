@@ -52,7 +52,8 @@ class Users < BaseStorage
     users_visible_to_current_user = users_visible_to_current_user.order(Sequel.asc(Sequel[:user][:username]))
 
     if q
-      users_visible_to_current_user = users_visible_to_current_user.filter(Sequel.|(Sequel.like(Sequel.function(:lower, Sequel[:user][:username]), "%#{q.downcase}%"), Sequel.like(Sequel.function(:lower, Sequel[:user][:name]), "%#{q.downcase}%")))
+      sanitised = q.downcase.gsub(/[^a-z0-9_\-\. ]/, '_')
+      users_visible_to_current_user = users_visible_to_current_user.filter(Sequel.|(Sequel.like(Sequel.function(:lower, Sequel[:user][:username]), "%#{sanitised}%"), Sequel.like(Sequel.function(:lower, Sequel[:user][:name]), "%#{sanitised}%")))
     end
 
 

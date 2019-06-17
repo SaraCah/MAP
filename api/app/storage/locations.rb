@@ -41,7 +41,8 @@ class Locations < BaseStorage
     end
 
     if q
-      dataset = dataset.filter(Sequel.like(Sequel.function(:lower, Sequel[:agency_location][:name]), "%#{q.downcase}%"))
+      sanitised = q.downcase.gsub(/[^a-z0-9_\-\. ]/, '')
+      dataset = dataset.filter(Sequel.like(Sequel.function(:lower, Sequel[:agency_location][:name]), "%#{sanitised}%"))
     end
 
     max_page = (dataset.count / page_size.to_f).ceil
