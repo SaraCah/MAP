@@ -369,3 +369,9 @@ a#userMenuTrigger:after {
     height: 90%;
     top: 5% !important;
 }
+
+@media only screen and (max-width: 1000px) {
+    .map-hide-on-phone {
+        display: none !important;
+    }
+}

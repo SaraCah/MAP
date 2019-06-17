@@ -77,22 +77,22 @@ Vue.component('controlled-records', {
             </section>
 
             <section class="row">
-                <div class="col s12 m6">
+                <div class="col s12 m12 l6">
                     <div class="input-field">
                         <label for="q">Search for keywords/identifiers</label>
                         <input type="text" id="q" name="q"></input>
                     </div>
                 </div>
-                <div class="col s12 m6">
-                  <span>between</span>
+                <div class="col s12 m12 l6">
+                  <span class="map-hide-on-phone" style="padding-right: 1em;">between</span>
                   <div class="input-field inline">
                     <label for="start_date">Start date</label>
-                    <input type="text" id="start_date" name="start_date"></input>
+                    <input type="text" size="10" id="start_date" name="start_date"></input>
                     <span class="helper-text">YYYY-MM-DD</span>
                   </div>
                   <div class="input-field inline">
                     <label for="end_date">End date</label>
-                    <input type="text" id="end_date" name="end_date"></input>
+                    <input type="text" size="10" id="end_date" name="end_date"></input>
                     <span class="helper-text">YYYY-MM-DD</span>
                   </div>
                 </div>
