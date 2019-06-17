@@ -42,5 +42,5 @@ Vue.component('transfer-sorter', {
     },
     mounted: function() {
         M.FormSelect.init(this.$el.querySelectorAll('select'));
-    }
+    },
 });

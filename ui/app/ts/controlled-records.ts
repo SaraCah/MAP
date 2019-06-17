@@ -302,7 +302,7 @@ Vue.component('controlled-records', {
             this.setHash();
         },
         reset: function(opts?: any) {
-            opts = opts ? opts : {}
+            opts = opts ? opts : {};
 
             this.queryString = '';
             this.startDate = '';
@@ -402,7 +402,7 @@ Vue.component('controlled-records', {
         }
     },
     watch: {
-        initialised: function (newValue, oldValue) {
+        initialised: function(newValue, oldValue) {
             if (!oldValue && newValue) {
                 this.focusSearchBox();
             }

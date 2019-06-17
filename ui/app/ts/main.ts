@@ -8,16 +8,16 @@ import 'conversation';
 import 'current-location-selector';
 import 'file-issue-form';
 import 'file-issue-notifications';
+import 'file-issue-requests-search';
+import 'file-issues-search';
 import 'file-uploader';
 import 'linker';
+import 'locations-search';
 import 'representation-linker';
 import 'select-with-other-option';
 import 'transfer-proposal-series';
-import 'users-search';
-import 'locations-search';
 import 'transfer-sorter';
-import 'file-issue-requests-search';
-import 'file-issues-search';
+import 'users-search';
 
 declare var M: any; // Materialize on the window context
 

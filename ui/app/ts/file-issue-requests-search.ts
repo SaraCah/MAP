@@ -76,5 +76,5 @@ Vue.component('file-issue-requests-search', {
     },
     mounted: function() {
         M.FormSelect.init(this.$el.querySelectorAll('select'));
-    }
+    },
 });
