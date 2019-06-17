@@ -2,19 +2,25 @@
 
 class Users < BaseStorage
 
-  def self.all(page, page_size)
-    page(page, page_size)
+  def self.all(page, page_size, q = nil, agency_ref = nil, role = nil)
+    if agency_ref
+      (_, aspace_agency_id) = agency_ref.split(':')
+      agency_id = db[:agency].filter(aspace_agency_id: aspace_agency_id.to_i).select(:id)
+      page(page, page_size, agency_id, nil, q, role)
+    else
+      page(page, page_size, nil, nil, q, role)
+    end
   end
 
-  def self.for_agency(page, page_size, agency_id)
-    page(page, page_size, agency_id)
+  def self.for_agency(page, page_size, agency_id, q = nil, role = nil)
+    page(page, page_size, agency_id, nil, q, role)
   end
 
-  def self.for_agency_location(page, page_size, agency_id, agency_location_id)
-    page(page, page_size, agency_id, agency_location_id)
+  def self.for_agency_location(page, page_size, agency_id, agency_location_id, q = nil, role = nil)
+    page(page, page_size, agency_id, agency_location_id, q, role)
   end
 
-  def self.page(page, page_size, agency_id = nil, agency_location_id = nil)
+  def self.page(page, page_size, agency_id = nil, agency_location_id = nil, q = nil, role = nil)
     permission_dataset = db[:user]
                            .left_join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
 
@@ -26,13 +32,24 @@ class Users < BaseStorage
       permission_dataset = permission_dataset.filter(Sequel[:agency_user][:agency_location_id] => agency_location_id)
     end
 
-    users_visible_to_current_user = db[:user].filter(:id => permission_dataset.select(Sequel[:user][:id]))
+    users_visible_to_current_user = db[:user]
+                                      .left_join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
+                                      .filter(Sequel[:user][:id] => permission_dataset.select(Sequel[:user][:id]))
 
     max_page = (users_visible_to_current_user.count / page_size.to_f).ceil
 
     users_visible_to_current_user = users_visible_to_current_user.limit(page_size, page * page_size)
 
     users_visible_to_current_user = users_visible_to_current_user.order(Sequel.asc(Sequel[:user][:username]))
+
+    if q
+      users_visible_to_current_user = users_visible_to_current_user.filter(Sequel.|(Sequel.ilike(Sequel[:user][:username], "%#{q}%"), Sequel.ilike(Sequel[:user][:name], "%#{q}%")))
+    end
+
+
+    if role
+      users_visible_to_current_user = users_visible_to_current_user.filter(Sequel[:agency_user][:role] => role)
+    end
 
     agency_permissions_by_user_id = {}
     aspace_agency_ids_to_resolve = []
@@ -48,7 +65,6 @@ class Users < BaseStorage
               Sequel.as(Sequel[:agency_location][:name], :agency_location_label),
               Sequel[:agency][:aspace_agency_id])
       .each do |row|
-      # FIXME ref business
       agency_ref = "agent_corporate_entity:#{row[:aspace_agency_id]}"
       agency_permissions_by_user_id[row[:user_id]] ||= []
       agency_permissions_by_user_id[row[:user_id]] << [agency_ref, row[:role], row[:agency_location_id], row[:agency_location_label]]
@@ -64,13 +80,13 @@ class Users < BaseStorage
         .filter(Sequel[:agent_corporate_entity][:id] => aspace_agency_ids_to_resolve)
         .select(Sequel[:agent_corporate_entity][:id],
                 Sequel[:name_corporate_entity][:sort_name]).each do |row|
-        # FIXME ref business
         agencies_by_agency_ref['agent_corporate_entity' + ':' + row[:id].to_s] = Agency.from_row(row)
       end
     end
 
     results = users_visible_to_current_user
                .select_all(:user)
+                .distinct
                .map do |row|
                  permissions = agency_permissions_by_user_id.fetch(row[:id], []).map {|agency_ref, role, location_id, location_label| [ agencies_by_agency_ref.fetch(agency_ref), role, location_label ]}
                  User.from_row(row, permissions)

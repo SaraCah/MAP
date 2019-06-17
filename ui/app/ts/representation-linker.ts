@@ -129,7 +129,7 @@ Vue.component('representation-browse', {
         isAlreadySelected: function(record: Record) {
             return !!Utils.find(this.selected, (representation: RepresentationRequest) => {
                 return representation.id === record.id;
-            })
+            });
         },
         removeSelected: function(record: Record) {
             this.selected.forEach((representation: RepresentationRequest) => {
@@ -143,7 +143,7 @@ Vue.component('representation-browse', {
         },
         isSelectable: function(record: Record) {
             return !!Utils.find(record.types, (type: string) => {
-                return type === 'representation';  
+                return type === 'representation';
             });
         },
     },

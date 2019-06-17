@@ -7,8 +7,8 @@ Vue.use(VueResource);
 
 import Utils from "./utils";
 
-interface Agency {
-    id: number;
+export default interface Agency {
+    id: string;
     label: string;
 }
 
@@ -23,7 +23,7 @@ class AgencyRole {
     public permissions: string[];
     public permissionOptions: string[];
 
-    constructor(public id: number,
+    constructor(public id: string,
                 public label: string,
                 public role: string) {
         this.locationId = undefined;
@@ -60,16 +60,18 @@ Vue.component('agency-typeahead', {
   </ul>
 </div>
 `,
-    data: function(): {matches: Agency[], text: string} {
+    data: function(): {matches: Agency[], text: string, minQueryLength: number} {
         return {
             matches: [],
             text: '',
+            minQueryLength: this.min_query_length || 4,
         };
     },
+    props: ['min_query_length'],
     methods: {
         handleInput() {
             const q = this.text;
-            if (q.length > 3) {
+            if (q.length >= this.minQueryLength) {
                 this.$http.get('/search/agencies', {
                     method: 'GET',
                     params: {
@@ -89,6 +91,9 @@ Vue.component('agency-typeahead', {
             this.matches = [];
             this.text = '';
             (this.$refs.text as HTMLElement).focus();
+        },
+        setText(value: string) {
+            this.text = value;
         },
     },
 });

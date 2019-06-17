@@ -3,6 +3,16 @@
         <a class="btn waves-effect" href="/users/new">Add User</a>
     </div>
 </div>
+
+<div class="vue-enabled">
+    <users-search q="<%= q %>"
+                  agency_ref="<%= agency_ref %>"
+                  agency_label="<%= agency_label %>"
+                  role="<%= role %>"
+                  :show_agency_filter="<%= Ctx.permissions.is_admin %>">
+    </users-search>
+</div>
+
 <div class="row">
     <div class="col s12">
         <table class="highlight responsive-table">

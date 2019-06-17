@@ -168,8 +168,16 @@ class MAPAPIClient
   end
 
 
-  def users(page = 0)
-    PagedResults.from_json(get('/users', page: page), User)
+  def users(page = 0, q = nil, agency_ref = nil, role = nil)
+    data = {
+      page: page
+    }
+
+    data[:q] = q unless q.nil? || q == ''
+    data[:agency_ref] = agency_ref unless agency_ref.nil? || agency_ref == ''
+    data[:role] = role unless role.nil? || role == ''
+    
+    PagedResults.from_json(get('/users', data), User)
   end
 
   def groups
@@ -228,6 +236,11 @@ class MAPAPIClient
   def get_current_agency
     return nil if Ctx.get.permissions.is_admin?
     Agency.from_json(get('/my-agency', {}))
+  end
+
+  def agency(agency_ref)
+    return nil unless Ctx.get.permissions.is_admin?
+    Agency.from_json(get('/agency', agency_ref: agency_ref))
   end
 
   def get_controlled_records(q, filters, sort, start_date, end_date, page, page_size)

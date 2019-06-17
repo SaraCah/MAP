@@ -13,6 +13,7 @@ import 'linker';
 import 'representation-linker';
 import 'select-with-other-option';
 import 'transfer-proposal-series';
+import 'users-search';
 
 declare var M: any; // Materialize on the window context
 
