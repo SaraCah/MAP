@@ -1,6 +1,29 @@
 class Transfers < BaseStorage
 
-  def self.proposals(page, page_size)
+  PROPOSAL_SORT_OPTIONS = {
+    'id_asc' => Sequel.asc(Sequel[:transfer_proposal][:id]),
+    'id_desc' => Sequel.desc(Sequel[:transfer_proposal][:id]),
+    'title_asc' => Sequel.asc(Sequel.function(:lower, Sequel[:transfer_proposal][:title])),
+    'title_desc' => Sequel.desc(Sequel.function(:lower, Sequel[:transfer_proposal][:title])),
+    'status_asc' => Sequel.asc(Sequel[:transfer_proposal][:status]),
+    'status_desc' => Sequel.desc(Sequel[:transfer_proposal][:status]),
+    'created_asc' => Sequel.asc(Sequel[:transfer_proposal][:create_time]),
+    'created_desc' => Sequel.desc(Sequel[:transfer_proposal][:create_time]),
+  }
+
+  TRANSFER_SORT_OPTIONS = {
+    'id_asc' => Sequel.asc(Sequel[:transfer][:id]),
+    'id_desc' => Sequel.desc(Sequel[:transfer][:id]),
+    'title_asc' => Sequel.asc(Sequel.function(:lower, Sequel[:transfer][:title])),
+    'title_desc' => Sequel.desc(Sequel.function(:lower, Sequel[:transfer][:title])),
+    'status_asc' => Sequel.asc(Sequel[:transfer][:status]),
+    'status_desc' => Sequel.desc(Sequel[:transfer][:status]),
+    'created_asc' => Sequel.asc(Sequel[:transfer][:create_time]),
+    'created_desc' => Sequel.desc(Sequel[:transfer][:create_time]),
+  }
+
+
+  def self.proposals(page, page_size, sort = nil)
     dataset = db[:transfer_proposal]
 
     unless Ctx.get.permissions.is_admin?
@@ -14,7 +37,9 @@ class Transfers < BaseStorage
 
     dataset = dataset.limit(page_size, page * page_size)
 
-    dataset = dataset.order(Sequel.desc(Sequel[:transfer_proposal][:create_time]))
+    sort_by = PROPOSAL_SORT_OPTIONS.fetch(sort, PROPOSAL_SORT_OPTIONS.fetch('id_asc'))
+
+    dataset = dataset.order(sort_by)
 
     PagedResults.new(dataset.map{|row| TransferProposal.from_row(row)},
                      page,
@@ -139,7 +164,7 @@ class Transfers < BaseStorage
   end
 
 
-  def self.transfers(page, page_size)
+  def self.transfers(page, page_size, sort = nil)
     dataset = db[:transfer]
 
     unless Ctx.get.permissions.is_admin?
@@ -153,7 +178,9 @@ class Transfers < BaseStorage
 
     dataset = dataset.limit(page_size, page * page_size)
 
-    dataset = dataset.order(Sequel.desc(Sequel[:transfer][:create_time]))
+    sort_by = TRANSFER_SORT_OPTIONS.fetch(sort, TRANSFER_SORT_OPTIONS.fetch('id_asc'))
+
+    dataset = dataset.order(sort_by)
 
     PagedResults.new(dataset.map{|row| Transfer.from_row(row)},
                      page,

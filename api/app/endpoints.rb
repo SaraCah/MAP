@@ -292,18 +292,20 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.get('/transfer-proposals')
+    .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(Transfers.proposals(params[:page], AppConfig[:page_size]))
+      json_response(Transfers.proposals(params[:page], AppConfig[:page_size], params[:sort]))
     else
       [404]
     end
   end
 
   Endpoint.get('/transfers')
+    .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(Transfers.transfers(params[:page], AppConfig[:page_size]))
+      json_response(Transfers.transfers(params[:page], AppConfig[:page_size], params[:sort]))
     else
       json_response([])
     end
@@ -494,9 +496,10 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.get('/file-issue-requests')
+    .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(FileIssues.requests(params[:page], AppConfig[:page_size]))
+      json_response(FileIssues.requests(params[:page], AppConfig[:page_size], params[:sort]))
     else
       [404]
     end
@@ -604,9 +607,10 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.get('/file-issues')
+    .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(FileIssues.file_issues(params[:page], AppConfig[:page_size]))
+      json_response(FileIssues.file_issues(params[:page], AppConfig[:page_size], params[:sort]))
     else
       [404]
     end

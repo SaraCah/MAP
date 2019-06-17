@@ -323,13 +323,25 @@ class MAPAPIClient
     })
   end
 
-  def transfer_proposals(page = 0)
-    PagedResults.from_json(get('/transfer-proposals', page: page), TransferProposal)
+  def transfer_proposals(page = 0, sort = nil)
+    data = {
+      page: page
+    }
+
+    data[:sort] = sort unless sort.nil? || sort == ''
+
+    PagedResults.from_json(get('/transfer-proposals', data), TransferProposal)
   end
 
 
-  def transfers(page = 0)
-    PagedResults.from_json(get('/transfers', page: page), Transfer)
+  def transfers(page = 0, sort = nil)
+    data = {
+      page: page
+    }
+
+    data[:sort] = sort unless sort.nil? || sort == ''
+
+    PagedResults.from_json(get('/transfers', data), Transfer)
   end
 
   def create_transfer_proposal(transfer)
@@ -407,8 +419,14 @@ class MAPAPIClient
   end
 
 
-  def file_issue_requests(page = 0)
-    PagedResults.from_json(get('/file-issue-requests', page: page), FileIssueRequest)
+  def file_issue_requests(page = 0, sort = nil)
+    data = {
+      page: page
+    }
+
+    data[:sort] = sort unless sort.nil? || sort == ''
+
+    PagedResults.from_json(get('/file-issue-requests', data), FileIssueRequest)
   end
 
   def create_file_issue_request(file_issue_request)
@@ -452,8 +470,14 @@ class MAPAPIClient
     post('/file-issue-requests/cancel', data)
   end
 
-  def file_issues(page = 0)
-    PagedResults.from_json(get('/file-issues', page: page), FileIssue)
+  def file_issues(page = 0, sort = nil)
+    data = {
+      page: page
+    }
+
+    data[:sort] = sort unless sort.nil? || sort == ''
+
+    PagedResults.from_json(get('/file-issues', data), FileIssue)
   end
 
   def get_file_issue(file_issue_id)

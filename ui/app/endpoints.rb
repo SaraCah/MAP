@@ -336,9 +336,13 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/transfer-proposals')
+    .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return", optional: true) do
 
-    Templates.emit_with_layout(:transfer_proposals, {paged_results: Ctx.client.transfer_proposals(params[:page] || 0)},
+    Templates.emit_with_layout(:transfer_proposals, {
+                                 paged_results: Ctx.client.transfer_proposals(params[:page] || 0, params[:sort]),
+                                 sort: params[:sort],
+                               },
                                :layout, title: "Transfer Proposals", context: ['transfers', 'transfer_proposals'])
   end
 
@@ -435,9 +439,13 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/transfers')
+    .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return", optional: true) do
 
-    Templates.emit_with_layout(:transfers, {paged_results: Ctx.client.transfers(params[:page] || 0)},
+    Templates.emit_with_layout(:transfers, {
+                                 paged_results: Ctx.client.transfers(params[:page] || 0, params[:sort]),
+                                 sort: params[:sort],
+                               },
                                :layout, title: "Transfers", context: ['transfers', 'initiated_transfers'])
   end
 
@@ -513,9 +521,13 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/file-issue-requests')
+    .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return", optional: true) do
 
-    Templates.emit_with_layout(:file_issue_requests, {paged_results: Ctx.client.file_issue_requests(params[:page] || 0)},
+    Templates.emit_with_layout(:file_issue_requests, {
+                                 paged_results: Ctx.client.file_issue_requests(params[:page] || 0, params[:sort]),
+                                 sort: params[:sort],
+                               },
                                :layout, title: "File Issue Requests", context: ['file_issues', 'file_issue_requests'])
   end
 
@@ -652,9 +664,13 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/file-issues')
+    .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return", optional: true) do
 
-    Templates.emit_with_layout(:file_issues, {paged_results: Ctx.client.file_issues(params[:page] || 0)},
+    Templates.emit_with_layout(:file_issues, {
+                                 paged_results: Ctx.client.file_issues(params[:page] || 0, params[:sort]),
+                                 sort: params[:sort],
+                               },
                                :layout, title: "File Issues", context: ['file_issues', 'initiated_file_issues'])
   end
 

@@ -1,6 +1,32 @@
 class FileIssues < BaseStorage
 
-  def self.requests(page, page_size)
+  REQUEST_SORT_OPTIONS = {
+    'id_asc' => Sequel.asc(Sequel[:file_issue_request][:id]),
+    'id_desc' => Sequel.desc(Sequel[:file_issue_request][:id]),
+    'request_type_asc' => Sequel.asc(Sequel.function(:lower, Sequel[:file_issue_request][:request_type])),
+    'request_type_desc' => Sequel.desc(Sequel.function(:lower, Sequel[:file_issue_request][:request_type])),
+    'digital_request_status_asc' => Sequel.asc(Sequel[:file_issue_request][:digital_request_status]),
+    'digital_request_status_desc' => Sequel.desc(Sequel[:file_issue_request][:digital_request_status]),
+    'physical_request_status_asc' => Sequel.asc(Sequel[:file_issue_request][:physical_request_status]),
+    'physical_request_status_desc' => Sequel.desc(Sequel[:file_issue_request][:physical_request_status]),
+    'created_asc' => Sequel.asc(Sequel[:file_issue_request][:create_time]),
+    'created_desc' => Sequel.desc(Sequel[:file_issue_request][:create_time]),
+  }
+
+  FILE_ISSUE_SORT_OPTIONS = {
+    'id_asc' => Sequel.asc(Sequel[:file_issue][:id]),
+    'id_desc' => Sequel.desc(Sequel[:file_issue][:id]),
+    'request_type_asc' => Sequel.asc(Sequel.function(:lower, Sequel[:file_issue][:request_type])),
+    'request_type_desc' => Sequel.desc(Sequel.function(:lower, Sequel[:file_issue][:request_type])),
+    'issue_type_asc' => Sequel.asc(Sequel.function(:lower, Sequel[:file_issue][:issue_type])),
+    'issue_type_desc' => Sequel.desc(Sequel.function(:lower, Sequel[:file_issue][:issue_type])),
+    'status_asc' => Sequel.asc(Sequel[:file_issue][:status]),
+    'status_desc' => Sequel.desc(Sequel[:file_issue][:status]),
+    'created_asc' => Sequel.asc(Sequel[:file_issue][:create_time]),
+    'created_desc' => Sequel.desc(Sequel[:file_issue][:create_time]),
+  }
+
+  def self.requests(page, page_size, sort = nil)
     dataset = db[:file_issue_request]
 
     unless Ctx.get.permissions.is_admin?
@@ -14,7 +40,9 @@ class FileIssues < BaseStorage
 
     dataset = dataset.limit(page_size, page * page_size)
 
-    dataset = dataset.order(Sequel.desc(Sequel[:file_issue_request][:create_time]))
+    sort_by = REQUEST_SORT_OPTIONS.fetch(sort, REQUEST_SORT_OPTIONS.fetch('id_asc'))
+
+    dataset = dataset.order(sort_by)
 
     PagedResults.new(dataset.map{|row| FileIssueRequest.from_row(row)},
                      page,
@@ -201,7 +229,7 @@ class FileIssues < BaseStorage
     raise StaleRecordException.new if updated == 0
   end
 
-  def self.file_issues(page, page_size)
+  def self.file_issues(page, page_size, sort = nil)
     dataset = db[:file_issue]
 
     unless Ctx.get.permissions.is_admin?
@@ -215,7 +243,9 @@ class FileIssues < BaseStorage
 
     dataset = dataset.limit(page_size, page * page_size)
 
-    dataset = dataset.order(Sequel.desc(Sequel[:file_issue][:create_time]))
+    sort_by = FILE_ISSUE_SORT_OPTIONS.fetch(sort, FILE_ISSUE_SORT_OPTIONS.fetch('id_asc'))
+
+    dataset = dataset.order(sort_by)
 
     PagedResults.new(dataset.map{|row| FileIssue.from_row(row)},
                      page,
