@@ -371,6 +371,11 @@ Vue.component('controlled-records', {
         },
         prevPage: function() {
             this.currentPage -= 1;
+
+            if (this.currentPage < 0) {
+                this.currentPage = 0;
+            }
+
             this.setHash();
         },
         loadFilters: function(s: string) {
