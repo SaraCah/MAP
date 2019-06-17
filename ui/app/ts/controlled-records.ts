@@ -71,7 +71,7 @@ Vue.component('controlled-records', {
           <form v-on:submit.stop.prevent="search()">
             <section class="row" v-if="this.selectedSeriesId && this.selectedSeriesLabel">
                 <div class="col s12">
-                    <blockquote>Searching within series: {{selectedSeriesLabel}} [<a href="javascript:void(0);" @click="reset()">reset</a>]</blockquote>
+                    <blockquote>Searching within series: {{selectedSeriesLabel}} [<a href="javascript:void(0);" @click="reset({clearSeries: true})">reset</a>]</blockquote>
                 </div>
             </section>
 
@@ -306,7 +306,10 @@ Vue.component('controlled-records', {
             this.currentPage = 0;
             this.appliedFilters = [];
             this.selectedSort = 'relevance';
-            this.selectedSeriesId = undefined;
+
+            if (opts.clearSeries) {
+                this.selectedSeriesId = undefined;
+            }
 
             if (opts.setHash !== false) {
                 this.setHash();
