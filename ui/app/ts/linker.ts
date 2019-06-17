@@ -51,7 +51,7 @@ interface Location {
 Vue.component('agency-typeahead', {
     template: `
 <div class="input-field">
-  <label for="agency-typeahead">Agency</label>
+  <label for="agency-typeahead" ref="label">Agency</label>
   <input id="agency-typeahead" v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
   <ul>
     <li v-for="agency in matches">
@@ -94,6 +94,7 @@ Vue.component('agency-typeahead', {
         },
         setText(value: string) {
             this.text = value;
+            (this.$refs.label as Element).classList.add('active');
         },
     },
 });
