@@ -23,10 +23,8 @@ Vue.component('users-search', {
                         </div>
                     </div>
                     <div v-if="show_agency_filter" class="col s12 m3">
-                        <div class="input-field">
-                            <agency-typeahead ref="agencyTypeahead" v-on:selected="handleAgencySelected"></agency-typeahead>
-                            <input name="agency_ref" type="hidden" v-model="selectedAgencyRef"/>
-                        </div>
+                        <agency-typeahead ref="agencyTypeahead" v-on:selected="handleAgencySelected"></agency-typeahead>
+                        <input name="agency_ref" type="hidden" v-model="selectedAgencyRef"/>
                     </div>
                     <div class="col s12 m3">
                         <div class="input-field">

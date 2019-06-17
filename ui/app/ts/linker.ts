@@ -50,9 +50,9 @@ interface Location {
 
 Vue.component('agency-typeahead', {
     template: `
-<div>
-  <input id="agency-typeahead" v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
+<div class="input-field">
   <label for="agency-typeahead">Agency</label>
+  <input id="agency-typeahead" v-on:keyup="handleInput" type="text" v-model="text" ref="text"></input>
   <ul>
     <li v-for="agency in matches">
       <a href="javascript:void(0);" v-on:click="select(agency)">{{ agency.label }}</a>
