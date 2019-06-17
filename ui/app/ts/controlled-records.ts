@@ -269,11 +269,13 @@ Vue.component('controlled-records', {
         },
         addFilter: function(facet: Facet) {
             this.appliedFilters.push(facet);
+            this.currentPage = 0;
             this.setHash();
         },
         removeFilter: function(facet: Facet) {
             this.appliedFilters = Utils.filter(this.appliedFilters,
                                                (elt: Filter) => !((elt.field === facet.field) && (elt.value === facet.value)));
+            this.currentPage = 0;
             this.setHash();
         },
         isFilterApplied: function(facet: Facet): boolean {
