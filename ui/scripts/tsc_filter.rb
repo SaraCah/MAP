@@ -4,7 +4,7 @@ File.open(File.join(File.dirname($0), '..', '.typescript_last_output.txt'), 'w')
   loop do
     line = $stdin.gets
 
-    if line.start_with?("\x1bc")
+    if line && line.start_with?("\x1bc")
       # Clear screen.  New build
       line = line[2..-1]
       fh.rewind
