@@ -329,7 +329,7 @@ a#userMenuTrigger:after {
     border-left: 2px solid #efefef;
 }
 
-.search-tools section {
+.search-tools section, .search-tools .facet-section {
     margin-bottom: 1em;
 }
 

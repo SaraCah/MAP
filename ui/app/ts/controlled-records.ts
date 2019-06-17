@@ -129,23 +129,25 @@ Vue.component('controlled-records', {
                 </select>
               </section>
 
-              <template v-for="filter in this.availableFilters">
-                <section v-if="facets[filter.field] && facets[filter.field].length > 0">
-                  <p class="facet-title">{{filter.title}}</p>
-                  <table class="facets-table">
-                    <tr v-for="(facet, idx) in facets[filter.field]">
-                      <td v-if="isFilterApplied(facet) || facets[filter.field].length === 1" class="facet-value">
-                        {{facet.label}}
-                      </td>
-                      <td v-else class="facet-value">
-                        <a href="javascript:void(0);" @click.prevent.default="addFilter(facet)">{{facet.label}}</a>
-                      </td>
-                      <td class="facet-count" v-if="isFilterApplied(facet)"><a href="javascript:void(0)" @click.prevent.default="removeFilter(facet)"><i class="fa fa-times"></i></a></td>
-                      <td v-else class="facet-count">{{facet.count}}</td>
-                    </tr>
-                  </table>
-                </section>
-              </template>
+              <div class="row">
+                <template v-for="filter in this.availableFilters">
+                  <div class="col s4 m4 l12 facet-section" v-if="facets[filter.field] && facets[filter.field].length > 0">
+                    <span class="facet-title">{{filter.title}}</span>
+                    <table class="facets-table">
+                      <tr v-for="(facet, idx) in facets[filter.field]">
+                        <td v-if="isFilterApplied(facet) || facets[filter.field].length === 1" class="facet-value">
+                          {{facet.label}}
+                        </td>
+                        <td v-else class="facet-value">
+                          <a href="javascript:void(0);" @click.prevent.default="addFilter(facet)">{{facet.label}}</a>
+                        </td>
+                        <td class="facet-count" v-if="isFilterApplied(facet)"><a href="javascript:void(0)" @click.prevent.default="removeFilter(facet)"><i class="fa fa-times"></i></a></td>
+                        <td v-else class="facet-count">{{facet.count}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </template>
+              </div>
 
             </div>
             <div class="col s12 m12 l9 search-results">
