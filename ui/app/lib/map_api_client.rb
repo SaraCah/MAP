@@ -245,7 +245,7 @@ class MAPAPIClient
   end
 
   def get_controlled_records(q, filters, sort, start_date, end_date, page, page_size)
-    return [] if Ctx.get.permissions.is_admin?
+    return { results: [], facets: {}} if Ctx.get.permissions.is_admin?
 
     params = {page: page, page_size: page_size}
 
