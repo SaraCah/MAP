@@ -317,6 +317,14 @@ Vue.component('controlled-records', {
                 this.setHash();
             }
         },
+        focusSearchBox: function() {
+            this.$nextTick(() => {
+                const inputElt = this.$el.querySelector('input[name="q"]');
+                if (inputElt) {
+                    (inputElt as HTMLInputElement).focus();
+                }
+            });
+        },
         getRecords: function() {
             let mergedFilters = JSON.parse(this.serializedFilters);
             if (this.selectedSeriesId) {
@@ -387,6 +395,11 @@ Vue.component('controlled-records', {
         }
     },
     watch: {
+        initialised: function (newValue, oldValue) {
+            if (!oldValue && newValue) {
+                this.focusSearchBox();
+            }
+        },
         selectedSort: {
             handler() {
                 this.setHash();
