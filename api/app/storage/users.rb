@@ -30,48 +30,44 @@ class Users < BaseStorage
   end
 
   def self.page(page, page_size, agency_id = nil, agency_location_id = nil, q = nil, role = nil, sort = nil)
-    permission_dataset = db[:user]
-                           .left_join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
+    dataset = db[:user]
+                .left_join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
 
     if agency_id
-      permission_dataset = permission_dataset.filter(Sequel[:agency_user][:agency_id] => agency_id)
+      dataset = dataset.filter(Sequel[:agency_user][:agency_id] => agency_id)
     end
 
     if agency_location_id
-      permission_dataset = permission_dataset.filter(Sequel[:agency_user][:agency_location_id] => agency_location_id)
+      dataset = dataset.filter(Sequel[:agency_user][:agency_location_id] => agency_location_id)
     end
-
-    users_visible_to_current_user = db[:user]
-                                      .left_join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
-                                      .filter(Sequel[:user][:id] => permission_dataset.select(Sequel[:user][:id]))
-
-    max_page = (users_visible_to_current_user.count / page_size.to_f).ceil
-
-    users_visible_to_current_user = users_visible_to_current_user.limit(page_size, page * page_size)
-
-    users_visible_to_current_user = users_visible_to_current_user.order(Sequel.asc(Sequel[:user][:username]))
 
     if q
       sanitised = q.downcase.gsub(/[^a-z0-9_\-\. ]/, '_')
-      users_visible_to_current_user = users_visible_to_current_user.filter(Sequel.|(Sequel.like(Sequel.function(:lower, Sequel[:user][:username]), "%#{sanitised}%"), Sequel.like(Sequel.function(:lower, Sequel[:user][:name]), "%#{sanitised}%")))
+      dataset = dataset.filter(Sequel.|(Sequel.like(Sequel.function(:lower, Sequel[:user][:username]), "%#{sanitised}%"), Sequel.like(Sequel.function(:lower, Sequel[:user][:name]), "%#{sanitised}%")))
     end
 
-
+    # FIXME check for real roles
     if role
-      users_visible_to_current_user = users_visible_to_current_user.filter(Sequel[:agency_user][:role] => role)
+      dataset = dataset.filter(Sequel[:agency_user][:role] => role)
     end
+
+    dataset = dataset.select_all(:user).distinct(Sequel[:user][:id])
+
+    max_page = (dataset.count / page_size.to_f).ceil
+
+    dataset = dataset.limit(page_size, page * page_size)
 
     sort_by = SORT_OPTIONS.fetch(sort, SORT_OPTIONS.fetch('username_asc'));
-    users_visible_to_current_user = users_visible_to_current_user.order(sort_by)
+    dataset = dataset.order(sort_by)
 
     agency_permissions_by_user_id = {}
     aspace_agency_ids_to_resolve = []
 
-    permission_dataset = permission_dataset
-                           .join(:agency, Sequel[:agency][:id] => Sequel[:agency_user][:agency_id])
-                           .join(:agency_location, Sequel[:agency_location][:id] => Sequel[:agency_user][:agency_location_id])
-
-    permission_dataset
+    db[:user]
+      .left_join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
+      .join(:agency, Sequel[:agency][:id] => Sequel[:agency_user][:agency_id])
+      .join(:agency_location, Sequel[:agency_location][:id] => Sequel[:agency_user][:agency_location_id])
+      .filter(Sequel[:user][:id] => dataset.select(Sequel[:user][:id]))
       .select(Sequel[:agency_user][:user_id],
               Sequel.as(Sequel[:agency_user][:role], :role),
               Sequel.as(Sequel[:agency_user][:agency_location_id], :agency_location_id),
@@ -97,9 +93,8 @@ class Users < BaseStorage
       end
     end
 
-    results = users_visible_to_current_user
+    results = dataset
                .select_all(:user)
-                .distinct
                .map do |row|
                  permissions = agency_permissions_by_user_id.fetch(row[:id], []).map {|agency_ref, role, location_id, location_label| [ agencies_by_agency_ref.fetch(agency_ref), role, location_label ]}
                  User.from_row(row, permissions)

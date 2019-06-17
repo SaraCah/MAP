@@ -118,6 +118,7 @@ class MAPTheApp < Sinatra::Base
                                    agency_label: agency_label,
                                    role: params[:role],
                                    sort: params[:sort],
+                                   params: params,
                                  },
                                  :layout, title: "Users", context: ['users'])
   end
@@ -237,6 +238,7 @@ class MAPTheApp < Sinatra::Base
                                    agency_ref: params[:agency_ref],
                                    agency_label: agency_label,
                                    sort: params[:sort],
+                                   params: params,
                                  },
                                  :layout, title: "Locations", context: ['locations'])
     else
@@ -344,6 +346,7 @@ class MAPTheApp < Sinatra::Base
                                  paged_results: Ctx.client.transfer_proposals(params[:page] || 0, params[:status], params[:sort]),
                                  status: params[:status],
                                  sort: params[:sort],
+                                 params: params,
                                },
                                :layout, title: "Transfer Proposals", context: ['transfers', 'transfer_proposals'])
   end
@@ -449,6 +452,7 @@ class MAPTheApp < Sinatra::Base
                                  paged_results: Ctx.client.transfers(params[:page] || 0, params[:status], params[:sort]),
                                  status: params[:status],
                                  sort: params[:sort],
+                                 params: params,
                                },
                                :layout, title: "Transfers", context: ['transfers', 'initiated_transfers'])
   end
@@ -542,6 +546,7 @@ class MAPTheApp < Sinatra::Base
                                  digital_request_status: params[:digital_request_status],
                                  physical_request_status: params[:physical_request_status],
                                  sort: params[:sort],
+                                 params: params,
                                },
                                :layout, title: "File Issue Requests", context: ['file_issues', 'file_issue_requests'])
   end
@@ -689,6 +694,7 @@ class MAPTheApp < Sinatra::Base
                                  issue_type: params[:issue_type],
                                  status: params[:status],
                                  sort: params[:sort],
+                                 params: params,
                                },
                                :layout, title: "File Issues", context: ['file_issues', 'initiated_file_issues'])
   end

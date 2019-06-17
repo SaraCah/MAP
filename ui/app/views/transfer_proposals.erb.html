@@ -59,7 +59,7 @@
 </div>
 <div class="row">
     <div class="col s12 center-align">
-        <% if paged_results.current_page > 0 %><a href="?page=<%= paged_results.current_page - 1 %>"><i class="fa fa-chevron-left"></i> Previous</a><% end %>
-        <% if paged_results.current_page < paged_results.max_page - 1 %><a href="?page=<%= paged_results.current_page + 1 %>">Next <i class="fa fa-chevron-right"></i></a><% end %>
+        <% if paged_results.current_page > 0 %><a href="?<%= URLHelper.merge_params(params, {'page' => paged_results.current_page - 1}) %>"><i class="fa fa-chevron-left"></i> Previous</a><% end %>
+        <% if paged_results.current_page < paged_results.max_page - 1 %><a href="?<%= URLHelper.merge_params(params, {'page' => paged_results.current_page + 1}) %>">Next <i class="fa fa-chevron-right"></i></a><% end %>
     </div>
 </div>

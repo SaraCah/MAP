@@ -20,4 +20,8 @@ class URLHelper
     "/js/#{file}" + cache_buster
   end
 
+  def self.merge_params(existing_params, new_params)
+    URI.encode_www_form(existing_params.merge(new_params))
+  end
+
 end
