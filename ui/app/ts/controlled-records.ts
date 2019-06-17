@@ -404,6 +404,7 @@ Vue.component('controlled-records', {
         },
         selectedSort: {
             handler() {
+                this.currentPage = 0;
                 this.setHash();
             },
         },
