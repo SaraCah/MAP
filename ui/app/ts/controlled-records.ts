@@ -366,17 +366,21 @@ Vue.component('controlled-records', {
             });
         },
         nextPage: function() {
-            this.currentPage += 1;
-            this.setHash();
+            if (!this.searchActive) {
+                this.currentPage += 1;
+                this.setHash();
+            }
         },
         prevPage: function() {
-            this.currentPage -= 1;
+            if (!this.searchActive) {
+                this.currentPage -= 1;
 
-            if (this.currentPage < 0) {
-                this.currentPage = 0;
+                if (this.currentPage < 0) {
+                    this.currentPage = 0;
+                }
+
+                this.setHash();
             }
-
-            this.setHash();
         },
         loadFilters: function(s: string) {
             try {
