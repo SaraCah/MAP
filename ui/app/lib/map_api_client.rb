@@ -419,11 +419,13 @@ class MAPAPIClient
   end
 
 
-  def file_issue_requests(page = 0, sort = nil)
+  def file_issue_requests(page = 0, digital_request_status = nil, physical_request_status = nil, sort = nil)
     data = {
       page: page
     }
 
+    data[:digital_request_status] = digital_request_status unless digital_request_status.nil? || digital_request_status == ''
+    data[:physical_request_status] = physical_request_status unless physical_request_status.nil? || physical_request_status == ''
     data[:sort] = sort unless sort.nil? || sort == ''
 
     PagedResults.from_json(get('/file-issue-requests', data), FileIssueRequest)
@@ -470,11 +472,13 @@ class MAPAPIClient
     post('/file-issue-requests/cancel', data)
   end
 
-  def file_issues(page = 0, sort = nil)
+  def file_issues(page = 0, issue_type = nil, status = nil, sort = nil)
     data = {
       page: page
     }
 
+    data[:issue_type] = issue_type unless issue_type.nil? || issue_type == ''
+    data[:status] = status unless status.nil? || status == ''
     data[:sort] = sort unless sort.nil? || sort == ''
 
     PagedResults.from_json(get('/file-issues', data), FileIssue)

@@ -9,6 +9,11 @@ class FileIssueRequest
   CANCELLED_BY_QSA = 'CANCELLED_BY_QSA'
   CANCELLED_BY_AGENCY = 'CANCELLED_BY_AGENCY'
 
+  STATUS_OPTIONS = [
+    NONE_REQUESTED, QUOTE_REQUESTED, QUOTE_PROVIDED, QUOTE_ACCEPTED,
+    FILE_ISSUE_CREATED, CANCELLED_BY_QSA, CANCELLED_BY_AGENCY,
+  ]
+
   define_field(:id, Integer, required: false)
   define_field(:request_type, String, validator: proc {|s| s.nil? || s.empty? ? "Request Type can't be blank" : nil })
   define_field(:request_notes, String)

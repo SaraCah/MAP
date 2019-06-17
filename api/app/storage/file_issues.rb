@@ -26,7 +26,7 @@ class FileIssues < BaseStorage
     'created_desc' => Sequel.desc(Sequel[:file_issue][:create_time]),
   }
 
-  def self.requests(page, page_size, sort = nil)
+  def self.requests(page, page_size, digital_request_status = nil, physical_request_status = nil, sort = nil)
     dataset = db[:file_issue_request]
 
     unless Ctx.get.permissions.is_admin?
@@ -34,6 +34,14 @@ class FileIssues < BaseStorage
       dataset = dataset
                   .filter(Sequel[:file_issue_request][:agency_id] => current_location.agency_id)
                   .filter(Sequel[:file_issue_request][:agency_location_id] => current_location.id)
+    end
+
+    if digital_request_status && FileIssueRequest::STATUS_OPTIONS.include?(digital_request_status)
+      dataset = dataset.filter(Sequel[:file_issue_request][:digital_request_status] => digital_request_status)
+    end
+
+    if physical_request_status && FileIssueRequest::STATUS_OPTIONS.include?(physical_request_status)
+      dataset = dataset.filter(Sequel[:file_issue_request][:physical_request_status] => physical_request_status)
     end
 
     max_page = (dataset.count / page_size.to_f).ceil
@@ -229,7 +237,7 @@ class FileIssues < BaseStorage
     raise StaleRecordException.new if updated == 0
   end
 
-  def self.file_issues(page, page_size, sort = nil)
+  def self.file_issues(page, page_size, issue_type = nil, status = nil, sort = nil)
     dataset = db[:file_issue]
 
     unless Ctx.get.permissions.is_admin?
@@ -238,6 +246,15 @@ class FileIssues < BaseStorage
                   .filter(Sequel[:file_issue][:agency_id] => current_location.agency_id)
                   .filter(Sequel[:file_issue][:agency_location_id] => current_location.id)
     end
+
+    if issue_type && FileIssue::ISSUE_TYPE_OPTIONS.include?(issue_type)
+      dataset = dataset.filter(Sequel[:file_issue][:issue_type] => issue_type)
+    end
+
+    if status && FileIssue::STATUS_OPTIONS.include?(status)
+      dataset = dataset.filter(Sequel[:file_issue][:status] => status)
+    end
+
 
     max_page = (dataset.count / page_size.to_f).ceil
 

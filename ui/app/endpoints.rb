@@ -529,10 +529,14 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/file-issue-requests')
     .param(:sort, String, "Sort key", :optional => true)
+    .param(:physical_request_status, String, "Physical request status filter", :optional => true)
+    .param(:digital_request_status, String, "Digital request status filter", :optional => true)
     .param(:page, Integer, "Page to return", optional: true) do
 
     Templates.emit_with_layout(:file_issue_requests, {
-                                 paged_results: Ctx.client.file_issue_requests(params[:page] || 0, params[:sort]),
+                                 paged_results: Ctx.client.file_issue_requests(params[:page] || 0, params[:digital_request_status], params[:physical_request_status], params[:sort]),
+                                 digital_request_status: params[:digital_request_status],
+                                 physical_request_status: params[:physical_request_status],
                                  sort: params[:sort],
                                },
                                :layout, title: "File Issue Requests", context: ['file_issues', 'file_issue_requests'])
@@ -672,10 +676,14 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/file-issues')
     .param(:sort, String, "Sort key", :optional => true)
+    .param(:issue_type, String, "Issue type filter", :optional => true)
+    .param(:status, String, "Status filter", :optional => true)
     .param(:page, Integer, "Page to return", optional: true) do
 
     Templates.emit_with_layout(:file_issues, {
-                                 paged_results: Ctx.client.file_issues(params[:page] || 0, params[:sort]),
+                                 paged_results: Ctx.client.file_issues(params[:page] || 0, params[:issue_type], params[:status], params[:sort]),
+                                 issue_type: params[:issue_type],
+                                 status: params[:status],
                                  sort: params[:sort],
                                },
                                :layout, title: "File Issues", context: ['file_issues', 'initiated_file_issues'])

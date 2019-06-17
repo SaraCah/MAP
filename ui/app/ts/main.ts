@@ -16,7 +16,8 @@ import 'transfer-proposal-series';
 import 'users-search';
 import 'locations-search';
 import 'transfer-sorter';
-import 'file-issue-sorter';
+import 'file-issue-requests-search';
+import 'file-issues-search';
 
 declare var M: any; // Materialize on the window context
 

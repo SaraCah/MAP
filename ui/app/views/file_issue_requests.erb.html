@@ -5,9 +5,11 @@
 </div>
 
 <div class="vue-enabled">
-    <file-issue-sorter path="/file-issue-requests"
-                     sort="<%= sort %>">
-    </file-issue-sorter>
+    <file-issue-requests-search digital_request_status="<%= digital_request_status %>"
+                                physical_request_status="<%= physical_request_status %>"
+                                :status_options="<%= FileIssueRequest::STATUS_OPTIONS.to_json %>"
+                                sort="<%= sort %>">
+    </file-issue-requests-search>
 </div>
 
 <div class="row vue-enabled">

@@ -496,10 +496,12 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.get('/file-issue-requests')
+    .param(:physical_request_status, String, "Physical request status filter", :optional => true)
+    .param(:digital_request_status, String, "Digital request status filter", :optional => true)
     .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(FileIssues.requests(params[:page], AppConfig[:page_size], params[:sort]))
+      json_response(FileIssues.requests(params[:page], AppConfig[:page_size], params[:digital_request_status], params[:physical_request_status], params[:sort]))
     else
       [404]
     end
@@ -607,10 +609,12 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.get('/file-issues')
+    .param(:issue_type, String, "Issue type filter", :optional => true)
+    .param(:status, String, "Status filter", :optional => true)
     .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(FileIssues.file_issues(params[:page], AppConfig[:page_size], params[:sort]))
+      json_response(FileIssues.file_issues(params[:page], AppConfig[:page_size], params[:issue_type], params[:status], params[:sort]))
     else
       [404]
     end

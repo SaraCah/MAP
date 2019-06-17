@@ -1,7 +1,10 @@
 <div class="vue-enabled">
-    <file-issue-sorter path="/file-issues"
-                       sort="<%= sort %>">
-    </file-issue-sorter>
+    <file-issues-search issue_type="<%= issue_type %>"
+                        status="<%= status %>"
+                        :status_options="<%= FileIssue::STATUS_OPTIONS.to_json %>"
+                        :issue_type_options="<%= FileIssue::ISSUE_TYPE_OPTIONS.to_json %>"
+                        sort="<%= sort %>">
+    </file-issues-search>
 </div>
 
 

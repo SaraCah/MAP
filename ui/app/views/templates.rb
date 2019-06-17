@@ -31,9 +31,9 @@ Templates.define(:transfers, [:paged_results, :sort?], "views/transfers.erb.html
 Templates.define(:transfer_proposal_view, [:transfer, :errors?, :is_readonly], "views/transfer_proposal_form.erb.html")
 Templates.define(:transfer_view, [:transfer, :errors?, :is_readonly], "views/transfer_form.erb.html")
 
-Templates.define(:file_issue_requests, [:paged_results, :sort?], "views/file_issue_requests.erb.html")
+Templates.define(:file_issue_requests, [:paged_results, :digital_request_status?, :physical_request_status?, :sort?], "views/file_issue_requests.erb.html")
 Templates.define(:file_issue_request_view, [:request, :resolved_representations?, :errors?, :is_readonly?, :digital_request_quote?, :physical_request_quote?], "views/file_issue_request_form.erb.html")
-Templates.define(:file_issues, [:paged_results, :sort?], "views/file_issues.erb.html")
+Templates.define(:file_issues, [:paged_results, :sort?, :issue_type?, :status?], "views/file_issues.erb.html")
 Templates.define(:file_issue_view, [:file_issue, :resolved_representations?, :errors?, :is_readonly?], "views/file_issue_form.erb.html")
 Templates.define(:file_issue_fee_schedule, [:chargeable_services], "views/file_issue_fee_schedule.erb.html")
 
