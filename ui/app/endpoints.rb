@@ -710,9 +710,11 @@ class MAPTheApp < Sinatra::Base
     'digital_representation' => 'Digital Representation',
   }
 
-  def label_for_field_value(field, value)
+  def label_for_field_value(field, value, response)
     if field == 'primary_type'
       TYPE_LABELS.fetch(value)
+    elsif field == 'creating_agency'
+      response['agency_titles_by_ref'].fetch(value, value)
     else
       value
     end
@@ -739,7 +741,7 @@ class MAPTheApp < Sinatra::Base
 
     # Map types to their labels
     controlled_records.fetch('results', []).each do |result|
-      result['type'] = label_for_field_value('primary_type', result.fetch('primary_type'))
+      result['type'] = label_for_field_value('primary_type', result.fetch('primary_type'), controlled_records)
     end
 
     # Turn facets from ['val1', count1, 'val2', count2, ...] into an array of maps
@@ -749,7 +751,7 @@ class MAPTheApp < Sinatra::Base
          {
            field: field,
            value: value,
-           label: label_for_field_value(field, value),
+           label: label_for_field_value(field, value, controlled_records),
            count: count,
          }
        }

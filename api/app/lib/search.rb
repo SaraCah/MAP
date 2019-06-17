@@ -181,6 +181,27 @@ class Search
     VALID_SORTS.fetch(sort_spec)
   end
 
+  def self.resolve_agency_names(facets)
+    agency_uris = facets.fetch('creating_agency', []).each_slice(2).map(&:first)
+    result = {}
+
+    return result if agency_uris.empty?
+
+    # We're assuming that our facet limit is lower than the maximum number of
+    # boolean clauses here, which it should be.  If that changes, we'd need to
+    # fire more than one search.
+    response = solr_handle_search('q' => '*:*',
+                       'fq' => 'uri:(%s)' % agency_uris.map {|uri| solr_escape(uri)}.join(" OR "),
+                       'fl' => 'uri,title',
+                       'rows' => agency_uris.length,)
+
+    response.fetch('response', {}).fetch('docs', []).each do |doc|
+      result[doc.fetch('uri')] = doc.fetch('title')
+    end
+
+    result
+  end
+
   def self.controlled_records(permissions,
                               q,
                               filters,
@@ -198,14 +219,17 @@ class Search
                                  'rows' => page_size + 1,
                                  'start' => (page * page_size),
                                  'facet' => 'true',
-                                 'facet.field' => ['primary_type', 'series'],
+                                 'facet.field' => ['primary_type', 'series', 'creating_agency'],
                                  'facet.mincount' => 1,
                                 )
+    facets = results.fetch('facet_counts', {}).fetch('facet_fields', {})
+
     {
       :results => results.fetch('response').fetch('docs').map {|result|
         record_hash(result)
       }[0...page_size],
-      :facets => results.fetch('facet_counts', {}).fetch('facet_fields', {}),
+      :facets => facets,
+      :agency_titles_by_ref => resolve_agency_names(facets),
       :has_next_page => results.fetch('response').fetch('docs').length > page_size,
     }
   end

@@ -129,19 +129,21 @@ Vue.component('controlled-records', {
               </section>
 
               <section v-for="filter in this.availableFilters">
-                <p class="facet-title">{{filter.title}}</p>
-                <table class="facets-table">
-                  <tr v-for="(facet, idx) in facets[filter.field]">
-                    <td v-if="isFilterApplied(facet) || facets[filter.field].length === 1" class="facet-value">
+                <template v-if="facets[filter.field] && facets[filter.field].length > 0">
+                  <p class="facet-title">{{filter.title}}</p>
+                  <table class="facets-table">
+                    <tr v-for="(facet, idx) in facets[filter.field]">
+                      <td v-if="isFilterApplied(facet) || facets[filter.field].length === 1" class="facet-value">
                         {{facet.label}}
-                    </td>
-                    <td v-else class="facet-value">
-                      <a href="javascript:void(0);" @click.prevent.default="addFilter(facet)">{{facet.label}}</a>
-                    </td>
-                    <td class="facet-count" v-if="isFilterApplied(facet)"><a href="javascript:void(0)" @click.prevent.default="removeFilter(facet)"><i class="fa fa-times"></i></a></td>
-                    <td v-else class="facet-count">{{facet.count}}</td>
-                  </tr>
-                </table>
+                      </td>
+                      <td v-else class="facet-value">
+                        <a href="javascript:void(0);" @click.prevent.default="addFilter(facet)">{{facet.label}}</a>
+                      </td>
+                      <td class="facet-count" v-if="isFilterApplied(facet)"><a href="javascript:void(0)" @click.prevent.default="removeFilter(facet)"><i class="fa fa-times"></i></a></td>
+                      <td v-else class="facet-count">{{facet.count}}</td>
+                    </tr>
+                  </table>
+                </template>
               </section>
 
             </div>
@@ -203,7 +205,8 @@ Vue.component('controlled-records', {
             startDate: '',
             endDate: '',
             availableFilters: [{field: 'primary_type', title: 'Record Types'},
-                               {field: 'series', title: 'Series'}],
+                               {field: 'series', title: 'Series'},
+                               {field: 'creating_agency', title: 'Creating agency'}],
             appliedFilters: [],
             selectedSort: 'relevance',
 
