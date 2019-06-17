@@ -2,25 +2,34 @@
 
 class Users < BaseStorage
 
-  def self.all(page, page_size, q = nil, agency_ref = nil, role = nil)
+  SORT_OPTIONS = {
+    'username_asc' => Sequel.asc(Sequel[:user][:username]),
+    'username_desc' => Sequel.desc(Sequel[:user][:username]),
+    'name_asc' => Sequel.asc(Sequel[:user][:name]),
+    'name_desc' => Sequel.desc(Sequel[:user][:name]),
+    'created_asc' => Sequel.asc(Sequel[:user][:create_time]),
+    'created_desc' => Sequel.desc(Sequel[:user][:create_time]),
+  }
+
+  def self.all(page, page_size, q = nil, agency_ref = nil, role = nil, sort = nil)
     if agency_ref
       (_, aspace_agency_id) = agency_ref.split(':')
       agency_id = db[:agency].filter(aspace_agency_id: aspace_agency_id.to_i).select(:id)
-      page(page, page_size, agency_id, nil, q, role)
+      page(page, page_size, agency_id, nil, q, role, sort)
     else
-      page(page, page_size, nil, nil, q, role)
+      page(page, page_size, nil, nil, q, role, sort)
     end
   end
 
-  def self.for_agency(page, page_size, agency_id, q = nil, role = nil)
-    page(page, page_size, agency_id, nil, q, role)
+  def self.for_agency(page, page_size, agency_id, q = nil, role = nil, sort = nil)
+    page(page, page_size, agency_id, nil, q, role, sort)
   end
 
-  def self.for_agency_location(page, page_size, agency_id, agency_location_id, q = nil, role = nil)
-    page(page, page_size, agency_id, agency_location_id, q, role)
+  def self.for_agency_location(page, page_size, agency_id, agency_location_id, q = nil, role = nil, sort = nil)
+    page(page, page_size, agency_id, agency_location_id, q, role,sort)
   end
 
-  def self.page(page, page_size, agency_id = nil, agency_location_id = nil, q = nil, role = nil)
+  def self.page(page, page_size, agency_id = nil, agency_location_id = nil, q = nil, role = nil, sort = nil)
     permission_dataset = db[:user]
                            .left_join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
 
@@ -50,6 +59,9 @@ class Users < BaseStorage
     if role
       users_visible_to_current_user = users_visible_to_current_user.filter(Sequel[:agency_user][:role] => role)
     end
+
+    sort_by = SORT_OPTIONS.fetch(sort, SORT_OPTIONS.fetch('username_asc'));
+    users_visible_to_current_user = users_visible_to_current_user.order(sort_by)
 
     agency_permissions_by_user_id = {}
     aspace_agency_ids_to_resolve = []

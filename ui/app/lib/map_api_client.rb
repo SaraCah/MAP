@@ -168,7 +168,7 @@ class MAPAPIClient
   end
 
 
-  def users(page = 0, q = nil, agency_ref = nil, role = nil)
+  def users(page = 0, q = nil, agency_ref = nil, role = nil, sort = nil)
     data = {
       page: page
     }
@@ -176,6 +176,7 @@ class MAPAPIClient
     data[:q] = q unless q.nil? || q == ''
     data[:agency_ref] = agency_ref unless agency_ref.nil? || agency_ref == ''
     data[:role] = role unless role.nil? || role == ''
+    data[:sort] = sort unless sort.nil? || sort == ''
     
     PagedResults.from_json(get('/users', data), User)
   end

@@ -103,6 +103,7 @@ class MAPTheApp < Sinatra::Base
     .param(:q, String, "Search string", optional: true)
     .param(:agency_ref, String, "Search agency id", optional: true)
     .param(:role, String, "Search role", optional: true)
+    .param(:sort, String, "Sort string", optional: true)
     .param(:page, Integer, "Page to return", optional: true) do
 
       agency_label = if params[:agency_ref] && params[:agency_ref] != '' && Ctx.permissions.is_admin?
@@ -111,11 +112,12 @@ class MAPTheApp < Sinatra::Base
                      end
 
       Templates.emit_with_layout(:users, {
-                                   paged_users: Ctx.client.users(params[:page] || 0, params[:q], params[:agency_ref], params[:role]),
+                                   paged_users: Ctx.client.users(params[:page] || 0, params[:q], params[:agency_ref], params[:role], params[:sort]),
                                    q: params[:q],
                                    agency_ref: params[:agency_ref],
                                    agency_label: agency_label,
                                    role: params[:role],
+                                   sort: params[:sort],
                                  },
                                  :layout, title: "Users", context: ['users'])
   end
