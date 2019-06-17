@@ -119,14 +119,17 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.get('/locations')
+    .param(:q, String, "Search string", optional: true)
+    .param(:agency_ref, String, "Search agency id", optional: true)
+    .param(:sort, String, "Sort string", optional: true)
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in?
       if Ctx.get.permissions.is_admin?
-        json_response(Locations.all(params[:page], AppConfig[:page_size]))
+        json_response(Locations.all(params[:page], AppConfig[:page_size], params[:q], params[:agency_ref], params[:sort]))
       elsif Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)
-        json_response(Locations.for_agency(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id))
+        json_response(Locations.for_agency(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id, params[:q], params[:sort]))
       elsif Ctx.get.permissions.is_agency_admin?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-        json_response(Locations.for_agency_location(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id, Ctx.get.current_location.id))
+        json_response(Locations.for_agency_location(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id, Ctx.get.current_location.id, params[:q], params[:sort]))
       else
         [404]
       end

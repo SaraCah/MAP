@@ -52,7 +52,7 @@ class Users < BaseStorage
     users_visible_to_current_user = users_visible_to_current_user.order(Sequel.asc(Sequel[:user][:username]))
 
     if q
-      users_visible_to_current_user = users_visible_to_current_user.filter(Sequel.|(Sequel.ilike(Sequel[:user][:username], "%#{q}%"), Sequel.ilike(Sequel[:user][:name], "%#{q}%")))
+      users_visible_to_current_user = users_visible_to_current_user.filter(Sequel.|(Sequel.like(Sequel.function(:lower, Sequel[:user][:username]), "%#{q.downcase}%"), Sequel.like(Sequel.function(:lower, Sequel[:user][:name]), "%#{q.downcase}%")))
     end
 
 

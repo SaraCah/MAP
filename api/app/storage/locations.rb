@@ -1,18 +1,34 @@
 class Locations < BaseStorage
 
-  def self.all(page, page_size)
-    page(page, page_size)
+  SORT_OPTIONS = {
+    'agency_asc' => [Sequel.asc(Sequel[:agency_location][:agency_id]), Sequel.asc(Sequel[:agency_location][:name])],
+    'agency_desc' => [Sequel.desc(Sequel[:agency_location][:agency_id]), Sequel.desc(Sequel[:agency_location][:name])],
+    'location_name_asc' => [Sequel.asc(Sequel[:agency_location][:name])],
+    'location_name_desc' => [Sequel.desc(Sequel[:agency_location][:name])],
+    'created_asc' => [Sequel.asc(Sequel[:agency_location][:create_time])],
+    'created_desc' => [Sequel.desc(Sequel[:agency_location][:create_time])],
+  }
+
+
+  def self.all(page, page_size, q = nil, agency_ref = nil, sort = nil)
+    if agency_ref
+      (_, aspace_agency_id) = agency_ref.split(':')
+      agency_id = db[:agency].filter(aspace_agency_id: aspace_agency_id.to_i).select(:id)
+      page(page, page_size, agency_id, nil, q, sort)
+    else
+      page(page, page_size, nil, nil, q, sort)
+    end
   end
 
-  def self.for_agency(page, page_size, agency_id)
-    page(page, page_size, agency_id)
+  def self.for_agency(page, page_size, agency_id, q = nil, sort = nil)
+    page(page, page_size, agency_id, nil, q, sort)
   end
 
-  def self.for_agency_location(page, page_size, agency_id, agency_location_id)
-    page(page, page_size, agency_id, agency_location_id)
+  def self.for_agency_location(page, page_size, agency_id, agency_location_id, q = nil, sort = nil)
+    page(page, page_size, agency_id, agency_location_id, q, sort)
   end
 
-  def self.page(page, page_size, agency_id = nil, agency_location_id = nil)
+  def self.page(page, page_size, agency_id = nil, agency_location_id = nil, q = nil, sort = nil)
     dataset = db[:agency_location]
                 .join(:agency, Sequel[:agency][:id] => Sequel[:agency_location][:agency_id])
 
@@ -24,6 +40,10 @@ class Locations < BaseStorage
       dataset = dataset.filter(Sequel[:agency_location][:id] => agency_location_id)
     end
 
+    if q
+      dataset = dataset.filter(Sequel.like(Sequel.function(:lower, Sequel[:agency_location][:name]), "%#{q.downcase}%"))
+    end
+
     max_page = (dataset.count / page_size.to_f).ceil
 
     dataset = dataset
@@ -31,7 +51,9 @@ class Locations < BaseStorage
                 .select_append(Sequel[:agency][:aspace_agency_id])
                 .limit(page_size, page * page_size)
 
-    dataset = dataset.order(Sequel.asc(Sequel[:agency_location][:agency_id]), Sequel.asc(Sequel[:agency_location][:name]))
+    sort_by = SORT_OPTIONS.fetch(sort, SORT_OPTIONS.fetch('agency_asc'))
+
+    dataset = dataset.order(*sort_by)
 
     aspace_agencies = {}
     aspace_agency_ids_to_resolve = dataset.map(:aspace_agency_id).uniq

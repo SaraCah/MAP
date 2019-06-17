@@ -3,6 +3,16 @@
         <a class="btn waves-effect" href="/locations/new">Add Location</a>
     </div>
 </div>
+
+<div class="vue-enabled">
+    <locations-search q="<%= q %>"
+                  agency_ref="<%= agency_ref %>"
+                  agency_label="<%= agency_label %>"
+                  :show_agency_filter="<%= Ctx.permissions.is_admin %>"
+                  sort="<%= sort %>">
+    </locations-search>
+</div>
+
 <div class="row">
     <div class="col s12">
         <table class="highlight responsive-table">

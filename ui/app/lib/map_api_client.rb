@@ -279,8 +279,17 @@ class MAPAPIClient
     end
   end
 
-  def locations(page = 0)
-    PagedResults.from_json(get('/locations', page: page), AgencyLocation)
+  def locations(page = 0, q = nil , agency_ref = nil, sort = nil)
+    data = {
+      page: page
+    }
+
+    data[:q] = q unless q.nil? || q == ''
+    data[:agency_ref] = agency_ref unless agency_ref.nil? || agency_ref == ''
+    data[:sort] = sort unless sort.nil? || sort == ''
+
+
+    PagedResults.from_json(get('/locations', data), AgencyLocation)
   end
 
   def locations_for_agency(agency_ref)
