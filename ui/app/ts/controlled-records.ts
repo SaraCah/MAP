@@ -39,6 +39,7 @@ interface SearchState {
     facets: object;
     records: Record[];
     initialised: boolean;
+    searchActive: boolean;
     showNextPage: boolean;
     showPrevPage: boolean;
     queryString: string;
@@ -196,6 +197,7 @@ Vue.component('controlled-records', {
   data: function(): SearchState {
         return {
             initialised: false,
+            searchActive: false,
             currentPage: 0,
             records: [],
             facets: [],
@@ -321,6 +323,8 @@ Vue.component('controlled-records', {
                 mergedFilters = mergedFilters.concat([['series_id', this.selectedSeriesId]]);
             }
 
+            this.searchActive = true;
+
             this.$http.get('/controlled-records', {
                 method: 'GET',
                 params: {
@@ -333,6 +337,7 @@ Vue.component('controlled-records', {
                     sort: this.selectedSort,
                 },
             }).then((response: any) => {
+                this.searchActive = false;
                 return response.json();
             }, () => {
                 // Failed
@@ -414,7 +419,7 @@ Vue.component('controlled-records', {
     },
     computed: {
         browseMode: function(): boolean {
-            return this.queryString === '' && this.startDate === '' && this.endDate === '';
+            return this.queryString === '' && this.startDate === '' && this.endDate === '' && !this.searchActive;
         },
         serializedFilters: function(): string {
             return JSON.stringify(this.appliedFilters.map((filter) => [filter.field, filter.value]));
