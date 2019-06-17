@@ -16,7 +16,7 @@ import 'locations-search';
 import 'representation-linker';
 import 'select-with-other-option';
 import 'transfer-proposal-series';
-import 'transfer-sorter';
+import 'transfers-search';
 import 'users-search';
 
 declare var M: any; // Materialize on the window context

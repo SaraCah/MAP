@@ -292,20 +292,22 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.get('/transfer-proposals')
+    .param(:status, String, "Status filter", :optional => true)
     .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(Transfers.proposals(params[:page], AppConfig[:page_size], params[:sort]))
+      json_response(Transfers.proposals(params[:page], AppConfig[:page_size], params[:status], params[:sort]))
     else
       [404]
     end
   end
 
   Endpoint.get('/transfers')
+    .param(:status, String, "Status filter", :optional => true)
     .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(Transfers.transfers(params[:page], AppConfig[:page_size], params[:sort]))
+      json_response(Transfers.transfers(params[:page], AppConfig[:page_size], params[:status], params[:sort]))
     else
       json_response([])
     end

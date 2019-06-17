@@ -323,22 +323,24 @@ class MAPAPIClient
     })
   end
 
-  def transfer_proposals(page = 0, sort = nil)
+  def transfer_proposals(page = 0, status = nil, sort = nil)
     data = {
       page: page
     }
 
+    data[:status] = status unless status.nil? || status == ''
     data[:sort] = sort unless sort.nil? || sort == ''
 
     PagedResults.from_json(get('/transfer-proposals', data), TransferProposal)
   end
 
 
-  def transfers(page = 0, sort = nil)
+  def transfers(page = 0, status = nil, sort = nil)
     data = {
       page: page
     }
 
+    data[:status] = status unless status.nil? || status == ''
     data[:sort] = sort unless sort.nil? || sort == ''
 
     PagedResults.from_json(get('/transfers', data), Transfer)

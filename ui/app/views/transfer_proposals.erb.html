@@ -5,9 +5,11 @@
 </div>
 
 <div class="vue-enabled">
-    <transfer-sorter path="/transfer-proposals"
-                     sort="<%= sort %>">
-    </transfer-sorter>
+    <transfers-search path="/transfer-proposals"
+                      status="<%= status %>"
+                      :status_options="<%= TransferProposal::STATUS_OPTIONS.to_json %>"
+                      sort="<%= sort %>">
+    </transfers-search>
 </div>
 
 <div class="row vue-enabled">

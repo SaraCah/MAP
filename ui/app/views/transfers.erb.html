@@ -1,7 +1,9 @@
 <div class="vue-enabled">
-    <transfer-sorter path="/transfers"
-                     sort="<%= sort %>">
-    </transfer-sorter>
+    <transfers-search path="/transfers"
+                      status="<%= status %>"
+                      :status_options="<%= Transfer::STATUS_OPTIONS.to_json %>"
+                      sort="<%= sort %>">
+    </transfers-search>
 </div>
 
 <div class="row">

@@ -23,7 +23,7 @@ class Transfers < BaseStorage
   }
 
 
-  def self.proposals(page, page_size, sort = nil)
+  def self.proposals(page, page_size, status = nil, sort = nil)
     dataset = db[:transfer_proposal]
 
     unless Ctx.get.permissions.is_admin?
@@ -31,6 +31,10 @@ class Transfers < BaseStorage
       dataset = dataset
                   .filter(Sequel[:transfer_proposal][:agency_id] => current_location.agency_id)
                   .filter(Sequel[:transfer_proposal][:agency_location_id] => current_location.id)
+    end
+
+    if status && TransferProposal::STATUS_OPTIONS.include?(status)
+      dataset = dataset.filter(Sequel[:transfer_proposal][:status] => status)
     end
 
     max_page = (dataset.count / page_size.to_f).ceil
@@ -164,7 +168,7 @@ class Transfers < BaseStorage
   end
 
 
-  def self.transfers(page, page_size, sort = nil)
+  def self.transfers(page, page_size, status = nil, sort = nil)
     dataset = db[:transfer]
 
     unless Ctx.get.permissions.is_admin?
@@ -172,6 +176,10 @@ class Transfers < BaseStorage
       dataset = dataset
                   .filter(Sequel[:transfer][:agency_id] => current_location.agency_id)
                   .filter(Sequel[:transfer][:agency_location_id] => current_location.id)
+    end
+
+    if status && Transfer::STATUS_OPTIONS.include?(status)
+      dataset = dataset.filter(Sequel[:transfer][:status] => status)
     end
 
     max_page = (dataset.count / page_size.to_f).ceil

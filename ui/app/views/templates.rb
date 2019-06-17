@@ -26,8 +26,8 @@ Templates.define(:location_edit, [:location, :errors?], "views/location_form.erb
 Templates.define(:flash_message, [:message], "views/_message.erb.html")
 Templates.define(:header, [:title, [:context]], "views/header.erb.html")
 
-Templates.define(:transfer_proposals, [:paged_results, :sort?], "views/transfer_proposals.erb.html")
-Templates.define(:transfers, [:paged_results, :sort?], "views/transfers.erb.html")
+Templates.define(:transfer_proposals, [:paged_results, :sort?, :status?], "views/transfer_proposals.erb.html")
+Templates.define(:transfers, [:paged_results, :sort?, :status?], "views/transfers.erb.html")
 Templates.define(:transfer_proposal_view, [:transfer, :errors?, :is_readonly], "views/transfer_proposal_form.erb.html")
 Templates.define(:transfer_view, [:transfer, :errors?, :is_readonly], "views/transfer_form.erb.html")
 

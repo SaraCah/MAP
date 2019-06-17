@@ -336,11 +336,13 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/transfer-proposals')
+    .param(:status, String, "Status filter", :optional => true)
     .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return", optional: true) do
 
     Templates.emit_with_layout(:transfer_proposals, {
-                                 paged_results: Ctx.client.transfer_proposals(params[:page] || 0, params[:sort]),
+                                 paged_results: Ctx.client.transfer_proposals(params[:page] || 0, params[:status], params[:sort]),
+                                 status: params[:status],
                                  sort: params[:sort],
                                },
                                :layout, title: "Transfer Proposals", context: ['transfers', 'transfer_proposals'])
@@ -439,11 +441,13 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/transfers')
+    .param(:status, String, "Status filter", :optional => true)
     .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return", optional: true) do
 
     Templates.emit_with_layout(:transfers, {
-                                 paged_results: Ctx.client.transfers(params[:page] || 0, params[:sort]),
+                                 paged_results: Ctx.client.transfers(params[:page] || 0, params[:status], params[:sort]),
+                                 status: params[:status],
                                  sort: params[:sort],
                                },
                                :layout, title: "Transfers", context: ['transfers', 'initiated_transfers'])

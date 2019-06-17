@@ -1,6 +1,14 @@
 class TransferProposal
   include DTO
 
+  STATUS_ACTIVE = 'ACTIVE'
+  STATUS_APPROVED = 'APPROVED'
+  STATUS_CANCELLED_BY_QSA = 'CANCELLED_BY_QSA'
+  STATUS_CANCELLED_BY_AGENCY = 'CANCELLED_BY_AGENCY'
+
+  STATUS_OPTIONS = [STATUS_ACTIVE, STATUS_APPROVED,
+                    STATUS_CANCELLED_BY_QSA, STATUS_CANCELLED_BY_AGENCY]
+
   define_field(:id, Integer, required: false)
   define_field(:title, String, validator: proc {|s| (s.length > 0) ? nil : "Title can't be blank" })
   define_field(:status, String, required: false)
