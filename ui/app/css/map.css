@@ -264,11 +264,11 @@ a#userMenuTrigger:after {
     padding: 0;
 }
 
-.representation-linker-table td {
+.file-issue-requested-items-table td {
     vertical-align: top;
 }
 
-.representation-linker-table .identifier {
+.file-issue-requested-items-table .identifier {
     display: inline-block;
     float: left;
     clear: both;
@@ -277,11 +277,11 @@ a#userMenuTrigger:after {
     margin-bottom: 0.25em;
 }
 
-.representation-linker-table .identifier .id {
+.file-issue-requested-items-table .identifier .id {
     color: black;
 }
 
-.representation-linker-table .extra-info h2 {
+.file-issue-requested-items-table .extra-info h2 {
     font-size: 100%;
     color: #9e9e9e;
     margin: 0.5em 0 0 0;
