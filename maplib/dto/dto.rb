@@ -126,7 +126,7 @@ module DTO
       result = DTO.clone_and_convert_keys(values.to_hash).map {|k, v| [k, dto_coerce_type(k, v)]}.to_h
 
       dto_fields.each do |field|
-        if !field.default.nil?
+        if !field.default.nil? && result[field.name].nil?
           result[field.name] ||= dto_try_clone(field.default)
         end
       end

@@ -20,9 +20,10 @@ class FileIssueRequest
   define_field(:digital_request_status, String, required: false, default: NONE_REQUESTED)
   define_field(:physical_request_status, String, required: false, default: NONE_REQUESTED)
   define_field(:urgent, Boolean, default: false)
+  define_field(:draft, Boolean, default: true)
   define_field(:delivery_location, String)
   define_field(:delivery_authorizer, String, validator: proc {|s, request| request.is_delivery_authorizer_required? ? "Delivery Authorizer can't be blank" : nil })
-  define_field(:items, [FileIssueRequestItem], default: [], validator: proc {|arr| arr.empty? ? "Items can't be empty" : nil })
+  define_field(:items, [FileIssueRequestItem], default: [], validator: proc {|arr, dto| arr.empty? && !dto.fetch(:draft, false) ? "Items can't be empty" : nil })
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)
   define_field(:agency_id, Integer, required: false)
@@ -50,6 +51,7 @@ class FileIssueRequest
         digital_request_status: row[:digital_request_status],
         physical_request_status: row[:physical_request_status],
         urgent: row[:urgent] == 1,
+        draft: row[:draft] == 1,
         delivery_location: row[:delivery_location],
         delivery_authorizer: row[:delivery_authorizer],
         request_notes: row[:request_notes],

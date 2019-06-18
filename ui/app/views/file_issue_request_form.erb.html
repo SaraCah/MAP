@@ -15,7 +15,7 @@
                                     <% if request.new? || request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'} %>
                                     <span class="card-title">Digital Request Status</span>
                                     <ul class="status-infomatic">
-                                        <li class="first <% if request.new? %>current<% end %>">Add Request Details</li>
+                                        <li class="first <% if request.new? || request.fetch('status', '') == 'NONE_REQUESTED' %>current<% end %>">Add Request Details</li>
                                         <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_REQUESTED' %>current<% end %>">Quote Requested</li>
                                         <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Quote Provided</li>
                                         <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">Quote Accepted</li>
@@ -140,7 +140,7 @@
                             <br>
                             <br>
                             <div class="col s12">
-                                <% if request.new? || (request.fetch('digital_request_status') == 'QUOTE_REQUESTED' && request.fetch('physical_request_status') == 'QUOTE_REQUESTED') %>
+                                <% if request.new? || request.fetch('draft') || (request.fetch('digital_request_status') == 'QUOTE_REQUESTED' && request.fetch('physical_request_status') == 'QUOTE_REQUESTED') %>
                                     <button class="btn">Save Request</button>
                                 <% else %>
                                     <confirmable-action
@@ -150,7 +150,7 @@
                                             message="<p>Please be aware saving this request will invalidate any provided quotes.</p><p>Are you sure you want to save this request?</p>">
                                     </confirmable-action>
                                 <% end %>
-                                <% unless request.new? %>
+                                <% unless request.new? || request.fetch('draft') %>
                                     <confirmable-action
                                             action="/file-issue-requests/<%= request.fetch('id') %>/cancel?lock_version=<%= request.fetch('lock_version') %>"
                                             csrf_token="<%= FormHelper.csrf_token %>"
@@ -159,13 +159,16 @@
                                             message="Are you sure you want to cancel this request? ">
                                     </confirmable-action>
                                 <% end %>
+                                <% if request.fetch('draft') %>
+                                    <button name="submit_file_issue_request" value="1" class="btn orange">Submit File Issue Request <i class="fa fa-paper-plane"></i></button>
+                                <% end %>
                             </div>
                         </div>
                     </section>
                 <% end %>
             </form>
         </div>
-        <% unless request.new? %>
+        <% unless request.fetch('draft') || request.new? %>
         <section id="conversation" class="scrollspy section">
             <div class="row vue-enabled">
                 <div class="col s12">

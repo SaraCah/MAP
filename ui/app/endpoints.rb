@@ -598,7 +598,10 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.post('/file-issue-requests/create')
-    .param(:file_issue_request, FileIssueRequest, "The file issue request to create") do
+    .param(:file_issue_request, FileIssueRequest, "The file issue request to create")
+    .param(:submit_file_issue_request, Integer, "Set to 1 if the submit button was clicked", :optional => true) do
+
+    params[:file_issue_request][:draft] = params[:submit_file_issue_request] != 1
 
     errors = Ctx.client.create_file_issue_request(params[:file_issue_request])
 
@@ -638,13 +641,24 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.post('/file-issue-requests/update')
-    .param(:file_issue_request, FileIssueRequest, "The file issue request to update") do
+    .param(:file_issue_request, FileIssueRequest, "The file issue request to update")
+    .param(:submit_file_issue_request, Integer, "Set to 1 if the submit button was clicked", :optional => true) do
 
-    errors = Ctx.client.update_file_issue_request(params[:file_issue_request])
+    orig_draft_status = params[:file_issue_request].fetch(:draft)
+    params[:file_issue_request][:draft] = params[:submit_file_issue_request] != 1
+
+    errors = params[:file_issue_request].validate.map {|e|
+      e.map {|k, v| [k.to_s, v]}.to_h
+    }
+
+    if errors.empty?
+      errors = Ctx.client.update_file_issue_request(params[:file_issue_request])
+    end
 
     if errors.empty?
       redirect '/file-issue-requests'
     else
+      params[:file_issue_request][:draft] = orig_draft_status
       Templates.emit_with_layout(:file_issue_request_view,
                                  {
                                    request: params[:file_issue_request],
