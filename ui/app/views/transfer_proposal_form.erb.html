@@ -116,7 +116,7 @@
                 <% end %>
             </form>
         </div>
-        <% unless transfer.new? %>
+        <% unless transfer.new? || transfer.fetch('status', 'INACTIVE') == 'INACTIVE' %>
             <section id="conversation" class="scrollspy section">
                 <div class="row vue-enabled">
                     <div class="col s12">
