@@ -28,7 +28,7 @@ Vue.component('notifications', {
                     <th></th>
                     <th>Record</th>
                     <th>Notification</th>
-                    <th>Timestamp</th>
+                    <th>Time of Event</th>
                     <th></th>
                 </thead>
                 <tbody>
