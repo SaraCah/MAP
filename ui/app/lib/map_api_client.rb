@@ -502,8 +502,8 @@ class MAPAPIClient
     get("/file-issue-quotes/#{quote_id}")
   end
 
-  def file_issue_notifications
-    get("/file_issue_notifications")
+  def notifications
+    get("/notifications")
   end
 
   def stream_file_issue(token, suggested_filename)

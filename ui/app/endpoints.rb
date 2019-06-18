@@ -5,8 +5,6 @@ class MAPTheApp < Sinatra::Base
       # These tags get escaped...
       Templates.emit_with_layout(:hello, {
                                    :name => Ctx.session[:username],
-                                   :agency => Ctx.client.get_current_agency,
-                                   :location => Ctx.get.current_location
                                  },
                                  :layout, title: "Welcome", context: ['home'])
     else
@@ -776,11 +774,11 @@ class MAPTheApp < Sinatra::Base
                                :layout, title: "Fee Schedule", context: ['file_issues', 'fee_schedule'])
   end
 
-  Endpoint.get('/file_issue_notifications') do
+  Endpoint.get('/notifications') do
     [
       200,
       {'Content-type' => 'text/json'},
-      Ctx.client.file_issue_notifications.to_json
+      Ctx.client.notifications.to_json
     ]
   end
 
@@ -846,4 +844,14 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
+  Endpoint.get('/records') do
+    Templates.emit_with_layout(
+      :records, {
+        :agency => Ctx.client.get_current_agency, 
+        :location => Ctx.get.current_location
+      },
+      :layout,
+      title: "My Records",
+      context: ['records'])
+  end
 end

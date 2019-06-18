@@ -654,9 +654,24 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.get('/file_issue_notifications') do
-    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(FileIssues.get_notifications)
+  Endpoint.get('/notifications') do
+    # TODO
+    #  - request quote issued
+    #  - file issue created
+    #  - transfer created
+    #  - add modified_time to major records and check for any updated in last 7 days
+    if Ctx.user_logged_in?
+      notifications = []
+      can_manage_file_issues = Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id) 
+      can_manage_transfers = Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id) 
+
+      if can_manage_file_issues
+        notifications += FileIssues.get_notifications
+      end
+
+      notifications += Conversations.get_notifications(can_manage_file_issues, can_manage_transfers)
+
+      json_response(notifications.sort_by(&:timestamp).reverse)
     else
       [404]
     end

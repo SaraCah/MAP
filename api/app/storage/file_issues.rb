@@ -328,8 +328,7 @@ class FileIssues < BaseStorage
   FILE_ISSUE_EXPIRY_WINDOW = 7 # days
 
   def self.get_notifications
-    notifications_per_file_issue = {}
-    file_issue_identifiers = {}
+    notifications = []
 
     # find any overdue physical file issues
     db[:file_issue]
@@ -343,13 +342,12 @@ class FileIssues < BaseStorage
       .filter(Sequel.~(Sequel[:file_issue_item][:expiry_date] => nil))
       .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today }
       .select(Sequel[:file_issue][:id],
-              Sequel[:file_issue][:issue_type])
+              Sequel[:file_issue][:issue_type],
+              Sequel[:file_issue_item][:expiry_date])
       .distinct
       .map do |row|
       identifier = "FI#{row[:issue_type][0]}#{row[:id]}"
-      file_issue_identifiers[row[:id]] = identifier
-      notifications_per_file_issue[row[:id]] ||= []
-      notifications_per_file_issue[row[:id]] << Notification.new("Has overdue items", "warning")
+      notifications << Notification.new('file_issue', row[:id], identifier, 'Has overdue items', 'warning', row[:expiry_date].to_time.to_i * 1000)
     end
 
     # find any recently expired digital file issues
@@ -364,13 +362,12 @@ class FileIssues < BaseStorage
       .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today }
       .filter{ Sequel[:file_issue_item][:expiry_date] >= Date.today - FILE_ISSUE_EXPIRY_WINDOW }
       .select(Sequel[:file_issue][:id],
-              Sequel[:file_issue][:issue_type])
+              Sequel[:file_issue][:issue_type],
+              Sequel[:file_issue_item][:expiry_date])
       .distinct
       .map do |row|
       identifier = "FI#{row[:issue_type][0]}#{row[:id]}"
-      file_issue_identifiers[row[:id]] = identifier
-      notifications_per_file_issue[row[:id]] ||= []
-      notifications_per_file_issue[row[:id]] << Notification.new("Has recently expired items", "info")
+      notifications << Notification.new('file_issue', row[:id], identifier, 'Has recently expired items', 'info', row[:expiry_date].to_time.to_i * 1000)
     end
 
     # find any file issues nearing expiry
@@ -385,22 +382,21 @@ class FileIssues < BaseStorage
       .filter{ Sequel[:file_issue_item][:expiry_date] >= Date.today }
       .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today + FILE_ISSUE_EXPIRY_WINDOW }
       .select(Sequel[:file_issue][:id],
-              Sequel[:file_issue][:issue_type])
+              Sequel[:file_issue][:issue_type],
+              Sequel[:file_issue_item][:expiry_date])
       .distinct
       .map do |row|
+      message = if row[:issue_type] == FileIssue::ISSUE_TYPE_DIGITAL
+                  'Has items nearing their expiry date'
+                else
+                  'Has items nearing their return date'
+                end
+
       identifier = "FI#{row[:issue_type][0]}#{row[:id]}"
-      file_issue_identifiers[row[:id]] = identifier
-      notifications_per_file_issue[row[:id]] ||= []
-      if row[:issue_type] == FileIssue::ISSUE_TYPE_DIGITAL
-        notifications_per_file_issue[row[:id]] << Notification.new("Has items nearing their expiry date", "info")
-      else
-        notifications_per_file_issue[row[:id]] << Notification.new("Has items nearing their return date", "info")
-      end
+      notifications << Notification.new('file_issue', row[:id], identifier, message, 'info', row[:expiry_date].to_time.to_i * 1000)
     end
 
-    notifications_per_file_issue.map do |file_issue_id, notifications|
-      RecordNotifications.new('file_issue', file_issue_id, file_issue_identifiers.fetch(file_issue_id), notifications)
-    end
+    notifications
   end
 
   def self.get_file_issue(token)

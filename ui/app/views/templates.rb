@@ -9,7 +9,7 @@
 # Partials would work the same way--just <%== Templates.emit(:partial_name) %>
 #
 
-Templates.define(:hello, [:name, :agency?, :location?], "views/hello.erb.html")
+Templates.define(:hello, [:name], "views/hello.erb.html")
 Templates.define(:example_partial, [], "views/_partial.erb.html")
 
 Templates.define(:layout, [:title, :template, :template_args, :message?, [:context]], "views/layout.erb.html")
@@ -19,6 +19,9 @@ Templates.define(:qgov_header, [], "views/qgov_header.erb.html")
 Templates.define(:qgov_footer, [], "views/qgov_footer.erb.html")
 
 Templates.define(:login, [:username?, :message?], "views/login.erb.html")
+
+Templates.define(:records, [:agency?, :location?], "views/records.erb.html")
+
 Templates.define(:users, [:paged_users, :q?, :agency_ref?, :agency_label?, :role?, :sort?, :params], "views/users.erb.html")
 Templates.define(:user_edit, [:user, :errors?], "views/user_form.erb.html")
 Templates.define(:locations, [:paged_results, :q?, :agency_ref?, :agency_label?, :sort?, :params], "views/locations.erb.html")
