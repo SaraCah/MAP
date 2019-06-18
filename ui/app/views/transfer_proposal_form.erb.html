@@ -20,7 +20,7 @@
                     <div class="row">
                         <div class="col s12">
                             <ul class="status-infomatic">
-                                <li class="first <% if transfer.new? %>current<% end %>">Inactive</li>
+                                <li class="first <% if transfer.new? || transfer.fetch('status', '') == 'INACTIVE' %>current<% end %>">Inactive</li>
                                 <li class="<% if transfer.fetch('status', '') == 'ACTIVE' %>current<% end %>">Active</li>
                                 <li class="last <% if transfer.fetch('status', '') == 'APPROVED' %>current<% end %>">Approved</li>
                                 <li class="stand-alone <% if transfer.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled<br>By User</li>
@@ -33,12 +33,13 @@
             <form id="transferProposalForm" class="col s12" <% if is_readonly %>disabled<% else %>action="<%= transfer.new? ? '/transfer-proposals/create' : '/transfer-proposals/update' %>" method="post" enctype="multipart/form-data"<% end %>>
                 <%== FormHelper.hidden_authenticity_token %>
                 <%== FormHelper.lock_version(transfer, 'transfer') %>
-        
+
                 <% unless transfer.new? %>
                     <input type="hidden" name="transfer[id]" value="<%= transfer.fetch('id') %>">
                     <input type="hidden" name="transfer[handle_id]" value="<%= transfer.fetch('handle_id') %>">
                     <input type="hidden" name="transfer[agency_id]" value="<%= transfer.fetch('agency_id') %>">
                     <input type="hidden" name="transfer[agency_location_id]" value="<%= transfer.fetch('agency_location_id') %>">
+                    <input type="hidden" name="transfer[status]" value="<%= transfer.fetch('status', '') %>">
                 <% end %>
 
                 <section id="details" class="scrollspy section">
@@ -86,7 +87,7 @@
                             <file-uploader files="<%= transfer.fetch('files', []).to_json %>"
                                            input_path="transfer[files][]"
                                            readonly="<%= is_readonly %>"
-                                           v-bind:submit_button_ids="['save_transfer_btn']"
+                                           v-bind:submit_button_ids="['save_transfer_btn', 'submit_transfer_btn']"
                                            csrf_token="<%= FormHelper.csrf_token %>">
                             </file-uploader>
                         </div>
@@ -105,7 +106,10 @@
                             <br>
                             <br>
                             <div class="col s12">
-                                <button id="save_transfer_btn" class="btn">Save Transfer Proposal</button>
+                                <button id="save_transfer_btn" name="save_transfer" value="1" class="btn">Save Transfer Proposal</button>
+                                <% if transfer.fetch('status', 'INACTIVE') == 'INACTIVE' %>
+                                    <button id="submit_transfer_btn" name="submit_transfer" value="1" class="btn orange">Submit Transfer Proposal <i class="fa fa-paper-plane"></i></button>
+                                <% end %>
                             </div>
                         </div>
                     </section>

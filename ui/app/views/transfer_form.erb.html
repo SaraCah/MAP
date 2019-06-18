@@ -25,7 +25,8 @@
                                 <li class="<% if transfer.fetch('checklist_rap_received', false) %>checked<% end %>">RAP Notice Received/<br>Exempt</li>
                                 <li class="<% if transfer.fetch('checklist_metadata_approved', false) %>checked<% end %>">Metadata Approved</li>
                                 <li class="<% if transfer.fetch('checklist_transfer_received', false) %>checked<% end %>">Transfer Received</li>
-                                <li class="last <% if transfer.fetch('checklist_metadata_imported', false) %>checked<% end %>">Metadata Imported</li>
+                                <li class="<% if transfer.fetch('checklist_metadata_imported', false) %>checked<% end %>">Metadata Imported</li>
+                                <li class="last <% if transfer.fetch('checklist_transfer_completed', false) %>checked<% end %>">Transfer Completed</li>
                             </ul>
                         </div>
                     </div>
@@ -37,6 +38,7 @@
                                 <li class="<% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_PENDING' %>current<% end %>">Pending</li>
                                 <li class="empty"></li>
                                 <li class="<% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_IN_PROGRESS' %>current<% end %>">In Progress</li>
+                                <li class="empty"></li>
                                 <li class="last <% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_COMPLETE' %>current<% end %>">Complete</li>
                             </ul>
                         </div>

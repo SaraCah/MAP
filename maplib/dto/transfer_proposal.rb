@@ -1,17 +1,21 @@
 class TransferProposal
   include DTO
 
+  STATUS_INACTIVE = 'INACTIVE'
   STATUS_ACTIVE = 'ACTIVE'
   STATUS_APPROVED = 'APPROVED'
   STATUS_CANCELLED_BY_QSA = 'CANCELLED_BY_QSA'
   STATUS_CANCELLED_BY_AGENCY = 'CANCELLED_BY_AGENCY'
 
-  STATUS_OPTIONS = [STATUS_ACTIVE, STATUS_APPROVED,
-                    STATUS_CANCELLED_BY_QSA, STATUS_CANCELLED_BY_AGENCY]
+  STATUS_OPTIONS = [STATUS_INACTIVE,
+                    STATUS_ACTIVE,
+                    STATUS_APPROVED,
+                    STATUS_CANCELLED_BY_QSA,
+                    STATUS_CANCELLED_BY_AGENCY]
 
   define_field(:id, Integer, required: false)
   define_field(:title, String, validator: proc {|s| (s.length > 0) ? nil : "Title can't be blank" })
-  define_field(:status, String, required: false)
+  define_field(:status, String, required: false, default: 'INACTIVE')
   define_field(:estimated_quantity, String, required: false)
   define_field(:files, [TransferFile], default: [])
   define_field(:series, [TransferProposalSeries], default: [])

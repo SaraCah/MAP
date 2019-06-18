@@ -57,7 +57,7 @@ class Transfers < BaseStorage
     raise "FIXME admin user" if Ctx.get.permissions.is_admin?
 
     transfer_proposal_id = db[:transfer_proposal].insert(title: transfer.fetch('title'),
-                                                         status: 'ACTIVE',
+                                                         status: transfer.fetch('status'),
                                                          estimated_quantity: transfer.fetch('estimated_quantity', nil),
                                                          agency_id: Ctx.get.current_location.agency_id,
                                                          agency_location_id: Ctx.get.current_location.id,
@@ -107,6 +107,7 @@ class Transfers < BaseStorage
                 .filter(lock_version: transfer.fetch('lock_version'))
                 .update(title: transfer.fetch('title'),
                         estimated_quantity: transfer.fetch('estimated_quantity', nil),
+                        status: transfer.fetch('status'),
                         lock_version: transfer.fetch('lock_version') + 1,
                         system_mtime: Time.now)
 

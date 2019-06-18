@@ -357,7 +357,13 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.post('/transfer-proposals/create')
-    .param(:transfer, TransferProposal, "The transfer to create") do
+    .param(:transfer, TransferProposal, "The transfer to create")
+    .param(:save_transfer, Integer, "Set to 1 if the save button was clicked", :optional => true)
+    .param(:submit_transfer, Integer, "Set to 1 if the submit button was clicked", :optional => true) do
+
+    if params[:submit_transfer] == 1
+      params[:transfer][:status] = TransferProposal::STATUS_ACTIVE
+    end
 
     errors = Ctx.client.create_transfer_proposal(params[:transfer])
 
@@ -395,14 +401,20 @@ class MAPTheApp < Sinatra::Base
       # return [404]
     end
 
-    Templates.emit_with_layout(:transfer_proposal_view, {transfer: transfer, is_readonly: (transfer.fetch('status') != 'ACTIVE')},
+    Templates.emit_with_layout(:transfer_proposal_view, {transfer: transfer, is_readonly: (!['ACTIVE', 'INACTIVE'].include?(transfer.fetch('status')))},
                                :layout, title: "Transfer Proposal", context: ['transfers', 'transfer_proposals'])
   end
 
   Endpoint.post('/transfer-proposals/update')
-    .param(:transfer, TransferProposal, "The transfer to update") do
+    .param(:transfer, TransferProposal, "The transfer to update")
+    .param(:save_transfer, Integer, "Set to 1 if the save button was clicked", :optional => true)
+    .param(:submit_transfer, Integer, "Set to 1 if the submit button was clicked", :optional => true) do
 
     # FIXME check permissions
+
+    if params[:submit_transfer] == 1
+      params[:transfer][:status] = TransferProposal::STATUS_ACTIVE
+    end
 
     errors = Ctx.client.update_transfer_proposal(params[:transfer])
 

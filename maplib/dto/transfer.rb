@@ -34,6 +34,7 @@ class Transfer
   define_field(:checklist_metadata_approved, Boolean, default: false)
   define_field(:checklist_transfer_received, Boolean, default: false)
   define_field(:checklist_metadata_imported, Boolean, default: false)
+  define_field(:checklist_transfer_completed, Boolean, default: false)
 
   define_field(:transfer_proposal_id, Integer, required: false)
 
@@ -51,6 +52,7 @@ class Transfer
         checklist_metadata_approved: row[:checklist_metadata_approved] == 1,
         checklist_transfer_received: row[:checklist_transfer_received] == 1,
         checklist_metadata_imported: row[:checklist_metadata_imported] == 1,
+        checklist_transfer_completed: row[:checklist_transfer_completed] == 1,
 
         date_scheduled: row[:date_scheduled],
         date_received: row[:date_received],
