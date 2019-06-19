@@ -190,7 +190,9 @@ class MAPTheApp < Sinatra::Base
     errors = Ctx.client.update_user(params[:user])
 
     if errors.empty?
-      if Ctx.permissions.current_location_roles.all? {|agency_role| agency_role.role == 'AGENCY_CONTACT'}
+      if Ctx.permissions.is_admin?
+        redirect '/users'
+      elsif Ctx.permissions.current_location_roles.all? {|agency_role| agency_role.role == 'AGENCY_CONTACT'}
         redirect '/'
       else
         redirect '/users'
