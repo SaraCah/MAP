@@ -161,7 +161,9 @@ class Locations < BaseStorage
       db[:agency_location].insert(:name => location.fetch('name'),
                                   :delivery_address => location.fetch('delivery_address', nil),
                                   :agency_id => agency_id,
+                                  :created_by => Ctx.username,
                                   :create_time => java.lang.System.currentTimeMillis,
+                                  :modified_by => Ctx.username,
                                   :modified_time => java.lang.System.currentTimeMillis)
 
       []
@@ -184,6 +186,7 @@ class Locations < BaseStorage
                   .update(:name => location.fetch('name'),
                           :delivery_address => location.fetch('delivery_address', nil),
                           :lock_version => location.fetch('lock_version') + 1,
+                          :modified_by => Ctx.username,
                           :modified_time => java.lang.System.currentTimeMillis)
 
       raise StaleRecordException.new if updated == 0

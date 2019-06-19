@@ -82,6 +82,8 @@ class FileIssues < BaseStorage
                                                            agency_location_id: Ctx.get.current_location.id,
                                                            created_by: Ctx.username,
                                                            create_time: java.lang.System.currentTimeMillis,
+                                                           modified_by: Ctx.username,
+                                                           modified_time: java.lang.System.currentTimeMillis,
                                                            version: 1,
                                                            system_mtime: Time.now)
 
@@ -186,6 +188,8 @@ class FileIssues < BaseStorage
                         request_notes: file_issue_request.fetch('request_notes', nil),
                         version: file_issue_request.fetch('version') + 1,
                         lock_version: file_issue_request.fetch('lock_version') + 1,
+                        modified_by: Ctx.username,
+                        modified_time: java.lang.System.currentTimeMillis,
                         system_mtime: Time.now)
 
     raise StaleRecordException.new if updated == 0
@@ -213,6 +217,8 @@ class FileIssues < BaseStorage
                 .filter(lock_version: lock_version)
                 .update("#{request_type.downcase}_request_status" => FileIssueRequest::QUOTE_ACCEPTED,
                         lock_version: lock_version + 1,
+                        modified_by: Ctx.username,
+                        modified_time: java.lang.System.currentTimeMillis,
                         system_mtime: Time.now)
 
     raise StaleRecordException.new if updated == 0
@@ -225,6 +231,8 @@ class FileIssues < BaseStorage
                   .filter(lock_version: lock_version)
                   .update("#{request_type.downcase}_request_status" => FileIssueRequest::CANCELLED_BY_AGENCY,
                           lock_version: lock_version + 1,
+                          modified_by: Ctx.username,
+                          modified_time: java.lang.System.currentTimeMillis,
                           system_mtime: Time.now)
               else
                 db[:file_issue_request]
@@ -233,6 +241,8 @@ class FileIssues < BaseStorage
                   .update(digital_request_status: FileIssueRequest::CANCELLED_BY_AGENCY,
                           physical_request_status: FileIssueRequest::CANCELLED_BY_AGENCY,
                           lock_version: lock_version + 1,
+                          modified_by: Ctx.username,
+                          modified_time: java.lang.System.currentTimeMillis,
                           system_mtime: Time.now)
               end
 
@@ -325,7 +335,7 @@ class FileIssues < BaseStorage
   end
 
 
-  FILE_ISSUE_EXPIRY_WINDOW = 7 # days
+  NOTIFICATION_WINDOW = 7 # days
 
   def self.get_notifications
     notifications = []
@@ -360,7 +370,7 @@ class FileIssues < BaseStorage
       .filter(Sequel.~(Sequel[:file_issue_item][:dispatch_date] => nil))
       .filter(Sequel.~(Sequel[:file_issue_item][:expiry_date] => nil))
       .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today }
-      .filter{ Sequel[:file_issue_item][:expiry_date] >= Date.today - FILE_ISSUE_EXPIRY_WINDOW }
+      .filter{ Sequel[:file_issue_item][:expiry_date] >= Date.today - NOTIFICATION_WINDOW }
       .select(Sequel[:file_issue][:id],
               Sequel[:file_issue][:issue_type],
               Sequel[:file_issue_item][:expiry_date])
@@ -380,7 +390,7 @@ class FileIssues < BaseStorage
       .filter(Sequel[:file_issue_item][:returned_date] => nil)
       .filter(Sequel.~(Sequel[:file_issue_item][:expiry_date] => nil))
       .filter{ Sequel[:file_issue_item][:expiry_date] >= Date.today }
-      .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today + FILE_ISSUE_EXPIRY_WINDOW }
+      .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today + NOTIFICATION_WINDOW }
       .select(Sequel[:file_issue][:id],
               Sequel[:file_issue][:issue_type],
               Sequel[:file_issue_item][:expiry_date])
@@ -394,6 +404,104 @@ class FileIssues < BaseStorage
 
       identifier = "FI#{row[:issue_type][0]}#{row[:id]}"
       notifications << Notification.new('file_issue', row[:id], identifier, message, 'info', row[:expiry_date].to_time.to_i * 1000)
+    end
+
+    # find any quotes issued recently
+    quote_to_request = {}
+    db[:file_issue_request]
+      .filter(Sequel[:file_issue_request][:agency_id] => Ctx.get.current_location.agency_id)
+      .filter(Sequel[:file_issue_request][:agency_location_id] => Ctx.get.current_location.id)
+      .filter(Sequel[:file_issue_request][:digital_request_status] => FileIssueRequest::QUOTE_PROVIDED)
+      .select(Sequel[:file_issue_request][:id],
+              Sequel[:file_issue_request][:aspace_digital_quote_id])
+      .map do |row|
+      quote_to_request[row[:aspace_digital_quote_id]] = row[:id]
+    end
+    db[:file_issue_request]
+      .filter(Sequel[:file_issue_request][:agency_id] => Ctx.get.current_location.agency_id)
+      .filter(Sequel[:file_issue_request][:agency_location_id] => Ctx.get.current_location.id)
+      .filter(Sequel[:file_issue_request][:physical_request_status] => FileIssueRequest::QUOTE_PROVIDED)
+      .select(Sequel[:file_issue_request][:id],
+              Sequel[:file_issue_request][:aspace_physical_quote_id])
+      .map do |row|
+      quote_to_request[row[:aspace_physical_quote_id]] = row[:id]
+    end
+
+    AspaceDB.open do |aspace_db|
+      aspace_db[:service_quote]
+        .filter(Sequel[:service_quote][:id] => quote_to_request.keys)
+        .filter{ Sequel[:service_quote][:issued_date] > Date.today - NOTIFICATION_WINDOW }
+        .select(Sequel[:service_quote][:id],
+                Sequel[:service_quote][:issued_date])
+        .map do |row|
+        request_id = quote_to_request.fetch(row[:id])
+        notifications << Notification.new('file_issue_request',
+                                          request_id,
+                                          'F%s' % [request_id],
+                                          'Quote issued on %s' % [row[:issued_date].iso8601],
+                                          'info',
+                                          row[:issued_date].to_time.to_i * 1000)
+      end
+    end
+
+    [[:file_issue_request, 'Request', 'R%s'],
+     [:file_issue, 'File Issue', 'FI%s%s']].each do |record_type, label, identifier_format|
+      # created
+      dataset = db[record_type]
+                  .filter(Sequel[record_type][:agency_id] => Ctx.get.current_location.agency_id)
+                  .filter(Sequel[record_type][:agency_location_id] => Ctx.get.current_location.id)
+                  .filter(Sequel[record_type][:create_time] > (Date.today - NOTIFICATION_WINDOW).to_time.to_i * 1000)
+                  .select(Sequel[record_type][:id],
+                          Sequel[record_type][:create_time],
+                          Sequel[record_type][:created_by])
+
+      if record_type == :file_issue
+        dataset = dataset.select_append(Sequel[record_type][:issue_type])
+      end
+
+      dataset.each do |row|
+        identifier = if record_type == :file_issue
+                       identifier_format % [row[:issue_type][0], row[:id]]
+                     else
+                       identifier_format % [row[:id]]
+                     end
+
+        notifications << Notification.new(record_type,
+                                          row[:id],
+                                          identifier,
+                                          "%s created by %s" % [label, row[:created_by]],
+                                          'info',
+                                          row[:create_time])
+      end
+
+      # modified
+      dataset = db[record_type]
+        .filter(Sequel[record_type][:agency_id] => Ctx.get.current_location.agency_id)
+        .filter(Sequel[record_type][:agency_location_id] => Ctx.get.current_location.id)
+        .filter(Sequel[record_type][:modified_time] > Sequel[record_type][:create_time])
+        .filter(Sequel[record_type][:modified_time] > (Date.today - NOTIFICATION_WINDOW).to_time.to_i * 1000)
+        .select(Sequel[record_type][:id],
+                Sequel[record_type][:modified_time],
+                Sequel[record_type][:modified_by])
+
+      if record_type == :file_issue
+        dataset = dataset.select_append(Sequel[record_type][:issue_type])
+      end
+
+      dataset.each do |row|
+        identifier = if record_type == :file_issue
+                       identifier_format % [row[:issue_type][0], row[:id]]
+                     else
+                       identifier_format % [row[:id]]
+                     end
+
+        notifications << Notification.new(record_type,
+                                          row[:id],
+                                          identifier,
+                                          "%s updated by %s" % [label, row[:modified_by]],
+                                          'info',
+                                          row[:modified_time])
+      end
     end
 
     notifications

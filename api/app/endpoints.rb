@@ -662,11 +662,6 @@ class MAPTheAPI < Sinatra::Base
         #  - new locations
         json_response([])
       else
-        # TODO
-        #  - request quote issued
-        #  - file issue created
-        #  - transfer created
-        #  - add modified_time to major records and check for any updated in last 7 days
         notifications = []
         can_manage_file_issues = Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
         can_manage_transfers = Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
@@ -675,9 +670,28 @@ class MAPTheAPI < Sinatra::Base
           notifications += FileIssues.get_notifications
         end
 
+        if can_manage_transfers
+          notifications += Transfers.get_notifications
+        end
+
         notifications += Conversations.get_notifications(can_manage_file_issues, can_manage_transfers)
 
-        json_response(notifications.sort_by(&:timestamp).reverse)
+        # Sort descending and show events with timestamp at midnight to show at
+        # top of the day
+        json_response(notifications.sort {|a,b|
+          time_a = Time.at(a.timestamp / 1000)
+          time_b = Time.at(b.timestamp / 1000)
+
+          if time_a.hour == 0 && time_a.min == 0 && time_a.sec == 0
+            time_a = (time_a.to_date + 1).to_time
+          end
+
+          if time_b.hour == 0 && time_b.min == 0 && time_b.sec == 0
+            time_b = (time_b.to_date + 1).to_time
+          end
+
+          time_b <=> time_a
+        })
       end
     else
       [404]

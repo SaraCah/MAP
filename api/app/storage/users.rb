@@ -112,7 +112,9 @@ class Users < BaseStorage
     db[:user].insert(:username => username,
                      :name => name,
                      :admin => 0,
+                     :created_by => Ctx.username,
                      :create_time => java.lang.System.currentTimeMillis,
+                     :modified_by => Ctx.username,
                      :modified_time => java.lang.System.currentTimeMillis)
   end
 
@@ -120,7 +122,9 @@ class Users < BaseStorage
     db[:user].insert(:username => username,
                      :name => name,
                      :admin => 1,
+                     :created_by => Ctx.username,
                      :create_time => java.lang.System.currentTimeMillis,
+                     :modified_by => Ctx.username,
                      :modified_time => java.lang.System.currentTimeMillis)
   end
 
@@ -130,6 +134,7 @@ class Users < BaseStorage
                 .filter(lock_version: lock_version)
                 .update(name: name,
                         lock_version: lock_version + 1,
+                        modified_by: Ctx.username,
                         modified_time: java.lang.System.currentTimeMillis)
 
     raise StaleRecordException.new if updated == 0
@@ -145,6 +150,7 @@ class Users < BaseStorage
                         admin: is_admin ? 1 : 0,
                         inactive: is_inactive ? 1 : 0,
                         lock_version: lock_version + 1,
+                        modified_by: Ctx.username,
                         modified_time: java.lang.System.currentTimeMillis)
 
     raise StaleRecordException.new if updated == 0

@@ -7,13 +7,17 @@ class Agencies < BaseStorage
       agency[:id]
     else
       agency_id = db[:agency].insert(aspace_agency_id: aspace_agency_id,
+                                     created_by: Ctx.username,
                                      create_time: java.lang.System.currentTimeMillis,
+                                     modified_by: Ctx.username,
                                      modified_time: java.lang.System.currentTimeMillis)
 
       db[:agency_location].insert(agency_id: agency_id,
                                   name: 'Agency Top Level Location',
                                   top_level_location: 1,
+                                  created_by: Ctx.username,
                                   create_time: java.lang.System.currentTimeMillis,
+                                  modified_by: Ctx.username,
                                   modified_time: java.lang.System.currentTimeMillis)
 
       agency_id

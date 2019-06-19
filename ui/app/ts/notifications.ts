@@ -75,14 +75,14 @@ Vue.component('notifications', {
                 this.loading = false;
             });
         },
-        urlFor: function(recordType:string, recordId: string) {
+        urlFor: function(recordType: string, recordId: string) {
             if (recordType === 'file_issue') {
                 return "/file-issues/" + recordId;
-            } else if(recordType === 'file_issue_request') {
+            } else if (recordType === 'file_issue_request') {
                 return "/file-issue-requests/" + recordId;
-            } else if(recordType === 'transfer') {
+            } else if (recordType === 'transfer') {
                 return "/transfers/" + recordId;
-            } else if(recordType === 'transfer_proposal') {
+            } else if (recordType === 'transfer_proposal') {
                 return "/transfer-proposals/" + recordId;
             }
             return "alert('ERROR');";
@@ -92,6 +92,10 @@ Vue.component('notifications', {
             M.Modal.init(this.$refs.modal).open();
         },
         formatTimestamp: function(epochTime: number) {
+            const date = new Date(epochTime);
+            if (date.getHours() === 0 && date.getMinutes() === 0 && date.getMilliseconds() === 0) {
+                return date.toLocaleDateString();
+            }
             return Utils.localDateForEpoch(epochTime);
         },
     },

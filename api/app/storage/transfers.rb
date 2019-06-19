@@ -63,6 +63,8 @@ class Transfers < BaseStorage
                                                          agency_location_id: Ctx.get.current_location.id,
                                                          created_by: Ctx.username,
                                                          create_time: java.lang.System.currentTimeMillis,
+                                                         modified_by: Ctx.username,
+                                                         modified_time: java.lang.System.currentTimeMillis,
                                                          system_mtime: Time.now)
 
     handle = db[:handle].insert(transfer_proposal_id: transfer_proposal_id)
@@ -109,6 +111,8 @@ class Transfers < BaseStorage
                         estimated_quantity: transfer.fetch('estimated_quantity', nil),
                         status: transfer.fetch('status'),
                         lock_version: transfer.fetch('lock_version') + 1,
+                        modified_by: Ctx.username,
+                        modified_time: java.lang.System.currentTimeMillis,
                         system_mtime: Time.now)
 
     raise StaleRecordException.new if updated == 0
@@ -165,6 +169,8 @@ class Transfers < BaseStorage
     db[:transfer_proposal]
       .filter(id: transfer_proposal_id)
       .update(status: 'CANCELLED_BY_AGENCY',
+              modified_by: Ctx.username,
+              modified_time: java.lang.System.currentTimeMillis,
               system_mtime: Time.now)
   end
 
@@ -232,6 +238,8 @@ class Transfers < BaseStorage
                 .filter(id: transfer_id)
                 .filter(lock_version: transfer.fetch('lock_version'))
                 .update(lock_version: transfer.fetch('lock_version') + 1,
+                        modified_by: Ctx.username,
+                        modified_time: java.lang.System.currentTimeMillis,
                         system_mtime: Time.now)
 
     raise StaleRecordException.new if updated == 0
@@ -251,5 +259,51 @@ class Transfers < BaseStorage
     end
 
     errors
+  end
+
+  NOTIFICATION_WINDOW = 7 # days
+
+  def self.get_notifications
+    notifications = []
+
+    [[:transfer_proposal, 'Proposal', 'P%s'],
+     [:transfer, 'Transfer', 'T%s']].each do |record_type, label, identifier_format|
+      # created
+      db[record_type]
+        .filter(Sequel[record_type][:agency_id] => Ctx.get.current_location.agency_id)
+        .filter(Sequel[record_type][:agency_location_id] => Ctx.get.current_location.id)
+        .filter(Sequel[record_type][:create_time] > (Date.today - NOTIFICATION_WINDOW).to_time.to_i * 1000)
+        .select(Sequel[record_type][:id],
+                Sequel[record_type][:create_time],
+                Sequel[record_type][:created_by])
+        .each do |row|
+        notifications << Notification.new(record_type,
+                                          row[:id],
+                                          identifier_format % [row[:id]],
+                                          "%s created by %s" % [label, row[:created_by]],
+                                          'info',
+                                          row[:create_time])
+      end
+
+      # modified
+      db[record_type]
+        .filter(Sequel[record_type][:agency_id] => Ctx.get.current_location.agency_id)
+        .filter(Sequel[record_type][:agency_location_id] => Ctx.get.current_location.id)
+        .filter(Sequel[record_type][:modified_time] > Sequel[record_type][:create_time])
+        .filter(Sequel[record_type][:modified_time] > (Date.today - NOTIFICATION_WINDOW).to_time.to_i * 1000)
+        .select(Sequel[record_type][:id],
+                Sequel[record_type][:modified_time],
+                Sequel[record_type][:modified_by])
+        .each do |row|
+        notifications << Notification.new(record_type,
+                                          row[:id],
+                                          identifier_format % [row[:id]],
+                                          "%s updated by %s" % [label, row[:modified_by]],
+                                          'info',
+                                          row[:modified_time])
+      end
+    end
+
+    notifications
   end
 end
