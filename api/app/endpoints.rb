@@ -656,13 +656,12 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/notifications') do
     if Ctx.user_logged_in?
+      notifications = []
+
       if Ctx.get.permissions.is_admin?
-        # TODO
-        #  - new users
-        #  - new locations
-        json_response([])
+        notifications += Users.get_notifications
+        notifications += Locations.get_notifications(false)
       else
-        notifications = []
         can_manage_file_issues = Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
         can_manage_transfers = Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
 
@@ -676,23 +675,27 @@ class MAPTheAPI < Sinatra::Base
 
         notifications += Conversations.get_notifications(can_manage_file_issues, can_manage_transfers)
 
-        # Sort descending and show events with timestamp at midnight to show at
-        # top of the day
-        json_response(notifications.sort {|a,b|
-          time_a = Time.at(a.timestamp / 1000)
-          time_b = Time.at(b.timestamp / 1000)
-
-          if time_a.hour == 0 && time_a.min == 0 && time_a.sec == 0
-            time_a = (time_a.to_date + 1).to_time
-          end
-
-          if time_b.hour == 0 && time_b.min == 0 && time_b.sec == 0
-            time_b = (time_b.to_date + 1).to_time
-          end
-
-          time_b <=> time_a
-        })
+        if Ctx.get.permissions.can_manage_locations?(Ctx.get.current_location.agency.fetch('id'))
+          notifications += Locations.get_notifications(true)
+        end
       end
+
+      # Sort descending and show events with timestamp at midnight to show at
+      # top of the day
+      json_response(notifications.sort {|a,b|
+        time_a = Time.at(a.timestamp / 1000)
+        time_b = Time.at(b.timestamp / 1000)
+
+        if time_a.hour == 0 && time_a.min == 0 && time_a.sec == 0
+          time_a = (time_a.to_date + 1).to_time
+        end
+
+        if time_b.hour == 0 && time_b.min == 0 && time_b.sec == 0
+          time_b = (time_b.to_date + 1).to_time
+        end
+
+        time_b <=> time_a
+      })
     else
       [404]
     end

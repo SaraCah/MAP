@@ -4,3 +4,6 @@ Notification = Struct.new(:record_type, :record_id, :identifier, :message, :leve
   end
 end
 
+module Notifications
+  NOTIFICATION_WINDOW = 7 # days
+end

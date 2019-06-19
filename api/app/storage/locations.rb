@@ -277,4 +277,83 @@ class Locations < BaseStorage
 
     AgencyLocationDTO.from_row(location, agency)
   end
+
+
+  def self.get_notifications(filter_by_current_agency = true)
+    notifications = []
+
+    locations_by_aspace_agency = {}
+
+    # any created or updated users
+    dataset = db[:agency_location]
+                .join(:agency, Sequel[:agency][:id] => Sequel[:agency_location][:agency_id])
+                .filter(Sequel[:agency_location][:create_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
+
+    if filter_by_current_agency
+      dataset = dataset.filter(Sequel[:agency_location][:agency_id] => Ctx.get.current_location.agency_id)
+    end
+
+    dataset.select(Sequel[:agency_location][:id],
+                   Sequel[:agency][:aspace_agency_id],
+                   Sequel[:agency_location][:name],
+                   Sequel[:agency_location][:create_time],
+                   Sequel[:agency_location][:created_by])
+      .each do |row|
+      locations_by_aspace_agency[row[:aspace_agency_id]] ||= []
+      locations_by_aspace_agency[row[:aspace_agency_id]] << row.to_hash
+    end
+
+    # modified
+    dataset = db[:agency_location]
+      .join(:agency, Sequel[:agency][:id] => Sequel[:agency_location][:agency_id])
+      .filter(Sequel[:agency_location][:modified_time] > Sequel[:agency_location][:create_time])
+      .filter(Sequel[:agency_location][:modified_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
+
+    if filter_by_current_agency
+      dataset = dataset.filter(Sequel[:agency_location][:agency_id] => Ctx.get.current_location.agency_id)
+    end
+
+    dataset.select(Sequel[:agency_location][:id],
+                   Sequel[:agency][:aspace_agency_id],
+                   Sequel[:agency_location][:name],
+                   Sequel[:agency_location][:modified_time],
+                   Sequel[:agency_location][:modified_by])
+      .each do |row|
+      locations_by_aspace_agency[row[:aspace_agency_id]] ||= []
+      locations_by_aspace_agency[row[:aspace_agency_id]] << row.to_hash
+    end
+
+    AspaceDB.open do |aspace_db|
+      aspace_db[:agent_corporate_entity]
+        .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
+        .filter(Sequel[:name_corporate_entity][:authorized] => 1)
+        .filter(Sequel[:agent_corporate_entity][:id] => locations_by_aspace_agency.keys)
+        .select(Sequel[:agent_corporate_entity][:id],
+                Sequel[:name_corporate_entity][:sort_name]).each do |row|
+        locations_by_aspace_agency.fetch(row[:id]).each do |notification_data|
+          notification_data[:agency_label] = row[:sort_name]
+        end
+      end
+    end
+
+    locations_by_aspace_agency.values.flatten.each do |notification_data|
+      if notification_data.include?(:create_time)
+        notifications << Notification.new('location',
+                                          notification_data.fetch(:id),
+                                          'Location',
+                                          '%s created by %s' % [notification_data.fetch(:name), notification_data.fetch(:created_by)],
+                                          'info',
+                                          notification_data.fetch(:create_time))
+      else
+        notifications << Notification.new('location',
+                                          notification_data.fetch(:id),
+                                          'Location',
+                                          '%s updated by %s' % [notification_data.fetch(:name), notification_data.fetch(:modified_by)],
+                                          'info',
+                                          notification_data.fetch(:modified_time))
+      end
+    end
+
+    notifications
+  end
 end

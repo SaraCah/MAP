@@ -261,7 +261,6 @@ class Transfers < BaseStorage
     errors
   end
 
-  NOTIFICATION_WINDOW = 7 # days
 
   def self.get_notifications
     notifications = []
@@ -272,7 +271,7 @@ class Transfers < BaseStorage
       db[record_type]
         .filter(Sequel[record_type][:agency_id] => Ctx.get.current_location.agency_id)
         .filter(Sequel[record_type][:agency_location_id] => Ctx.get.current_location.id)
-        .filter(Sequel[record_type][:create_time] > (Date.today - NOTIFICATION_WINDOW).to_time.to_i * 1000)
+        .filter(Sequel[record_type][:create_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
         .select(Sequel[record_type][:id],
                 Sequel[record_type][:create_time],
                 Sequel[record_type][:created_by])
@@ -290,7 +289,7 @@ class Transfers < BaseStorage
         .filter(Sequel[record_type][:agency_id] => Ctx.get.current_location.agency_id)
         .filter(Sequel[record_type][:agency_location_id] => Ctx.get.current_location.id)
         .filter(Sequel[record_type][:modified_time] > Sequel[record_type][:create_time])
-        .filter(Sequel[record_type][:modified_time] > (Date.today - NOTIFICATION_WINDOW).to_time.to_i * 1000)
+        .filter(Sequel[record_type][:modified_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
         .select(Sequel[record_type][:id],
                 Sequel[record_type][:modified_time],
                 Sequel[record_type][:modified_by])

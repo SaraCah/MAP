@@ -333,4 +333,42 @@ class Users < BaseStorage
 
       errors
   end
+
+
+  def self.get_notifications
+    notifications = []
+
+    # any created or updated users
+    db[:user]
+      .filter(Sequel[:user][:create_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
+      .select(Sequel[:user][:username],
+              Sequel[:user][:create_time],
+              Sequel[:user][:created_by])
+      .each do |row|
+      notifications << Notification.new(:user,
+                                        row[:username],
+                                        row[:username],
+                                        "User created by %s" % [row[:created_by]],
+                                        'info',
+                                        row[:create_time])
+    end
+
+    # modified
+    db[:user]
+      .filter(Sequel[:user][:modified_time] > Sequel[:user][:create_time])
+      .filter(Sequel[:user][:modified_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
+      .select(Sequel[:user][:username],
+              Sequel[:user][:modified_time],
+              Sequel[:user][:modified_by])
+      .each do |row|
+      notifications << Notification.new(:user,
+                                        row[:username],
+                                        row[:username],
+                                        "User updated by %s" % [row[:modified_by]],
+                                        'info',
+                                        row[:modified_time])
+    end
+
+    notifications
+  end
 end

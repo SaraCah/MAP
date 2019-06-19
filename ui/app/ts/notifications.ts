@@ -23,7 +23,7 @@ Vue.component('notifications', {
     <div class="card-content">
         <div class="card-title">Notifications</div>
         <template v-if="notifications.length > 0">
-            <table>
+            <table class="striped">
                 <thead>
                     <th></th>
                     <th>Record</th>
@@ -84,6 +84,10 @@ Vue.component('notifications', {
                 return "/transfers/" + recordId;
             } else if (recordType === 'transfer_proposal') {
                 return "/transfer-proposals/" + recordId;
+            } else if (recordType === 'user') {
+                return "/users/edit?username=" + recordId;
+            } else if (recordType === 'location') {
+                return "/locations/" + recordId;
             }
             return "alert('ERROR');";
         },

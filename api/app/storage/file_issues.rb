@@ -335,8 +335,6 @@ class FileIssues < BaseStorage
   end
 
 
-  NOTIFICATION_WINDOW = 7 # days
-
   def self.get_notifications
     notifications = []
 
@@ -370,7 +368,7 @@ class FileIssues < BaseStorage
       .filter(Sequel.~(Sequel[:file_issue_item][:dispatch_date] => nil))
       .filter(Sequel.~(Sequel[:file_issue_item][:expiry_date] => nil))
       .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today }
-      .filter{ Sequel[:file_issue_item][:expiry_date] >= Date.today - NOTIFICATION_WINDOW }
+      .filter{ Sequel[:file_issue_item][:expiry_date] >= Date.today - Notifications::NOTIFICATION_WINDOW }
       .select(Sequel[:file_issue][:id],
               Sequel[:file_issue][:issue_type],
               Sequel[:file_issue_item][:expiry_date])
@@ -390,7 +388,7 @@ class FileIssues < BaseStorage
       .filter(Sequel[:file_issue_item][:returned_date] => nil)
       .filter(Sequel.~(Sequel[:file_issue_item][:expiry_date] => nil))
       .filter{ Sequel[:file_issue_item][:expiry_date] >= Date.today }
-      .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today + NOTIFICATION_WINDOW }
+      .filter{ Sequel[:file_issue_item][:expiry_date] < Date.today + Notifications::NOTIFICATION_WINDOW }
       .select(Sequel[:file_issue][:id],
               Sequel[:file_issue][:issue_type],
               Sequel[:file_issue_item][:expiry_date])
@@ -430,7 +428,7 @@ class FileIssues < BaseStorage
     AspaceDB.open do |aspace_db|
       aspace_db[:service_quote]
         .filter(Sequel[:service_quote][:id] => quote_to_request.keys)
-        .filter{ Sequel[:service_quote][:issued_date] > Date.today - NOTIFICATION_WINDOW }
+        .filter{ Sequel[:service_quote][:issued_date] > Date.today - Notifications::NOTIFICATION_WINDOW }
         .select(Sequel[:service_quote][:id],
                 Sequel[:service_quote][:issued_date])
         .map do |row|
@@ -450,7 +448,7 @@ class FileIssues < BaseStorage
       dataset = db[record_type]
                   .filter(Sequel[record_type][:agency_id] => Ctx.get.current_location.agency_id)
                   .filter(Sequel[record_type][:agency_location_id] => Ctx.get.current_location.id)
-                  .filter(Sequel[record_type][:create_time] > (Date.today - NOTIFICATION_WINDOW).to_time.to_i * 1000)
+                  .filter(Sequel[record_type][:create_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
                   .select(Sequel[record_type][:id],
                           Sequel[record_type][:create_time],
                           Sequel[record_type][:created_by])
@@ -479,7 +477,7 @@ class FileIssues < BaseStorage
         .filter(Sequel[record_type][:agency_id] => Ctx.get.current_location.agency_id)
         .filter(Sequel[record_type][:agency_location_id] => Ctx.get.current_location.id)
         .filter(Sequel[record_type][:modified_time] > Sequel[record_type][:create_time])
-        .filter(Sequel[record_type][:modified_time] > (Date.today - NOTIFICATION_WINDOW).to_time.to_i * 1000)
+        .filter(Sequel[record_type][:modified_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
         .select(Sequel[record_type][:id],
                 Sequel[record_type][:modified_time],
                 Sequel[record_type][:modified_by])

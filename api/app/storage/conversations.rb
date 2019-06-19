@@ -21,7 +21,7 @@ class Conversations < BaseStorage
               create_time: java.lang.System.currentTimeMillis)
   end
 
-  NOTIFICATION_WINDOW = 7 # days
+
   def self.get_notifications(can_manage_file_issues, can_manage_transfers)
     notifications = []
 
@@ -37,7 +37,7 @@ class Conversations < BaseStorage
         .join(record_type, Sequel[record_type][:id] => Sequel[:handle][column])
         .filter(Sequel[record_type][:agency_id] => Ctx.get.current_location.agency_id)
         .filter(Sequel[record_type][:agency_location_id] => Ctx.get.current_location.id)
-        .filter(Sequel[:conversation][:create_time] > (Date.today - NOTIFICATION_WINDOW).to_time.to_i * 1000)
+        .filter(Sequel[:conversation][:create_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
         .filter(Sequel.~(Sequel[:conversation][:created_by] => Ctx.username))
         .select(Sequel[record_type][:id],
                 Sequel[:conversation][:message],
