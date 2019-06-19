@@ -41,7 +41,7 @@ class Transfers < BaseStorage
 
     dataset = dataset.limit(page_size, page * page_size)
 
-    sort_by = PROPOSAL_SORT_OPTIONS.fetch(sort, PROPOSAL_SORT_OPTIONS.fetch('id_asc'))
+    sort_by = PROPOSAL_SORT_OPTIONS.fetch(sort, PROPOSAL_SORT_OPTIONS.fetch('id_desc'))
 
     dataset = dataset.order(sort_by)
 
@@ -187,7 +187,7 @@ class Transfers < BaseStorage
 
     dataset = dataset.limit(page_size, page * page_size)
 
-    sort_by = TRANSFER_SORT_OPTIONS.fetch(sort, TRANSFER_SORT_OPTIONS.fetch('id_asc'))
+    sort_by = TRANSFER_SORT_OPTIONS.fetch(sort, TRANSFER_SORT_OPTIONS.fetch('id_desc'))
 
     dataset = dataset.order(sort_by)
 

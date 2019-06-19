@@ -63,7 +63,7 @@ Vue.component('file-issues-search', {
 `,
     data: function(): {selectedSort: string, selectedStatus: string, selectedIssueType: string} {
         return {
-            selectedSort: this.sort || 'id_asc',
+            selectedSort: this.sort || 'id_desc',
             selectedStatus: this.status || undefined,
             selectedIssueType: this.issue_type || undefined,
         };

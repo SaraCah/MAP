@@ -52,7 +52,7 @@ Vue.component('transfers-search', {
 `,
     data: function(): {selectedSort: string, selectedStatus: string} {
         return {
-            selectedSort: this.sort || 'id_asc',
+            selectedSort: this.sort || 'id_desc',
             selectedStatus: this.status || undefined,
         };
     },

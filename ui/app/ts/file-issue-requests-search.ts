@@ -63,7 +63,7 @@ Vue.component('file-issue-requests-search', {
 `,
     data: function(): {selectedSort: string, selectedDigitalRequestStatus: string, selectedPhysicalRequestStatus: string} {
         return {
-            selectedSort: this.sort || 'id_asc',
+            selectedSort: this.sort || 'id_desc',
             selectedDigitalRequestStatus: this.digital_request_status || undefined,
             selectedPhysicalRequestStatus: this.physical_request_status || undefined,
         };

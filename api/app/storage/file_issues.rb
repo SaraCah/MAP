@@ -48,7 +48,7 @@ class FileIssues < BaseStorage
 
     dataset = dataset.limit(page_size, page * page_size)
 
-    sort_by = REQUEST_SORT_OPTIONS.fetch(sort, REQUEST_SORT_OPTIONS.fetch('id_asc'))
+    sort_by = REQUEST_SORT_OPTIONS.fetch(sort, REQUEST_SORT_OPTIONS.fetch('id_desc'))
 
     dataset = dataset.order(sort_by)
 
@@ -262,7 +262,7 @@ class FileIssues < BaseStorage
 
     dataset = dataset.limit(page_size, page * page_size)
 
-    sort_by = FILE_ISSUE_SORT_OPTIONS.fetch(sort, FILE_ISSUE_SORT_OPTIONS.fetch('id_asc'))
+    sort_by = FILE_ISSUE_SORT_OPTIONS.fetch(sort, FILE_ISSUE_SORT_OPTIONS.fetch('id_desc'))
 
     dataset = dataset.order(sort_by)
 
