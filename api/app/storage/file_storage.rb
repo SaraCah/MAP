@@ -16,7 +16,7 @@ class FileStorage
   def store(io, key = nil)
     key ||= SecureRandom.hex
 
-    File.open(File.join(@basedir, key), "w") do |fh|
+    File.open(File.join(@basedir, key), "wb") do |fh|
       io.each(4096) do |chunk|
         fh << chunk
       end
@@ -26,7 +26,7 @@ class FileStorage
   end
 
   def get_stream(key, &block)
-    File.open(File.join(@basedir, key), "r") do |fh|
+    File.open(File.join(@basedir, key), "rb") do |fh|
       fh.each(4096) do |chunk|
         block.call(chunk)
       end
