@@ -58,6 +58,10 @@ echo "Installing gems"
 scripts/jruby.sh distlibs/gems/bin/bundle install
 scripts/jruby.sh distlibs/gems/bin/bundle update --all
 
+# Remove BUNDLED WITH if it appears
+if grep 'BUNDLED WITH' Gemfile.lock; then
+    echo -e '/BUNDLED WITH\nd\nd\nw' | ed Gemfile.lock
+fi
 
 if [ ! -d "solr_dist" ]; then
     echo
