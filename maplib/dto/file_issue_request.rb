@@ -23,7 +23,7 @@ class FileIssueRequest
   define_field(:preapprove_quotes, Boolean, default: false)
   define_field(:draft, Boolean, default: true)
   define_field(:delivery_location, String)
-  define_field(:delivery_authorizer, String, validator: proc {|s, request| request.is_delivery_authorizer_required? ? "Delivery Authorizer can't be blank" : nil })
+  define_field(:delivery_authorizer, String, required: false)
   define_field(:items, [FileIssueRequestItem], default: [], validator: proc {|arr, dto| arr.empty? && !dto.fetch(:draft, false) ? "Items can't be empty" : nil })
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)
