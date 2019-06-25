@@ -26,7 +26,7 @@
             <% paged_results.results.each do |file_issue| %>
             <tr>
                 <td><%= file_issue.id_for_display %></td>
-                <td><%= file_issue.fetch('request_type') %></td>
+                <td><%= file_issue.request_type_display_string %></td>
                 <td><%= file_issue.fetch('issue_type') === 'DIGITAL' ? 'Digitised copy' : 'Original' %></td>
                 <td><%= file_issue.fetch('status') %></td>
                 <td><%= file_issue.fetch('created_by') %></td>

@@ -73,4 +73,14 @@ class FileIssue
       item.expired?
     end
   end
+
+  def request_type_display_string
+    if AppConfig[:file_issue_request_types].include?(fetch('request_type'))
+      fetch('request_type')
+    elsif fetch('request_type') == 'Other'
+      fetch('request_type')
+    else
+      ['Other', fetch('request_type')].join(' - ')
+    end
+  end
 end
