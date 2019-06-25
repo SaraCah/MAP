@@ -104,7 +104,11 @@ class FileIssues < BaseStorage
   end
 
   def self.request_dto_for(file_issue_request_id)
-    handle_id = db[:handle][file_issue_request_id: file_issue_request_id][:id]
+    handle_row = db[:handle][file_issue_request_id: file_issue_request_id]
+
+    return nil unless handle_row
+
+    handle_id = handle_row[:id]
     row = db[:file_issue_request][id: file_issue_request_id]
 
     digital_request_id = nil

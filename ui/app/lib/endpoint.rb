@@ -117,6 +117,8 @@ class Endpoint
         Ctx.get.session = session || {}
         begin
           return app_instance.instance_eval(&block)
+        rescue MAPAPIClient::NotFoundError
+          return [404, {}, "Not Found"]
         rescue MAPAPIClient::SessionGoneError
           # The backend session gone dropped.  You're logged out now.
           session[:api_session_id] = nil

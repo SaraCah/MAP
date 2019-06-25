@@ -517,6 +517,13 @@ class MAPAPIClient
     end
   end
 
+  class NotFoundError < StandardError
+    def initialize(json)
+      @json = json
+      super
+    end
+  end
+
   class FileIssueExpired < StandardError; end
   class FileIssueNotFound < StandardError; end
   class FileIssueNotDispatched < StandardError; end
@@ -655,6 +662,11 @@ class MAPAPIClient
 
   def check_errors!(response)
     if !response.code.start_with?('2')
+
+      if response.code == '404'
+        raise NotFoundError.new('Not Found')
+      end
+
       error = JSON.parse(response.body)
 
       if error.fetch('SERVER_ERROR', {})['type'] == 'Sessions::SessionNotFoundError'
