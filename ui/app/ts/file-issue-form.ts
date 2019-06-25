@@ -413,8 +413,8 @@ Vue.component('requested-items-table', {
                         </template>
                         <template v-else>
                             <select class="browser-default" :name="buildPath('request_type')" v-model="representation.requestType">
-                                <option value="DIGITAL">Digital</option>
-                                <option value="PHYSICAL">Physical</option>
+                                <option value="DIGITAL">Digitised copy</option>
+                                <option value="PHYSICAL">Original</option>
                             </select>
                         </template>
                     </div>
