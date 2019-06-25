@@ -202,7 +202,17 @@ class FileIssues < BaseStorage
 
     raise StaleRecordException.new if updated == 0
 
-    verify_item_access!(file_issue_request.fetch('items', []))
+    existing_item_refs = db[:file_issue_request_item]
+                       .filter(:file_issue_request_id => file_issue_request_id)
+                       .select(:aspace_record_type, :aspace_record_id)
+                       .map {|row|
+      '%s:%s' % [row[:aspace_record_type], row[:aspace_record_id]]
+    }
+
+    # Identify newly added items and make sure access is OK.
+    verify_item_access!(file_issue_request.fetch('items', []).select {|item|
+                          !existing_item_refs.include?(item.fetch('record_ref'))
+                        })
 
     db[:file_issue_request_item]
       .filter(file_issue_request_id: file_issue_request_id)
@@ -555,7 +565,7 @@ class FileIssues < BaseStorage
     items.each do |item|
       unless controlled.include?(item.fetch('record_ref'))
         $LOG.error("Requested item '%s' does not appear to be available to current agency" % item.fetch('record_ref'))
-        raise "Cannot complete request"
+        raise StaleRecordException.new
       end
     end
   end
