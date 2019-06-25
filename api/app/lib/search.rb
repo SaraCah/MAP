@@ -234,6 +234,19 @@ class Search
     }
   end
 
+  def self.select_controlled_records(permissions, record_refs)
+    results = solr_handle_search('q' => '*:*',
+                                 'fq' => ['{!terms f=id}%s' % record_refs.join(','),
+                                          build_controlled_records_filter(permissions)],
+                                 'rows' => record_refs.size,
+                                 'fl' => 'id',
+                                 'start' => 0)
+
+    results.fetch('response').fetch('docs').map {|result|
+      result.fetch('id')
+    }
+  end
+
   def self.get_record(record_ref, permissions)
     solr_handle_search(q: "id:#{solr_escape(record_ref)}", fq: build_controlled_records_filter(permissions))
       .fetch('response')

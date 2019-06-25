@@ -90,6 +90,8 @@ class FileIssues < BaseStorage
 
     db[:handle].insert(file_issue_request_id: file_issue_request_id)
 
+    verify_item_access!(file_issue_request.fetch('items', []))
+
     file_issue_request.fetch('items').each do |item|
       (record_type, record_id) = item.fetch('record_ref').split(':')
       db[:file_issue_request_item]
@@ -199,6 +201,8 @@ class FileIssues < BaseStorage
                         system_mtime: Time.now)
 
     raise StaleRecordException.new if updated == 0
+
+    verify_item_access!(file_issue_request.fetch('items', []))
 
     db[:file_issue_request_item]
       .filter(file_issue_request_id: file_issue_request_id)
@@ -536,6 +540,22 @@ class FileIssues < BaseStorage
       rescue => e
         $LOG.error("Failure while fetching token #{token}: #{e}")
         {status: :missing}
+      end
+    end
+  end
+
+  # If the user is choosing their items from the search results with no funny
+  # business, this should never happen.
+  #
+  # Just here to catch people monkeying with their requests.
+  #
+  def self.verify_item_access!(items)
+    controlled = Search.select_controlled_records(Ctx.get.permissions, items.map {|item| item.fetch('record_ref')})
+
+    items.each do |item|
+      unless controlled.include?(item.fetch('record_ref'))
+        $LOG.error("Requested item '%s' does not appear to be available to current agency" % item.fetch('record_ref'))
+        raise "Cannot complete request"
       end
     end
   end
