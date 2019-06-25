@@ -20,7 +20,7 @@
                                         <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Quote Provided</li>
                                         <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">
                                             Quote Accepted
-                                            <% if request.fetch('preapprove_quotes', false) %><div><span data-badge-caption="Quote Preapproved" class="new badge"></span></div><% end %>
+                                            <% if request.fetch('preapprove_quotes', false) %><div><span data-badge-caption="Quote Pre-approved" class="new badge"></span></div><% end %>
                                         </li>
                                         <li class="last <% if request.fetch('digital_request_status', '') == 'FILE_ISSUE_CREATED' %>current<% end %>">File Issue Created</li>
                                         <li class="stand-alone <% if request.fetch('digital_request_status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled by Agency</li>
@@ -35,7 +35,7 @@
                                             <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Quote Provided</li>
                                             <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">
                                                 Quote Accepted
-                                                <% if request.fetch('preapprove_quotes', false) %><div><strong>(Quote Preapproved)</strong></div><% end %>
+                                                <% if request.fetch('preapprove_quotes', false) %><div><span data-badge-caption="Quote Pre-approved" class="new badge"></span></div><% end %>
                                             </li>
                                             <li class="last <% if request.fetch('physical_request_status', '') == 'FILE_ISSUE_CREATED' %>current<% end %>">File Issue Created</li>
                                             <li class="stand-alone <% if request.fetch('physical_request_status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled by Agency</li>
@@ -141,7 +141,7 @@
                             <div class="col s12">
                                 <label>
                                     <input name="file_issue_request[preapprove_quotes]" value="yes" type="checkbox" <% if request.fetch('preapprove_quotes', false) %>checked<% end %> <% if is_readonly %>disabled<% end %> />
-                                    <span>Preapprove Quotes?</span>
+                                    <span>Pre-approve Quotes?</span>
                                 </label>
                             </div>
                         </div>
