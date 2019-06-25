@@ -425,7 +425,7 @@ Vue.component('requested-items-table', {
             <td colspan="13">
                 <div class="row">
                     <div class="col s2">
-                        <label>Request Type</label>
+                        <label>Issue Type</label>
                         <template v-if="readonly || representation.isDigitalRepresentation()">
                             <input type="hidden" :name="buildPath('request_type')" v-model="representation.requestType" readonly />
                             <input type="text" v-bind:value="representation.requestType === 'DIGITAL' ? 'Digitised copy' : 'Original'" readonly />
