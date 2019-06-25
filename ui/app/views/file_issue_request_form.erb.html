@@ -139,6 +139,7 @@
                             <div class="input-field col s12">
                                 <input id="delivery_authorizer" type="text" name="file_issue_request[delivery_authorizer]" value="<%= request.fetch('delivery_authorizer', '') %>" <% if is_readonly %>disabled<% end %> />
                                 <label for="delivery_authorizer">Person preferred to receive the File Issue</label>
+                                <span id="delivery_authorizer_reading_room_note" class="helper-text <% if request.fetch('delivery_location', 'AGENCY_LOCATION') != 'READING_ROOM' %>hide<% end %>">If nominating someone other than the requesting officer to access closed records in the reading room, they must have permission from your agency’s authorised officer</span>
                             </div>
                         </div>
                         <div class="row">
