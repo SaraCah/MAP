@@ -101,7 +101,7 @@
                                     input_id="request_type"
                                     input_name="file_issue_request[request_type]"
                                     input_label="Request Type"
-                                    options_json="<%= AppConfig[:file_issue_request_types].to_json %>"
+                                    options_json="<%= request.available_request_types.to_json %>"
                                     current_selection="<%= request.fetch('request_type', '') %>"
                                     is_readonly="<%= is_readonly %>">
                                 </select-with-other-option>

@@ -39,8 +39,16 @@ class FileIssueRequest
   define_field(:physical_processing_estimate, String, required: false)
 
   def self.from_hash(hash)
-    if hash[:urgent] == 'yes'
-      hash[:urgent] = true
+    if hash['urgent'] == 'yes'
+      hash['urgent'] = true
+    end
+
+    if hash['preapprove_quotes'] == 'yes'
+      hash['preapprove_quotes'] = true
+    end
+
+    if hash['request_type'].nil? || hash['request_type'].strip.empty?
+      hash['request_type'] = 'Other'
     end
 
     super(hash)
@@ -111,5 +119,19 @@ class FileIssueRequest
     s = fetch('delivery_authorizer', nil)
 
     s.nil? || s.empty?
+  end
+
+  def available_request_types
+    AppConfig[:file_issue_request_types]
+  end
+
+  def request_type_display_string
+    if AppConfig[:file_issue_request_types].include?(fetch('request_type'))
+      fetch('request_type')
+    elsif fetch('request_type') == 'Other'
+      fetch('request_type')
+    else
+      ['Other', fetch('request_type')].join(' - ')
+    end
   end
 end

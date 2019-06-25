@@ -31,7 +31,7 @@
             <% paged_results.results.each do |file_issue_request| %>
             <tr>
                 <td><%= file_issue_request.id_for_display %></td>
-                <td><%= file_issue_request.fetch('request_type') %></td>
+                <td><%= file_issue_request.request_type_display_string %></td>
                 <td><% if file_issue_request.fetch('urgent') %>Yes<% else %>No<% end %></td>
                 <td><%= file_issue_request.fetch('draft') ? FileIssueRequest::NONE_REQUESTED : file_issue_request.fetch('digital_request_status') %></td>
                 <td><%= file_issue_request.fetch('draft') ? FileIssueRequest::NONE_REQUESTED : file_issue_request.fetch('physical_request_status') %></td>

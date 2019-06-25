@@ -38,7 +38,12 @@ Vue.component('select-with-other-option', {
         });
 
         const selectedValue = (selectedOption === null) ? 'Other' : selectedOption.value;
-        const otherText = (selectedOption === null) ? this.current_selection : '';
+        let otherText = '';
+        if (selectedValue === 'Other') {
+            if (this.current_selection !== 'Other') {
+                otherText = this.current_selection;
+            }
+        }
 
         return {
             otherText: otherText,
