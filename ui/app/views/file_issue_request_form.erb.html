@@ -109,10 +109,14 @@
                         </div>
                         <div class="row">
                             <div class="col s12">
-                                <label>
-                                    <input name="file_issue_request[urgent]" value="yes" type="checkbox" <% if request.fetch('urgent', false) %>checked<% end %> <% if is_readonly %>disabled<% end %> />
-                                    <span>Urgent?</span>
-                                </label>
+                                <div class="input-field">
+                                    <label>
+                                        <input name="file_issue_request[urgent]" value="yes" type="checkbox" <% if request.fetch('urgent', false) %>checked<% end %> <% if is_readonly %>disabled<% end %> />
+                                        <span>Urgent?</span>
+                                        <span class="helper-text">Please be aware fees apply for urgent requests</span>
+                                    </label>
+                                </div>
+                                <br><br>
                             </div>
                         </div>
                         <div class="row">
