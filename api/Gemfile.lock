@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/hudmol/map_validator.git
-  revision: 45c48e8b92f03118f0f09e81077c560d70322ec2
+  revision: 7dc1842ecccabc39c4338e11f58c676b4bf1d4ff
   branch: master
   specs:
     map_validator (0.0.1)
@@ -17,7 +17,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     aws-eventstream (1.0.3)
-    aws-partitions (1.177.0)
+    aws-partitions (1.178.0)
     aws-sdk-core (3.56.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1.0)
@@ -80,3 +80,4 @@ DEPENDENCIES
   sinatra (= 2.0.5)
   sinatra-contrib (= 2.0.5)
   xlsx_streaming_reader!
+
