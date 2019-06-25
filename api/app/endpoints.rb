@@ -474,7 +474,7 @@ class MAPTheAPI < Sinatra::Base
       if VALIDATION_SEMAPHORE.try_acquire(1, 60, java.util.concurrent.TimeUnit::SECONDS)
         begin
           import_validator = MapValidator.new
-          import_validator.run_validations(import_file.path, import_validator.sample_validations)
+          import_validator.run_validations(import_file.path, import_validator.base_validations)
           import_validator.notifications.notification_list.each do |notification|
             if notification.source.to_s.empty?
               errors << "#{notification.type} - #{notification.message}"
