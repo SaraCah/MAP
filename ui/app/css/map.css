@@ -259,6 +259,12 @@ a#userMenuTrigger:after {
     background-color: white;
 }
 
+.status-infomatic li .badge {
+    margin: 0;
+    float: none;
+    display: inline-block;
+}
+
 .toc-wrapper .table-of-contents {
     margin: 0;
     padding: 0;

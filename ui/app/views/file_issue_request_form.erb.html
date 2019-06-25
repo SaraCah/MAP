@@ -18,7 +18,10 @@
                                         <li class="first <% if request.new? || request.fetch('draft') || request.fetch('status', '') == 'NONE_REQUESTED' %>current<% end %>">Add Request Details</li>
                                         <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_REQUESTED' %>current<% end %>">Quote Requested</li>
                                         <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Quote Provided</li>
-                                        <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">Quote Accepted</li>
+                                        <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">
+                                            Quote Accepted
+                                            <% if request.fetch('preapprove_quotes', false) %><div><span data-badge-caption="Quote Preapproved" class="new badge"></span></div><% end %>
+                                        </li>
                                         <li class="last <% if request.fetch('digital_request_status', '') == 'FILE_ISSUE_CREATED' %>current<% end %>">File Issue Created</li>
                                         <li class="stand-alone <% if request.fetch('digital_request_status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled by Agency</li>
                                         <li class="stand-alone <% if request.fetch('digital_request_status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled by QSA</li>
@@ -30,7 +33,10 @@
                                             <li class="first <% if request.new? %>current<% end %>">Add Request Details</li>
                                             <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_REQUESTED' %>current<% end %>">Quote Requested</li>
                                             <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Quote Provided</li>
-                                            <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">Quote Accepted</li>
+                                            <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">
+                                                Quote Accepted
+                                                <% if request.fetch('preapprove_quotes', false) %><div><strong>(Quote Preapproved)</strong></div><% end %>
+                                            </li>
                                             <li class="last <% if request.fetch('physical_request_status', '') == 'FILE_ISSUE_CREATED' %>current<% end %>">File Issue Created</li>
                                             <li class="stand-alone <% if request.fetch('physical_request_status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled by Agency</li>
                                             <li class="stand-alone <% if request.fetch('physical_request_status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled by QSA</li>
@@ -129,6 +135,14 @@
                             <div class="input-field col s12">
                                 <input id="delivery_authorizer" type="text" name="file_issue_request[delivery_authorizer]" value="<%= request.fetch('delivery_authorizer', '') %>" <% if is_readonly %>disabled<% end %> />
                                 <label for="delivery_authorizer">Please Authorise to Receive Delivery</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <label>
+                                    <input name="file_issue_request[preapprove_quotes]" value="yes" type="checkbox" <% if request.fetch('preapprove_quotes', false) %>checked<% end %> <% if is_readonly %>disabled<% end %> />
+                                    <span>Preapprove Quotes?</span>
+                                </label>
                             </div>
                         </div>
                     </section>

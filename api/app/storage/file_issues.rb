@@ -72,6 +72,7 @@ class FileIssues < BaseStorage
 
     file_issue_request_id = db[:file_issue_request].insert(request_type: file_issue_request.fetch('request_type'),
                                                            urgent: file_issue_request.fetch('urgent') ? 1 : 0,
+                                                           preapprove_quotes: file_issue_request.fetch('preapprove_quotes') ? 1 : 0,
                                                            draft: file_issue_request.fetch('draft') ? 1 : 0,
                                                            delivery_location: file_issue_request.fetch('delivery_location'),
                                                            delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
@@ -180,6 +181,7 @@ class FileIssues < BaseStorage
                 .filter(lock_version: file_issue_request.fetch('lock_version'))
                 .update(request_type: file_issue_request.fetch('request_type'),
                         urgent: file_issue_request.fetch('urgent') ? 1 : 0,
+                        preapprove_quotes: file_issue_request.fetch('preapprove_quotes') ? 1 : 0,
                         draft: file_issue_request.fetch('draft') ? 1 : 0,
                         digital_request_status: digital_request_status, # assume any change forces a quote redo
                         physical_request_status: physical_request_status, # assume any change forces a quote redo
