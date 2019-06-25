@@ -12,10 +12,10 @@
                         <div class="col s12">
                             <div class="card">
                                 <div class="card-content">
-                                    <% if request.new? || request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'} %>
+                                    <% if request.new? || request.fetch('draft') || request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'} %>
                                     <span class="card-title">Digital Request Status</span>
                                     <ul class="status-infomatic">
-                                        <li class="first <% if request.new? || request.fetch('status', '') == 'NONE_REQUESTED' %>current<% end %>">Add Request Details</li>
+                                        <li class="first <% if request.new? || request.fetch('draft') || request.fetch('status', '') == 'NONE_REQUESTED' %>current<% end %>">Add Request Details</li>
                                         <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_REQUESTED' %>current<% end %>">Quote Requested</li>
                                         <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Quote Provided</li>
                                         <li class="<% if request.fetch('digital_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">Quote Accepted</li>
