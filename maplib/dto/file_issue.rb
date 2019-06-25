@@ -83,4 +83,8 @@ class FileIssue
       ['Other', fetch('request_type')].join(' - ')
     end
   end
+
+  def issue_type_display_string
+    fetch('issue_type') === 'DIGITAL' ? 'Digitised copy' : 'Original'
+  end
 end
