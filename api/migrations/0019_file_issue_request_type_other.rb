@@ -5,6 +5,8 @@ Sequel.migration do
     self[:file_issue_request]
       .filter(:request_type => 'other')
       .update(:request_type => 'Other')
-
+    self[:file_issue]
+      .filter(:request_type => 'other')
+      .update(:request_type => 'Other')
   end
 end

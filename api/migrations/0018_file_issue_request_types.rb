@@ -6,8 +6,14 @@ Sequel.migration do
     self[:file_issue_request]
       .filter(:request_type => 'NATIONAL_REDRESS_SCHEME')
       .update(:request_type => 'National Redress Scheme')
-
     self[:file_issue_request]
+      .filter(:request_type => 'RIGHT_TO_INFORMATION')
+      .update(:request_type => 'Right to Information')
+
+    self[:file_issue]
+      .filter(:request_type => 'NATIONAL_REDRESS_SCHEME')
+      .update(:request_type => 'National Redress Scheme')
+    self[:file_issue]
       .filter(:request_type => 'RIGHT_TO_INFORMATION')
       .update(:request_type => 'Right to Information')
 

@@ -27,7 +27,7 @@
             <tr>
                 <td><%= file_issue.id_for_display %></td>
                 <td><%= file_issue.fetch('request_type') %></td>
-                <td><%= file_issue.fetch('issue_type') %></td>
+                <td><%= file_issue.fetch('issue_type') === 'DIGITAL' ? 'Digitised copy' : 'Original' %></td>
                 <td><%= file_issue.fetch('status') %></td>
                 <td><%= file_issue.fetch('created_by') %></td>
                 <td><%= Time.at(file_issue.fetch('create_time') / 1000)%></td>
