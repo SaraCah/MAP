@@ -298,6 +298,8 @@ class Users < BaseStorage
   def self.dto_for(username)
     user = db[:user][:username => username]
 
+    return nil unless user
+
     UserDTO.from_row(
       user,
       Permissions.agency_roles_for_user(user[:id], with_labels: true))
