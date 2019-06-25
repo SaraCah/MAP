@@ -16,10 +16,10 @@ Vue.component('select-with-other-option', {
 <div>
     <label :for="input_id">{{input_label}}</label>
     <select id="request_type" :name="input_name" class="browser-default" v-model="selectedValue" :disabled="readonly">
-        <option v-for="option in options" :value="option.value">{{option.label}}</option>
-        <option value="OTHER">Other</option>
+        <option v-for="option in options" :value="option">{{option}}</option>
+        <option value="Other">Other</option>
     </select>
-    <template v-if="selectedValue === 'OTHER'">
+    <template v-if="selectedValue === 'Other'">
         <input type="text" :name="input_name" v-model="otherText" :placeholder="'Please enter your ' + input_label + '...'"  :disabled="readonly" />
     </template>
 </div>
@@ -37,7 +37,7 @@ Vue.component('select-with-other-option', {
             return opt.value === this.current_selection;
         });
 
-        const selectedValue = (selectedOption === null) ? 'OTHER' : selectedOption.value;
+        const selectedValue = (selectedOption === null) ? 'Other' : selectedOption.value;
         const otherText = (selectedOption === null) ? this.current_selection : '';
 
         return {
