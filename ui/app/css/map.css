@@ -293,6 +293,10 @@ a#userMenuTrigger:after {
     margin: 0.5em 0 0 0;
 }
 
+.file-issue-requested-items-table tbody:nth-child(2n) td {
+    background-color: #FAFAFA;
+}
+
 .tabs .tab {
     position: relative;
 }

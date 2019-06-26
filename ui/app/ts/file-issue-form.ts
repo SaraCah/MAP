@@ -365,17 +365,32 @@ Vue.component('requested-items-table', {
 <table class="file-issue-requested-items-table">
     <thead>
         <tr>
-            <th>Identifiers</th>
-            <th>Title</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Format</th>
-            <th>File Issue Allowed</th>
-            <th>Extra Information</th>
+            <th style="width:140px;">Issue Type</th>
+            <th style="width:160px">Identifiers</th>
+            <th style="min-width: 200px;">Title</th>
+            <th>Dates</th>
+            <th style="width:80px;">Format</th>
+            <th style="min-width: 200px;">Extra Information</th>
+            <th v-if="!readonly" style="width:40px;"></th>
         </tr>
     </thead>
     <tbody v-for="representation in requested_items">
         <tr>
+            <td>
+                <template v-if="readonly || representation.isDigitalRepresentation()">
+                    <input type="hidden" :name="buildPath('request_type')" v-model="representation.requestType" readonly />
+                    <input type="text" v-bind:value="representation.requestType === 'DIGITAL' ? 'Digitised copy' : 'Original'" readonly />
+                </template>
+                <template v-else-if="representation.isDigitalRepresentation()">
+                    <input type="text" :name="buildPath('request_type')" v-model="representation.requestType" readonly />
+                </template>
+                <template v-else>
+                    <select class="browser-default" :name="buildPath('request_type')" v-model="representation.requestType">
+                        <option value="DIGITAL">Digitised copy</option>
+                        <option value="PHYSICAL">Original</option>
+                    </select>
+                </template>
+            </td>
             <td>
               <input type="hidden" :name="buildPath('record_ref')" v-bind:value="representation.id"/>
               <input type="hidden" :name="buildPath('record_label')" v-bind:value="representation.label"/>
@@ -395,14 +410,9 @@ Vue.component('requested-items-table', {
 
             <td>{{representation.metadata.title}}</td>
 
-            <td>{{representation.metadata.start_date}}</td>
-            <td>{{representation.metadata.end_date}}</td>
+            <td>{{representation.metadata.start_date}} - {{representation.metadata.end_date}}</td>
 
             <td>{{representation.metadata.format}}</td>
-            <td>
-              <span v-if="representation.metadata.file_issue_allowed">yes</span>
-              <span v-else>no</span>
-            </td>
 
             <td>
               <section class="extra-info" v-if="representation.metadata.intended_use">
@@ -420,36 +430,18 @@ Vue.component('requested-items-table', {
                 <p>{{representation.metadata.processing_handling_notes}}</p>
               </section>
             </td>
+            <td v-if="!readonly">
+                <div class="right-align">
+                    <a class="btn btn-small red darken-1" v-on:click="removeItem(representation)" title="Remove"><i class="fa fa-minus-circle" style="font-size: 1em;"></i></a>
+                </div>
+            </td>
         </tr>
         <tr>
             <td colspan="13">
                 <div class="row">
-                    <div class="col s2">
-                        <label>Issue Type</label>
-                        <template v-if="readonly || representation.isDigitalRepresentation()">
-                            <input type="hidden" :name="buildPath('request_type')" v-model="representation.requestType" readonly />
-                            <input type="text" v-bind:value="representation.requestType === 'DIGITAL' ? 'Digitised copy' : 'Original'" readonly />
-                        </template>
-                        <template v-else-if="representation.isDigitalRepresentation()">
-                            <input type="text" :name="buildPath('request_type')" v-model="representation.requestType" readonly />
-                        </template>
-                        <template v-else>
-                            <select class="browser-default" :name="buildPath('request_type')" v-model="representation.requestType">
-                                <option value="DIGITAL">Digitised copy</option>
-                                <option value="PHYSICAL">Original</option>
-                            </select>
-                        </template>
-                    </div>
-                    <div class="col s8">
+                    <div class="col offset-s1 s10">
                         <label>Record Details</label>
                         <textarea class="materialize-textarea" :name="buildPath('record_details')" v-model="representation.recordDetails" :readonly="readonly"></textarea>
-                    </div>
-                    <div class="col s2">
-                        <template v-if="!readonly">
-                            <div class="right-align">
-                                <a class="btn btn-small red darken-1" v-on:click="removeItem(representation)"><i class="fa fa-minus-circle" style="font-size: 1em;"></i> Remove</a>
-                            </div>
-                        </template>
                     </div>
                 </div>
             </td>
