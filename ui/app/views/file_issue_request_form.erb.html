@@ -30,7 +30,7 @@
                                     <% if request.fetch('items').any?{|item| item.fetch('request_type') == 'PHYSICAL'} %>
                                         <span class="card-title">Physical Request Status</span>
                                         <ul class="status-infomatic">
-                                            <li class="first <% if request.new? %>current<% end %>">Add Request Details</li>
+                                            <li class="first <% if request.new? || request.fetch('draft') %>current<% end %>">Add Request Details</li>
                                             <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_REQUESTED' %>current<% end %>">Quote Requested</li>
                                             <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_PROVIDED' %>current<% end %>">Quote Provided</li>
                                             <li class="<% if request.fetch('physical_request_status', '') == 'QUOTE_ACCEPTED' %>current<% end %>">

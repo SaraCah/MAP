@@ -33,8 +33,8 @@
                 <td><%= file_issue_request.id_for_display %></td>
                 <td><%= file_issue_request.request_type_display_string %></td>
                 <td><% if file_issue_request.fetch('urgent') %>Yes<% else %>No<% end %></td>
-                <td><%= file_issue_request.fetch('draft') ? FileIssueRequest::NONE_REQUESTED : file_issue_request.fetch('digital_request_status') %></td>
-                <td><%= file_issue_request.fetch('draft') ? FileIssueRequest::NONE_REQUESTED : file_issue_request.fetch('physical_request_status') %></td>
+                <td><%= file_issue_request.fetch('draft') ? FileIssueRequest::DRAFT : file_issue_request.fetch('digital_request_status') %></td>
+                <td><%= file_issue_request.fetch('draft') ? FileIssueRequest::DRAFT : file_issue_request.fetch('physical_request_status') %></td>
                 <td><%= file_issue_request.fetch('created_by') %></td>
                 <td><%= Time.at(file_issue_request.fetch('create_time') / 1000)%></td>
                 <td>
