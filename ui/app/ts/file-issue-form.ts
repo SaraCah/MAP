@@ -362,12 +362,9 @@ Vue.component('requested-items-table', {
     <tbody v-for="representation in requested_items">
         <tr>
             <td>
-                <template v-if="readonly || representation.isDigitalRepresentation()">
+                <template v-if="readonly">
                     <input type="hidden" :name="buildPath('request_type')" v-model="representation.requestType" readonly />
                     <input type="text" v-bind:value="representation.requestType === 'DIGITAL' ? 'Digitised copy' : 'Original'" readonly />
-                </template>
-                <template v-else-if="representation.isDigitalRepresentation()">
-                    <input type="text" :name="buildPath('request_type')" v-model="representation.requestType" readonly />
                 </template>
                 <template v-else>
                     <select class="browser-default" :name="buildPath('request_type')" v-model="representation.requestType">

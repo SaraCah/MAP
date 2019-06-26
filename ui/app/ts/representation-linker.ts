@@ -30,10 +30,6 @@ export default class RepresentationRequest {
                 public requestType: string) {
         this.recordDetails = '';
     }
-
-    public isDigitalRepresentation():boolean {
-        return this.id.substring(0, 'digital_representation'.length) === 'digital_representation';
-    }
 }
 
 Vue.component('representation-browse', {
