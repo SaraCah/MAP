@@ -2,12 +2,11 @@ class FileIssue
   include DTO
 
   STATUS_FILE_ISSUE_INITIATED = 'INITIATED'
-  STATUS_RETRIEVAL_IN_PROGRESS = 'IN_PROGRESS'
   STATUS_FILE_ISSUE_ACTIVE = 'ACTIVE'
   STATUS_FILE_ISSUE_COMPLETE = 'COMPLETE'
 
-  STATUS_OPTIONS = [STATUS_FILE_ISSUE_INITIATED, STATUS_RETRIEVAL_IN_PROGRESS,
-                    STATUS_FILE_ISSUE_ACTIVE, STATUS_FILE_ISSUE_COMPLETE]
+  STATUS_OPTIONS = [STATUS_FILE_ISSUE_INITIATED, STATUS_FILE_ISSUE_ACTIVE,
+                    STATUS_FILE_ISSUE_COMPLETE]
 
   ISSUE_TYPE_DIGITAL = 'DIGITAL'
   ISSUE_TYPE_PHYSICAL = 'PHYSICAL'
@@ -20,9 +19,7 @@ class FileIssue
   define_field(:issue_type, String)
   define_field(:status, String)
   define_field(:checklist_submitted, Boolean, default: false)
-  define_field(:checklist_retrieval_started, Boolean, default: false)
   define_field(:checklist_dispatched, Boolean, default: false)
-  define_field(:checklist_summary_sent, Boolean, default: false)
   define_field(:checklist_completed, Boolean, default: false)
   define_field(:date_completed, String, required: false)
   define_field(:items, [FileIssueItem], default: [])
@@ -42,9 +39,7 @@ class FileIssue
         issue_type: row[:issue_type],
         status: row[:status],
         checklist_submitted: row[:checklist_submitted] == 1,
-        checklist_retrieval_started: row[:checklist_retrieval_started] == 1,
         checklist_dispatched: row[:checklist_dispatched] == 1,
-        checklist_summary_sent: row[:checklist_summary_sent] == 1,
         checklist_completed: row[:checklist_completed] == 1,
         urgent: row[:urgent] == 1,
         delivery_location: row[:delivery_location],

@@ -20,9 +20,7 @@
                         <div class="col s12">
                             <ul class="status-infomatic">
                                 <li class="first <% if file_issue.fetch('checklist_submitted', false) %>checked<% end %>">Request<br>Submitted</li>
-                                <li class="<% if file_issue.fetch('checklist_retrieval_started', false) %>checked<% end %>">Retrieval<br>Started</li>
                                 <li class="<% if file_issue.fetch('checklist_dispatched', false) %>checked<% end %>">Files<br>Dispatched/Uploaded</li>
-                                <li class="<% if file_issue.fetch('checklist_summary_sent', false) %>checked<% end %>">File Issue<br>Summary Sent</li>
                                 <% if file_issue.fetch('issue_type') == 'DIGITAL' %>
                                     <li class="last <% if file_issue.all_links_expired? %>checked<% end %>">Link(s) Expired</li>
                                 <% else %>
@@ -35,9 +33,7 @@
                         <div class="col s12">
                             <ul class="status-infomatic">
                                 <li class="first <% if file_issue.fetch('status', '') == 'INITIATED' %>current<% end %>">File Issue<br>Initiated</li>
-                                <li class="<% if file_issue.fetch('status', '') == 'IN_PROGRESS' %>current<% end %>">Retrieval<br>In Progress</li>
                                 <li class="<% if file_issue.fetch('status', '') == 'ACTIVE' %>current<% end %>">File Issue<br>Active</li>
-                                <li class="empty"></li>
                                 <li class="last <% if file_issue.fetch('status', '') == 'COMPLETE' %>current<% end %>">File Issue Complete</li>
                             </ul>
                         </div>
