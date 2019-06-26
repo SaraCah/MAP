@@ -52,7 +52,6 @@ Vue.component('file-issue-form', {
                                             request_type="digital"
                                             :quote_blob="digital_request_quote"
                                             :file_issue_id="digital_file_issue_id"
-                                            :processing_estimate="digital_processing_estimate"
                                             @remove="removeRequestedItem">
                 </file-issue-request-summary>
             </div>
@@ -71,7 +70,6 @@ Vue.component('file-issue-form', {
                                             request_type="physical"
                                             :quote_blob="physical_request_quote"
                                             :file_issue_id="physical_file_issue_id"
-                                            :processing_estimate="physical_processing_estimate"
                                             @remove="removeRequestedItem">
                 </file-issue-request-summary>
             </div>
@@ -109,9 +107,7 @@ Vue.component('file-issue-form', {
             'digital_request_quote',
             'physical_request_quote',
             'digital_file_issue_id',
-            'physical_file_issue_id',
-            'digital_processing_estimate',
-            'physical_processing_estimate'],
+            'physical_file_issue_id'],
     computed: {
         requestedDigitalItems: function(): RepresentationRequest[] {
             return Utils.filter(this.requestedItems, (item: RepresentationRequest) => {
@@ -213,16 +209,6 @@ Vue.component('file-issue-request-summary', {
                 </div>
             </div>
         </template>
-
-        <template v-if="processing_estimate">
-            <div class="row">
-                <div class="input-field col s12">
-                    <input type="text" disabled :value="processing_estimate"/>
-                    <label class="active">Estimated duration for processing, post-request confirmation and submission</label>
-                </div>
-            </div>
-        </template>
-
         <template v-if="quote != null">
             <div class="card">
                 <div class="card-content">
@@ -327,8 +313,7 @@ Vue.component('file-issue-request-summary', {
             'lock_version',
             'csrf_token',
             'quote_blob',
-            'file_issue_id',
-            'processing_estimate'],
+            'file_issue_id'],
     computed: {
         readonly: function(): boolean {
             return (this.$parent as any).readonly;
