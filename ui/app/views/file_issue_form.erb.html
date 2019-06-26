@@ -24,7 +24,7 @@
                                 <% if file_issue.fetch('issue_type') == 'DIGITAL' %>
                                     <li class="last <% if file_issue.all_links_expired? %>checked<% end %>">Link(s) Expired</li>
                                 <% else %>
-                                    <li class="last <% if file_issue.fetch('checklist_completed', false) %>checked<% end %>">Loan Returned</li>
+                                    <li class="last <% if file_issue.fetch('checklist_completed', false) %>checked<% end %>">Loan Returned/<br>Closed</li>
                                 <% end %>
                             </ul>
                         </div>
@@ -50,7 +50,7 @@
 
                 <section id="items" class="scrollspy section card">
                     <div class="card-content">
-                        <table class="representation-linker-table">
+                        <table class="file-issue-requested-items-table">
                             <thead>
                                 <tr>
                                     <th>File Issue<br>Rep ID</th>
@@ -66,9 +66,9 @@
                                         <th>Link Expiry Date</th>
                                         <th></th>
                                     <% else %>
-                                        <th>Dispatch Date</th>
-                                        <th>Loan Expiry Date</th>
-                                        <th>Returned Date</th>
+                                        <th>Dispatch</th>
+                                        <th>Loan Expiry</th>
+                                        <th>Returned</th>
                                         <th>Overdue?</th>
                                     <% end %>
                                 </tr>
@@ -98,21 +98,37 @@
                                         <% else %>
                                             <td><%= item.fetch('dispatch_date','') %></td>
                                             <td><%= item.fetch('expiry_date','') %></td>
-                                            <td><%= item.fetch('returned_date','') %></td>
+                                            <td>
+                                                <% if item.fetch('not_returned') %>
+                                                    <span class="orange-text text-darken-3">Not Returned</span>
+                                                <% else %>
+                                                    <%= item.fetch('returned_date','') %>
+                                                <% end %>
+                                            </td>
                                             <td>
                                                 <% if item.overdue? %><span aria-hidden="true" class="red-text text-darken-2"><i class="fa fa-exclamation-triangle"></i></span><% end %>
                                                 <%= item.overdue? ? 'Yes' : 'No' %>
                                             </td>
                                         <% end %>
                                     </tr>
-                                    <tr>
-                                        <td colspan="12">
-                                            <div class="input-field">
-                                                <textarea type="text" class="materialize-textarea" disabled><%= item.fetch('record_details','') %></textarea>
-                                                <label>Record Details</label>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <% if !item.fetch('record_details','').empty? || !item.fetch('not_returned_note','').empty? %>
+                                        <tr>
+                                            <td colspan="12">
+                                                <% if !item.fetch('record_details','').empty? %>
+                                                    <div class="input-field">
+                                                        <textarea type="text" class="materialize-textarea" disabled><%= item.fetch('record_details','') %></textarea>
+                                                        <label>Record Details</label>
+                                                    </div>
+                                                <% end %>
+                                                <% if !item.fetch('not_returned_note','').empty? %>
+                                                    <div class="input-field">
+                                                        <textarea type="text" class="materialize-textarea" disabled><%= item.fetch('not_returned_note','') %></textarea>
+                                                        <label>Not Returned Note</label>
+                                                    </div>
+                                                <% end %>
+                                            </td>
+                                        </tr>
+                                    <% end %>
                                 </tbody>
                             <% end %>
                         </table>
