@@ -35,7 +35,7 @@ Sequel.migration do
     [:file_issue_request, :file_issue, :transfer_proposal,
      :transfer].each do |table|
       alter_table(table) do
-        add_column(:modified_time, :bigint)
+        add_column(:modified_by, :bigint)
       end
 
       self[table].update(:modified_time => :create_time)

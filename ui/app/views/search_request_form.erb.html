@@ -1,0 +1,131 @@
+<div class="row">
+    <div class="col s12 m9 l10">
+        <div class="row vue-enabled">
+            <% if errors %>
+                <section id="errors" class="scroll-spy">
+                    <%== FormHelper.render_errors(errors) %>
+                </section>
+            <% end %>
+            <section id="status" class="scrollspy section">
+                <div class="col s12">
+                    <div class="row">
+                        <div class="col s12">
+                            <ul class="status-infomatic">
+                                <li class="first <% if request.new? || request.fetch('status') == SearchRequest::INACTIVE %>current<% end %>">Inactive</li>
+                                <li class="<% if request.fetch('status') == SearchRequest::SUBMITTED %>current<% end %>">Submitted</li>
+                                <li class="<% if request.fetch('status') == SearchRequest::OPEN %>current<% end %>">Open</li>
+                                <li class="last <% if request.fetch('status') == SearchRequest::CLOSED %>current<% end %>">Closed</li>
+                                <li class="stand-alone <% if request.fetch('status') == SearchRequest::CANCELLED_BY_AGENCY %>current<% end %>">Cancelled<br>By User</li>
+                                <li class="stand-alone <% if request.fetch('status') == SearchRequest::CANCELLED_BY_QSA %>current<% end %>">Cancelled<br>By QSA</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <form id="searchRequestForm" class="col s12" <% if is_readonly %>disabled<% else %>action="<%= request.new? ? '/search-requests/create' : '/search-requests/update' %>" method="post"<% end %>>
+            <%== FormHelper.hidden_authenticity_token %>
+            <%== FormHelper.lock_version(request, 'search_request') %>
+
+            <% unless request.new? %>
+                <input type="hidden" name="search_request[id]" value="<%= request.fetch('id') %>">
+                <input type="hidden" name="search_request[handle_id]" value="<%= request.fetch('handle_id') %>">
+                <input type="hidden" name="search_request[agency_id]" value="<%= request.fetch('agency_id') %>">
+                <input type="hidden" name="search_request[agency_location_id]" value="<%= request.fetch('agency_location_id') %>">
+                <input type="hidden" name="search_request[status]" value="<%= request.fetch('status', '') %>">
+            <% end %>
+
+            <section id="details" class="scrollspy section">
+
+                <div class="card orange lighten-5">
+                    <div class="card-content">
+                        <p>When making a Search Request, please be aware of the following:</p>
+                        <ul class="browser-default">
+                            <li>Provide as much detail as possible, including (where possible) file numbers, dates, full names of people involved, any relevant geographical locations or institution names and locations;</li>
+                            <li>A search fill not be undertaken if insufficient information is provided;</li>
+                            <li>Analysis of records will not be undertaken;</li>
+                            <li>Staff will spend up to 1 hour on your search;</li>
+                            <li>Charges will be applied in accordance with the fee schedule.</li>
+                        </ul>
+                        <%# FIXME change fee schedule URL %>
+                        <p><a target="_blank" href="/file-issue-fee-schedule">View Fee Schedule</a></p>
+                    </div>
+                </div>
+
+                <% unless request.new? %>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="proposal_id" type="text" value="<%= request.id_for_display %>" disabled>
+                            <label for="proposal_id">Request ID</label>
+                        </div>
+                    </div>
+                <% end %>
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="agency" type="text" value="<%= Ctx.get.current_location.agency.label %>" disabled>
+                        <label for="agency">Agency</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="agency_location" type="text" value="<%= Ctx.get.current_location.name %>" disabled>
+                        <label for="agency_location">Agency Location</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <textarea id="request_details" name="search_request[details]" class="materialize-textarea" <% if is_readonly %>disabled<% end %>><%= request.fetch('details', '') %></textarea>
+                        <label for="request_details">Request Details</label>
+                    </div>
+                </div>
+            </section>
+
+            <% unless is_readonly %>
+            <section id="actions" class="scrollspy section">
+                <div class="row">
+                    <br>
+                    <br>
+                    <div class="col s12">
+                        <button id="save_request_btn" name="save_search_request" value="1" class="btn">Save Search Request</button>
+                        <% if request.fetch('draft') %>
+                        <button id="submit_request_btn" name="submit_search_request" value="1" class="btn orange">Submit Search Request<i class="fa fa-paper-plane"></i></button>
+                        <% end %>
+                    </div>
+                </div>
+            </section>
+            <% end %>
+            </form>
+        </div>
+        <% unless request.new? || request.fetch('status') == SearchRequest::INACTIVE %>
+        <section id="conversation" class="scrollspy section">
+            <div class="row vue-enabled">
+                <div class="col s12">
+                    <conversation handle_id="<%= request.fetch('handle_id') %>"
+                                  csrf_token="<%= FormHelper.csrf_token %>"
+                                  title="Comments/Discussion">
+                    </conversation>
+                </div>
+            </div>
+        </section>
+        <% end %>
+    </div>
+    <div class="col hide-on-small-only m3 l2">
+        <div class="toc-wrapper pinned">
+            <ul class="section table-of-contents">
+                <% if errors %>
+                <li><a href="#errors">Errors</a></li>
+                <% end %>
+                <li><a href="#status">Status</a></li>
+                <li><a href="#details">Details</a></li>
+                <% unless is_readonly %>
+                    <li><a href="#actions">Form Actions</a></li>
+                <% end %>
+                <% unless request.new? || request.fetch('status') == SearchRequest::INACTIVE %>
+                    <li><a href="#conversation">Comments/Discussion</a></li>
+                <% end %>
+            </ul>
+        </div>
+    </div>
+</div>

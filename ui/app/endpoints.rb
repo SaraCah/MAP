@@ -853,7 +853,94 @@ class MAPTheApp < Sinatra::Base
         :location => Ctx.get.current_location
       },
       :layout,
-      title: "My Records",
-      context: ['records'])
+      title: "Controlled Records",
+      context: ['records', 'controlled_records'])
+  end
+
+  Endpoint.get('/search-requests')
+    .param(:sort, String, "Sort key", :optional => true)
+    .param(:page, Integer, "Page to return", optional: true) do
+
+    Templates.emit_with_layout(
+      :search_requests,
+      {
+        paged_results: Ctx.client.search_requests(params[:page] || 0, params[:sort]),
+        sort: params[:sort],
+        params: params,
+      },
+      :layout,
+      title: "Search Requests",
+      context: ['records', 'search_requests'])
+  end
+
+  Endpoint.get('/search-requests/new')
+    .param(:record_ref, String, "Populate request items from this record", optional: true) do
+
+    request = SearchRequest.new
+
+    Templates.emit_with_layout(:search_request_view, {request: request, is_readonly: false},
+                               :layout, title: "New Search Request", context: ['records', 'search_requests'])
+  end
+
+  Endpoint.post('/search-requests/create')
+    .param(:search_request, SearchRequest, "The search request to create")
+    .param(:save_search_request, Integer, "Set to 1 if the save button was clicked", :optional => true)
+    .param(:submit_search_request, Integer, "Set to 1 if the submit button was clicked", :optional => true) do
+
+    params[:search_request][:draft] = params[:submit_search_request] != 1
+
+    errors = Ctx.client.create_search_request(params[:search_request])
+
+    if errors.empty?
+      redirect '/search-requests'
+    else
+      Templates.emit_with_layout(:search_request_view, {request: params[:search_request], errors: errors, is_readonly: false},
+                                 :layout, title: "New Request", context: ['records', 'search_requests'])
+    end
+  end
+
+  Endpoint.get('/search-requests/:id')
+    .param(:id, Integer, "ID of search request") do
+    search_request = Ctx.client.get_search_request(params[:id])
+
+    quote = nil
+
+    if search_request.show_quote?
+      # FIXME
+      # quote = Ctx.client.get_quote(search_request.fetch('aspace_quote_id'))
+    end
+
+    Templates.emit_with_layout(
+      :search_request_view,
+      {
+        request: search_request,
+        is_readonly: !search_request.can_edit?,
+        quote: quote,
+      },
+      :layout, title: "Search Request", context: ['records', 'search_requests'])
+  end
+
+  Endpoint.post('/search-requests/update')
+    .param(:search_request, SearchRequest, "The search request to update")
+    .param(:save_search_request, Integer, "Set to 1 if the save button was clicked", :optional => true)
+    .param(:submit_search_request, Integer, "Set to 1 if the submit button was clicked", :optional => true) do
+
+    orig_draft_status = params[:search_request].fetch(:draft)
+    params[:search_request][:draft] = params[:submit_search_request] != 1
+
+    errors = Ctx.client.update_search_request(params[:search_request])
+
+    if errors.empty?
+      redirect '/search-requests'
+    else
+      params[:search_request][:draft] = orig_draft_status
+      Templates.emit_with_layout(:search_request_view,
+                                 {
+                                   request: params[:search_request],
+                                   errors: errors,
+                                   is_readonly: false,
+                                 },
+                                 :layout, title: "Search Request", context: ['file_issues', 'search_requests'])
+    end
   end
 end

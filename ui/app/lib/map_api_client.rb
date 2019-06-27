@@ -528,6 +528,35 @@ class MAPAPIClient
   class FileIssueNotFound < StandardError; end
   class FileIssueNotDispatched < StandardError; end
 
+  def search_requests(page = 0, sort = nil)
+    data = {
+      page: page
+    }
+
+    data[:sort] = sort unless sort.nil? || sort == ''
+
+    PagedResults.from_json(get('/search-requests', data), SearchRequest)
+  end
+
+  def create_search_request(search_request)
+    response = post('/search-requests/create', search_request: search_request.to_json)
+    response['errors'] || []
+  end
+
+  def get_search_request(search_request_id)
+    json = get("/search-requests/#{search_request_id}")
+
+    return nil if json.nil?
+
+    SearchRequest.from_hash(json)
+  end
+
+  def update_search_request(search_request)
+    response = post('/search-requests/update', search_request: search_request.to_json)
+    response['errors'] || []
+  end
+
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

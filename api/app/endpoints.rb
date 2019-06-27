@@ -717,4 +717,67 @@ class MAPTheAPI < Sinatra::Base
       raise "Unexpected status"
     end
   end
+
+  Endpoint.get('/search-requests')
+    .param(:sort, String, "Sort key", :optional => true)
+    .param(:page, Integer, "Page to return") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      json_response(SearchRequests.search_requests(params[:page], AppConfig[:page_size], params[:sort]))
+    else
+      [404]
+    end
+  end
+
+  Endpoint.post('/search-requests/create')
+    .param(:search_request, SearchRequest, "Search Request to create") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      if (errors = params[:search_request].validate).empty?
+        if (errors = SearchRequests.create_from_dto(params[:search_request])).empty?
+          json_response(status: 'created')
+        else
+          json_response(errors: errors)
+        end
+      else
+        json_response(errors: errors)
+      end
+    else
+      [404]
+    end
+  end
+
+  Endpoint.get('/search-requests/:id')
+    .param(:id, Integer, "ID of search request") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      search_request = SearchRequests.dto_for(params[:id])
+      if search_request && Ctx.get.permissions.has_role_for_location?(search_request.fetch('agency_id'), search_request.fetch('agency_location_id'))
+        json_response(search_request.to_hash)
+      else
+        [404]
+      end
+    else
+      [404]
+    end
+  end
+
+  Endpoint.post('/search-requests/update')
+    .param(:search_request, SearchRequest, "Search Request to create") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      if (errors = params[:search_request].validate).empty?
+        existing_search_request = SearchRequests.dto_for(params[:search_request].fetch('id'))
+        if existing_search_request && Ctx.get.permissions.has_role_for_location?(existing_search_request.fetch('agency_id'), existing_search_request.fetch('agency_location_id'))
+          if (errors = SearchRequests.update_from_dto(params[:search_request])).empty?
+            json_response(status: 'updated')
+          else
+            json_response(errors: errors)
+          end
+        else
+          json_response(errors: [{code: 'INSUFFICIENT_PRIVILEGES', field: 'agency_location_id'}])
+        end
+      else
+        json_response(errors: errors)
+      end
+    else
+      [404]
+    end
+  end
 end

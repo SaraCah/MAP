@@ -62,6 +62,14 @@
                 </ul>
             </div>
         <% end %>
+        <% if context.include?('records') %>
+        <div class="nav-content grey darken-2">
+            <ul class="tabs tabs-transparent">
+                <li class="tab col s3"><a <% if context.include?('controlled_records') %>class="active"<% end %> href="/records">Controlled Records</a></li>
+                <li class="tab col s3"><a <% if context.include?('search_request') %>class="active"<% end %> href="/search-requests">Search Requests</a></li>
+            </ul>
+        </div>
+        <% end %>
     <% end %>
 </nav>
 <ul id="userMenu" class="dropdown-content grey darken-3 white-text">
