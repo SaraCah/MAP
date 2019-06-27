@@ -64,4 +64,8 @@ class SearchRequest
   def show_quote?
     fetch('quote_id', false)
   end
+
+  def can_be_cancelled?
+    [INACTIVE, SUBMITTED].include?(fetch('status'))
+  end
 end

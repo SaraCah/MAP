@@ -556,6 +556,10 @@ class MAPAPIClient
     response['errors'] || []
   end
 
+  def cancel_search_request(search_request_id, lock_version)
+    post('/search-requests/cancel', id: search_request_id, lock_version: lock_version)
+  end
+
 
   private
 

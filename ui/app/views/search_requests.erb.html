@@ -15,10 +15,10 @@
             <tr>
                 <th style="width:5%">ID</th>
                 <th style="width:15%">Status</th>
-                <th style="width:40%">Details</th>
+                <th style="width:30%">Details</th>
                 <th style="width:10%">Created By</th>
                 <th style="width:20%">Date Created</th>
-                <th style="width:10%"></th>
+                <th style="width:20%"></th>
             </tr>
             </thead>
             <tbody>
@@ -33,6 +33,14 @@
                 <td><%= Time.at(search_request.fetch('create_time') / 1000)%></td>
                 <td>
                     <a class="btn" href="/search-requests/<%= search_request.fetch('id') %>">View</a>
+                    <% if search_request.can_be_cancelled? %>
+                        <confirmable-action action="/search-requests/<%= search_request.fetch('id') %>/cancel?lock_version=<%= search_request.fetch('lock_version') %>"
+                                            csrf_token="<%= FormHelper.csrf_token %>"
+                                            css="btn red lighten-2"
+                                            label="Cancel"
+                                            message="Are you sure you want to cancel this search request?">
+                        </confirmable-action>
+                    <% end %>
                 </td>
             </tr>
             <% end %>

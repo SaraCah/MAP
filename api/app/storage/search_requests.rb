@@ -105,4 +105,21 @@ class SearchRequests < BaseStorage
 
     errors
   end
+
+  def self.cancel(search_request_id, lock_version)
+    errors = []
+
+    updated = db[:search_request]
+                .filter(id: search_request_id)
+                .filter(lock_version: lock_version)
+                .update(status: SearchRequest::CANCELLED_BY_AGENCY,
+                        lock_version: lock_version + 1,
+                        modified_by: Ctx.username,
+                        modified_time: java.lang.System.currentTimeMillis,
+                        system_mtime: Time.now)
+
+    raise StaleRecordException.new if updated == 0
+
+    errors
+  end
 end

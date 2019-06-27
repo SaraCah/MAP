@@ -943,4 +943,14 @@ class MAPTheApp < Sinatra::Base
                                  :layout, title: "Search Request", context: ['file_issues', 'search_requests'])
     end
   end
+
+  Endpoint.post('/search-requests/:id/cancel')
+    .param(:id, Integer, "The ID of the search request to cancel")
+    .param(:lock_version, Integer, "The lock version search request to cancel") do
+
+    Ctx.client.cancel_search_request(params[:id], params[:lock_version])
+
+    redirect '/search-requests'
+  end
+
 end

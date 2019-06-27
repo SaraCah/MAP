@@ -780,4 +780,23 @@ class MAPTheAPI < Sinatra::Base
       [404]
     end
   end
+
+  Endpoint.post('/search-requests/cancel')
+    .param(:id, Integer, "ID of search request")
+    .param(:lock_version, Integer, "Lock version of search request") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      existing_search_request = SearchRequests.dto_for(params[:id])
+      if existing_search_request && Ctx.get.permissions.has_role_for_location?(existing_search_request.fetch('agency_id'), existing_search_request.fetch('agency_location_id'))
+        if (errors = SearchRequests.cancel(params[:id], params[:lock_version])).empty?
+          json_response(status: 'updated')
+        else
+          json_response(errors: errors)
+        end
+      else
+        json_response(errors: [{code: 'INSUFFICIENT_PRIVILEGES', field: 'agency_location_id'}])
+      end
+    else
+      [404]
+    end
+  end
 end
