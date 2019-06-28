@@ -62,6 +62,12 @@ class MAPAPIClient
           json.fetch('agency_roles', []).map {|agency_role_json| AgencyRole.from_json(agency_role_json)})
     end
 
+    def allow_manage_agency?(agency_ref)
+      self.is_admin? || self.agency_roles.any? {|role|
+        "agent_corporate_entity:#{role.aspace_agency_id}" == agency_ref && role.is_agency_admin?
+      }
+    end
+
     def allow_manage_users?
       self.is_admin || is_agency_admin?
     end
@@ -189,6 +195,14 @@ class MAPAPIClient
     data[:q] = q unless q.nil? || q == ''
 
     PagedResults.from_json(get('/agencies-for-current-user', data), Agency)
+  end
+
+  def agency_for_edit(agency_ref)
+    json = get('/agency-for-edit', {agency_ref: agency_ref})
+
+    return nil if json.nil?
+
+    AgencyForEdit.from_hash(json)
   end
 
   def groups

@@ -12,6 +12,7 @@ import 'file-issues-search';
 import 'file-uploader';
 import 'linker';
 import 'locations-search';
+import 'manage-agency';
 import 'notifications';
 import 'representation-linker';
 import 'select-with-other-option';

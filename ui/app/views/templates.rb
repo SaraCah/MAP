@@ -48,3 +48,4 @@ Templates.define(:search_requests, [:paged_results, :sort?, :status?, :params], 
 Templates.define(:search_request_view, [:request, :errors?, :is_readonly?, :quote?], "views/search_request_form.erb.html")
 
 Templates.define(:agencies, [:paged_agencies, :q?, :params], "views/agencies.erb.html")
+Templates.define(:manage_agency, [:agency_ref], "views/manage_agency.erb.html")

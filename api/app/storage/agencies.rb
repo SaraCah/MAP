@@ -95,4 +95,66 @@ class Agencies < BaseStorage
                        max_page)
     end
   end
+
+  def self.for_edit(agency_ref)
+    aspace_agency_id = Integer(agency_ref.split(':')[1])
+    agency = aspace_agencies([aspace_agency_id]).values.first
+
+    return nil unless agency
+
+    result = AgencyForEdit.new(agency_ref: agency_ref, locations: [])
+    result[:label] = agency.label
+
+    # Locations
+    locations_by_id = {}
+
+    db[:agency]
+      .join(:agency_location, Sequel[:agency_location][:agency_id] => Sequel[:agency][:id])
+      .filter(Sequel[:agency][:aspace_agency_id] => aspace_agency_id)
+      .select_all(:agency_location).each do |row|
+      locations_by_id[row[:id]] = AgencyForEdit::LocationWithMembers.new(:location => AgencyLocationDTO.from_row(row, agency),
+                                                                         :members => [])
+    end
+
+    # Users and their roles
+    db[:agency]
+      .join(:agency_user, Sequel[:agency][:id] => Sequel[:agency_user][:agency_id])
+      .join(:user, Sequel[:user][:id] => Sequel[:agency_user][:user_id])
+      .filter(Sequel[:agency][:aspace_agency_id] => aspace_agency_id)
+      .select(Sequel[:user][:username],
+              Sequel[:user][:name],
+              Sequel[:agency_user][:agency_location_id],
+              Sequel[:agency_user][:role],
+              Sequel[:agency_user][:allow_transfers],
+              Sequel[:agency_user][:allow_file_issue],
+              Sequel[:agency_user][:allow_set_raps],
+              Sequel[:agency_user][:allow_change_raps],
+              Sequel[:agency_user][:allow_restricted_access],)
+      .each do |row|
+      locations_by_id.fetch(row[:agency_location_id]).fetch(:members) << AgencyForEdit::MemberDTO.new(
+        :username => row[:username],
+        :name => row[:name],
+        :role => row[:role],
+        :permissions => Permissions::AVAILABLE_PERMISSIONS.select {|perm| row[perm] == 1}.map(&:to_s),
+      )
+    end
+
+    result[:locations] = locations_by_id.values
+
+    result.fetch(:locations).sort! {|a, b|
+      if a.fetch(:location).fetch(:is_top_level, false)
+        -1
+      elsif b.fetch(:location).fetch(:is_top_level, false)
+        1
+      else
+        a.fetch(:location).fetch(:name) <=> b.fetch(:location).fetch(:name)
+      end
+    }
+
+    result.fetch(:locations).each do |location|
+      location.fetch(:members).sort_by! {|member| member.fetch(:username).downcase}
+    end
+
+    result
+  end
 end

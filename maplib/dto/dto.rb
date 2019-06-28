@@ -171,6 +171,8 @@ module DTO
               end
             }
           else
+            field_type = field_definition.type
+
             if value.respond_to?(:to_hash) && field_type.respond_to?(:from_hash)
               field_type.from_hash(value.to_hash)
             else

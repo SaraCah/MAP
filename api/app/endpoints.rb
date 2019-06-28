@@ -251,6 +251,16 @@ class MAPTheAPI < Sinatra::Base
   end
 
 
+  Endpoint.get('/agency-for-edit')
+    .param(:agency_ref, String, "The agency reference") do
+    if Ctx.get.permissions.can_manage_locations?(params[:agency_ref])
+      json_response(Agencies.for_edit(params[:agency_ref]))
+    else
+      [403]
+    end
+  end
+
+
   Endpoint.get('/controlled-records')
     .param(:q, String, "Query string", :optional => true)
     .param(:filters, String, "Filters to apply [[field1, val1], [field2, val2]]", :optional => true)

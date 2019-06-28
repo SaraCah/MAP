@@ -231,6 +231,34 @@ class MAPTheApp < Sinatra::Base
                                  :layout, title: "Agencies", context: ['agencies'])
   end
 
+  Endpoint.get('/agencies/:agency_ref')
+    .param(:agency_ref, String, "Agency ref") do
+
+    if Ctx.permissions.allow_manage_agency?(params[:agency_ref])
+      Templates.emit_with_layout(:manage_agency, {
+                                   agency_ref: params[:agency_ref],
+                                 },
+                                 :layout, title: '', context: ['agencies'])
+
+    else
+      [404]
+    end
+  end
+
+
+  Endpoint.get('/agencies/:agency_ref/json')
+    .param(:agency_ref, String, "Agency ref") do
+
+    if Ctx.permissions.allow_manage_agency?(params[:agency_ref])
+      [
+        200,
+        {'Content-Type' => 'text/json'},
+        Ctx.client.agency_for_edit(params[:agency_ref]).to_json
+      ]
+    else
+      [404]
+    end
+  end
 
   Endpoint.get('/locations')
     .param(:q, String, "Search string", optional: true)
