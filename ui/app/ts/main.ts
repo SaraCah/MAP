@@ -15,6 +15,7 @@ import 'locations-search';
 import 'notifications';
 import 'representation-linker';
 import 'select-with-other-option';
+import 'service-quote';
 import 'transfer-proposal-series';
 import 'transfers-search';
 import 'users-search';

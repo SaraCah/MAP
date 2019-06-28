@@ -82,6 +82,16 @@
                 </div>
             </section>
 
+            <% if quote %>
+                <section id="quote" class="scrollspy section">
+                    <div class="row">
+                        <div class="col s12">
+                            <service-quote quote_blob="<%= quote.to_json %>" title="Service Fee"></service-quote>
+                        </div>
+                    </div>
+                </section>
+            <% end %>
+
             <% unless is_readonly %>
             <section id="actions" class="scrollspy section">
                 <div class="row">
@@ -119,6 +129,9 @@
                 <% end %>
                 <li><a href="#status">Status</a></li>
                 <li><a href="#details">Details</a></li>
+                <% if quote %>
+                <li><a href="#quote">Service Fee</a></li>
+                <% end %>
                 <% unless is_readonly %>
                     <li><a href="#actions">Form Actions</a></li>
                 <% end %>

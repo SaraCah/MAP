@@ -81,6 +81,7 @@ require 'storage/file_issues'
 require 'storage/representations'
 require 'storage/stale_record_exception'
 require 'storage/search_requests'
+require 'storage/service_quotes'
 
 require 'endpoints/upload_file'
 require 'endpoints/date_string'

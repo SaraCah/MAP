@@ -498,8 +498,12 @@ class MAPAPIClient
     get("/file-issue-fee-schedule")
   end
 
-  def get_file_issue_quote(quote_id)
-    get("/file-issue-quotes/#{quote_id}")
+  def get_file_issue_digital_quote(file_issue_request_id)
+    get("/file-issue-requests/#{file_issue_request_id}/digital_quote")
+  end
+
+  def get_file_issue_physical_quote(file_issue_request_id)
+    get("/file-issue-requests/#{file_issue_request_id}/physical_quote")
   end
 
   def notifications
@@ -560,6 +564,9 @@ class MAPAPIClient
     post('/search-requests/cancel', id: search_request_id, lock_version: lock_version)
   end
 
+  def get_search_request_quote(search_request_id)
+    get("/search-requests/#{search_request_id}/quote")
+  end
 
   private
 

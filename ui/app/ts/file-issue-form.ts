@@ -10,21 +10,6 @@ Vue.use(VueResource);
 import Record from "./controlled-records";
 import RepresentationRequest from "./representation-linker";
 
-interface QuoteLineItem {
-    description: string;
-    quantity: number;
-    chargePerUnitCents: number;
-    chargeQuantityUnit: string;
-    chargeCents: number;
-}
-
-interface Quote {
-    id: number;
-    issuedDate: string;
-    totalChargeCents: string;
-    lineItems: QuoteLineItem[];
-}
-
 Vue.component('file-issue-form', {
     template: `
 <div>
@@ -209,61 +194,28 @@ Vue.component('file-issue-request-summary', {
                 </div>
             </div>
         </template>
-        <template v-if="quote != null">
-            <div class="card">
-                <div class="card-content">
-                    <span class="card-title">Quote</span>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Unit Description</th>
-                                <th>Unit Cost</th>
-                                <th>No. of Units</th>
-                                <th>Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="item in quote.lineItems">
-                                <td>{{item.description}}</td>
-                                <td>{{formatCents(item.chargePerUnitCents)}} per {{formatUnit(item.chargeQuantityUnit)}}</td>
-                                <td>{{item.quantity}}</td>
-                                <td class="right-align">{{formatCents(item.chargeCents)}}</td>
-                            </tr>
-                            <tr class="grey lighten-4">
-                                <td colspan="3"><strong>TOTAL</strong></td>
-                                <td class="right-align">{{formatCents(quote.totalChargeCents)}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="row">
-                        <div class="col s12">
-                            <p>Issued: {{quote.issuedDate}}</p>
-                        </div>
+        <service-quote :quote_blob="quote_blob">
+            <template v-if="status === 'QUOTE_PROVIDED'">
+                <div class="row">
+                    <div class="col s12">
+                        <confirmable-action
+                            :action="'/file-issue-requests/'+request_id+'/accept?request_type='+request_type+'&lock_version='+lock_version"
+                            :csrf_token="csrf_token"
+                            css="btn green lighten-2"
+                            label="Accept Quote"
+                            message="Are you sure you want to accept this quote?">
+                        </confirmable-action>
+                        <confirmable-action
+                            :action="'/file-issue-requests/'+request_id+'/cancel?request_type='+request_type+'&lock_version='+lock_version"
+                            :csrf_token="csrf_token"
+                            css="btn red lighten-2"
+                            label="Cancel Request"
+                            message="Are you sure you want to cancel this request?">
+                        </confirmable-action>
                     </div>
-
-                    <template v-if="status === 'QUOTE_PROVIDED'">
-                        <div class="row">
-                            <div class="col s12">
-                                <confirmable-action
-                                    :action="'/file-issue-requests/'+request_id+'/accept?request_type='+request_type+'&lock_version='+lock_version"
-                                    :csrf_token="csrf_token"
-                                    css="btn green lighten-2"
-                                    label="Accept Quote"
-                                    message="Are you sure you want to accept this quote?">
-                                </confirmable-action>
-                                <confirmable-action
-                                    :action="'/file-issue-requests/'+request_id+'/cancel?request_type='+request_type+'&lock_version='+lock_version"
-                                    :csrf_token="csrf_token"
-                                    css="btn red lighten-2"
-                                    label="Cancel Request"
-                                    message="Are you sure you want to cancel this request?">
-                                </confirmable-action>
-                            </div>
-                        </div>
-                    </template>
                 </div>
-            </div>
-        </template>
+            </template>
+        </service-quote>
 
         <div class="card">
             <div class="card-content">
@@ -277,35 +229,6 @@ Vue.component('file-issue-request-summary', {
     </template>
 </div>
 `,
-    data: function(): {quote: Quote|null} {
-        let quote: Quote|null = null;
-
-        if (this.quote_blob !== 'null') {
-            const rawQuote = JSON.parse(this.quote_blob);
-            quote = {
-                id: rawQuote.id,
-                issuedDate: rawQuote.issued_date,
-                totalChargeCents: rawQuote.total_charge_cents,
-                lineItems: [],
-            };
-
-            rawQuote.line_items.forEach((rawItem: any) => {
-                if (quote) {
-                    quote.lineItems.push({
-                        description: rawItem.description,
-                        quantity: rawItem.quantity,
-                        chargePerUnitCents: rawItem.charge_per_unit_cents,
-                        chargeQuantityUnit: rawItem.charge_quantity_unit,
-                        chargeCents: rawItem.charge_cents,
-                    });
-                }
-            });
-        }
-
-        return {
-            quote: quote,
-        };
-    },
     props: ['requested_items',
             'status',
             'request_type',
@@ -320,15 +243,6 @@ Vue.component('file-issue-request-summary', {
         },
     },
     methods: {
-        formatCents: function(cents: number) {
-            return (cents / 100).toLocaleString(undefined, {style: 'currency', currency: 'AUD'});
-        },
-        formatUnit: function(unit: string) {
-            if (unit === 'qtr_hour') {
-                return '15min';
-            }
-            return unit;
-        },
         removeItem: function(itemId: string) {
             this.$emit('remove', itemId);
         },

@@ -623,11 +623,11 @@ class MAPTheApp < Sinatra::Base
     physical_request_quote = nil
 
     if file_issue_request.show_digital_quote?
-      digital_request_quote = Ctx.client.get_file_issue_quote(file_issue_request.fetch('aspace_digital_quote_id'))
+      digital_request_quote = Ctx.client.get_file_issue_digital_quote(file_issue_request.fetch('id'))
     end
 
     if file_issue_request.show_physical_quote?
-      physical_request_quote = Ctx.client.get_file_issue_quote(file_issue_request.fetch('aspace_physical_quote_id'))
+      physical_request_quote = Ctx.client.get_file_issue_physical_quote(file_issue_request.fetch('id'))
     end
 
     Templates.emit_with_layout(:file_issue_request_view, {
@@ -645,7 +645,10 @@ class MAPTheApp < Sinatra::Base
     .param(:submit_file_issue_request, Integer, "Set to 1 if the submit button was clicked", :optional => true) do
 
     orig_draft_status = params[:file_issue_request].fetch(:draft)
-    params[:file_issue_request][:draft] = params[:submit_file_issue_request] != 1
+
+    if orig_draft_status
+      params[:file_issue_request][:draft] = params[:submit_file_issue_request] != 1
+    end
 
     errors = params[:file_issue_request].validate.map {|e|
       e.map {|k, v| [k.to_s, v]}.to_h
@@ -905,9 +908,12 @@ class MAPTheApp < Sinatra::Base
 
     quote = nil
 
-    if search_request.show_quote?
-      # FIXME
-      # quote = Ctx.client.get_quote(search_request.fetch('aspace_quote_id'))
+    if search_request.has_quote?
+      quote = Ctx.client.get_search_request_quote(search_request.fetch('id'))
+
+      unless quote.fetch('issued_date', false)
+        quote = nil
+      end
     end
 
     Templates.emit_with_layout(

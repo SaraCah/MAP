@@ -645,10 +645,29 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.get('/file-issue-quotes/:id')
-  .param(:id, Integer, "ASpace service quote ID")do
+  Endpoint.get('/file-issue-requests/:id/digital_quote')
+  .param(:id, Integer, "File Issue Request ID") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(FileIssues.get_quote(params[:id]))
+      file_issue_request = FileIssues.request_dto_for(params[:id])
+      if file_issue_request && Ctx.get.permissions.can_manage_file_issues?(file_issue_request.fetch('agency_id'), file_issue_request.fetch('agency_location_id'))
+        json_response(ServiceQuotes.get_quote(file_issue_request.fetch('aspace_digital_quote_id')))
+      else
+        [404]
+      end
+    else
+      [404]
+    end
+  end
+
+  Endpoint.get('/file-issue-requests/:id/physical_quote')
+    .param(:id, Integer, "File Issue ID") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      file_issue_request = FileIssues.request_dto_for(params[:id])
+      if file_issue_request && Ctx.get.permissions.can_manage_file_issues?(file_issue_request.fetch('agency_id'), file_issue_request.fetch('agency_location_id'))
+        json_response(ServiceQuotes.get_quote(file_issue_request.fetch('aspace_physical_quote_id')))
+      else
+        [404]
+      end
     else
       [404]
     end
@@ -794,6 +813,25 @@ class MAPTheAPI < Sinatra::Base
         end
       else
         json_response(errors: [{code: 'INSUFFICIENT_PRIVILEGES', field: 'agency_location_id'}])
+      end
+    else
+      [404]
+    end
+  end
+
+
+  Endpoint.get('/search-requests/:id/quote')
+    .param(:id, Integer, "Search Request ID")do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      existing_search_request = SearchRequests.dto_for(params[:id])
+      if existing_search_request && Ctx.get.permissions.has_role_for_location?(existing_search_request.fetch('agency_id'), existing_search_request.fetch('agency_location_id'))
+        if existing_search_request.fetch('aspace_quote_id', false)
+          json_response(ServiceQuotes.get_quote(existing_search_request.fetch('aspace_quote_id')))
+        else
+          [404]
+        end
+      else
+        [404]
       end
     else
       [404]

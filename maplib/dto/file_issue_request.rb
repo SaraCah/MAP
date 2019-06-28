@@ -42,6 +42,12 @@ class FileIssueRequest
       hash['urgent'] = true
     end
 
+    if hash['draft'] == 'yes'
+      hash['draft'] = true
+    elsif hash['draft'] == 'no'
+      hash['draft'] = false
+    end
+
     if hash['preapprove_quotes'] == 'yes'
       hash['preapprove_quotes'] = true
     end

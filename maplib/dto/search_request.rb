@@ -23,7 +23,7 @@ class SearchRequest
   define_field(:agency_location_id, Integer, required: false)
   define_field(:handle_id, Integer, required: false)
   define_field(:version, Integer, required: false)
-  define_field(:quote_id, Integer, required: false)
+  define_field(:aspace_quote_id, Integer, required: false)
   define_field(:items, [SearchRequestItem], default: [])
 
 
@@ -32,7 +32,7 @@ class SearchRequest
         details: row[:details],
         status: row[:status],
         draft: row[:draft] == 1,
-        quote_id: row[:quote_id],
+        aspace_quote_id: row[:aspace_quote_id],
         agency_id: row[:agency_id],
         agency_location_id: row[:agency_location_id],
         created_by: row[:created_by],
@@ -61,8 +61,8 @@ class SearchRequest
     "SR#{id}"
   end
 
-  def show_quote?
-    fetch('quote_id', false)
+  def has_quote?
+    fetch('aspace_quote_id', false)
   end
 
   def can_be_cancelled?
