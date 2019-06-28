@@ -171,7 +171,8 @@ body {
 }
 
 a .current-location-display:after,
-a#userMenuTrigger:after {
+a#userMenuTrigger:after,
+a#manageMenuTrigger:after {
     content: '\f078';
     font-family: "Font Awesome 5 Free";
     font-weight: 900;

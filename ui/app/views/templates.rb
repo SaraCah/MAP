@@ -46,3 +46,5 @@ Templates.define(:file_issue_not_dispatched, [], "views/file_issue_not_dispatche
 
 Templates.define(:search_requests, [:paged_results, :sort?, :status?, :params], "views/search_requests.erb.html")
 Templates.define(:search_request_view, [:request, :errors?, :is_readonly?, :quote?], "views/search_request_form.erb.html")
+
+Templates.define(:agencies, [:paged_agencies, :q?, :params], "views/agencies.erb.html")

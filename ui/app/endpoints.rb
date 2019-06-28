@@ -220,6 +220,18 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
+  Endpoint.get('/agencies')
+    .param(:q, String, "Search string", optional: true)
+    .param(:page, Integer, "Page to return", optional: true) do
+    Templates.emit_with_layout(:agencies, {
+                                   paged_agencies: Ctx.client.agencies(params[:page] || 0, params[:q]),
+                                   q: params[:q],
+                                   params: params,
+                                 },
+                                 :layout, title: "Agencies", context: ['agencies'])
+  end
+
+
   Endpoint.get('/locations')
     .param(:q, String, "Search string", optional: true)
     .param(:agency_ref, String, "Search agency id", optional: true)

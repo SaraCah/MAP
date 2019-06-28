@@ -39,8 +39,12 @@
                         </current-location-selector>
                     </li>
                 <% end %>
+                <%# FIXME: Check permissions on this %>
                 <li class="map-tab">
-                    <a id="userMenuTrigger" href="#" data-target="userMenu"><span class="sr-only">User menu</span><i aria-hidden="true" class="fa fa-user" style="font-size:16px;"></i></a>
+                    <a id="manageMenuTrigger" href="#" data-target="manageMenu" class="menu-dropdown"><span class="sr-only">Manage menu</span><i aria-hidden="true" class="fa fa-wrench" style="font-size:16px;"></i></a>
+                </li>
+                <li class="map-tab">
+                    <a id="userMenuTrigger" href="#" data-target="userMenu" class="menu-dropdown"><span class="sr-only">User menu</span><i aria-hidden="true" class="fa fa-user" style="font-size:16px;"></i></a>
                 </li>
             </ul>
             <div class="clearfix"></div>
@@ -72,6 +76,10 @@
         <% end %>
     <% end %>
 </nav>
+<ul id="manageMenu" class="dropdown-content grey darken-3 white-text">
+    <li><a href="/agencies" class="white-text">Manage Agencies</a></li>
+    <li><a href="#" class="white-text">Manage system</a></li>
+</ul>
 <ul id="userMenu" class="dropdown-content grey darken-3 white-text">
     <li><a href="/users/edit?username=<%= URI.escape(Ctx.username) %>" class="white-text">Edit</a></li>
     <li><a href="/logout" class="white-text">Logout (<%= Ctx.username %>)</a></li>

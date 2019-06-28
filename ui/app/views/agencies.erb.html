@@ -1,0 +1,52 @@
+<div>
+    <div class="card">
+        <div class="card-content">
+            <form action="/agencies" method="get">
+                <div class="row">
+                    <div class="col s12">
+                        <div class="input-field">
+                            <input type="text" id="q" name="q" value="<%= q || '' %>"></input>
+                            <label for="q">Search agency name</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <button class="btn btn-small">Search Agencies</button>
+                        <a href="/agencies" class="btn btn-small">Reset</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col s12">
+        <table class="highlight responsive-table">
+            <thead>
+            <tr>
+                <th>Agency name</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <% paged_agencies.results.each do |agency| %>
+            <tr>
+                <td><%= agency.label %></td>
+                <td>
+                    <a class="btn" href="/agencies/<%= agency.id %>">View</a>
+                </td>
+            </tr>
+            <% end %>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12 center-align">
+        <% if paged_agencies.current_page > 0 %><a href="?<%= URLHelper.merge_params(params, {'page' => paged_agencies.current_page - 1}) %>"><i class="fa fa-chevron-left"></i> Previous</a><% end %>
+        <% if paged_agencies.current_page < paged_agencies.max_page - 1 %><a href="?<%= URLHelper.merge_params(params, {'page' => paged_agencies.current_page + 1}) %>">Next <i class="fa fa-chevron-right"></i></a><% end %>
+    </div>
+</div>

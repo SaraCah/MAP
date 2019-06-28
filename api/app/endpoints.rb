@@ -244,6 +244,13 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.get('/agencies-for-current-user')
+    .param(:q, String, "Query string", :optional => true)
+    .param(:page, Integer, "Page to fetch (zero-indexed)") do
+    json_response(Agencies.for_permissions(Ctx.get.permissions, q: params[:q], page: params[:page]))
+  end
+
+
   Endpoint.get('/controlled-records')
     .param(:q, String, "Query string", :optional => true)
     .param(:filters, String, "Filters to apply [[field1, val1], [field2, val2]]", :optional => true)

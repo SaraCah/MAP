@@ -177,8 +177,18 @@ class MAPAPIClient
     data[:agency_ref] = agency_ref unless agency_ref.nil? || agency_ref == ''
     data[:role] = role unless role.nil? || role == ''
     data[:sort] = sort unless sort.nil? || sort == ''
-    
+
     PagedResults.from_json(get('/users', data), User)
+  end
+
+  def agencies(page = 0, q = nil)
+    data = {
+      page: page
+    }
+
+    data[:q] = q unless q.nil? || q == ''
+
+    PagedResults.from_json(get('/agencies-for-current-user', data), Agency)
   end
 
   def groups

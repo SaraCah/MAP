@@ -67,4 +67,32 @@ class Agencies < BaseStorage
 
     result
   end
+
+  def self.for_permissions(permissions, q: nil, page: 0, page_size: AppConfig[:page_size])
+    AspaceDB.open do |aspace_db|
+      dataset = aspace_db[:agent_corporate_entity]
+                  .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
+                  .filter(Sequel[:name_corporate_entity][:authorized] => 1)
+                  .order(Sequel[:name_corporate_entity][:sort_name])
+                  .select(Sequel[:agent_corporate_entity][:id],
+                          Sequel[:name_corporate_entity][:sort_name])
+
+      if q
+        sanitised = q.downcase.gsub(/[^a-z0-9_\-\. ]/, '')
+        dataset = dataset.filter(Sequel.like(Sequel.function(:lower, Sequel[:name_corporate_entity][:sort_name]), "%#{sanitised}%"))
+      end
+
+      unless permissions.is_admin?
+        dataset = dataset.filter(Sequel[:agent_corporate_entity][:id] => permissions.agency_roles.map(&:aspace_agency_id))
+      end
+
+      max_page = (dataset.count / page_size.to_f).ceil
+
+      PagedResults.new(dataset
+                         .limit(page_size, page * page_size)
+                         .map {|row| Agency.from_row(row)},
+                       page,
+                       max_page)
+    end
+  end
 end

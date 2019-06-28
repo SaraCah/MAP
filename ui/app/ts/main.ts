@@ -28,4 +28,4 @@ document.querySelectorAll('.vue-enabled').forEach(function(elt: Element) {
 });
 
 M.ScrollSpy.init(document.querySelectorAll('.scrollspy'));
-M.Dropdown.init(document.querySelectorAll('#userMenuTrigger'), {constrainWidth: false, coverTrigger: false});
+M.Dropdown.init(document.querySelectorAll('.menu-dropdown'), {constrainWidth: false, coverTrigger: false});
