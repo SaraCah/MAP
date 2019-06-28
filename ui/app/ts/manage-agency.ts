@@ -73,7 +73,7 @@ Vue.component('manage-agency', {
     <section id="users" class="scrollspy section">
       <div class="card">
         <div class="card-content">
-          <span class="card-title">Agency users</span>
+          <h4>Users</h4>
 
           <table>
             <thead>
