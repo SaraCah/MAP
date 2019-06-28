@@ -4,28 +4,30 @@
         <div class="map-nav grey darken-3">
             <ul class="map-tabs map-nav-left">
                 <li class="map-tab"><a href="/" <% if context.include?('home') %> class='active'<% end %>><span class="sr-only">Home</span><i class="fa fa-home" aria-hidden="true" style="font-size:14px;"></i></a></li>
-                <% unless Ctx.permissions.is_admin %>
-                <li class="map-tab"><a href="/records" <% if context.include?('records') %> class='active'<% end %>>My Records</a></li>
-                <% end %>
-                <% if Ctx.permissions.allow_manage_users? %>
-                <li class="map-tab"><a href="/users" <% if context.include?('users') %> class='active'<% end %>>My Users</a></li>
-                <% end %>
-                <% if Ctx.permissions.allow_manage_locations? %>
-                <li class="map-tab"><a href="/locations" <% if context.include?('locations') %> class='active'<% end %>>My Locations</a></li>
-                <% end %>
-                <% if Ctx.permissions.allow_manage_transfers? %>
-                <li class="map-tab"><a href="/transfer-proposals" <% if context.include?('transfers') %> class='active'<% end %>>My Transfers</a></li>
-                <% end %>
-                <% if Ctx.permissions.allow_manage_file_issues? %>
-                <li class="map-tab">
-                    <a href="/file-issue-requests" <% if context.include?('file_issues') %> class='active'<% end %>>
-                        My File Issues
-                    </a>
-                </li>
+                <% unless context.include?('global') %>
+                    <% unless Ctx.permissions.is_admin %>
+                        <li class="map-tab"><a href="/records" <% if context.include?('records') %> class='active'<% end %>>My Records</a></li>
+                    <% end %>
+                    <% if Ctx.permissions.allow_manage_users? %>
+                        <li class="map-tab"><a href="/users" <% if context.include?('users') %> class='active'<% end %>>My Users</a></li>
+                    <% end %>
+                    <% if Ctx.permissions.allow_manage_locations? %>
+                        <li class="map-tab"><a href="/locations" <% if context.include?('locations') %> class='active'<% end %>>My Locations</a></li>
+                    <% end %>
+                    <% if Ctx.permissions.allow_manage_transfers? %>
+                        <li class="map-tab"><a href="/transfer-proposals" <% if context.include?('transfers') %> class='active'<% end %>>My Transfers</a></li>
+                    <% end %>
+                    <% if Ctx.permissions.allow_manage_file_issues? %>
+                        <li class="map-tab">
+                            <a href="/file-issue-requests" <% if context.include?('file_issues') %> class='active'<% end %>>
+                                My File Issues
+                            </a>
+                        </li>
+                    <% end %>
                 <% end %>
             </ul>
             <ul class="map-tabs map-nav-right">
-                <% unless Ctx.permissions.is_admin %>
+                <% unless context.include?('global') || Ctx.permissions.is_admin %>
                     <li class="map-tab vue-enabled">
                         <%
                         available_locations = Ctx.get.available_locations

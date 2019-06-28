@@ -228,7 +228,7 @@ class MAPTheApp < Sinatra::Base
                                    q: params[:q],
                                    params: params,
                                  },
-                                 :layout, title: "Agencies", context: ['agencies'])
+                                 :layout, title: "Agencies", context: ['global', 'agencies'])
   end
 
   Endpoint.get('/agencies/:agency_ref')
@@ -238,7 +238,7 @@ class MAPTheApp < Sinatra::Base
       Templates.emit_with_layout(:manage_agency, {
                                    agency_ref: params[:agency_ref],
                                  },
-                                 :layout, title: '', context: ['agencies'])
+                                 :layout, title: '', context: ['global', 'agencies'])
 
     else
       [404]
