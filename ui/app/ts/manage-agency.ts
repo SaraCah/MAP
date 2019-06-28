@@ -56,7 +56,7 @@ Vue.component('manage-agency', {
                       </ul>
                     </td>
                     <td>
-                      <button class="btn btn-small">Edit</button>
+                      <button class="btn btn-small right">Edit</button>
                     </td>
                   </tr>
                 </tbody>
