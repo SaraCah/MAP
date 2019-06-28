@@ -21,7 +21,7 @@ Vue.component('manage-agency', {
     template: `
 <div v-if="initialised">
   <div class="col s8">
-    <h2>Editing {{this.agency.label}}</h2>
+    <h2>{{this.agency.label}}</h2>
 
     <button class="btn right">Add new location</button>
 
