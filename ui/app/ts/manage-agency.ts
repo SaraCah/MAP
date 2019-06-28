@@ -10,56 +10,102 @@ Vue.use(VueResource);
 interface State {
     initialised: boolean;
     failed: boolean;
-    agency: Agency;
+    agency?: Agency;
 }
 
 interface Agency {
     label: string;
+    locations: any[];
 }
 
 Vue.component('manage-agency', {
     template: `
 <div v-if="initialised">
-  <div class="col s8">
+  <div class="col s12 m9 l10">
     <h2>{{this.agency.label}}</h2>
 
-    <button class="btn right">Add new location</button>
+    <section id="locations" class="scrollspy section">
+      <div class="card">
+        <div class="card-content">
+          <button class="btn right">Add new location</button>
 
-    <template v-for="location in this.agency.locations">
-      <h4>{{location.location.name}}</h4>
-      <button class="btn btn-small">Add user to location</button>
-      <table class="highlight" v-if="location.members.length > 0">
-        <thead>
-          <th>Username</th>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Permissions</th>
-          <th></th>
-        </thead>
-        <tbody>
-          <tr v-for="member in location.members">
-            <td>{{member.username}}</td>
-            <td>{{member.name}}</td>
-            <td>{{member.role}}</td>
-            <td>
-              <ul>
-                <li v-for="permission in member.permissions">
-                  {{permission}}
-                </li>
-              </ul>
-            </td>
-            <td>
-              <button class="btn btn-small">Edit</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="card" v-else>
-        <div class="card-content">No members for this location</div>
+          <h4>Locations</h4>
+
+          <div class="card" v-for="location in this.agency.locations">
+            <div class="card-content">
+              <button class="btn btn-small right">Add user to location</button>
+              <h5>{{location.location.name}}</h5>
+              <table class="highlight" v-if="location.members.length > 0">
+                <thead>
+                  <th>Username</th>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Permissions</th>
+                  <th></th>
+                </thead>
+                <tbody>
+                  <tr v-for="member in location.members">
+                    <td>{{member.username}}</td>
+                    <td>{{member.name}}</td>
+                    <td>{{member.role}}</td>
+                    <td>
+                      <ul>
+                        <li v-for="permission in member.permissions">
+                          {{permission}}
+                        </li>
+                      </ul>
+                    </td>
+                    <td>
+                      <button class="btn btn-small">Edit</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div v-else>
+                <p>No members for this location</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </template>
+    </section>
+
+    <section id="users" class="scrollspy section">
+      <div class="card">
+        <div class="card-content">
+          <span class="card-title">Agency users</span>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Role(s)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user in this.mergedUsers">
+                <td>{{user.username}}</td>
+                <td>{{user.name}}</td>
+                <td>
+                  <ul>
+                    <li v-for="role in user.roles">{{role}}</li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
     <pre>{{this.agency}}</pre>
+  </div>
+  <div class="col hide-on-small-only m3 l2">
+    <ul class="section table-of-contents">
+      <li><a href="#locations">Locations</a></li>
+      <li><a href="#users">Users</a></li>
+    </ul>
   </div>
 </div>
 <div v-else-if="failed">
@@ -71,9 +117,7 @@ Vue.component('manage-agency', {
         return {
             initialised: false,
             failed: false,
-            agency: {
-                label: "test",
-            },
+            agency: undefined,
         };
     },
     props: {
@@ -96,6 +140,41 @@ Vue.component('manage-agency', {
                     this.agency = json;
                 }
             })
+        }
+    },
+    computed: {
+        mergedUsers: function(): object[] {
+            const usernames: string[] = [];
+            const users: any = {};
+
+            if (!this.agency) {
+                return [];
+            }
+
+            for (const location of this.agency.locations) {
+                for (const member of location.members) {
+                    if (!users[member.username]) {
+                        usernames.push(member.username);
+                        users[member.username] = {
+                            username: member.username,
+                            name: member.name,
+                            roles: [],
+                        }
+                    }
+
+                    // \u2014 = emdash
+                    users[member.username].roles.push(location.location.name + " \u2014 " + member.role);
+                }
+            }
+
+            let result: any = [];
+            usernames.sort();
+
+            for (const username of usernames) {
+                result.push(users[username]);
+            }
+
+            return result;
         }
     },
     mounted: function () {
