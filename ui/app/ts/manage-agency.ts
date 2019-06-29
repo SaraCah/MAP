@@ -15,7 +15,22 @@ interface State {
 
 interface Agency {
     label: string;
-    locations: any[];
+    locations: LocationWithMembers[];
+}
+
+interface Location {
+    name: string;
+}
+
+interface Member {
+    username: string;
+    name: string;
+    role: string;
+}
+
+interface LocationWithMembers {
+    location: Location;
+    members: Member[];
 }
 
 Vue.component('manage-agency', {
@@ -128,7 +143,7 @@ Vue.component('manage-agency', {
         };
     },
     props: {
-        agency_ref: String
+        agency_ref: String,
     },
     methods: {
         refreshAgency: function() {
@@ -146,13 +161,19 @@ Vue.component('manage-agency', {
                     this.initialised = true;
                     this.agency = json;
                 }
-            })
-        }
+            });
+        },
     },
     computed: {
         mergedUsers: function(): object[] {
+            interface AggregatedMember {
+                username: string;
+                name: string;
+                roles: string[];
+            }
+
             const usernames: string[] = [];
-            const users: any = {};
+            const users: { [username: string]: AggregatedMember } = {};
 
             if (!this.agency) {
                 return [];
@@ -166,7 +187,7 @@ Vue.component('manage-agency', {
                             username: member.username,
                             name: member.name,
                             roles: [],
-                        }
+                        };
                     }
 
                     // \u2014 = emdash
@@ -174,7 +195,7 @@ Vue.component('manage-agency', {
                 }
             }
 
-            let result: any = [];
+            const result: AggregatedMember[] = [];
             usernames.sort();
 
             for (const username of usernames) {
@@ -182,9 +203,9 @@ Vue.component('manage-agency', {
             }
 
             return result;
-        }
+        },
     },
-    mounted: function () {
+    mounted: function() {
         this.refreshAgency();
-    }
+    },
 });
