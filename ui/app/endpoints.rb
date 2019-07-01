@@ -323,8 +323,7 @@ class MAPTheApp < Sinatra::Base
       # return [404]
     end
 
-    Templates.emit_with_layout(:location_edit, {location: location},
-                               :layout, title: "Location", context: ['locations'])
+    Templates.emit(:location_edit, {location: location})
   end
 
   Endpoint.post('/locations/update')
@@ -339,10 +338,9 @@ class MAPTheApp < Sinatra::Base
     errors = Ctx.client.update_location(params[:location])
 
     if errors.empty?
-      redirect '/locations'
+      [202]                     # AJAX form success 
     else
-      Templates.emit_with_layout(:location_edit, {location: params[:location], errors: errors},
-                                 :layout, title: "Location", context: ['locations'])
+      Templates.emit(:location_edit, {location: params[:location], errors: errors})
     end
   end
 

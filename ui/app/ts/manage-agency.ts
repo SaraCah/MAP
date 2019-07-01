@@ -21,7 +21,9 @@ interface Agency {
 }
 
 interface Location {
+    id: number;
     name: string;
+    is_top_level: boolean;
 }
 
 interface Member {
@@ -55,7 +57,10 @@ Vue.component('manage-agency', {
 
             <div class="card" v-for="location in this.agency.locations">
               <div class="card-content">
-                <button class="btn btn-small right">Add user to location</button>
+                <div class="right">
+                  <button class="btn btn-small">Add user to location</button>
+                  <button v-if="!location.location.is_top_level" @click.prevent.default="editLocation(location.location)" class="btn btn-small">Edit location</button>
+                </div>
                 <h5>{{location.location.name}}</h5>
                 <table class="highlight" v-if="location.members.length > 0">
                   <thead>
@@ -169,6 +174,13 @@ Vue.component('manage-agency', {
                 params: {
                     agency_ref: this.agency_ref,
                 },
+                successCallback: () => {
+                    this.refreshAgency();
+                },
+            });
+        },
+        editLocation: function(location: Location) {
+            this.ajaxFormModal('/locations/' + location.id, {
                 successCallback: () => {
                     this.refreshAgency();
                 },
