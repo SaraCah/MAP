@@ -105,6 +105,10 @@ body {
     display: block;
     white-space: nowrap;
 }
+.map-tab > a.active,
+.map-tab > span > a.active {
+    border-bottom: 2px solid #FFF;
+}
 .map-tab i.fa {
     height: inherit;
     line-height: inherit;
