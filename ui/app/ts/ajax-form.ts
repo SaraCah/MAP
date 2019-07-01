@@ -7,6 +7,8 @@ class AjaxForm {
     formElement: HTMLFormElement | null;
 
     constructor(rootElement: HTMLElement, successCallback: () => void) {
+        window.MAP.init();
+
         this.successCallback = successCallback;
 
         this.rootElement = rootElement;

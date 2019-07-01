@@ -155,6 +155,45 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  Endpoint.post('/users/create-for-location')
+    .param(:user, UserDTO, "The user to create")
+    .param(:role, String, "The role to assign")
+    .param(:location_id, Integer, "The location to link our user to") do
+
+    location = Ctx.client.location_for_edit(params[:location_id])
+
+    unless Ctx.permissions.is_admin?
+      unless Ctx.permissions.agency_roles.any? {|role|
+               (role.agency_location_id == location.fetch('id') && role.role == 'AGENCY_ADMIN') ||
+                 (role.agency_ref == location.fetch('agency_ref') && role.role == 'SENIOR_AGENCY_ADMIN')
+             }
+        raise "Insufficient Privileges"
+      end
+    end
+
+    params[:user]['is_admin'] = false
+
+    params[:user]['agency_roles'] = [
+      AgencyRoleDTO.new(:agency_ref => location.fetch('agency_ref'),
+                        :role => params[:role],
+                        :agency_location_id => location.fetch('id'))
+    ]
+
+    errors = Ctx.client.create_user(params[:user])
+
+    if errors.empty?
+      [202]                     # AJAX form success
+    else
+      Templates.emit(:location_add_user, {
+                       user: params[:user],
+                       role: params[:role],
+                       location: location,
+                       mode: 'new_user',
+                       errors: errors
+                     })
+    end
+  end
+
   Endpoint.get('/users/edit')
     .param(:username, String, "Username") do
     unless Ctx.permissions.is_admin?
@@ -325,6 +364,21 @@ class MAPTheApp < Sinatra::Base
 
     Templates.emit(:location_edit, {location: location})
   end
+
+  Endpoint.get('/locations/:id/add-user-form')
+    .param(:id, Integer, "ID of agency location")
+    .param(:mode, String, "One of 'new_user' or 'existing_user'")do
+    location = Ctx.client.location_for_edit(params[:id])
+    if false
+      # FIXME check permissions and agency/location etc
+      # return [404]
+    end
+
+    Templates.emit(:location_add_user, {location: location,
+                                        user: UserDTO.new(username: '', name: ''),
+                                        mode: params[:mode]})
+  end
+
 
   Endpoint.post('/locations/update')
     .param(:location, AgencyLocationDTO, "The location to update") do

@@ -24,10 +24,29 @@ import 'users-search';
 
 declare var M: any; // Materialize on the window context
 
-document.querySelectorAll('.vue-enabled').forEach(function(elt: Element) {
-    /* tslint:disable:no-unused-expression */
-    new Vue({el: elt});
-});
+declare global {
+    interface Window { MAP: any; }
+}
 
-M.ScrollSpy.init(document.querySelectorAll('.scrollspy'));
-M.Dropdown.init(document.querySelectorAll('.menu-dropdown'), {constrainWidth: false, coverTrigger: false});
+window.MAP = {
+    // Called when the page first loads, plus any time we load AJAX content that
+    // might contain components that need to be initialised.
+    init: function () {
+        document.querySelectorAll('.vue-enabled').forEach(function(elt: Element) {
+            /* tslint:disable:no-unused-expression */
+            if (!elt.classList.contains('vue-map-initialised')) {
+                elt.classList.add('vue-map-initialised');
+                new Vue({el: elt});
+            }
+        });
+
+        M.ScrollSpy.init(document.querySelectorAll('.scrollspy'));
+        M.Dropdown.init(document.querySelectorAll('.menu-dropdown'), {constrainWidth: false, coverTrigger: false});
+
+        document.querySelectorAll('.tabs').forEach(function (elt: Element) {
+            M.Tabs.init(elt, {});
+        });
+    },
+};
+
+window.MAP.init();

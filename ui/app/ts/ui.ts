@@ -28,12 +28,20 @@ export default class UI {
             node = content;
         }
 
+        // Clear any previous modals
+        document.querySelectorAll('.modal-generated-elt').forEach(function (elt) {
+            if (elt.parentNode) {
+                elt.parentNode.removeChild(elt);
+            }
+        });
+
         const modal = document.createElement('div');
         const contentContainer = document.createElement('div');
 
         modal.appendChild(contentContainer);
 
         modal.className = 'modal';
+        modal.classList.add('modal-generated-elt')
         contentContainer.className = 'modal-content';
 
         contentContainer.appendChild(node);

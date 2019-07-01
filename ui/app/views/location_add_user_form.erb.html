@@ -1,0 +1,56 @@
+<div class="row vue-enabled">
+    <% if errors %>
+        <%== FormHelper.render_errors(errors) %>
+    <% end %>
+
+    <h5>Adding a user to <%= location.fetch('name') %></h5>
+
+    <div class="row">
+        <div class="col s12">
+            <ul class="tabs">
+                <li class="tab col s3"><a <% if mode == 'new_user' %>class="active"<% end %> href="#new_user">Create new user</a></li>
+                <li class="tab col s3"><a <% if mode != 'new_user' %>class="active"<% end %> href="#existing_user">Add existing user</a></li>
+            </ul>
+        </div>
+
+        <div id="new_user">
+            <form class="col s12" action='/users/create-for-location' method="post">
+                <%== FormHelper.hidden_authenticity_token %>
+
+                <input type="hidden" name="location_id" value="<%= location.fetch('id') %>">
+
+                <select class="browser-default" name="role">
+                    <option value="AGENCY_CONTACT" <% if !role || role == 'AGENCY_CONTACT' %> selected<% end %>>Agency Contact</option>
+                    <option value="AGENCY_ADMIN" <% if role == 'AGENCY_ADMIN' %> selected<% end %>>Agency Admin</option>
+                </select>
+
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="username" name="user[username]" type="text" value="<%= user.fetch('username') %>" required>
+                        <label for="username">Username</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="name" name="user[name]" type="text" value="<%= user.fetch('name') %>" required>
+                        <label for="name">Name</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="password" name="user[password]" type="password" required>
+                        <label for="password">Password</label>
+                    </div>
+                </div>
+
+                <div class="col s12">
+                    <button class="btn">Create user</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="existing_user">
+            EXISTING SCHMO
+        </div>
+    </div>
+</div>

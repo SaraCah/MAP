@@ -58,7 +58,7 @@ Vue.component('manage-agency', {
             <div class="card" v-for="location in this.agency.locations">
               <div class="card-content">
                 <div class="right">
-                  <button class="btn btn-small">Add user to location</button>
+                  <button @click.prevent.default="addUserToLocation(location.location)" class="btn btn-small">Add user to location</button>
                   <button v-if="!location.location.is_top_level" @click.prevent.default="editLocation(location.location)" class="btn btn-small">Edit location</button>
                 </div>
                 <h5>{{location.location.name}}</h5>
@@ -181,6 +181,16 @@ Vue.component('manage-agency', {
         },
         editLocation: function(location: Location) {
             this.ajaxFormModal('/locations/' + location.id, {
+                successCallback: () => {
+                    this.refreshAgency();
+                },
+            });
+        },
+        addUserToLocation: function(location: Location) {
+            this.ajaxFormModal('/locations/' + location.id + '/add-user-form', {
+                params: {
+                    mode: 'new_user',
+                },
                 successCallback: () => {
                     this.refreshAgency();
                 },
