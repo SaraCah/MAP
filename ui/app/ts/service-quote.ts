@@ -24,42 +24,46 @@ interface Quote {
 
 Vue.component('service-quote', {
     template: `
-<template v-if="quote != null">
-    <div class="card">
-        <div class="card-content">
-            <span class="card-title">{{title || "Quote"}}</span>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Unit Description</th>
-                        <th>Unit Cost</th>
-                        <th>No. of Units</th>
-                        <th>Cost</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="item in quote.lineItems">
-                        <td>{{item.description}}</td>
-                        <td>{{formatCents(item.chargePerUnitCents)}} per {{formatUnit(item.chargeQuantityUnit)}}</td>
-                        <td>{{item.quantity}}</td>
-                        <td class="right-align">{{formatCents(item.chargeCents)}}</td>
-                    </tr>
-                    <tr class="grey lighten-4">
-                        <td colspan="3"><strong>TOTAL</strong></td>
-                        <td class="right-align">{{formatCents(quote.totalChargeCents)}}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="row">
-                <div class="col s12">
-                    <p>Issued: {{quote.issuedDate}}</p>
-                </div>
-            </div>
+<div>
+    <template v-if="quote != null">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">{{title || "Quote"}}</span>
 
-            <slot></slot>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Unit Description</th>
+                            <th>Unit Cost</th>
+                            <th>No. of Units</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="item in quote.lineItems">
+                            <td>{{item.description}}</td>
+                            <td>{{formatCents(item.chargePerUnitCents)}} per {{formatUnit(item.chargeQuantityUnit)}}</td>
+                            <td>{{item.quantity}}</td>
+                            <td class="right-align">{{formatCents(item.chargeCents)}}</td>
+                        </tr>
+                        <tr class="grey lighten-4">
+                            <td colspan="3"><strong>TOTAL</strong></td>
+                            <td class="right-align">{{formatCents(quote.totalChargeCents)}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <div class="col s12">
+                        <p>Issued: {{quote.issuedDate}}</p>
+                    </div>
+                </div>
+
+                <slot></slot>
+            </div>
         </div>
-    </div>
-</template>
+    </template>
+</div>
 `,
     data: function(): {quote: Quote|null} {
         let quote: Quote|null = null;
