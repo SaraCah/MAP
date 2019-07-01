@@ -868,7 +868,7 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/file-issue-fee-schedule') do
     chargeable_services = Ctx.client.get_file_issue_fee_schedule
 
-    Templates.emit_with_layout(:file_issue_fee_schedule, {chargeable_services: chargeable_services},
+    Templates.emit_with_layout(:fee_schedule, {chargeable_services: chargeable_services},
                                :layout, title: "Fee Schedule", context: ['file_issues', 'fee_schedule'])
   end
 
@@ -1052,6 +1052,13 @@ class MAPTheApp < Sinatra::Base
     Ctx.client.cancel_search_request(params[:id], params[:lock_version])
 
     redirect '/search-requests'
+  end
+
+  Endpoint.get('/search-request-fee-schedule') do
+    chargeable_services = Ctx.client.get_search_request_fee_schedule
+
+    Templates.emit_with_layout(:fee_schedule, {chargeable_services: chargeable_services},
+                               :layout, title: "Fee Schedule", context: ['records', 'fee_schedule'])
   end
 
 end

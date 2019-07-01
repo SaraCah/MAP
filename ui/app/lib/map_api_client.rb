@@ -593,6 +593,10 @@ class MAPAPIClient
     get("/search-requests/#{search_request_id}/quote")
   end
 
+  def get_search_request_fee_schedule
+    get("/search-request-fee-schedule")
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

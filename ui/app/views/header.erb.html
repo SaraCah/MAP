@@ -73,6 +73,7 @@
             <ul class="map-tabs">
                 <li class="map-tab col s3"><a <% if context.include?('controlled_records') %>class="active"<% end %> href="/records">Controlled Records</a></li>
                 <li class="map-tab col s3"><a <% if context.include?('search_requests') %>class="active"<% end %> href="/search-requests">Search Requests</a></li>
+                <li class="map-tab col s3"><a <% if context.include?('fee_schedule') %>class="active"<% end %> href="/search-request-fee-schedule">Fee Schedule</a></li>
             </ul>
         </div>
         <% end %>

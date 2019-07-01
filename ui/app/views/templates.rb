@@ -39,7 +39,8 @@ Templates.define(:file_issue_requests, [:paged_results, :digital_request_status?
 Templates.define(:file_issue_request_view, [:request, :resolved_representations?, :errors?, :is_readonly?, :digital_request_quote?, :physical_request_quote?], "views/file_issue_request_form.erb.html")
 Templates.define(:file_issues, [:paged_results, :sort?, :issue_type?, :status?, :params], "views/file_issues.erb.html")
 Templates.define(:file_issue_view, [:file_issue, :resolved_representations?, :errors?, :is_readonly?], "views/file_issue_form.erb.html")
-Templates.define(:file_issue_fee_schedule, [:chargeable_services], "views/file_issue_fee_schedule.erb.html")
+
+Templates.define(:fee_schedule, [:chargeable_services], "views/fee_schedule.erb.html")
 
 Templates.define(:file_issue_download_expired, [], "views/file_issue_download_expired.erb.html")
 Templates.define(:file_issue_download_missing, [], "views/file_issue_download_missing.erb.html")

@@ -655,7 +655,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/file-issue-fee-schedule') do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      chargeable_services = FileIssues.chargeable_services
+      chargeable_services = ServiceQuotes.chargeable_services(['File Issue Physical', 'File Issue Digital'])
       json_response(chargeable_services)
     else
       [404]
@@ -840,7 +840,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/search-requests/:id/quote')
     .param(:id, Integer, "Search Request ID")do
-    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       existing_search_request = SearchRequests.dto_for(params[:id])
       if existing_search_request && Ctx.get.permissions.has_role_for_location?(existing_search_request.fetch('agency_id'), existing_search_request.fetch('agency_location_id'))
         if existing_search_request.fetch('aspace_quote_id', false)
@@ -851,6 +851,15 @@ class MAPTheAPI < Sinatra::Base
       else
         [404]
       end
+    else
+      [404]
+    end
+  end
+
+  Endpoint.get('/search-request-fee-schedule') do
+    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      chargeable_services = ServiceQuotes.chargeable_services(['Search Request'])
+      json_response(chargeable_services)
     else
       [404]
     end
