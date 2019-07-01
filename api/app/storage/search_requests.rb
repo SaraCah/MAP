@@ -126,4 +126,45 @@ class SearchRequests < BaseStorage
 
     errors
   end
+
+  def self.get_notifications
+    notifications = []
+
+    # created
+    db[:search_request]
+      .filter(Sequel[:search_request][:agency_id] => Ctx.get.current_location.agency_id)
+      .filter(Sequel[:search_request][:agency_location_id] => Ctx.get.current_location.id)
+      .filter(Sequel[:search_request][:create_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
+      .select(Sequel[:search_request][:id],
+              Sequel[:search_request][:create_time],
+              Sequel[:search_request][:created_by])
+      .each do |row|
+      notifications << Notification.new('search_request',
+                                        row[:id],
+                                        "SR%s" % [row[:id]],
+                                        "%s created by %s" % ['Search Request', row[:created_by]],
+                                        'info',
+                                        row[:create_time])
+    end
+
+    # modified
+    db[:search_request]
+      .filter(Sequel[:search_request][:agency_id] => Ctx.get.current_location.agency_id)
+      .filter(Sequel[:search_request][:agency_location_id] => Ctx.get.current_location.id)
+      .filter(Sequel[:search_request][:modified_time] > Sequel[:search_request][:create_time])
+      .filter(Sequel[:search_request][:modified_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
+      .select(Sequel[:search_request][:id],
+              Sequel[:search_request][:modified_time],
+              Sequel[:search_request][:modified_by])
+      .each do |row|
+      notifications << Notification.new('search_request',
+                                        row[:id],
+                                        "SR%s" % [row[:id]],
+                                        "%s updated by %s" % ['Search Request', row[:modified_by]],
+                                        'info',
+                                        row[:modified_time])
+    end
+
+    notifications
+  end
 end

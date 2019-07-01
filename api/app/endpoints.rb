@@ -711,6 +711,8 @@ class MAPTheAPI < Sinatra::Base
 
         notifications += Conversations.get_notifications(can_manage_file_issues, can_manage_transfers)
 
+        notifications += SearchRequests.get_notifications
+
         if Ctx.get.permissions.can_manage_locations?(Ctx.get.current_location.agency.fetch('id'))
           notifications += Locations.get_notifications(true)
         end

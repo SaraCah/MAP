@@ -41,7 +41,9 @@ Vue.component('notifications', {
                         <td>{{notification.identifier}}</td>
                         <td>{{notification.message}}</td>
                         <td>{{formatTimestamp(notification.timestamp)}}</td>
-                        <td><a class="btn btn-small" :href="urlFor(notification.record_type, notification.record_id)">View</a></td>
+                        <td>
+                            <a class="btn btn-small" :href="urlFor(notification.record_type, notification.record_id)" v-if="urlFor(notification.record_type, notification.record_id) != null">View</a>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -88,8 +90,10 @@ Vue.component('notifications', {
                 return "/users/edit?username=" + recordId;
             } else if (recordType === 'location') {
                 return "/locations/" + recordId;
+            } else if (recordType === 'search_request') {
+                return "/search-requests/" + recordId;
             }
-            return "alert('ERROR');";
+            return null;
         },
         showNotifications: function() {
             document.body.append(this.$refs.modal as Element);
