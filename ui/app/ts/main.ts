@@ -2,6 +2,7 @@
 
 import Vue from "vue";
 
+import 'ajax-form';
 import 'confirmable-action';
 import 'controlled-records';
 import 'conversation';

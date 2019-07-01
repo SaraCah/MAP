@@ -18,19 +18,31 @@ export default class UI {
         M.Modal.init(modal).open();
     }
 
-    public static genericHTMLModal(node: HTMLElement) {
-        const modal = document.createElement('div');
-        const content = document.createElement('div');
+    public static genericHTMLModal(content: HTMLElement | string): [any, HTMLElement] {
+        let node: HTMLElement | null = null;
 
-        modal.appendChild(content);
+        if (typeof(content) == 'string') {
+            node = document.createElement('div');
+            node.innerHTML = content;
+        } else {
+            node = content;
+        }
+
+        const modal = document.createElement('div');
+        const contentContainer = document.createElement('div');
+
+        modal.appendChild(contentContainer);
 
         modal.className = 'modal';
-        content.className = 'modal-content';
+        contentContainer.className = 'modal-content';
 
-        content.appendChild(node);
+        contentContainer.appendChild(node);
 
         document.body.appendChild(modal);
 
-        M.Modal.init(modal).open();
+        const modalObj = M.Modal.init(modal);
+        modalObj.open();
+
+        return [modalObj, contentContainer];
     }
 }

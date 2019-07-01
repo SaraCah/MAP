@@ -286,10 +286,12 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
-  Endpoint.get('/locations/new') do
+  Endpoint.get('/locations/new')
+    .param(:agency_ref, String, "The agency we'll be adding a location to") do
     if Ctx.permissions.allow_manage_locations?
-      Templates.emit_with_layout(:location_edit, {location: AgencyLocationDTO.new},
-                                 :layout, title: "New Location", context: ['locations'])
+      Templates.emit(:location_edit, {
+                       location: AgencyLocationDTO.new(agency_ref: params[:agency_ref]),
+                     })
     else
       [404]
     end
@@ -307,10 +309,9 @@ class MAPTheApp < Sinatra::Base
     errors = Ctx.client.create_location(params[:location])
 
     if errors.empty?
-      redirect '/locations'
+      [202]                     # AJAX form success
     else
-      Templates.emit_with_layout(:location_edit, {location: params[:location], errors: errors},
-                                 :layout, title: "New Location", context: ['locations'])
+      Templates.emit(:location_edit, {location: params[:location], errors: errors})
     end
   end
 

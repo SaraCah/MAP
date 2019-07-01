@@ -3,7 +3,9 @@
 
 import Vue from "vue";
 import VueResource from "vue-resource";
+import UI from "./ui";
 // import Utils from "./utils";
+
 
 Vue.use(VueResource);
 
@@ -44,11 +46,10 @@ Vue.component('manage-agency', {
   <div class="row">
     <div class="col s12 m9 l10">
 
-
       <section id="locations" class="scrollspy section">
         <div class="card">
           <div class="card-content">
-            <button class="btn right">Add new location</button>
+            <button @click.prevent.default="addLocation()" class="btn right">Add new location</button>
 
             <h4>Locations</h4>
 
@@ -163,6 +164,38 @@ Vue.component('manage-agency', {
                 }
             });
         },
+        addLocation: function() {
+            this.ajaxFormModal('/locations/new', {
+                params: {
+                    agency_ref: this.agency_ref,
+                },
+                successCallback: () => {
+                    this.refreshAgency();
+                },
+            });
+        },
+        ajaxFormModal: function (url: string, opts: any) {
+            this.$http.get(url, {
+                method: 'GET',
+                params: opts.params || {},
+            }).then((response: any) => {
+                const modalAndContentObj = UI.genericHTMLModal(response.body);
+
+                const modal = modalAndContentObj[0];
+                const contentPane = modalAndContentObj[1];
+
+                new AjaxForm(contentPane, () => {
+                    modal.close();
+
+                    if (opts.successCallback) {
+                        opts.successCallback();
+                    }
+                });
+            }, () => {
+                // failed
+            });
+
+        },
     },
     computed: {
         mergedUsers: function(): object[] {
@@ -209,3 +242,4 @@ Vue.component('manage-agency', {
         this.refreshAgency();
     },
 });
+

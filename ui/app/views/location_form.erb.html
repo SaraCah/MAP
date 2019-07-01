@@ -3,7 +3,7 @@
         <%== FormHelper.render_errors(errors) %>
     <% end %>
     <% form_action = "/locations/" + (location.new? ? "create" : "update") %>
-    <form class="col s12" action="<%= form_action %>" method="post">
+    <form class="ajax-form col s12" action="<%= form_action %>" method="post">
         <%== FormHelper.hidden_authenticity_token %>
         <%== FormHelper.lock_version(location, 'location') %>
 
@@ -14,7 +14,7 @@
         <% if Ctx.permissions.is_admin? %>
             <div class="row">
                 <% if location.new? %>
-                    <agency-linker agency_ref="<%= location.fetch('agency_ref', nil) %>" agency_label="<%= location.fetch('agency_label', nil) %>"></agency-linker>
+                    <input type="hidden" name="location[agency_ref]" value="<%= location.fetch('agency_ref') %>">
                 <% else %>
                     <div class="col s12">
                         <%= location.fetch('agency_label') %>
