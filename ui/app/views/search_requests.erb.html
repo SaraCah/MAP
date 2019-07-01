@@ -17,8 +17,9 @@
             <thead>
             <tr>
                 <th style="width:5%">ID</th>
-                <th style="width:15%">Status</th>
-                <th style="width:30%">Details</th>
+                <th style="width:10%">Purpose</th>
+                <th style="width:25%">Details</th>
+                <th style="width:10%">Status</th>
                 <th style="width:10%">Created By</th>
                 <th style="width:20%">Date Created</th>
                 <th style="width:20%"></th>
@@ -28,10 +29,11 @@
             <% paged_results.results.each do |search_request| %>
             <tr>
                 <td><%= search_request.id_for_display %></td>
-                <td><%= search_request.fetch('status') %></td>
+                <td><%= search_request.purpose_for_display %></td>
                 <td>
                     <%= search_request.fetch('details').length > 100 ? "#{search_request.fetch('details') [0...100]}..." : search_request.fetch('details') %>
                 </td>
+                <td><%= search_request.fetch('status') %></td>
                 <td><%= search_request.fetch('created_by') %></td>
                 <td><%= Time.at(search_request.fetch('create_time') / 1000)%></td>
                 <td>

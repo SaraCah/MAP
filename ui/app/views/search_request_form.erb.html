@@ -80,6 +80,26 @@
                             <label for="request_details">Request Details</label>
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <textarea id="date_details" name="search_request[date_details]" class="materialize-textarea" <% if is_readonly %>disabled<% end %>><%= request.fetch('date_details', '') %></textarea>
+                            <label for="date_details">Date Details</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col s12">
+                            <select-with-other-option
+                                    input_id="purpose"
+                                    input_name="search_request[purpose]"
+                                    input_label="Purpose"
+                                    options_json="<%= request.available_purposes.to_json %>"
+                                    current_selection="<%= request.fetch('purpose', '') %>"
+                                    is_readonly="<%= is_readonly %>">
+                            </select-with-other-option>
+                        </div>
+                    </div>
                 </section>
 
                 <% if request.fetch('files').length > 0 %>

@@ -46,6 +46,8 @@ class SearchRequests < BaseStorage
              end
 
     search_request_id = db[:search_request].insert(details: search_request.fetch('details'),
+                                                   date_details: search_request.fetch('date_details', nil),
+                                                   purpose: search_request.fetch('purpose', nil),
                                                    draft: search_request.fetch('draft') ? 1 : 0,
                                                    status: status,
                                                    agency_id: Ctx.get.current_location.agency_id,
@@ -98,6 +100,8 @@ class SearchRequests < BaseStorage
                 .filter(id: search_request_id)
                 .filter(lock_version: search_request.fetch('lock_version'))
                 .update(details: search_request.fetch('details'),
+                        date_details: search_request.fetch('date_details', nil),
+                        purpose: search_request.fetch('purpose', nil),
                         draft: is_draft ? 1 : 0,
                         status: status,
                         lock_version: search_request.fetch('lock_version') + 1,

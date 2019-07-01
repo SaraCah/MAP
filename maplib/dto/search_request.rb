@@ -15,6 +15,8 @@ class SearchRequest
 
   define_field(:id, Integer, required: false)
   define_field(:details, String, validator: proc {|s| s.nil? || s.empty? ? "Details can't be blank" : nil })
+  define_field(:date_details, String)
+  define_field(:purpose, String)
   define_field(:status, String, required: false, default: INACTIVE)
   define_field(:draft, Boolean, default: true)
   define_field(:created_by, String, required: false)
@@ -30,6 +32,8 @@ class SearchRequest
   def self.from_row(row, handle_id = nil, file_rows = [])
     new(id: row[:id],
         details: row[:details],
+        date_details: row[:date_details],
+        purpose: row[:purpose],
         status: row[:status],
         draft: row[:draft] == 1,
         aspace_quote_id: row[:aspace_quote_id],
@@ -42,6 +46,16 @@ class SearchRequest
         files: file_rows.map{|file_row| SearchRequestFile.from_row(file_row)},
         handle_id: handle_id)
   end
+
+
+  def self.from_hash(hash)
+    if hash['purpose'].nil? || hash['purpose'].strip.empty?
+      hash['purpose'] = 'Other'
+    end
+
+    super(hash)
+  end
+
 
   def can_edit?
     return false if fetch('status') == CANCELLED_BY_AGENCY
@@ -67,5 +81,21 @@ class SearchRequest
 
   def can_be_cancelled?
     [INACTIVE, SUBMITTED].include?(fetch('status'))
+  end
+
+  def available_purposes
+    ['RTI', 'Redress']
+  end
+
+  def purpose_for_display
+    return '' if fetch('purpose', nil).nil?
+
+    if available_purposes.include?(fetch('purpose'))
+      fetch('purpose')
+    elsif fetch('purpose') == 'Other'
+      fetch('purpose')
+    else
+      ['Other', fetch('purpose')].join(' - ')
+    end
   end
 end
