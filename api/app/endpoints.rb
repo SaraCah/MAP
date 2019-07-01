@@ -756,9 +756,10 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/search-requests')
     .param(:sort, String, "Sort key", :optional => true)
+    .param(:status, String, "Status filter", :optional => true)
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(SearchRequests.search_requests(params[:page], AppConfig[:page_size], params[:sort]))
+      json_response(SearchRequests.search_requests(params[:page], AppConfig[:page_size], params[:status], params[:sort]))
     else
       [404]
     end

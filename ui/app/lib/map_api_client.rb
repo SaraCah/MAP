@@ -556,12 +556,13 @@ class MAPAPIClient
   class FileIssueNotFound < StandardError; end
   class FileIssueNotDispatched < StandardError; end
 
-  def search_requests(page = 0, sort = nil)
+  def search_requests(page = 0, status = nil, sort = nil)
     data = {
       page: page
     }
 
     data[:sort] = sort unless sort.nil? || sort == ''
+    data[:status] = status unless status.nil? || status == ''
 
     PagedResults.from_json(get('/search-requests', data), SearchRequest)
   end

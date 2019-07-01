@@ -16,6 +16,7 @@ import 'locations-search';
 import 'manage-agency';
 import 'notifications';
 import 'representation-linker';
+import 'search-requests-search';
 import 'select-with-other-option';
 import 'service-quote';
 import 'transfer-proposal-series';

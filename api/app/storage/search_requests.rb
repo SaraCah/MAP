@@ -9,7 +9,7 @@ class SearchRequests < BaseStorage
     'created_desc' => Sequel.desc(Sequel[:search_request][:create_time]),
   }
 
-  def self.search_requests(page, page_size, sort = nil)
+  def self.search_requests(page, page_size, status = nil, sort = nil)
     dataset = db[:search_request]
 
     unless Ctx.get.permissions.is_admin?
@@ -17,6 +17,10 @@ class SearchRequests < BaseStorage
       dataset = dataset
                   .filter(Sequel[:search_request][:agency_id] => current_location.agency_id)
                   .filter(Sequel[:search_request][:agency_location_id] => current_location.id)
+    end
+
+    if status && SearchRequest::STATUS_OPTIONS.include?(status)
+      dataset = dataset.filter(Sequel[:search_request][:status] => status)
     end
 
     max_page = (dataset.count / page_size.to_f).ceil

@@ -5,7 +5,10 @@
 </div>
 
 <div class="vue-enabled">
-    FIXME add search/filter here
+    <search-requests-search status="<%= status %>"
+                            :status_options="<%= SearchRequest::STATUS_OPTIONS.to_json %>"
+                            sort="<%= sort %>">
+    </search-requests-search>
 </div>
 
 <div class="row vue-enabled">

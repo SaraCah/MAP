@@ -955,13 +955,15 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/search-requests')
     .param(:sort, String, "Sort key", :optional => true)
+    .param(:status, String, "Status filter", :optional => true)
     .param(:page, Integer, "Page to return", optional: true) do
 
     Templates.emit_with_layout(
       :search_requests,
       {
-        paged_results: Ctx.client.search_requests(params[:page] || 0, params[:sort]),
+        paged_results: Ctx.client.search_requests(params[:page] || 0, params[:status], params[:sort]),
         sort: params[:sort],
+        status: params[:status],
         params: params,
       },
       :layout,
