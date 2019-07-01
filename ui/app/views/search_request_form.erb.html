@@ -23,89 +23,125 @@
                 </div>
             </section>
             <form id="searchRequestForm" class="col s12" <% if is_readonly %>disabled<% else %>action="<%= request.new? ? '/search-requests/create' : '/search-requests/update' %>" method="post"<% end %>>
-            <%== FormHelper.hidden_authenticity_token %>
-            <%== FormHelper.lock_version(request, 'search_request') %>
-
-            <% unless request.new? %>
-                <input type="hidden" name="search_request[id]" value="<%= request.fetch('id') %>">
-                <input type="hidden" name="search_request[handle_id]" value="<%= request.fetch('handle_id') %>">
-                <input type="hidden" name="search_request[agency_id]" value="<%= request.fetch('agency_id') %>">
-                <input type="hidden" name="search_request[agency_location_id]" value="<%= request.fetch('agency_location_id') %>">
-                <input type="hidden" name="search_request[status]" value="<%= request.fetch('status', '') %>">
-            <% end %>
-
-            <section id="details" class="scrollspy section">
-
-                <div class="card orange lighten-5">
-                    <div class="card-content">
-                        <p>When making a Search Request, please be aware of the following:</p>
-                        <ul class="browser-default">
-                            <li>Provide as much detail as possible, including (where possible) file numbers, dates, full names of people involved, any relevant geographical locations or institution names and locations;</li>
-                            <li>A search fill not be undertaken if insufficient information is provided;</li>
-                            <li>Analysis of records will not be undertaken;</li>
-                            <li>Staff will spend up to 1 hour on your search;</li>
-                            <li>Charges will be applied in accordance with the fee schedule.</li>
-                        </ul>
-                        <%# FIXME change fee schedule URL %>
-                        <p><a target="_blank" href="/file-issue-fee-schedule">View Fee Schedule</a></p>
-                    </div>
-                </div>
+                <%== FormHelper.hidden_authenticity_token %>
+                <%== FormHelper.lock_version(request, 'search_request') %>
 
                 <% unless request.new? %>
-                    <div class="row">
-                        <div class="input-field col s12">
-                            <input id="proposal_id" type="text" value="<%= request.id_for_display %>" disabled>
-                            <label for="proposal_id">Request ID</label>
-                        </div>
-                    </div>
+                    <input type="hidden" name="search_request[id]" value="<%= request.fetch('id') %>">
+                    <input type="hidden" name="search_request[handle_id]" value="<%= request.fetch('handle_id') %>">
+                    <input type="hidden" name="search_request[agency_id]" value="<%= request.fetch('agency_id') %>">
+                    <input type="hidden" name="search_request[agency_location_id]" value="<%= request.fetch('agency_location_id') %>">
+                    <input type="hidden" name="search_request[status]" value="<%= request.fetch('status', '') %>">
                 <% end %>
 
-                <div class="row">
-                    <div class="input-field col s12">
-                        <input id="agency" type="text" value="<%= Ctx.get.current_location.agency.label %>" disabled>
-                        <label for="agency">Agency</label>
-                    </div>
-                </div>
+                <section id="details" class="scrollspy section">
 
-                <div class="row">
-                    <div class="input-field col s12">
-                        <input id="agency_location" type="text" value="<%= Ctx.get.current_location.name %>" disabled>
-                        <label for="agency_location">Agency Location</label>
+                    <div class="card orange lighten-5">
+                        <div class="card-content">
+                            <p>When making a Search Request, please be aware of the following:</p>
+                            <ul class="browser-default">
+                                <li>Provide as much detail as possible, including (where possible) file numbers, dates, full names of people involved, any relevant geographical locations or institution names and locations;</li>
+                                <li>A search fill not be undertaken if insufficient information is provided;</li>
+                                <li>Analysis of records will not be undertaken;</li>
+                                <li>Staff will spend up to 1 hour on your search;</li>
+                                <li>Charges will be applied in accordance with the fee schedule.</li>
+                            </ul>
+                            <%# FIXME change fee schedule URL %>
+                            <p><a target="_blank" href="/file-issue-fee-schedule">View Fee Schedule</a></p>
+                        </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="input-field col s12">
-                        <textarea id="request_details" name="search_request[details]" class="materialize-textarea" <% if is_readonly %>disabled<% end %>><%= request.fetch('details', '') %></textarea>
-                        <label for="request_details">Request Details</label>
-                    </div>
-                </div>
-            </section>
+                    <% unless request.new? %>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="proposal_id" type="text" value="<%= request.id_for_display %>" disabled>
+                                <label for="proposal_id">Request ID</label>
+                            </div>
+                        </div>
+                    <% end %>
 
-            <% if quote %>
-                <section id="quote" class="scrollspy section">
                     <div class="row">
-                        <div class="col s12">
-                            <service-quote quote_blob="<%= quote.to_json %>" title="Service Fee"></service-quote>
+                        <div class="input-field col s12">
+                            <input id="agency" type="text" value="<%= Ctx.get.current_location.agency.label %>" disabled>
+                            <label for="agency">Agency</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="agency_location" type="text" value="<%= Ctx.get.current_location.name %>" disabled>
+                            <label for="agency_location">Agency Location</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <textarea id="request_details" name="search_request[details]" class="materialize-textarea" <% if is_readonly %>disabled<% end %>><%= request.fetch('details', '') %></textarea>
+                            <label for="request_details">Request Details</label>
                         </div>
                     </div>
                 </section>
-            <% end %>
 
-            <% unless is_readonly %>
-            <section id="actions" class="scrollspy section">
-                <div class="row">
-                    <br>
-                    <br>
-                    <div class="col s12">
-                        <button id="save_request_btn" name="save_search_request" value="1" class="btn">Save Search Request</button>
-                        <% if request.fetch('draft') %>
-                        <button id="submit_request_btn" name="submit_search_request" value="1" class="btn orange">Submit Search Request<i class="fa fa-paper-plane"></i></button>
-                        <% end %>
-                    </div>
-                </div>
-            </section>
-            <% end %>
+                <% if request.fetch('files').length > 0 %>
+                    <section id="files" class="scrollspy section">
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <div class="card-title">Search Results</div>
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Filename</th>
+                                                    <th style="width: 240px;">Mime Type</th>
+                                                    <th style="width: 120px;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% request.fetch('files').each do |file| %>
+                                                    <tr>
+                                                        <td><%= file.fetch('filename') %></td>
+                                                        <td><%= file.fetch('mime_type') %></td>
+                                                        <td>
+                                                            <a href="/file-download?key=<%= CGI::escape(file.fetch('key')) %>&filename=<%= CGI::escape(file.fetch('filename')) %>&mime_type=<%=CGI::escape(file.fetch('mime_type')) %>"
+                                                               target="_blank"
+                                                               class="btn btn-small">Download</a>
+                                                        </td>
+                                                    </tr>
+                                                <% end %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                <% end %>
+
+                <% if quote %>
+                    <section id="quote" class="scrollspy section">
+                        <div class="row">
+                            <div class="col s12">
+                                <service-quote quote_blob="<%= quote.to_json %>" title="Service Fee"></service-quote>
+                            </div>
+                        </div>
+                    </section>
+                <% end %>
+
+                <% unless is_readonly %>
+                    <section id="actions" class="scrollspy section">
+                        <div class="row">
+                            <br>
+                            <br>
+                            <div class="col s12">
+                                <button id="save_request_btn" name="save_search_request" value="1" class="btn">Save Search Request</button>
+                                <% if request.fetch('draft') %>
+                                <button id="submit_request_btn" name="submit_search_request" value="1" class="btn orange">Submit Search Request<i class="fa fa-paper-plane"></i></button>
+                                <% end %>
+                            </div>
+                        </div>
+                    </section>
+                <% end %>
             </form>
         </div>
         <% unless request.new? || request.fetch('status') == SearchRequest::INACTIVE %>
@@ -129,6 +165,9 @@
                 <% end %>
                 <li><a href="#status">Status</a></li>
                 <li><a href="#details">Details</a></li>
+                <% if request.fetch('files').length > 0 %>
+                <li><a href="#files">Search Results</a></li>
+                <% end %>
                 <% if quote %>
                 <li><a href="#quote">Service Fee</a></li>
                 <% end %>

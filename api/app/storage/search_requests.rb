@@ -68,7 +68,7 @@ class SearchRequests < BaseStorage
 
     SearchRequest.from_row(row,
                            handle_id,
-                           db[:search_request_item].filter(search_request_id: search_request_id))
+                           db[:search_request_file].filter(search_request_id: search_request_id))
   end
 
   def self.update_from_dto(search_request)

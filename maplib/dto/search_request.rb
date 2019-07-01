@@ -24,10 +24,10 @@ class SearchRequest
   define_field(:handle_id, Integer, required: false)
   define_field(:version, Integer, required: false)
   define_field(:aspace_quote_id, Integer, required: false)
-  define_field(:items, [SearchRequestItem], default: [])
+  define_field(:files, [SearchRequestFile], default: [])
 
 
-  def self.from_row(row, handle_id = nil, item_rows = [])
+  def self.from_row(row, handle_id = nil, file_rows = [])
     new(id: row[:id],
         details: row[:details],
         status: row[:status],
@@ -39,7 +39,7 @@ class SearchRequest
         create_time: row[:create_time],
         lock_version: row[:lock_version],
         version: row[:version],
-        items: item_rows.map{|item_row| SearchRequestItem.from_row(item_row)},
+        files: file_rows.map{|file_row| SearchRequestFile.from_row(file_row)},
         handle_id: handle_id)
   end
 
