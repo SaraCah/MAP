@@ -84,7 +84,7 @@ class SearchRequest
   end
 
   def available_purposes
-    ['RTI', 'Redress']
+    AppConfig[:search_request_purposes]
   end
 
   def purpose_for_display

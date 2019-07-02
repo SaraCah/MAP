@@ -6,11 +6,6 @@ import VueResource from "vue-resource";
 Vue.use(VueResource);
 import Utils from "./utils";
 
-interface SelectOption {
-    value: string;
-    label: string;
-}
-
 Vue.component('select-with-other-option', {
     template: `
 <div>
@@ -26,18 +21,18 @@ Vue.component('select-with-other-option', {
 `,
     data: function(): {
             otherText: string,
-            options: SelectOption[],
+            options: string[],
             selectedValue: string,
             readonly: boolean,
         } {
 
-        const parsedOptions: SelectOption[] = JSON.parse(this.options_json);
+        const parsedOptions: string[] = JSON.parse(this.options_json);
 
-        const selectedOption: SelectOption|null = Utils.find(parsedOptions, (opt: SelectOption) => {
-            return opt.value === this.current_selection;
+        const selectedOption: string|null = Utils.find(parsedOptions, (opt: string) => {
+            return opt === this.current_selection;
         });
 
-        const selectedValue = (selectedOption === null) ? 'Other' : selectedOption.value;
+        const selectedValue = (selectedOption === null) ? 'Other' : selectedOption;
         let otherText = '';
         if (selectedValue === 'Other') {
             if (this.current_selection !== 'Other') {
