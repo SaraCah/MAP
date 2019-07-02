@@ -201,7 +201,7 @@ Vue.component('manage-agency', {
                 method: 'GET',
                 params: opts.params || {},
             }).then((response: any) => {
-                const modalAndContentObj = UI.genericHTMLModal(response.body);
+                const modalAndContentObj = UI.genericHTMLModal(response.body, ['manage-agency-modal']);
 
                 const modal = modalAndContentObj[0];
                 const contentPane = modalAndContentObj[1];

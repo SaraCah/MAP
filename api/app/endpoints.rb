@@ -68,6 +68,22 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  # The list of users that the currently logged-in user could conceivably add to
+  # a given location.
+  Endpoint.get('/users/candidates-for-location')
+    .param(:location_id, Integer, "The location in question")
+    .param(:q, String, "Search string", optional: true)
+    .param(:sort, String, "Sort string", optional: true)
+    .param(:page, Integer, "Page to return") do
+
+    json_response(Locations.candidates_for_location(Ctx.get.permissions,
+                                                    params[:location_id],
+                                                    params[:q],
+                                                    params[:sort],
+                                                    params[:page]))
+  end
+
+
   Endpoint.post('/users/update')
     .param(:user, UserDTO, "User") do
     if Ctx.user_logged_in? #FIXME check if can update the user
@@ -89,18 +105,21 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/search/agencies')
     .param(:q, String, "Search string") do
+    # FIXME: Users.permissions_for_user -> Ctx.get.permissions?
     permissions = Users.permissions_for_user(Ctx.username)
     json_response(Search.agency_typeahead(params[:q], permissions))
   end
 
   Endpoint.get('/search/representations')
     .param(:q, String, "Search string") do
+    # FIXME: Users.permissions_for_user -> Ctx.get.permissions?
     permissions = Users.permissions_for_user(Ctx.username)
     json_response(Search.representation_typeahead(params[:q], permissions))
   end
 
   Endpoint.get('/search/get_record')
     .param(:record_ref, String, "Record reference (SOLR doc id)") do
+    # FIXME: Users.permissions_for_user -> Ctx.get.permissions?
     permissions = Users.permissions_for_user(Ctx.username)
     record = Search.get_record(params[:record_ref], permissions)
     if (record)
@@ -112,6 +131,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/my-permissions') do
     if Ctx.user_logged_in?
+    # FIXME: Users.permissions_for_user -> Ctx.get.permissions?
       json_response(Users.permissions_for_user(Ctx.username))
     else
       json_response([])
@@ -270,6 +290,7 @@ class MAPTheAPI < Sinatra::Base
     .param(:page, Integer, "Page to fetch (zero-indexed)")
     .param(:page_size, Integer, "Size of each page") do
     if Ctx.user_logged_in? && Ctx.get.current_location
+      # FIXME: Users.permissions_for_user -> Ctx.get.permissions?
       permissions = Users.permissions_for_user(Ctx.username)
       json_response(Search.controlled_records(permissions,
                                               params[:q],

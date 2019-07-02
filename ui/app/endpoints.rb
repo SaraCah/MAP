@@ -194,6 +194,26 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  # The list of users that the currently logged-in user could conceivably add to
+  # a given location.
+  Endpoint.get('/users/candidates-for-location')
+    .param(:location_id, Integer, "The location in question")
+    .param(:q, String, "Search string", optional: true)
+    .param(:sort, String, "Sort string", optional: true)
+    .param(:page, Integer, "Page to return") do
+
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      Ctx.client.users_candidates_for_location(params[:location_id],
+                                               params[:q],
+                                               params[:sort],
+                                               params[:page]).to_json
+    ]
+  end
+
+
+
   Endpoint.get('/users/edit')
     .param(:username, String, "Username") do
     unless Ctx.permissions.is_admin?

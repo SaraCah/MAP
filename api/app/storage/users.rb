@@ -14,7 +14,7 @@ class Users < BaseStorage
   def self.all(page, page_size, q = nil, agency_ref = nil, role = nil, sort = nil)
     if agency_ref
       (_, aspace_agency_id) = agency_ref.split(':')
-      agency_id = db[:agency].filter(aspace_agency_id: aspace_agency_id.to_i).select(:id)
+      agency_id = db[:agency].filter(aspace_agency_id: aspace_agency_id.to_i).get(:id)
       page(page, page_size, agency_id, nil, q, role, sort)
     else
       page(page, page_size, nil, nil, q, role, sort)
@@ -306,34 +306,32 @@ class Users < BaseStorage
   end
 
   def self.validate_roles(dto)
-      errors = []
+    errors = []
 
-      if Ctx.get.permissions.is_admin?
-        # No dramas
-      elsif Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)
-        dto.fetch('agency_roles').each do |agency_role|
-          if agency_role.fetch('agency_ref') != Ctx.get.current_location.agency_ref
-            errors << {code: "AGENCY_MISMATCH", field: 'agency_roles'}
-          end
+    # Rule: You can create or update a user if their roles are a subset of yours.
+
+    if Ctx.get.permissions.is_admin?
+    # No dramas
+    else
+      dto.fetch('agency_roles').each do |agency_role|
+        (_, aspace_agency_id) = agency_role.fetch('agency_ref').split(':')
+        agency_id = db[:agency].filter(aspace_agency_id: Integer(aspace_agency_id)).get(:id)
+
+        # Only system admins can create senior agency admins
+        if agency_role.fetch('role') == 'SENIOR_AGENCY_ADMIN'
+          errors << {code: "INSUFFICIENT_PRIVILEGES", field: 'agency_roles'}
+        elsif Ctx.get.permissions.is_senior_agency_admin?(agency_id)
+        # We're a senior admin for this agency, so that's fine.
+        elsif Ctx.get.permissions.is_agency_admin?(agency_id,
+                                                   agency_role.fetch('agency_location_id'))
+        # We're an admin for this location; also fine.
+        else
+          errors << {code: "INSUFFICIENT_PRIVILEGES", field: 'agency_roles'}
         end
-      elsif Ctx.get.permissions.is_agency_admin?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-        dto.fetch('agency_roles').each do |agency_role|
-          if agency_role.fetch('agency_ref') != Ctx.get.current_location.agency_ref
-            errors << {code: "AGENCY_MISMATCH", field: 'agency_roles'}
-          elsif agency_role.fetch('agency_location_id') != Ctx.get.current_location.id
-            errors << {code: "AGENCY_LOCATION_MISMATCH", field: 'agency_roles'}
-          end
-          if agency_role.fetch('role') == 'SENIOR_AGENCY_ADMIN'
-            errors << {code: "INSUFFICIENT_PRIVILEGES", field: 'agency_roles'}
-          end
-        end
-      elsif Ctx.username == dto.fetch('username')
-        # Permissions are ignored in storage
-      else
-        errors << {code: "INSUFFICIENT_PRIVILEGES", field: 'agency_roles'}
       end
+    end
 
-      errors
+    errors
   end
 
 

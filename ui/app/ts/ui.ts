@@ -18,7 +18,7 @@ export default class UI {
         M.Modal.init(modal).open();
     }
 
-    public static genericHTMLModal(content: HTMLElement | string): [any, HTMLElement] {
+    public static genericHTMLModal(content: HTMLElement | string, modalClasses?: string[]): [any, HTMLElement] {
         let node: HTMLElement | null = null;
 
         if (typeof(content) == 'string') {
@@ -42,6 +42,14 @@ export default class UI {
 
         modal.className = 'modal';
         modal.classList.add('modal-generated-elt')
+
+        if (modalClasses) {
+            for (const className of modalClasses) {
+                modal.classList.add(className);
+            }
+        }
+
+
         contentContainer.className = 'modal-content';
 
         contentContainer.appendChild(node);

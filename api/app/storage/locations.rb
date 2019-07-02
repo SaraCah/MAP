@@ -13,7 +13,7 @@ class Locations < BaseStorage
   def self.all(page, page_size, q = nil, agency_ref = nil, sort = nil)
     if agency_ref
       (_, aspace_agency_id) = agency_ref.split(':')
-      agency_id = db[:agency].filter(aspace_agency_id: aspace_agency_id.to_i).select(:id)
+      agency_id = db[:agency].filter(aspace_agency_id: aspace_agency_id.to_i).get(:id)
       page(page, page_size, agency_id, nil, q, sort)
     else
       page(page, page_size, nil, nil, q, sort)
@@ -356,4 +356,153 @@ class Locations < BaseStorage
 
     notifications
   end
+
+  # FIXME: This is pretty similar to Users#page.  Do we need both still?
+  def self.candidates_for_location(permissions, location_id, q = nil, sort = nil, page = 0)
+    # Returns a page of users who are candidates for being added to a given location.
+    #
+    # The logic here is a little complicated, but here we go:
+    #
+    #  * You can't add a user who is already in this location
+    #
+    #  * You can't add a senior agency admin of an agency to a location within that agency (no point)
+    #
+    #  * You can't add a system admin user either (again, no point)
+    #
+    #  * Otherwise, any user of the current agency is a candidate for being added.
+    #
+    #  * If the user doing the adding is a senior agency admin, they can add
+    #    users from *other* agencies for which they're a senior agency admin.
+    #
+    #  * If the user doing the adding is a system administrator, they can add
+    #    any user that doesn't conflict with the above rules.
+
+    # Permissions check: the current user must either be a sysadmin, or a senior
+    # admin for the agency, or an agency admin for the location in question.
+    location = self.dto_for(location_id)
+    location_agency_id = db[:agency].filter(aspace_agency_id: Integer(location.fetch('agency_ref').split(':')[1])).get(:id)
+
+    role_in_location = permissions.agency_roles.reduce(nil) do |best_role, role|
+      if best_role == 'SENIOR_AGENCY_ADMIN'
+        # No topping that!
+        best_role
+      else
+        if role.role == 'SENIOR_AGENCY_ADMIN' && "agent_corporate_entity:#{role.aspace_agency_id}" == location.fetch('agency_ref')
+          'SENIOR_AGENCY_ADMIN'
+        elsif role.role == 'AGENCY_ADMIN' && role.agency_location_id == location_id
+          'AGENCY_ADMIN'
+        else
+          best_role
+        end
+      end
+    end
+
+    unless permissions.is_admin? || role_in_location
+      # No permission
+      raise "Permission denied"
+    end
+
+    dataset = db[:user]
+                .left_join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
+
+    if q
+      sanitised = q.downcase.gsub(/[^a-z0-9_\-\. ]/, '_')
+      dataset = dataset.filter(Sequel.|(Sequel.like(Sequel.function(:lower, Sequel[:user][:username]), "%#{sanitised}%"),
+                                        Sequel.like(Sequel.function(:lower, Sequel[:user][:name]), "%#{sanitised}%")))
+    end
+
+    # Users already in the current location shouldn't be included
+    existing_location_users = dataset.filter(Sequel[:agency_user][:agency_location_id] => location_id).select(Sequel[:user][:id])
+    dataset = dataset.filter(Sequel.~(Sequel[:user][:id] => existing_location_users))
+
+    # Users who are already senior agency admins also should not be included as
+    # they're effectively already members of every location.
+    senior_agency_admins = dataset.filter(Sequel[:agency_user][:role] => 'SENIOR_AGENCY_ADMIN',
+                                          Sequel[:agency_user][:agency_id] => location_agency_id)
+                             .select(Sequel[:user][:id])
+    dataset = dataset.filter(Sequel.~(Sequel[:user][:id] => senior_agency_admins))
+
+    # Admin users are never eligible
+    dataset = dataset.filter(Sequel[:user][:admin] => 0)
+
+    # Inactive users are never eligible
+    dataset = dataset.filter(Sequel[:user][:inactive] => 0)
+
+    # If we're a senior agency admin in this agency and others, we can add any
+    # user from any of those agencies.
+    if role_in_location == 'SENIOR_AGENCY_ADMIN'
+      administered_agencies = permissions.agency_roles.map {|role|
+        if role.role == 'SENIOR_AGENCY_ADMIN'
+          role.agency_id
+        else
+          nil
+        end
+      }.compact
+
+      dataset = dataset.filter(Sequel[:agency_user][:agency_id] => administered_agencies)
+    elsif role_in_location == 'AGENCY_ADMIN'
+      # If we're an agency admin, we can only add from the current agency.
+      dataset = dataset.filter(Sequel[:agency_user][:agency_id] => location_agency_id)
+    end
+
+    dataset = dataset.select_all(:user).distinct(Sequel[:user][:id])
+
+    page_size = AppConfig[:page_size]
+    max_page = (dataset.count / page_size.to_f).ceil
+
+    dataset = dataset.limit(page_size, page * page_size)
+
+    sort_by = Users::SORT_OPTIONS.fetch(sort, Users::SORT_OPTIONS.fetch('username_asc'))
+    dataset = dataset.order(sort_by)
+
+    agency_permissions_by_user_id = {}
+    aspace_agency_ids_to_resolve = []
+
+    db[:user]
+      .left_join(:agency_user, Sequel[:agency_user][:user_id] => Sequel[:user][:id])
+      .join(:agency, Sequel[:agency][:id] => Sequel[:agency_user][:agency_id])
+      .join(:agency_location, Sequel[:agency_location][:id] => Sequel[:agency_user][:agency_location_id])
+      .filter(Sequel[:user][:id] => dataset.select(Sequel[:user][:id]))
+      .select(Sequel[:agency_user][:user_id],
+              Sequel.as(Sequel[:agency_user][:role], :role),
+              Sequel.as(Sequel[:agency_user][:agency_location_id], :agency_location_id),
+              Sequel.as(Sequel[:agency_location][:name], :agency_location_label),
+              Sequel[:agency][:aspace_agency_id])
+      .each do |row|
+      agency_ref = "agent_corporate_entity:#{row[:aspace_agency_id]}"
+      agency_permissions_by_user_id[row[:user_id]] ||= []
+      agency_permissions_by_user_id[row[:user_id]] << [agency_ref, row[:role], row[:agency_location_id], row[:agency_location_label]]
+      aspace_agency_ids_to_resolve << row[:aspace_agency_id]
+    end
+
+    agencies_by_agency_ref = {}
+
+    AspaceDB.open do |aspace_db|
+      aspace_db[:agent_corporate_entity]
+        .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
+        .filter(Sequel[:name_corporate_entity][:authorized] => 1)
+        .filter(Sequel[:agent_corporate_entity][:id] => aspace_agency_ids_to_resolve)
+        .select(Sequel[:agent_corporate_entity][:id],
+                Sequel[:name_corporate_entity][:sort_name]).each do |row|
+        agencies_by_agency_ref['agent_corporate_entity' + ':' + row[:id].to_s] = Agency.from_row(row)
+      end
+    end
+
+    results = dataset
+               .select_all(:user)
+               .map do |row|
+                 permissions = agency_permissions_by_user_id.fetch(row[:id], [])
+                                 .map {|agency_ref, role, location_id, location_label|
+                   [
+                     agencies_by_agency_ref.fetch(agency_ref),
+                     role,
+                     location_label
+                   ]}
+
+                 User.from_row(row, permissions)
+               end
+
+    PagedResults.new(results, page, max_page)
+  end
+
 end

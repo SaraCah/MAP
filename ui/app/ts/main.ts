@@ -21,6 +21,7 @@ import 'select-with-other-option';
 import 'service-quote';
 import 'transfer-proposal-series';
 import 'transfers-search';
+import 'user-for-location-picker';
 import 'users-search';
 
 declare var M: any; // Materialize on the window context

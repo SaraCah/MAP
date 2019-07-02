@@ -143,6 +143,10 @@ class MAPAPIClient
         role != 'SENIOR_AGENCY_ADMIN'
       }
     end
+
+    def to_json(*args)
+      to_h.to_json
+    end
   end
 
   Agency = Struct.new(:id, :label, :series_count, :controlled_records) do
@@ -167,9 +171,14 @@ class MAPAPIClient
 
   PagedResults = Struct.new(:results, :current_page, :max_page) do
     def self.from_json(json, type_class)
+
       PagedResults.new(json.fetch('results', []).map{|user_json| type_class.included_modules.include?(DTO) ? type_class.from_hash(user_json) : type_class.from_json(user_json)},
                      json.fetch('current_page'),
                      json.fetch('max_page'))
+    end
+
+    def to_json
+      to_h.to_json
     end
   end
 
@@ -186,6 +195,19 @@ class MAPAPIClient
 
     PagedResults.from_json(get('/users', data), User)
   end
+
+  def users_candidates_for_location(location_id, q = nil, sort = nil, page = 0)
+    data = {
+      location_id: location_id,
+      page: page
+    }
+
+    data[:q] = q unless q.nil? || q == ''
+    data[:sort] = sort unless sort.nil? || sort == ''
+
+    PagedResults.from_json(get('/users/candidates-for-location', data), User)
+  end
+
 
   def agencies(page = 0, q = nil)
     data = {
