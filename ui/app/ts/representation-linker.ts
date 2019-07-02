@@ -39,7 +39,13 @@ Vue.component('representation-browse', {
     <template v-if="show_modal">
         <div ref="modal" class="modal representation-browse-modal">
             <div class="modal-content">
-                <controlled-records title="Add Records to Request">
+                <div class="row">
+                    <div class="col s12">
+                        <h4 class="left">Add Records to Request</h4>
+                        <a href="#!" class="right modal-close waves-effect waves-green btn-flat"><i class="fa fa-times fa-2x"></i></a>
+                    </div>
+                </div>
+                <controlled-records title="">
                     <template v-slot:record_actions="slotProps">
                         <span class="new badge orange" v-if="isNotOnShelf(slotProps.record)" title="Currently not available, there may be delays if requested, contact QSA for details." data-badge-caption="Not On Shelf"></span>
                         <template v-if="isAlreadySelected(slotProps.record)">
@@ -52,7 +58,11 @@ Vue.component('representation-browse', {
                 </controlled-records>
             </div>
             <div class="modal-footer">
-                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+                <div class="row">
+                    <div class="col s12">
+                        <a href="#!" class="btn btn-small modal-close waves-effect waves-green">Return to File Issue Request</a>
+                    </div>
+                </div>
             </div>
         </div>
     </template>
