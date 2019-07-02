@@ -12,7 +12,7 @@
                         <div class="col s12">
                             <div class="card">
                                 <div class="card-content">
-                                    <% if request.new? || request.fetch('draft') || request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'} %>
+                                    <% if request.new? || request.fetch('draft') || request.fetch('digital_request_status', '') != 'NONE_REQUESTED' || request.fetch('items').any?{|item| item.fetch('request_type') == 'DIGITAL'} %>
                                     <span class="card-title">Digital Request Status</span>
                                     <ul class="status-infomatic">
                                         <li class="first <% if request.new? || request.fetch('draft') || request.fetch('status', '') == 'NONE_REQUESTED' %>current<% end %>">Add Request Details</li>
@@ -27,7 +27,7 @@
                                         <li class="stand-alone <% if request.fetch('digital_request_status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled by QSA</li>
                                     </ul>
                                     <% end %>
-                                    <% if request.fetch('items').any?{|item| item.fetch('request_type') == 'PHYSICAL'} %>
+                                    <% if  request.fetch('physical_request_status', '') != 'NONE_REQUESTED' || request.fetch('items').any?{|item| item.fetch('request_type') == 'PHYSICAL'} %>
                                         <span class="card-title">Physical Request Status</span>
                                         <ul class="status-infomatic">
                                             <li class="first <% if request.new? || request.fetch('draft') %>current<% end %>">Add Request Details</li>

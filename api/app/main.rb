@@ -64,6 +64,7 @@ require 'lib/ctx'
 require 'lib/watch_dir_reloader'
 require 'lib/search'
 require 'lib/solr_indexer'
+require 'lib/clean_up_deleted_representations'
 
 require 'storage/base_storage'
 require 'storage/db_auth'
@@ -117,6 +118,13 @@ class MAPTheAPI < Sinatra::Base
 
     DB.connect
     AspaceDB.connect
+
+    # FIXME REMOVE THIS POST RELEASE
+    # DO IT DO IT DO IT DO IT
+    # OR NOT... WHATEVS
+    #
+    # NO REALLY, REMOVE THIS
+    CleanUpdeletedRepresentations.do_it
 
     Ctx.open do
       # Bootstrap an admin user if we need one
