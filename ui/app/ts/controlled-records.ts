@@ -20,6 +20,7 @@ export default interface Record {
     qsa_id: number;
     physical_representations_count: number;
     digital_representations_count: number;
+    current_location: string|null;
 }
 
 interface Facet {
