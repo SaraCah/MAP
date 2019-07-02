@@ -69,9 +69,8 @@ Vue.component('user-for-location-picker', {
               <td>{{record.name}}</td>
               <td>
                 <ul>
-                  <li v-for="role in record.agency_roles">
-                    <!-- FIXME: Dedupe agencies here -->
-                    {{role[0].label}}
+                  <li v-for="agency_label in new Set(record.agency_roles.map((role) => role[0].label))">
+                    {{agency_label}}
                   </li>
                 </ul>
               </td>
