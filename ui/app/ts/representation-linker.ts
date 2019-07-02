@@ -80,11 +80,7 @@ Vue.component('representation-browse', {
             });
         },
         removeSelected: function(record: Record) {
-            this.selected.forEach((representation: RepresentationRequest) => {
-                if (representation.id === record.id) {
-                    (this.$parent as any).removeSelected(representation);
-                }
-            });
+            this.$emit('removed', record.id);
         },
         addSelected: function(record: Record) {
             this.$emit('selected', new RepresentationRequest(record.id, record.title, 'DIGITAL'));

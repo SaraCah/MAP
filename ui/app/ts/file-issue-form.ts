@@ -19,6 +19,7 @@ Vue.component('file-issue-form', {
         <div class="row">
             <div class="col s12">
                 <representation-browse v-on:selected="addRequestedItem"
+                                       v-on:removed="removeRequestedItem"
                                        :selected="requestedItems">
                 </representation-browse>
             </div>
