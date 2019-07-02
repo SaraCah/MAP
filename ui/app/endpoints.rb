@@ -1026,7 +1026,7 @@ class MAPTheApp < Sinatra::Base
     if search_request.has_quote?
       quote = Ctx.client.get_search_request_quote(search_request.fetch('id'))
 
-      unless quote.fetch('issued_date', false)
+      if quote.nil? || quote.fetch('issued_date', nil).nil?
         quote = nil
       end
     end
