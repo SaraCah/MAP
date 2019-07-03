@@ -15,6 +15,7 @@ import 'linker';
 import 'locations-search';
 import 'manage-agency';
 import 'manage-current-user';
+import 'manage-system';
 import 'notifications';
 import 'representation-linker';
 import 'search-requests-search';

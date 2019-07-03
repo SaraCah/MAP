@@ -922,4 +922,13 @@ class MAPTheAPI < Sinatra::Base
       json_response(Permissions.assign_to_location(user_id, params[:location_id], params[:role]))
     end
   end
+
+  Endpoint.get('/system-administrators') do
+    if Ctx.get.permissions.is_admin?
+      json_response(Users.get_system_admins)
+    else
+      [403]
+    end
+  end
+
 end

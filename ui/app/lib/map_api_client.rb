@@ -570,6 +570,10 @@ class MAPAPIClient
     stream_get('/stream-file-issue', suggested_filename, { "token" => token })
   end
 
+  def get_system_admins
+    get("/system-administrators")
+  end
+
   class ClientError < StandardError
     def initialize(json)
       @json = json

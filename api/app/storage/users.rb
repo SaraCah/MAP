@@ -137,6 +137,7 @@ class Users < BaseStorage
                   .filter(lock_version: user.fetch('lock_version'))
                   .update(name: user.fetch('name'),
                           lock_version: user.fetch('lock_version') + 1,
+                          inactive: user.fetch('is_inactive') ? 1 : 0,
                           modified_by: Ctx.username,
                           modified_time: java.lang.System.currentTimeMillis)
 
@@ -152,7 +153,7 @@ class Users < BaseStorage
   def self.create_from_dto(user)
     # check for uniqueness
     if db[:user][:username => user.fetch('username')].nil?
-      user_id = if user.fetch('is_admin')
+      user_id = if Ctx.get.permissions.is_admin? && user.fetch('is_admin')
                   self.create_admin_user(user.fetch('username'), user.fetch('name'))
                 else
                   self.create_user(user.fetch('username'), user.fetch('username'))
@@ -280,5 +281,14 @@ class Users < BaseStorage
     end
 
     notifications
+  end
+
+
+  def self.get_system_admins
+    db[:user]
+      .filter(admin: 1)
+      .map do |row|
+        UserDTO.from_row(row)
+      end
   end
 end

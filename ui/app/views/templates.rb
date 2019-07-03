@@ -51,6 +51,7 @@ Templates.define(:search_request_view, [:request, :errors?, :is_readonly?, :quot
 
 Templates.define(:agencies, [:paged_agencies, :q?, :params], "views/agencies.erb.html")
 Templates.define(:manage_agency, [:agency_ref], "views/manage_agency.erb.html")
+Templates.define(:manage_system, [], "views/manage_system.erb.html")
 
 Templates.define(:location_edit_user_permissions,
                  [:user_id, :location_id, :username, :role, [:existing_permissions], [:available_permissions], :errors?],

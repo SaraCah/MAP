@@ -121,9 +121,14 @@ class MAPTheApp < Sinatra::Base
                                  :layout, title: "Users", context: ['users'])
   end
 
-  Endpoint.get('/users/new') do
-    Templates.emit_with_layout(:user_edit, {user: UserDTO.new},
-                               :layout, title: "New User", context: ['users'])
+  Endpoint.get('/users/new-admin') do
+    if Ctx.permissions.is_admin?
+      user = UserDTO.new
+      user['is_admin'] = true
+      Templates.emit(:user_edit, {user: user})
+    else
+      [404]
+    end
   end
 
   Endpoint.post('/users/assign-to-location')
@@ -141,30 +146,16 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.post('/users/create')
     .param(:user, UserDTO, "The user to create") do
+    if Ctx.permissions.is_admin?
+      errors = Ctx.client.create_user(params[:user])
 
-    unless Ctx.permissions.is_admin?
-      params[:user]['is_admin'] = false
-      if Ctx.permissions.is_senior_agency_admin?
-        params[:user].fetch('agency_roles', []).select! do |agency_role|
-          Integer(agency_role.fetch('agency_location_id')) == Ctx.get.current_location.id
-        end
-      elsif Ctx.permissions.is_agency_admin?
-        params[:user].fetch('agency_roles', []).select! do |agency_role|
-          Integer(agency_role.fetch('agency_location_id')) == Ctx.get.current_location.id && agency_role.fetch('role', '') != 'SENIOR_AGENCY_ADMIN'
-        end
+      if errors.empty?
+        [202]
       else
-        # FIXME
-        raise "Insufficient Privileges"
+        Templates.emit(:user_edit, {user: params[:user], errors: errors})
       end
-    end
-
-    errors = Ctx.client.create_user(params[:user])
-
-    if errors.empty?
-      redirect '/users'
     else
-      Templates.emit_with_layout(:user_edit, {user: params[:user], errors: errors},
-                                 :layout, title: "New User", context: ['users'])
+      [404]
     end
   end
 
@@ -1130,4 +1121,26 @@ class MAPTheApp < Sinatra::Base
                                :layout, title: "Fee Schedule", context: ['records', 'fee_schedule'])
   end
 
+  Endpoint.get('/system') do
+    if Ctx.permissions.is_admin?
+      Templates.emit_with_layout(:manage_system, {},
+                                 :layout, title: "Manage System", context: ['global', 'system'])
+    else
+      [404]
+    end
+  end
+
+  Endpoint.get('/system/json') do
+    if Ctx.permissions.is_admin?
+      [
+        200,
+        {'Content-Type' => 'text/json'},
+        {
+          'administrators' => Ctx.client.get_system_admins
+        }.to_json
+      ]
+    else
+      [404]
+    end
+  end
 end

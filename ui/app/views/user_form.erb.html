@@ -6,6 +6,8 @@
         <%== FormHelper.hidden_authenticity_token %>
         <%== FormHelper.lock_version(user, 'user') %>
 
+        <input type="hidden" name="user[is_admin]" value="<%= user.fetch('is_admin', false) %>">
+
         <% unless user.new? %>
             <input type="hidden" name="user[id]" value="<%= user.fetch('id') %>">
             <input type="hidden" name="user[username]" value="<%= user.fetch('username') %>">
@@ -29,6 +31,17 @@
                 <label for="password">Password</label>
             </div>
         </div>
+
+        <% if user.fetch('is_admin', false) && !user.new? && Ctx.username != user.fetch('username') %>
+            <div class="row">
+                <div class="input-field col s12">
+                    <label>
+                        <input type="checkbox" name="user[is_inactive]" value="true" <% if user.fetch('is_inactive') %> checked="checked" <% end %> />
+                        <span>Inactive?</span>
+                    </label>
+                </div>
+            </div>
+        <% end %>
 
         <div class="row">
             <br>
