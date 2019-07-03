@@ -20,6 +20,7 @@ class FormHelper
   ERROR_LABELS_FOR_CODE = {
     'UNIQUE_CONSTRAINT' => "name is already in use.  Please choose another.",
     'AGENCY_NOT_FOUND' => "the requested agency could not be found.",
+    'REQUIRED_VALUE_MISSING' => "can't be blank",
   }
 
   def self.render_errors(errors)
