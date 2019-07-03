@@ -8,9 +8,6 @@
                     <% unless Ctx.permissions.is_admin %>
                         <li class="map-tab"><a href="/records" <% if context.include?('records') %> class='active'<% end %>>My Records</a></li>
                     <% end %>
-                    <% if Ctx.permissions.allow_manage_locations? %>
-                        <li class="map-tab"><a href="/locations" <% if context.include?('locations') %> class='active'<% end %>>My Locations</a></li>
-                    <% end %>
                     <% if Ctx.permissions.allow_manage_transfers? %>
                         <li class="map-tab"><a href="/transfer-proposals" <% if context.include?('transfers') %> class='active'<% end %>>My Transfers</a></li>
                     <% end %>
