@@ -155,7 +155,7 @@ class Agencies < BaseStorage
       end
 
       can_edit_user_by_username[username] = Users.permissions_for_user(username).agency_roles.all?{|agency_role|
-        Ctx.get.permissions.can_edit_agency_role?(agency_role.agency_id, agency_role.agency_location_id, agency_role.role)
+        Ctx.get.permissions.can_edit_agency_role?(agency_role.agency_ref, agency_role.agency_location_id, agency_role.role)
       }
     end
 

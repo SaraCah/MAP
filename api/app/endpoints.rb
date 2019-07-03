@@ -322,7 +322,7 @@ class MAPTheAPI < Sinatra::Base
     .param(:username, String, "Username to authenticate") do
     if Ctx.user_logged_in?
       user = Users.dto_for(params[:username])
-      if user && (Ctx.username == params[:username] || Ctx.get.permissions.can_edit_user?(user))
+      if user && Ctx.get.permissions.can_edit_user?(user)
         json_response(user.to_hash)
       else
         [404]
