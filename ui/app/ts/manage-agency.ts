@@ -31,7 +31,7 @@ interface Member {
     username: string;
     name: string;
     role: string;
-    editable?: boolean;
+    is_user_editable?: boolean;
 }
 
 interface LocationWithMembers {
@@ -125,7 +125,7 @@ Vue.component('manage-agency', {
                     </ul>
                   </td>
                   <td>
-                    <button  v-if="user.editable" class="btn btn-small right" @click.prevent.default="editUser(user.username)">Edit User</button>
+                    <button  v-if="user.is_user_editable" class="btn btn-small right" @click.prevent.default="editUser(user.username)">Edit User</button>
                   </td>
                 </tr>
               </tbody>
@@ -256,7 +256,7 @@ Vue.component('manage-agency', {
                 username: string;
                 name: string;
                 roles: string[];
-                editable: boolean;
+                is_user_editable: boolean;
             }
 
             const usernames: string[] = [];
@@ -274,14 +274,14 @@ Vue.component('manage-agency', {
                             username: member.username,
                             name: member.name,
                             roles: [],
-                            editable: false,
+                            is_user_editable: false,
                         };
                     }
 
                     // \u2014 = emdash
                     users[member.username].roles.push(location.location.name + " \u2014 " + member.role);
-                    if (member.editable) {
-                        users[member.username].editable = true;
+                    if (member.is_user_editable) {
+                        users[member.username].is_user_editable = true;
                     }
                 }
             }

@@ -173,7 +173,7 @@ class Agencies < BaseStorage
 
     result.fetch(:locations).each do |location|
       location.fetch(:members).each do |member|
-        member['editable'] = can_edit_user_by_username.fetch(member.fetch('username'))
+        member['is_user_editable'] = can_edit_user_by_username.fetch(member.fetch('username'))
       end
       location.fetch(:members).sort_by! {|member| member.fetch(:username).downcase}
     end
