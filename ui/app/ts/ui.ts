@@ -21,7 +21,7 @@ export default class UI {
     public static genericHTMLModal(content: HTMLElement | string, modalClasses?: string[]): [any, HTMLElement] {
         let node: HTMLElement | null = null;
 
-        if (typeof(content) == 'string') {
+        if (typeof(content) === 'string') {
             node = document.createElement('div');
             node.innerHTML = content;
         } else {
@@ -29,7 +29,7 @@ export default class UI {
         }
 
         // Clear any previous modals
-        document.querySelectorAll('.modal-generated-elt').forEach(function (elt) {
+        document.querySelectorAll('.modal-generated-elt').forEach(function(elt) {
             if (elt.parentNode) {
                 elt.parentNode.removeChild(elt);
             }
@@ -41,7 +41,7 @@ export default class UI {
         modal.appendChild(contentContainer);
 
         modal.className = 'modal';
-        modal.classList.add('modal-generated-elt')
+        modal.classList.add('modal-generated-elt');
 
         if (modalClasses) {
             for (const className of modalClasses) {
@@ -57,9 +57,9 @@ export default class UI {
         const closeButtonIcon = document.createElement('i');
 
         closeButton.setAttribute('href', '#');
-        closeButton.classList.add('right','modal-close','btn-flat');
+        closeButton.classList.add('right', 'modal-close', 'btn-flat');
 
-        closeButtonIcon.classList.add('fa', 'fa-times', 'fa-2x')
+        closeButtonIcon.classList.add('fa', 'fa-times', 'fa-2x');
 
         closeButton.appendChild(closeButtonIcon);
 
