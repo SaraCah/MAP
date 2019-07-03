@@ -86,17 +86,20 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/users/update')
     .param(:user, UserDTO, "User") do
-    if Ctx.user_logged_in? #FIXME check if can update the user
-      if (errors = params[:user].validate).empty?
-        if !(errors = Users.validate_roles(params[:user])).empty?
-          json_response(errors: errors)
-        elsif (errors = Users.update_from_dto(params[:user])).empty?
-          json_response(status: 'updated')
+    if Ctx.user_logged_in?
+      existing_user = Users.dto_for(params[:user].fetch('username'))
+      if existing_user && Ctx.get.permissions.can_edit_user?(existing_user)
+        if (errors = params[:user].validate).empty?
+          if (errors = Users.update_from_dto(params[:user])).empty?
+            json_response(status: 'updated')
+          else
+            json_response(errors: errors)
+          end
         else
-          json_response(errors: errors)
+          json_response(errors: errors) unless errors.empty?
         end
       else
-        json_response(errors: errors) unless errors.empty?
+        [404]
       end
     else
       [404]

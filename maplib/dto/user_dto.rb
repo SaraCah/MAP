@@ -3,11 +3,11 @@ class UserDTO
 
   define_field(:id, Integer, required: false)
   define_field(:username, String)
-  define_field(:name, String)
+  define_field(:name, String, validator: proc {|s| (s.nil? || s.empty?) ? "Name can't be blank" : nil})
   define_field(:password, String, required: false, validator: proc {|s, user| user.new? && s.empty? ? "Password can't be blank" : nil})
   define_field(:is_admin, Boolean, default: false)
   define_field(:is_inactive, Boolean, default: false)
-  define_field(:agency_roles, [AgencyRoleDTO], default: [], validator: proc {|arr, user| user.agency_roles_valid?(arr) ? "Agency Role can't be blank" : nil})
+  define_field(:agency_roles, [AgencyRoleDTO], default: [])
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)
 

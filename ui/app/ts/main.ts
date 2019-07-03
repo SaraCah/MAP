@@ -14,6 +14,7 @@ import 'file-uploader';
 import 'linker';
 import 'locations-search';
 import 'manage-agency';
+import 'manage-current-user';
 import 'notifications';
 import 'representation-linker';
 import 'search-requests-search';

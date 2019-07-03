@@ -30,6 +30,7 @@ interface Member {
     username: string;
     name: string;
     role: string;
+    editable?: boolean;
 }
 
 interface LocationWithMembers {
@@ -108,6 +109,7 @@ Vue.component('manage-agency', {
                   <th>Username</th>
                   <th>Name</th>
                   <th>Role(s)</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -118,6 +120,9 @@ Vue.component('manage-agency', {
                     <ul>
                       <li v-for="role in user.roles">{{role}}</li>
                     </ul>
+                  </td>
+                  <td>
+                    <button  v-if="user.editable" class="btn btn-small right" @click.prevent.default="editUser(user.username)">Edit User</button>
                   </td>
                 </tr>
               </tbody>
@@ -220,6 +225,16 @@ Vue.component('manage-agency', {
             });
 
         },
+        editUser: function(username: string) {
+            this.ajaxFormModal('/users/edit', {
+                params: {
+                    username: username,
+                },
+                successCallback: () => {
+                    this.refreshAgency();
+                },
+            });
+        }
     },
     computed: {
         mergedUsers: function(): object[] {
@@ -227,6 +242,7 @@ Vue.component('manage-agency', {
                 username: string;
                 name: string;
                 roles: string[];
+                editable: boolean;
             }
 
             const usernames: string[] = [];
@@ -244,11 +260,15 @@ Vue.component('manage-agency', {
                             username: member.username,
                             name: member.name,
                             roles: [],
+                            editable: false,
                         };
                     }
 
                     // \u2014 = emdash
                     users[member.username].roles.push(location.location.name + " \u2014 " + member.role);
+                    if (member.editable) {
+                        users[member.username].editable = true;
+                    }
                 }
             }
 

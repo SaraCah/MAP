@@ -116,6 +116,8 @@ class Agencies < BaseStorage
                                                                          :members => [])
     end
 
+    can_edit_user_by_username = {}
+
     # Users and their roles
     db[:agency]
       .join(:agency_user, Sequel[:agency][:id] => Sequel[:agency_user][:agency_id])
@@ -132,13 +134,29 @@ class Agencies < BaseStorage
               Sequel[:agency_user][:allow_change_raps],
               Sequel[:agency_user][:allow_restricted_access],)
       .each do |row|
-      locations_by_id.fetch(row[:agency_location_id]).fetch(:members) << AgencyForEdit::MemberDTO.new(
+
+      member = AgencyForEdit::MemberDTO.new(
         :user_id => row[:user_id],
         :username => row[:username],
         :name => row[:name],
         :role => row[:role],
         :permissions => Permissions::AVAILABLE_PERMISSIONS.select {|perm| row[perm] == 1}.map(&:to_s),
       )
+
+      can_edit_user_by_username[row[:username]] = false
+
+      locations_by_id.fetch(row[:agency_location_id]).fetch(:members) << member
+    end
+
+    can_edit_user_by_username.keys.each do |username|
+      if Ctx.get.permissions.is_admin? || username === Ctx.username
+        can_edit_user_by_username[username] = true
+        next
+      end
+
+      can_edit_user_by_username[username] = Users.permissions_for_user(username).agency_roles.all?{|agency_role|
+        Ctx.get.permissions.can_edit_agency_role?(agency_role.agency_id, agency_role.agency_location_id, agency_role.role)
+      }
     end
 
     result[:locations] = locations_by_id.values
@@ -154,6 +172,9 @@ class Agencies < BaseStorage
     }
 
     result.fetch(:locations).each do |location|
+      location.fetch(:members).each do |member|
+        member['editable'] = can_edit_user_by_username.fetch(member.fetch('username'))
+      end
       location.fetch(:members).sort_by! {|member| member.fetch(:username).downcase}
     end
 

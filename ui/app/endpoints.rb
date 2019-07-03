@@ -233,45 +233,20 @@ class MAPTheApp < Sinatra::Base
       # FIXME check permissions
     end
 
-    Templates.emit_with_layout(:user_edit, {user: Ctx.client.user_for_edit(params[:username])},
-                               :layout, title: "Edit User", context: ['users'])
+    Templates.emit(:user_edit,
+                   user: Ctx.client.user_for_edit(params[:username]))
   end
 
   Endpoint.post('/users/update/:id')
     .param(:id, Integer, "User id")
     .param(:user, UserDTO, "The user to update") do
-
-    unless Ctx.permissions.is_admin?
-      params[:user]['is_admin'] = false
-      if Ctx.permissions.is_senior_agency_admin?
-        params[:user].fetch('agency_roles', []).select! do |agency_role|
-          Integer(agency_role.fetch('agency_location_id')) == Ctx.get.current_location.id
-        end
-      elsif Ctx.permissions.is_agency_admin?
-        params[:user].fetch('agency_roles', []).select! do |agency_role|
-          Integer(agency_role.fetch('agency_location_id')) == Ctx.get.current_location.id && agency_role.fetch('role', '') != 'SENIOR_AGENCY_ADMIN'
-        end
-      elsif Ctx.username == params[:user].fetch(:username)
-        # Ok! Update your own things (permission changes are ignored in the API)
-      else
-        # FIXME
-        raise "Insufficient Privileges"
-      end
-    end
     
     errors = Ctx.client.update_user(params[:user])
 
     if errors.empty?
-      if Ctx.permissions.is_admin?
-        redirect '/users'
-      elsif Ctx.permissions.current_location_roles.all? {|agency_role| agency_role.role == 'AGENCY_CONTACT'}
-        redirect '/'
-      else
-        redirect '/users'
-      end
+      [202]
     else
-      Templates.emit_with_layout(:user_edit, {user: params[:user], errors: errors},
-                                 :layout, title: "Edit User", context: ['users'])
+      Templates.emit(:user_edit, {user: params[:user], errors: errors})
     end
   end
 

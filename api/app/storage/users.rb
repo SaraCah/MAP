@@ -127,115 +127,26 @@ class Users < BaseStorage
                      :modified_time => java.lang.System.currentTimeMillis)
   end
 
-  def self.update_current_user(user_id, name, lock_version)
-    updated = db[:user]
-                .filter(id: user_id)
-                .filter(lock_version: lock_version)
-                .update(name: name,
-                        lock_version: lock_version + 1,
-                        modified_by: Ctx.username,
-                        modified_time: java.lang.System.currentTimeMillis)
-
-    raise StaleRecordException.new if updated == 0
-  end
-
-
-  def self.update_user(user_id, username, name, is_admin, is_inactive, lock_version)
-    updated = db[:user]
-                .filter(id: user_id)
-                .filter(lock_version: lock_version)
-                .update(username: username,
-                        name: name,
-                        admin: is_admin ? 1 : 0,
-                        inactive: is_inactive ? 1 : 0,
-                        lock_version: lock_version + 1,
-                        modified_by: Ctx.username,
-                        modified_time: java.lang.System.currentTimeMillis)
-
-    raise StaleRecordException.new if updated == 0
-  end
-
   def self.id_for_username(username)
     db[:user][:username => username][:id]
   end
 
   def self.update_from_dto(user)
-    # check for uniqueness
-    user_for_username = db[:user][:username => user.fetch('username')]
+      updated = db[:user]
+                  .filter(id: user.fetch('id'))
+                  .filter(lock_version: user.fetch('lock_version'))
+                  .update(name: user.fetch('name'),
+                          lock_version: user.fetch('lock_version') + 1,
+                          modified_by: Ctx.username,
+                          modified_time: java.lang.System.currentTimeMillis)
 
-    if user_for_username.nil? || user_for_username[:id] == Integer(user.fetch('id'))
-      if user.fetch('username') == Ctx.username
-        update_current_user(user.fetch('id'),
-                            user.fetch('name'),
-                            user.fetch('lock_version'))
-      else
-        update_user(user.fetch('id'),
-                    user.fetch('username'),
-                    user.fetch('name'),
-                    user.fetch('is_admin'),
-                    user.fetch('is_inactive'),
-                    user.fetch('lock_version'))
-
-        # FIXME what to do about user_agency.mtime? currently clear_roles drops create_time
-        if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)
-          Permissions.clear_roles(user.fetch('id'))
-
-          unless user.fetch('is_admin')
-            user.fetch('agency_roles').each do |agency_role|
-              agency_ref = agency_role.fetch('agency_ref')
-              role = agency_role.fetch('role')
-              location_id = agency_role.fetch('agency_location_id', nil)
-              permissions = agency_role.fetch('permissions')
-
-              (_, aspace_agency_id) = agency_ref.split(':')
-              agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
-
-              if location_id.nil? || location_id == ''
-                location_id = Locations.locations_for_agency(aspace_agency_id).first.id
-              end
-
-              if role == 'SENIOR_AGENCY_ADMIN'
-                Permissions.add_agency_senior_admin(user.fetch('id'), agency_id)
-              elsif role == 'AGENCY_ADMIN'
-                Permissions.add_agency_admin(user.fetch('id'), agency_id, location_id, permissions)
-              elsif role == 'AGENCY_CONTACT'
-                Permissions.add_agency_contact(user.fetch('id'), agency_id, location_id, permissions)
-              end
-            end
-          end
-        else
-          # ensure permissions set by more senior user are not lost
-          agency_role = user.fetch('agency_roles').first
-          agency_ref = agency_role.fetch('agency_ref')
-
-          (_, aspace_agency_id) = agency_ref.split(':')
-          agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
-          role = agency_role.fetch('role')
-          location_id = agency_role.fetch('agency_location_id')
-          permissions = agency_role.fetch('permissions')
-
-          current_permissions = Permissions.permissions_for_agency_user(user.fetch('id'), agency_id, location_id)
-
-          permissions += (current_permissions - ['allow_transfers', 'allow_file_issue'])
-
-          Permissions.clear_roles(user.fetch('id'))
-
-          if role == 'AGENCY_ADMIN'
-            Permissions.add_agency_admin(user.fetch('id'), agency_id, location_id, permissions)
-          elsif role == 'AGENCY_CONTACT'
-            Permissions.add_agency_contact(user.fetch('id'), agency_id, location_id, permissions)
-          end
-        end
-      end
+      raise StaleRecordException.new if updated == 0
 
       unless user.fetch('password').empty?
         DBAuth.set_user_password(user.fetch('id'), user.fetch('password'))
       end
 
       []
-    else
-      [{code: "UNIQUE_CONSTRAINT", field: 'username'}]
-    end
   end
 
   def self.create_from_dto(user)

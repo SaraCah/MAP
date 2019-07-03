@@ -10,6 +10,7 @@ class AgencyForEdit
     define_field(:name, String)
     define_field(:role, String)
     define_field(:permissions, [String])
+    define_field(:editable, Boolean, default: false)
   end
 
   class LocationWithMembers

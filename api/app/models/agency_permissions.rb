@@ -38,14 +38,10 @@ AgencyPermissions = Struct.new(:is_admin, :agency_roles) do
 
   def can_edit_user?(user)
     return true if is_admin?
+    return true if user.fetch('username', nil) === Ctx.username
+    return false if user.is_admin?
 
-    user.fetch('agency_roles').map do |user_agency_role|
-      if agency_roles.any?{|agency_role| agency_role.agency_ref == user_agency_role.fetch('agency_ref') && agency_role.is_agency_admin?}
-        return true
-      end
-    end
-
-    false
+    return user.fetch('agency_roles').all?{|agency_role| can_edit_agency_role?(agency_role.fetch('agency_id'),agency_role.fetch('agency_location_id'),agency_role.fetch('role'))}
   end
 
   def can_manage_transfers?(agency_id, agency_location_id)
@@ -67,6 +63,15 @@ AgencyPermissions = Struct.new(:is_admin, :agency_roles) do
     return true if is_senior_agency_admin?(agency_id)
 
     agency_roles.any?{|agency_role| agency_role.agency_id == agency_id && agency_role.agency_location_id == agency_location_id}
+  end
+
+  def can_edit_agency_role?(agency_id, agency_location_id, role)
+    # need to have a superior role for agency/location to be able to edit a user with the `agency_role`
+    return true if is_admin?
+    return true if is_senior_agency_admin?(agency_id) && ['AGENCY_ADMIN', 'AGENCY_CONTACT'].include?(role)
+    return true if is_agency_admin?(agency_id, agency_location_id) && ['AGENCY_CONTACT'].include?(role)
+
+    false
   end
 
 end

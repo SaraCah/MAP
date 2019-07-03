@@ -13,13 +13,13 @@
         <% disable_user_name = !user.new? && (user.fetch('username') == Ctx.username || !Ctx.get.permissions.is_admin?) %>
         <div class="row">
             <div class="input-field col s12">
-                <input id="username" name="user[username]" type="text" value="<%= user.fetch('username', '') %>" required <% if disable_user_name %>disabled<% end %>>
+                <input id="username" name="user[username]" type="text" value="<%= user.fetch('username', '') %>" <% if disable_user_name %>disabled<% end %>>
                 <label for="username">Username</label>
             </div>
         </div>
         <div class="row">
             <div class="input-field col s12">
-                <input id="name" name="user[name]" type="text" value="<%= user.fetch('name', '') %>" required>
+                <input id="name" name="user[name]" type="text" value="<%= user.fetch('name', '') %>">
                 <label for="name">Name</label>
             </div>
         </div>
@@ -29,78 +29,6 @@
                 <label for="password">Password</label>
             </div>
         </div>
-
-        <% if user.new? || user.fetch('username') != Ctx.username %>
-            <% if Ctx.permissions.is_admin? %>
-                <div class="row">
-                    <div class="input-field col s12">
-                        <label>
-                            <input type="checkbox" name="user[is_admin]" value="true" <% if user.fetch('is_admin') %> checked="checked" <% end %> />
-                            <span>Administrator?</span>
-                        </label>
-                    </div>
-                </div>
-            <% end %>
-            <% unless user.new? %>
-                <div class="row">
-                    <div class="input-field col s12">
-                        <label>
-                            <input type="checkbox" name="user[is_inactive]" value="true" <% if user.fetch('is_inactive') %> checked="checked" <% end %> />
-                            <span>Inactive?</span>
-                        </label>
-                    </div>
-                </div>
-            <% end %>
-            <% if Ctx.get.permissions.is_admin? %>
-                <br>
-                <div class="row">
-                    <agency-role-linker agencies="<%= user.fetch('agency_roles').to_json %>" permission_options="<%= Ctx.client.permission_options.to_json %>"></agency-role-linker>
-                </div>
-            <% else %>
-                <% agency_role = user.fetch('agency_roles').first || {} %>
-                <input type="hidden" name="user[agency_roles][][agency_ref]" value="<%= Ctx.get.current_location.agency.id  %>">
-                <input type="hidden" name="user[agency_roles][][agency_location_id]" value="<%= Ctx.get.current_location.id %>">
-                <div class="row">
-                    <div class="col s12">
-                        <label for="role">Role</label>
-                        <select id="role" name="user[agency_roles][][role]" class="browser-default">
-                            <% if Ctx.get.permissions.is_senior_agency_admin? %>
-                                <option value="SENIOR_AGENCY_ADMIN" <% if agency_role.fetch('role', '') == 'SENIOR_AGENCY_ADMIN' %>selected<% end %>>Senior Agency Admin</option>
-                            <% end %>
-                            <option value="AGENCY_ADMIN" <% if agency_role.fetch('role', '') == 'AGENCY_ADMIN' %>selected<% end %>>Agency Admin</option>
-                            <option value="AGENCY_CONTACT" <% if agency_role.fetch('role', '') == 'AGENCY_CONTACT' %>selected<% end %>>Agency Contact</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="input-field col s12">
-                        <label><input type="checkbox" name="user[agency_roles][][permissions][]" value="allow_transfers" <% if agency_role.fetch('permissions', []).include?('allow_transfers') %>checked<% end %>> <span>allow_transfers</span></label>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="input-field col s12">
-                        <label><input type="checkbox" name="user[agency_roles][][permissions][]" value="allow_file_issue" <% if agency_role.fetch('permissions', []).include?('allow_file_issue') %>checked<% end %>> <span>allow_file_issue</span></label>
-                    </div>
-                </div>
-                <% if Ctx.get.permissions.is_senior_agency_admin? %>
-                    <div class="row">
-                        <div class="input-field col s12">
-                            <label><input type="checkbox" name="user[agency_roles][][permissions][]" value="allow_set_raps" <% if agency_role.fetch('permissions', []).include?('allow_set_raps') %>checked<% end %>> <span>allow_set_raps</span></label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="input-field col s12">
-                            <label><input type="checkbox" name="user[agency_roles][][permissions][]" value="allow_change_raps" <% if agency_role.fetch('permissions', []).include?('allow_change_raps') %>checked<% end %>> <span>allow_change_raps</span></label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="input-field col s12">
-                            <label><input type="checkbox" name="user[agency_roles][][permissions][]" value="allow_restricted_access" <% if agency_role.fetch('permissions', []).include?('allow_restricted_access') %>checked<% end %>> <span>allow_restricted_access</span></label>
-                        </div>
-                    </div>
-                <% end %>
-            <% end %>
-        <% end %>
 
         <div class="row">
             <br>
