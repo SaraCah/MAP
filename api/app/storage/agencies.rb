@@ -105,6 +105,9 @@ class Agencies < BaseStorage
     result = AgencyForEdit.new(agency_ref: agency_ref, locations: [])
     result[:label] = agency.label
 
+    # Ensure agency exists for ASpace Agency
+    get_or_create_for_aspace_agency_id(aspace_agency_id)
+
     # Locations
     locations_by_id = {}
 
