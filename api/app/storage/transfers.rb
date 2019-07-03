@@ -57,6 +57,7 @@ class Transfers < BaseStorage
     raise "FIXME admin user" if Ctx.get.permissions.is_admin?
 
     transfer_proposal_id = db[:transfer_proposal].insert(title: transfer.fetch('title'),
+                                                         description: transfer.fetch('description', nil),
                                                          status: transfer.fetch('status'),
                                                          estimated_quantity: transfer.fetch('estimated_quantity', nil),
                                                          agency_id: Ctx.get.current_location.agency_id,
@@ -82,8 +83,10 @@ class Transfers < BaseStorage
     transfer.fetch('series', []).each do |series|
       db[:transfer_proposal_series].insert(transfer_proposal_id: transfer_proposal_id,
                                            series_title: series.fetch('series_title', nil),
+                                           description: series.fetch('description', nil),
                                            disposal_class: series.fetch('disposal_class', nil),
                                            date_range: series.fetch('date_range', nil),
+                                           accrual: series.fetch('accrual', false) ? 1 : 0,
                                            accrual_details: series.fetch('accrual_details', nil),
                                            creating_agency: series.fetch('creating_agency', nil),
                                            mandate: series.fetch('mandate', nil),
@@ -108,6 +111,7 @@ class Transfers < BaseStorage
                 .filter(id: transfer_proposal_id)
                 .filter(lock_version: transfer.fetch('lock_version'))
                 .update(title: transfer.fetch('title'),
+                        description: transfer.fetch('description', nil),
                         estimated_quantity: transfer.fetch('estimated_quantity', nil),
                         status: transfer.fetch('status'),
                         lock_version: transfer.fetch('lock_version') + 1,
@@ -138,8 +142,10 @@ class Transfers < BaseStorage
     transfer.fetch('series', []).each do |series|
       db[:transfer_proposal_series].insert(transfer_proposal_id: transfer_proposal_id,
                                            series_title: series.fetch('series_title', nil),
+                                           description: series.fetch('description', nil),
                                            disposal_class: series.fetch('disposal_class', nil),
                                            date_range: series.fetch('date_range', nil),
+                                           accrual: series.fetch('accrual', false) ? 1 : 0,
                                            accrual_details: series.fetch('accrual_details', nil),
                                            creating_agency: series.fetch('creating_agency', nil),
                                            mandate: series.fetch('mandate', nil),

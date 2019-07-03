@@ -11,8 +11,10 @@ Vue.use(VueResource);
 
 interface SeriesMetadata {
     series_title?: string;
+    description?: string;
     disposal_class?: string;
     date_range?: string;
+    accrual?: boolean;
     accrual_details?: string;
     creating_agency?: string;
     mandate?: string;
@@ -41,8 +43,14 @@ Vue.component('transfer-proposal-series', {
             <div class="card-content">
                 <div class="row">
                     <div class="input-field col s12">
-                        <textarea :id="'series_title_' + index" name="transfer[series][][series_title]" v-model="series.series_title" class="materialize-textarea" required></textarea>
+                        <textarea :id="'series_title_' + index" name="transfer[series][][series_title]" v-model="series.series_title" class="materialize-textarea"></textarea>
                         <label :for="'series_title_' + index">Series Title</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <textarea :id="'series_description_' + index" name="transfer[series][][description]" v-model="series.description" class="materialize-textarea"></textarea>
+                        <label :for="'series_description_' + index">Description</label>
                     </div>
                 </div>
                 <div class="row">
@@ -57,10 +65,16 @@ Vue.component('transfer-proposal-series', {
                         <label :for="'date_range_' + index">Date Range</label>
                     </div>
                 </div>
+                <div class="col s12">
+                    <label>
+                        <input type="checkbox" name="transfer[series][][accrual]" v-model="series.accrual">
+                        <span>Is transfer an addition to an existing Series at QSA?</span>
+                    </label>
+                </div>
                 <div class="row">
                     <div class="input-field col s12">
                         <textarea :id="'accrual_details_' + index" name="transfer[series][][accrual_details]" v-model="series.accrual_details" class="materialize-textarea"></textarea>
-                        <label :for="'accrual_details_' + index">Accrual Details</label>
+                        <label :for="'accrual_details_' + index">If yes, please provide some details</label>
                     </div>
                 </div>
                 <div class="row">

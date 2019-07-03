@@ -15,8 +15,9 @@ class TransferProposal
 
   define_field(:id, Integer, required: false)
   define_field(:title, String, validator: proc {|s| (s.length > 0) ? nil : "Title can't be blank" })
+  define_field(:description, String, required: false)
   define_field(:status, String, required: false, default: 'INACTIVE')
-  define_field(:estimated_quantity, String, required: false)
+  define_field(:estimated_quantity, String, validator: proc {|s| (s.length > 0) ? nil : "Estimated Quantity can't be blank" })
   define_field(:files, [TransferFile], default: [])
   define_field(:series, [TransferProposalSeries], default: [])
   define_field(:created_by, String, required: false)
@@ -29,6 +30,7 @@ class TransferProposal
   def self.from_row(row, handle = nil, file_rows = [], series_rows = [], transfer_id = nil)
     new(id: row[:id],
         title: row[:title],
+        description: row[:description],
         status: row[:status],
         estimated_quantity: row[:estimated_quantity],
         files: file_rows.map{|file_row| TransferFile.from_row(file_row)},

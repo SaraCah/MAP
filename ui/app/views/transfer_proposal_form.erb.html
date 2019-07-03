@@ -68,11 +68,19 @@
 
                     <div class="row">
                         <div class="input-field col s12">
-                            <input id="title" name="transfer[title]" type="text" value="<%= transfer.fetch('title', '') %>" required <% if is_readonly %>disabled<% end %>>
+                            <input id="title" name="transfer[title]" type="text" value="<%= transfer.fetch('title', '') %>" <% if is_readonly %>disabled<% end %>>
                             <label for="title">Title</label>
                         </div>
                     </div>
-            
+
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <textarea id="description" name="transfer[description]" type="text" class="materialize-textarea" <% if is_readonly %>disabled<% end %>><%= transfer.fetch('description', '') %></textarea>
+                            <label for="description">Description</label>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="input-field col s12">
                             <input id="estimated_quantity" name="transfer[estimated_quantity]" type="text" value="<%= transfer.fetch('estimated_quantity', '') %>" <% if is_readonly %>disabled<% end %>>

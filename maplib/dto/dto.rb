@@ -86,6 +86,15 @@ module DTO
         errors << {code: "VALIDATION_FAILED", validation_code: validation_code, field: field_def.name}
         next
       end
+
+      if field_value && field_def.type.is_a?(Array)
+        child_type = field_def.type[0]
+        if child_type.included_modules.include?(DTO)
+          field_value.each do |field_item|
+            errors += field_item.validate
+          end
+        end
+      end
     end
 
     errors
