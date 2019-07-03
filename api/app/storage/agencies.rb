@@ -102,11 +102,13 @@ class Agencies < BaseStorage
 
     return nil unless agency
 
+    # Ensure agency exists for ASpace Agency
+    agency_id = get_or_create_for_aspace_agency_id(aspace_agency_id)
+
+
     result = AgencyForEdit.new(agency_ref: agency_ref, locations: [])
     result[:label] = agency.label
-
-    # Ensure agency exists for ASpace Agency
-    get_or_create_for_aspace_agency_id(aspace_agency_id)
+    result[:is_agency_editable] = Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_senior_agency_admin?(agency_id)
 
     # Locations
     locations_by_id = {}
@@ -116,7 +118,8 @@ class Agencies < BaseStorage
       .filter(Sequel[:agency][:aspace_agency_id] => aspace_agency_id)
       .select_all(:agency_location).each do |row|
       locations_by_id[row[:id]] = AgencyForEdit::LocationWithMembers.new(:location => AgencyLocationDTO.from_row(row, agency),
-                                                                         :members => [])
+                                                                         :members => [],
+                                                                         :is_location_editable => Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_agency_admin?(agency_id, row[:id]))
     end
 
     can_edit_user_by_username = {}

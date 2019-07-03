@@ -19,10 +19,12 @@ class AgencyForEdit
 
     define_field(:location, AgencyLocationDTO)
     define_field(:members, [MemberDTO])
+    define_field(:is_location_editable, Boolean, default: false)
   end
 
 
   define_field(:agency_ref, String)
   define_field(:label, String)
   define_field(:locations, [LocationWithMembers])
+  define_field(:is_agency_editable, Boolean, default: false)
 end

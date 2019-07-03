@@ -62,6 +62,12 @@ class MAPAPIClient
           json.fetch('agency_roles', []).map {|agency_role_json| AgencyRole.from_json(agency_role_json)})
     end
 
+    def allow_add_location?(agency_ref)
+      self.is_admin? || self.agency_roles.any? {|role|
+        "agent_corporate_entity:#{role.aspace_agency_id}" == agency_ref && role.is_senior_agency_admin?
+      }
+    end
+
     def allow_manage_agency?(agency_ref)
       self.is_admin? || self.agency_roles.any? {|role|
         "agent_corporate_entity:#{role.aspace_agency_id}" == agency_ref && role.is_agency_admin?

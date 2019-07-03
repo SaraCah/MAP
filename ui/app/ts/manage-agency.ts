@@ -18,6 +18,7 @@ interface State {
 interface Agency {
     label: string;
     locations: LocationWithMembers[];
+    is_agency_editable: boolean;
 }
 
 interface Location {
@@ -38,6 +39,7 @@ interface Member {
 interface LocationWithMembers {
     location: Location;
     members: Member[];
+    is_location_editable: boolean;
 }
 
 Vue.component('manage-agency', {
@@ -54,15 +56,15 @@ Vue.component('manage-agency', {
       <section id="locations" class="scrollspy section">
         <div class="card">
           <div class="card-content">
-            <button @click.prevent.default="addLocation()" class="btn right">Add new location</button>
+            <button v-if="agency.is_agency_editable" @click.prevent.default="addLocation()" class="btn right">Add new location</button>
 
             <h4>Locations</h4>
 
             <div class="card" v-for="location in this.agency.locations">
               <div class="card-content">
                 <div class="right">
-                  <button @click.prevent.default="addUserToLocation(location.location)" class="btn btn-small">Add user to location</button>
-                  <button v-if="!location.location.is_top_level" @click.prevent.default="editLocation(location.location)" class="btn btn-small">Edit location</button>
+                  <button v-if="location.is_location_editable" @click.prevent.default="addUserToLocation(location.location)" class="btn btn-small">Add user to location</button>
+                  <button v-if="location.is_location_editable" @click.prevent.default="editLocation(location.location)" class="btn btn-small">Edit location</button>
                 </div>
                 <h5>{{location.location.name}}</h5>
                 <table class="highlight" v-if="location.members.length > 0">
@@ -86,7 +88,7 @@ Vue.component('manage-agency', {
                         </ul>
                       </td>
                       <td>
-                        <template v-if="member.is_membership_editable">
+                        <template v-if="location.is_location_editable && member.is_membership_editable">
                           <button @click.prevent.default="editPermissions(location.location, member)" class="btn btn-small right">Set Permissions</button>
                         </template>
                       </td>
