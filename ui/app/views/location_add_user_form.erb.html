@@ -58,7 +58,10 @@
             </div>
 
             <div id="existing_user" class="vue-enabled">
-                <user-for-location-picker csrf_token="<%= FormHelper.csrf_token %>" location-id=<%= location.fetch('id') %>></user-for-location-picker>
+                <user-for-location-picker csrf_token="<%= FormHelper.csrf_token %>"
+                                          location-id=<%= location.fetch('id') %>
+                                          :allow_senior_admin="<%= Ctx.permissions.is_admin? && location.fetch('is_top_level', false) %>">
+                </user-for-location-picker>
             </div>
         </div>
     </div>

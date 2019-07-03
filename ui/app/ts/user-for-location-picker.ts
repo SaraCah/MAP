@@ -78,6 +78,7 @@ template: `
               </td>
               <td>
                 <div class="assign-users-buttons">
+                  <div v-if="allow_senior_admin"><button @click.stop.prevent="addUserToLocation(record.username, 'SENIOR_AGENCY_ADMIN')" class="right btn btn-small"><i class="fa fa-plus-circle" style="font-size: 1em;"></i> Add Senior Agency Admin</button></div>
                   <div><button @click.stop.prevent="addUserToLocation(record.username, 'AGENCY_ADMIN')" class="right btn btn-small"><i class="fa fa-plus-circle" style="font-size: 1em;"></i> Add Agency Admin</button></div>
                   <div><button @click.stop.prevent="addUserToLocation(record.username, 'AGENCY_CONTACT')" class="right btn btn-small"><i class="fa fa-plus-circle" style="font-size: 1em;"></i> Add Agency Contact</button></div>
                   <div class="clearfix"></div>
@@ -101,7 +102,7 @@ template: `
           selectedSort: undefined,
         };
     },
-    props: ['locationId', 'csrf_token'],
+    props: ['locationId', 'csrf_token', 'allow_senior_admin'],
     methods: {
         addUserToLocation: function(username: string, role: string) {
             this.$http.post('/users/assign-to-location', {

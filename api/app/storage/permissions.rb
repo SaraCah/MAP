@@ -135,6 +135,8 @@ class Permissions < BaseStorage
         self.add_agency_admin(user_id, agency_id, location_id, [])
       elsif role == 'AGENCY_CONTACT'
         self.add_agency_contact(user_id, agency_id, location_id, [])
+      elsif role == 'SENIOR_AGENCY_ADMIN' && Ctx.get.permissions.is_admin?
+        self.add_agency_senior_admin(user_id, agency_id)
       else
         errors << ["Invalid role given"]
       end
