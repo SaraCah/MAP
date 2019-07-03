@@ -1,3 +1,5 @@
+require_relative 'search_request_file'
+
 class SearchRequest
   include DTO
 

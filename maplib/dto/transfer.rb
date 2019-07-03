@@ -1,3 +1,5 @@
+require_relative 'transfer_file'
+
 class Transfer
   include DTO
 

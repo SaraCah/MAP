@@ -1,3 +1,5 @@
+require_relative 'transfer_proposal_series'
+
 class TransferProposal
   include DTO
 

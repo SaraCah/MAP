@@ -1,3 +1,5 @@
+require_relative 'file_issue_request_item'
+
 class FileIssueRequest
   include DTO
 
