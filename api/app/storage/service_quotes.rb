@@ -54,6 +54,7 @@ class ServiceQuotes < BaseStorage
           Sequel.as(Sequel[:chargeable_service][:id], :chargeable_service_id),
           Sequel.as(Sequel[:chargeable_service][:name], :chargeable_service_name),
           Sequel.as(Sequel[:chargeable_service][:description], :chargeable_service_description),
+          Sequel.as(Sequel[:chargeable_service][:last_revised_statement], :chargeable_service_last_revised_statement),
           Sequel.as(Sequel[:chargeable_item][:id], :chargeable_item_id),
           Sequel.as(Sequel[:chargeable_item][:name], :chargeable_item_name),
           Sequel.as(Sequel[:chargeable_item][:description], :chargeable_item_description),
@@ -62,7 +63,8 @@ class ServiceQuotes < BaseStorage
         .map do |row|
         service_by_id[row[:chargeable_service_id]] ||= ChargeableService.new(row[:chargeable_service_id],
                                                                              row[:chargeable_service_name],
-                                                                             row[:chargeable_service_description], [])
+                                                                             row[:chargeable_service_description],
+                                                                             row[:chargeable_service_last_revised_statement], [])
         service_by_id[row[:chargeable_service_id]].items << ChargeableItem.new(row[:chargeable_item_id],
                                                                                row[:chargeable_item_name],
                                                                                row[:chargeable_item_description],
