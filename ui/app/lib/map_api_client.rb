@@ -619,6 +619,14 @@ class MAPAPIClient
     get("/search-request-fee-schedule")
   end
 
+  def assign_to_location(username, location_id, role)
+    post('/users/assign-to-location', {
+           username: username,
+           location_id: location_id,
+           role: role
+         })
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

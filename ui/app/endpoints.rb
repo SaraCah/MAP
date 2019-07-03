@@ -126,6 +126,19 @@ class MAPTheApp < Sinatra::Base
                                :layout, title: "New User", context: ['users'])
   end
 
+  Endpoint.post('/users/assign-to-location')
+    .param(:username, String, "The username to assign")
+    .param(:location_id, Integer, "The location to assign them to")
+    .param(:role, String, "The role to grant") do
+    errors = Ctx.client.assign_to_location(params[:username], params[:location_id], params[:role])
+
+    [
+      200,
+      {'Content-type' => 'text/json'},
+      {'errors' => errors}.to_json
+    ]
+  end
+
   Endpoint.post('/users/create')
     .param(:user, UserDTO, "The user to create") do
 
@@ -361,9 +374,9 @@ class MAPTheApp < Sinatra::Base
 
     return [404] unless Ctx.permissions.allow_manage_locations?
 
-    unless Ctx.permissions.is_admin?
-        params[:location]['agency_ref'] = Ctx.get.current_location.agency.id
-    end
+    # unless Ctx.permissions.is_admin?
+    #     params[:location]['agency_ref'] = Ctx.get.current_location.agency.id
+    # end
 
     errors = Ctx.client.create_location(params[:location])
 

@@ -887,4 +887,15 @@ class MAPTheAPI < Sinatra::Base
       [404]
     end
   end
+
+  Endpoint.post('/users/assign-to-location')
+    .param(:username, String, "The username to assign")
+    .param(:location_id, Integer, "The location to assign them to")
+    .param(:role, String, "The role to grant") do
+    if (user_id = Users.id_for_username(params[:username])).nil?
+      json_response(["no such user"])
+    else
+      json_response(Permissions.assign_to_location(user_id, params[:location_id], params[:role]))
+    end
+  end
 end

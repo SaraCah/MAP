@@ -83,7 +83,7 @@ Vue.component('manage-agency', {
                         </ul>
                       </td>
                       <td>
-                        <button class="btn btn-small right">Edit</button>
+                        <button class="btn btn-small right">Set Permissions</button>
                       </td>
                     </tr>
                   </tbody>
@@ -206,12 +206,14 @@ Vue.component('manage-agency', {
                 const modal = modalAndContentObj[0];
                 const contentPane = modalAndContentObj[1];
 
-                new AjaxForm(contentPane, () => {
-                    modal.close();
+                setTimeout(function () {
+                    new AjaxForm(contentPane, () => {
+                        modal.close();
 
-                    if (opts.successCallback) {
-                        opts.successCallback();
-                    }
+                        if (opts.successCallback) {
+                            opts.successCallback();
+                        }
+                    });
                 });
             }, () => {
                 // failed

@@ -55,7 +55,7 @@
             </div>
 
             <div id="existing_user" class="vue-enabled">
-                <user-for-location-picker location-id=<%= location.fetch('id') %>></user-for-location-picker>
+                <user-for-location-picker csrf_token="<%= FormHelper.csrf_token %>" location-id=<%= location.fetch('id') %>></user-for-location-picker>
             </div>
         </div>
     </div>

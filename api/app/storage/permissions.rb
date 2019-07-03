@@ -125,4 +125,26 @@ class Permissions < BaseStorage
     AVAILABLE_PERMISSIONS.select{|permission| current_role[permission] == 1}.map(&:to_s)
   end
 
+  def self.assign_to_location(user_id, location_id, role)
+    errors = []
+
+    agency_id = db[:agency_location].filter(:id => location_id).get(:agency_id)
+
+    if ['AGENCY_ADMIN']
+      if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_agency_admin?(agency_id, location_id)
+        if role == 'AGENCY_ADMIN'
+          self.add_agency_admin(user_id, agency_id, location_id, [])
+        elsif role == 'AGENCY_CONTACT'
+          self.add_agency_contact(user_id, agency_id, location_id, [])
+        else
+          errors << ["Invalid role given"]
+        end
+      else
+        errors << ["Permission denied"]
+      end
+
+      errors
+    end
+  end
+
 end

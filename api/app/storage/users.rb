@@ -46,7 +46,6 @@ class Users < BaseStorage
       dataset = dataset.filter(Sequel.|(Sequel.like(Sequel.function(:lower, Sequel[:user][:username]), "%#{sanitised}%"), Sequel.like(Sequel.function(:lower, Sequel[:user][:name]), "%#{sanitised}%")))
     end
 
-    # FIXME check for real roles
     if role
       dataset = dataset.filter(Sequel[:agency_user][:role] => role)
     end

@@ -18,7 +18,7 @@ interface State {
 
 
 Vue.component('user-for-location-picker', {
-    template: `
+template: `
 <div>
   <div class="card">
     <div class="card-content">
@@ -53,8 +53,10 @@ Vue.component('user-for-location-picker', {
       </form>
       <hr>
 
+      <form class="ajax-form-success"></form>
+
       <template v-if="initialised">
-        <table v-if="records.length > 0">
+        <table class="assign-users-table" v-if="records.length > 0">
           <thead>
             <tr>
               <th>Username</th>
@@ -75,7 +77,11 @@ Vue.component('user-for-location-picker', {
                 </ul>
               </td>
               <td>
-                <button class="btn btn-small"><i class="fa fa-plus-circle" style="font-size: 1em;"></i> Add to location</button>
+                <div class="assign-users-buttons">
+                  <div><button @click.stop.prevent="addUserToLocation(record.username, 'AGENCY_ADMIN')" class="right btn btn-small"><i class="fa fa-plus-circle" style="font-size: 1em;"></i> Add Agency Admin</button></div>
+                  <div><button @click.stop.prevent="addUserToLocation(record.username, 'AGENCY_CONTACT')" class="right btn btn-small"><i class="fa fa-plus-circle" style="font-size: 1em;"></i> Add Agency Contact</button></div>
+                  <div class="clearfix"></div>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -95,43 +101,59 @@ Vue.component('user-for-location-picker', {
           selectedSort: undefined,
         };
     },
-    props: ['locationId'],
+    props: ['locationId', 'csrf_token'],
     methods: {
-      searchUsers: function() {
-        this.query = (this.$el.querySelector('input[name="q"]') as HTMLInputElement).value
-        this.selectedSort = (this.$el.querySelector('select[name="sort"]') as HTMLInputElement).value
-        this.page = 0;
+        addUserToLocation: function(username: string, role: string) {
+            this.$http.post('/users/assign-to-location', {
+                username: username,
+                role: role,
+                location_id: this.locationId,
+                authenticity_token: this.csrf_token,
+            }, {
+                emulateJSON: true,
+            }).then(
+                (_response: any) => {
+                    (this.$el.querySelector('form.ajax-form-success') as HTMLFormElement).dispatchEvent(new Event('ajax-success'));
+                },
+                () => {
+                    (this.$el.querySelector('form.ajax-form-success') as HTMLFormElement).dispatchEvent(new Event('ajax-success'));
+                });
+        },
+        searchUsers: function() {
+            this.query = (this.$el.querySelector('input[name="q"]') as HTMLInputElement).value
+            this.selectedSort = (this.$el.querySelector('select[name="sort"]') as HTMLInputElement).value
+            this.page = 0;
 
-        this.fireSearch();
-      },
-      reset: function() {
-        this.query = '';
-        this.page = 0;
-        this.initialised = false;
-        this.selectedSort = undefined;
+            this.fireSearch();
+        },
+        reset: function() {
+            this.query = '';
+            this.page = 0;
+            this.initialised = false;
+            this.selectedSort = undefined;
 
-        this.fireSearch();
-      },
-      fireSearch: function() {
-        this.$http.get('/users/candidates-for-location', {
-          method: 'GET',
-          params: {
-            q: this.query,
-            page: this.page,
-            sort: this.selectedSort,
-            location_id: this.locationId,
-          },
-        }).then((response: any) => {
-          return response.json();
-        }, () => {
-          // Failed
-          this.initialised = true;
-          this.records = [];
-        }).then((json: any) => {
-          this.initialised = true;
-          this.records = json.results;
-        });
-      },
+            this.fireSearch();
+        },
+        fireSearch: function() {
+            this.$http.get('/users/candidates-for-location', {
+                method: 'GET',
+                params: {
+                    q: this.query,
+                    page: this.page,
+                    sort: this.selectedSort,
+                    location_id: this.locationId,
+                },
+            }).then((response: any) => {
+                return response.json();
+            }, () => {
+                // Failed
+                this.initialised = true;
+                this.records = [];
+            }).then((json: any) => {
+                this.initialised = true;
+                this.records = json.results;
+            });
+        },
     },
     mounted: function() {
       this.fireSearch();
