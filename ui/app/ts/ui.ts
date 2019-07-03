@@ -52,6 +52,19 @@ export default class UI {
 
         contentContainer.className = 'modal-content';
 
+        // <a href="#!" class="right modal-close waves-effect waves-green "></a>
+        const closeButton = document.createElement('a');
+        const closeButtonIcon = document.createElement('i');
+
+        closeButton.setAttribute('href', '#');
+        closeButton.classList.add('right','modal-close','btn-flat');
+
+        closeButtonIcon.classList.add('fa', 'fa-times', 'fa-2x')
+
+        closeButton.appendChild(closeButtonIcon);
+
+        contentContainer.appendChild(closeButton);
+
         contentContainer.appendChild(node);
 
         document.body.appendChild(modal);
