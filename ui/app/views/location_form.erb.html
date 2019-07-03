@@ -11,19 +11,18 @@
             <input type="hidden" name="location[id]" value="<%= location.fetch('id') %>">
         <% end %>
 
-        <% if Ctx.permissions.is_admin? %>
-            <div class="row">
-                <% if location.new? %>
+        <div class="row">
+            <% if location.new? %>
+                <input type="hidden" name="location[agency_ref]" value="<%= location.fetch('agency_ref') %>">
+            <% else %>
+                <div class="col s12">
+                    <%= location.fetch('agency_label') %>
                     <input type="hidden" name="location[agency_ref]" value="<%= location.fetch('agency_ref') %>">
-                <% else %>
-                    <div class="col s12">
-                        <%= location.fetch('agency_label') %>
-                        <input type="hidden" name="location[agency_ref]" value="<%= location.fetch('agency_ref') %>">
-                        <input type="hidden" name="location[agency_label]" value="<%= location.fetch('agency_label') %>">
-                    </div>
-                <% end %>
-            </div>
-        <% end %>
+                    <input type="hidden" name="location[agency_label]" value="<%= location.fetch('agency_label') %>">
+                </div>
+            <% end %>
+        </div>
+
         <div class="row">
             <div class="input-field col s12">
                 <input id="name" name="location[name]" type="text" value="<%= location.fetch('name', '') %>" required>
