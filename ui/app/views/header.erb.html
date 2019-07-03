@@ -8,9 +8,6 @@
                     <% unless Ctx.permissions.is_admin %>
                         <li class="map-tab"><a href="/records" <% if context.include?('records') %> class='active'<% end %>>My Records</a></li>
                     <% end %>
-                    <% if Ctx.permissions.allow_manage_users? %>
-                        <li class="map-tab"><a href="/users" <% if context.include?('users') %> class='active'<% end %>>My Users</a></li>
-                    <% end %>
                     <% if Ctx.permissions.allow_manage_locations? %>
                         <li class="map-tab"><a href="/locations" <% if context.include?('locations') %> class='active'<% end %>>My Locations</a></li>
                     <% end %>
@@ -41,10 +38,11 @@
                         </current-location-selector>
                     </li>
                 <% end %>
-                <%# FIXME: Check permissions on this %>
+                <% if Ctx.permissions.allow_manage_agencies? %>
                 <li class="map-tab">
                     <a id="manageMenuTrigger" href="#" data-target="manageMenu" class="menu-dropdown"><span class="sr-only">Manage menu</span><i aria-hidden="true" class="fa fa-wrench" style="font-size:16px;"></i></a>
                 </li>
+                <% end %>
                 <li class="map-tab">
                     <a id="userMenuTrigger" href="#" data-target="userMenu" class="menu-dropdown"><span class="sr-only">User menu</span><i aria-hidden="true" class="fa fa-user" style="font-size:16px;"></i></a>
                 </li>
@@ -79,10 +77,14 @@
         <% end %>
     <% end %>
 </nav>
+<% if Ctx.permissions.allow_manage_agencies? %>
 <ul id="manageMenu" class="dropdown-content grey darken-3 white-text">
     <li><a href="/agencies" class="white-text">Manage Agencies</a></li>
-    <li><a href="/system" class="white-text">Manage system</a></li>
+    <% if Ctx.permissions.is_admin? %>
+    <li><a href="/system" class="white-text">Manage System</a></li>
+    <% end %>
 </ul>
+<% end %>
 <ul id="userMenu" class="dropdown-content grey darken-3 white-text">
     <li class="vue-enabled"><manage-current-user username="<%= Ctx.username %>"></manage-current-user></li>
     <li><a href="/logout" class="white-text">Logout (<%= Ctx.username %>)</a></li>

@@ -68,7 +68,7 @@ class MAPAPIClient
       }
     end
 
-    def allow_manage_users?
+    def allow_manage_agencies?
       self.is_admin || is_agency_admin?
     end
 
