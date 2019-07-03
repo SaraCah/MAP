@@ -126,6 +126,7 @@ class Agencies < BaseStorage
       .select(Sequel.as(Sequel[:user][:id], :user_id),
               Sequel[:user][:username],
               Sequel[:user][:name],
+              Sequel.as(Sequel[:agency][:id], :agency_id),
               Sequel[:agency_user][:agency_location_id],
               Sequel[:agency_user][:role],
               Sequel[:agency_user][:allow_transfers],
@@ -135,12 +136,21 @@ class Agencies < BaseStorage
               Sequel[:agency_user][:allow_restricted_access],)
       .each do |row|
 
+      is_membership_editable = false
+
+      if Ctx.get.permissions.is_senior_agency_admin?(row[:agency_id])
+        is_membership_editable = row[:role] != 'SENIOR_AGENCY_ADMIN'
+      elsif Ctx.get.permissions.is_agency_admin?(row[:agency_id], row[:agency_location_id])
+        is_membership_editable = row[:role] == 'AGENCY_CONTACT'
+      end
+
       member = AgencyForEdit::MemberDTO.new(
         :user_id => row[:user_id],
         :username => row[:username],
         :name => row[:name],
         :role => row[:role],
         :permissions => Permissions::AVAILABLE_PERMISSIONS.select {|perm| row[perm] == 1}.map(&:to_s),
+        :is_membership_editable => is_membership_editable
       )
 
       can_edit_user_by_username[row[:username]] = false

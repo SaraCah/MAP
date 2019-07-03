@@ -31,6 +31,7 @@ interface Member {
     username: string;
     name: string;
     role: string;
+    is_membership_editable?: boolean;
     is_user_editable?: boolean;
 }
 
@@ -85,7 +86,7 @@ Vue.component('manage-agency', {
                         </ul>
                       </td>
                       <td>
-                        <template v-if="member.role === 'AGENCY_ADMIN' || member.role === 'AGENCY_CONTACT'">
+                        <template v-if="member.is_membership_editable">
                           <button @click.prevent.default="editPermissions(location.location.id, member)" class="btn btn-small right">Set Permissions</button>
                         </template>
                       </td>
