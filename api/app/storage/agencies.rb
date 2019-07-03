@@ -121,7 +121,8 @@ class Agencies < BaseStorage
       .join(:agency_user, Sequel[:agency][:id] => Sequel[:agency_user][:agency_id])
       .join(:user, Sequel[:user][:id] => Sequel[:agency_user][:user_id])
       .filter(Sequel[:agency][:aspace_agency_id] => aspace_agency_id)
-      .select(Sequel[:user][:username],
+      .select(Sequel.as(Sequel[:user][:id], :user_id),
+              Sequel[:user][:username],
               Sequel[:user][:name],
               Sequel[:agency_user][:agency_location_id],
               Sequel[:agency_user][:role],
@@ -132,6 +133,7 @@ class Agencies < BaseStorage
               Sequel[:agency_user][:allow_restricted_access],)
       .each do |row|
       locations_by_id.fetch(row[:agency_location_id]).fetch(:members) << AgencyForEdit::MemberDTO.new(
+        :user_id => row[:user_id],
         :username => row[:username],
         :name => row[:name],
         :role => row[:role],
