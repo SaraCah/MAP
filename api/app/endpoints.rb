@@ -83,7 +83,6 @@ class MAPTheAPI < Sinatra::Base
                                                     params[:page]))
   end
 
-
   Endpoint.post('/users/update')
     .param(:user, UserDTO, "User") do
     if Ctx.user_logged_in?
@@ -227,6 +226,28 @@ class MAPTheAPI < Sinatra::Base
     else
       json_response(errors: errors)
     end
+  end
+
+  Endpoint.get('/location-membership')
+    .param(:user_id, Integer, "User ID")
+    .param(:location_id, Integer, "Location ID") do
+
+    membership = Permissions.get_location_membership(params[:user_id], params[:location_id])
+
+    if membership
+      json_response(membership)
+    else
+      [404]
+    end
+  end
+
+  Endpoint.post('/location-membership/set-permissions')
+    .param(:user_id, Integer, "User ID")
+    .param(:location_id, Integer, "Location ID")
+    .param(:permissions, [String], "Permissions to set") do
+    membership = Permissions.set_membership_permissions(params[:user_id], params[:location_id], params[:permissions])
+
+    json_response({})
   end
 
   Endpoint.get('/my-location') do

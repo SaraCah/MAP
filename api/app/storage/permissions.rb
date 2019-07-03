@@ -130,20 +130,66 @@ class Permissions < BaseStorage
 
     agency_id = db[:agency_location].filter(:id => location_id).get(:agency_id)
 
-    if ['AGENCY_ADMIN']
-      if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_agency_admin?(agency_id, location_id)
-        if role == 'AGENCY_ADMIN'
-          self.add_agency_admin(user_id, agency_id, location_id, [])
-        elsif role == 'AGENCY_CONTACT'
-          self.add_agency_contact(user_id, agency_id, location_id, [])
-        else
-          errors << ["Invalid role given"]
-        end
+    if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_agency_admin?(agency_id, location_id)
+      if role == 'AGENCY_ADMIN'
+        self.add_agency_admin(user_id, agency_id, location_id, [])
+      elsif role == 'AGENCY_CONTACT'
+        self.add_agency_contact(user_id, agency_id, location_id, [])
       else
-        errors << ["Permission denied"]
+        errors << ["Invalid role given"]
       end
+    else
+      errors << ["Permission denied"]
+    end
 
-      errors
+    errors
+  end
+
+  def self.get_location_membership(user_id, location_id)
+    agency_id = db[:agency_location].filter(:id => location_id).get(:agency_id)
+
+    if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_agency_admin?(agency_id, location_id)
+      row = db[:agency_user][:user_id => user_id, :agency_location_id => location_id]
+
+      return nil unless row
+
+      permissions = AVAILABLE_PERMISSIONS.select {|permission| row[permission] == 1}
+
+      Membership.new(user_id: user_id,
+                     agency_id: agency_id,
+                     location_id: location_id,
+                     permissions: permissions)
+    else
+      nil
+    end
+  end
+
+  def self.set_membership_permissions(user_id, location_id, permissions)
+    # Permissions being set must be a subset of the permissions available to the
+    # user doing the setting.  If `user_id` has other permissions outside of
+    # that set, we want to leave them untouched.
+    agency_id = db[:agency_location].filter(:id => location_id).get(:agency_id)
+
+    available_permissions = if Ctx.get.permissions.is_senior_agency_admin?(agency_id)
+                              AVAILABLE_PERMISSIONS.map(&:to_s)
+                            else
+                              self.permissions_for_agency_user(Users.id_for_username(Ctx.username),
+                                                               agency_id,
+                                                               location_id)
+                            end
+
+    if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_agency_admin?(agency_id, location_id)
+      row = db[:agency_user][:user_id => user_id, :agency_location_id => location_id]
+
+      return nil unless row
+
+      db[:agency_user]
+        .filter(:user_id => user_id, :agency_location_id => location_id)
+        .update(available_permissions.map {|permission|
+                  [permission.intern, permissions.include?(permission) ? 1 : 0]
+                }.to_h)
+    else
+      nil
     end
   end
 

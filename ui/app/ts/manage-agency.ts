@@ -27,6 +27,7 @@ interface Location {
 }
 
 interface Member {
+    user_id: number;
     username: string;
     name: string;
     role: string;
@@ -84,7 +85,9 @@ Vue.component('manage-agency', {
                         </ul>
                       </td>
                       <td>
-                        <button class="btn btn-small right">Set Permissions</button>
+                        <template v-if="member.role === 'AGENCY_ADMIN' || member.role === 'AGENCY_CONTACT'">
+                          <button @click.prevent.default="editPermissions(location.location.id, member.user_id)" class="btn btn-small right">Set Permissions</button>
+                        </template>
                       </td>
                     </tr>
                   </tbody>
@@ -195,6 +198,17 @@ Vue.component('manage-agency', {
             this.ajaxFormModal('/locations/' + location.id + '/add-user-form', {
                 params: {
                     mode: 'new_user',
+                },
+                successCallback: () => {
+                    this.refreshAgency();
+                },
+            });
+        },
+        editPermissions: function(location_id: number, user_id: number) {
+            this.ajaxFormModal('/permissions/edit', {
+                params: {
+                    location_id: location_id,
+                    user_id: user_id,
                 },
                 successCallback: () => {
                     this.refreshAgency();

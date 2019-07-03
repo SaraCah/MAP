@@ -240,7 +240,25 @@ class MAPTheApp < Sinatra::Base
   Endpoint.post('/users/update/:id')
     .param(:id, Integer, "User id")
     .param(:user, UserDTO, "The user to update") do
-    
+
+    unless Ctx.permissions.is_admin?
+      params[:user]['is_admin'] = false
+      if Ctx.permissions.is_senior_agency_admin?
+        params[:user].fetch('agency_roles', []).select! do |agency_role|
+          Integer(agency_role.fetch('agency_location_id')) == Ctx.get.current_location.id
+        end
+      elsif Ctx.permissions.is_agency_admin?
+        params[:user].fetch('agency_roles', []).select! do |agency_role|
+          Integer(agency_role.fetch('agency_location_id')) == Ctx.get.current_location.id && agency_role.fetch('role', '') != 'SENIOR_AGENCY_ADMIN'
+        end
+      elsif Ctx.username == params[:user].fetch(:username)
+        # Ok! Update your own things (permission changes are ignored in the API)
+      else
+        # FIXME
+        raise "Insufficient Privileges"
+      end
+    end
+
     errors = Ctx.client.update_user(params[:user])
 
     if errors.empty?
@@ -248,6 +266,45 @@ class MAPTheApp < Sinatra::Base
     else
       Templates.emit(:user_edit, {user: params[:user], errors: errors})
     end
+  end
+
+  Endpoint.get('/permissions/edit')
+    .param(:user_id, Integer, "User ID")
+    .param(:location_id, Integer, "Location ID") do
+
+    membership = Ctx.client.get_location_membership(params[:location_id], params[:user_id])
+
+    if membership.nil?
+      [404]
+    else
+      matched_role = Ctx.permissions.agency_roles.find {|role|
+        role.agency_id == membership.fetch('agency_id') && role.role == 'SENIOR_AGENCY_ADMIN'}
+
+      matched_role ||= Ctx.permissions.agency_roles.find {|role|
+        role.agency_location_id == params[:location_id] && role.role == 'AGENCY_ADMIN'
+      }
+
+      if matched_role.nil?
+        [404]
+      else
+        Templates.emit(:location_edit_user_permissions, {
+                         user_id: params[:user_id],
+                         location_id: params[:location_id],
+                         existing_permissions: membership.fetch('permissions'),
+                         available_permissions: matched_role.permissions,
+                       })
+      end
+    end
+  end
+
+  Endpoint.post('/permissions/update')
+    .param(:user_id, Integer, "User ID")
+    .param(:location_id, Integer, "Location ID")
+    .param(:permissions, [String], "Permissions to set") do
+
+    Ctx.client.set_membership_permissions(params[:location_id], params[:user_id], params[:permissions])
+
+    [202]
   end
 
   Endpoint.get('/logout') do

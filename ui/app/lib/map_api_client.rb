@@ -363,10 +363,20 @@ class MAPAPIClient
   end
 
   def set_location(agency_id, location_id)
-    post('/set-location', {
-      agency_id: agency_id,
-      location_id: location_id,
-    })
+    post('/set-location',
+         agency_id: agency_id,
+         location_id: location_id)
+  end
+
+  # The membership details for a user at a location
+  def get_location_membership(location_id, user_id)
+    json = get('/location-membership',
+               location_id: location_id,
+               user_id: user_id)
+
+    return nil if json.nil?
+
+    Membership.from_hash(json)
   end
 
   def transfer_proposals(page = 0, status = nil, sort = nil)
@@ -620,12 +630,19 @@ class MAPAPIClient
   end
 
   def assign_to_location(username, location_id, role)
-    post('/users/assign-to-location', {
+    post('/users/assign-to-location',
            username: username,
            location_id: location_id,
-           role: role
-         })
+           role: role)
   end
+
+  def set_membership_permissions(location_id, user_id, permissions)
+    post('/location-membership/set-permissions',
+         'location_id' => location_id,
+         'user_id' => user_id,
+         'permissions[]' => permissions)
+  end
+
 
   private
 
