@@ -67,7 +67,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="input-field col s12">
+                        <div class="input-field col s12 required">
                             <input id="title" name="transfer[title]" type="text" value="<%= transfer.fetch('title', '') %>" <% if is_readonly %>disabled<% end %>>
                             <label for="title">Title</label>
                         </div>
@@ -82,7 +82,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="input-field col s12">
+                        <div class="input-field col s12 required">
                             <input id="estimated_quantity" name="transfer[estimated_quantity]" type="text" value="<%= transfer.fetch('estimated_quantity', '') %>" <% if is_readonly %>disabled<% end %>>
                             <label for="estimated_quantity">Estimated Quantity</label>
                         </div>

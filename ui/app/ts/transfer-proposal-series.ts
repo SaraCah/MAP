@@ -42,25 +42,25 @@ Vue.component('transfer-proposal-series', {
         <div v-for="(series, index) in metadata" class="card">
             <div class="card-content">
                 <div class="row">
-                    <div class="input-field col s12">
+                    <div class="input-field col s12 required">
                         <textarea :id="'series_title_' + index" name="transfer[series][][series_title]" v-model="series.series_title" class="materialize-textarea"></textarea>
                         <label :for="'series_title_' + index">Series Title</label>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="input-field col s12">
+                    <div class="input-field col s12 required">
                         <textarea :id="'series_description_' + index" name="transfer[series][][description]" v-model="series.description" class="materialize-textarea"></textarea>
                         <label :for="'series_description_' + index">Description</label>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="input-field col s12">
+                    <div class="input-field col s12 required">
                         <input :id="'disposal_class_' + index" name="transfer[series][][disposal_class]" type="text" v-model="series.disposal_class">
                         <label :for="'disposal_class_' + index">Disposal Class</label>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="input-field col s12">
+                    <div class="input-field col s12 required">
                         <textarea :id="'date_range_' + index" name="transfer[series][][date_range]" v-model="series.date_range" class="materialize-textarea"></textarea>
                         <label :for="'date_range_' + index">Date Range</label>
                     </div>
@@ -96,7 +96,7 @@ Vue.component('transfer-proposal-series', {
                     </div>
                 </div>
                 <div class="row">
-                    <div class="input-field col s12">
+                    <div class="input-field col s12 required">
                         <select name="transfer[series][][system_of_arrangement]" v-model="series.system_of_arrangement">
                             <option disabled></option>
                             <option value="single_number">Single Number</option>

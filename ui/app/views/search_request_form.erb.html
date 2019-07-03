@@ -75,7 +75,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="input-field col s12">
+                        <div class="input-field col s12 required">
                             <textarea id="request_details" name="search_request[details]" class="materialize-textarea" <% if is_readonly %>disabled<% end %>><%= request.fetch('details', '') %></textarea>
                             <label for="request_details">Request Details</label>
                         </div>
