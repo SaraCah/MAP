@@ -244,8 +244,9 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.post('/location-membership/set-permissions')
     .param(:user_id, Integer, "User ID")
     .param(:location_id, Integer, "Location ID")
-    .param(:permissions, [String], "Permissions to set") do
-    membership = Permissions.set_membership_permissions(params[:user_id], params[:location_id], params[:permissions])
+    .param(:role, String, "Role")
+    .param(:permissions, [String], "Permissions to set", :optional => true) do
+    membership = Permissions.set_membership_permissions(params[:user_id], params[:location_id], Array(params[:permissions]), params[:role])
 
     json_response({})
   end

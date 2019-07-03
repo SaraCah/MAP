@@ -640,10 +640,11 @@ class MAPAPIClient
            role: role)
   end
 
-  def set_membership_permissions(location_id, user_id, permissions)
+  def set_membership_permissions(location_id, user_id, permissions, role)
     post('/location-membership/set-permissions',
          'location_id' => location_id,
          'user_id' => user_id,
+         'role' => role,
          'permissions[]' => permissions)
   end
 

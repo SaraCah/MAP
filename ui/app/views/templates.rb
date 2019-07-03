@@ -54,5 +54,5 @@ Templates.define(:manage_agency, [:agency_ref], "views/manage_agency.erb.html")
 Templates.define(:manage_system, [], "views/manage_system.erb.html")
 
 Templates.define(:location_edit_user_permissions,
-                 [:user_id, :location_id, :username, :role, [:existing_permissions], [:available_permissions], :errors?],
+                 [:user_id, :location_id, :is_top_level, :username, :role, [:existing_permissions], [:available_permissions], :errors?],
                  "views/location_edit_user_permissions.erb.html")

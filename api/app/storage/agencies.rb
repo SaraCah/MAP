@@ -138,7 +138,9 @@ class Agencies < BaseStorage
 
       is_membership_editable = false
 
-      if Ctx.get.permissions.is_senior_agency_admin?(row[:agency_id])
+      if Ctx.get.permissions.is_admin?
+        is_membership_editable = true
+      elsif Ctx.get.permissions.is_senior_agency_admin?(row[:agency_id])
         is_membership_editable = row[:role] != 'SENIOR_AGENCY_ADMIN'
       elsif Ctx.get.permissions.is_agency_admin?(row[:agency_id], row[:agency_location_id])
         is_membership_editable = row[:role] == 'AGENCY_CONTACT'

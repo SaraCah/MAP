@@ -262,6 +262,7 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/permissions/edit')
     .param(:user_id, Integer, "User ID")
     .param(:location_id, Integer, "Location ID")
+    .param(:is_top_level, Integer, "True if this is a top-level location")
     .param(:username, String, "Username")
     .param(:role, String, "User current role") do
 
@@ -277,14 +278,15 @@ class MAPTheApp < Sinatra::Base
         role.agency_location_id == params[:location_id] && role.role == 'AGENCY_ADMIN'
       }
 
-      if matched_role.nil?
+      if matched_role.nil? && !Ctx.permissions.is_admin?
         [404]
       else
         Templates.emit(:location_edit_user_permissions, {
                          user_id: params[:user_id],
                          location_id: params[:location_id],
+                         is_top_level: params[:is_top_level] == 1,
                          existing_permissions: membership.fetch('permissions'),
-                         available_permissions: matched_role.permissions,
+                         available_permissions: Ctx.permissions.is_admin? ? Ctx.client.permission_options.map(&:to_s) : matched_role.permissions,
                          username: params[:username],
                          role: params[:role],
                        })
@@ -295,9 +297,10 @@ class MAPTheApp < Sinatra::Base
   Endpoint.post('/permissions/update')
     .param(:user_id, Integer, "User ID")
     .param(:location_id, Integer, "Location ID")
-    .param(:permissions, [String], "Permissions to set") do
+    .param(:role, String, "Role")
+    .param(:permissions, [String], "Permissions to set", :optional => true) do
 
-    Ctx.client.set_membership_permissions(params[:location_id], params[:user_id], params[:permissions])
+    Ctx.client.set_membership_permissions(params[:location_id], params[:user_id], Array(params[:permissions]), params[:role])
 
     [202]
   end

@@ -1,14 +1,26 @@
 <div class="row">
-    <h4>Permissions for <%= username %> (<%= role %>)</h4>
+    <h4>Permissions for <%= username %></h4>
 
     <% if errors %>
         <%== FormHelper.render_errors(errors) %>
     <% end %>
+
+
     <form class="col s12" action='/permissions/update' method="post">
         <%== FormHelper.hidden_authenticity_token %>
 
         <input type="hidden" name="user_id" value="<%= user_id %>">
         <input type="hidden" name="location_id" value="<%= location_id %>">
+
+        <label for="role">Role</label>
+        <select class="browser-default" id="role"name="role">
+            <option value="AGENCY_CONTACT" <% if !role || role == 'AGENCY_CONTACT' %> selected<% end %>>Agency Contact</option>
+            <option value="AGENCY_ADMIN" <% if role == 'AGENCY_ADMIN' %> selected<% end %>>Agency Admin</option>
+            <% if Ctx.permissions.is_admin? && is_top_level %>
+                <option value="SENIOR_AGENCY_ADMIN" <% if role == 'SENIOR_AGENCY_ADMIN' %> selected<% end %>>Senior Agency Admin</option>
+            <% end %>
+        </select>
+
 
         <% available_permissions.each do |permission| %>
             <div class="row">
