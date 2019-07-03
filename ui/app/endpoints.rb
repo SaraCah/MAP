@@ -270,7 +270,9 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/permissions/edit')
     .param(:user_id, Integer, "User ID")
-    .param(:location_id, Integer, "Location ID") do
+    .param(:location_id, Integer, "Location ID")
+    .param(:username, String, "Username")
+    .param(:role, String, "User current role") do
 
     membership = Ctx.client.get_location_membership(params[:location_id], params[:user_id])
 
@@ -292,6 +294,8 @@ class MAPTheApp < Sinatra::Base
                          location_id: params[:location_id],
                          existing_permissions: membership.fetch('permissions'),
                          available_permissions: matched_role.permissions,
+                         username: params[:username],
+                         role: params[:role],
                        })
       end
     end

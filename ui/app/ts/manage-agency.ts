@@ -86,7 +86,7 @@ Vue.component('manage-agency', {
                       </td>
                       <td>
                         <template v-if="member.role === 'AGENCY_ADMIN' || member.role === 'AGENCY_CONTACT'">
-                          <button @click.prevent.default="editPermissions(location.location.id, member.user_id)" class="btn btn-small right">Set Permissions</button>
+                          <button @click.prevent.default="editPermissions(location.location.id, member)" class="btn btn-small right">Set Permissions</button>
                         </template>
                       </td>
                     </tr>
@@ -202,11 +202,13 @@ Vue.component('manage-agency', {
                 },
             });
         },
-        editPermissions: function(location_id: number, user_id: number) {
+        editPermissions: function(location_id: number, member: Member) {
             this.ajaxFormModal('/permissions/edit', {
                 params: {
                     location_id: location_id,
-                    user_id: user_id,
+                    user_id: member.user_id,
+                    username: member.username,
+                    role: member.role,
                 },
                 successCallback: () => {
                     this.refreshAgency();
