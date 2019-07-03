@@ -27,6 +27,9 @@
                     <select class="browser-default" name="role">
                         <option value="AGENCY_CONTACT" <% if !role || role == 'AGENCY_CONTACT' %> selected<% end %>>Agency Contact</option>
                         <option value="AGENCY_ADMIN" <% if role == 'AGENCY_ADMIN' %> selected<% end %>>Agency Admin</option>
+                        <% if Ctx.permissions.is_admin? && location.fetch('is_top_level', false) %>
+                        <option value="SENIOR_AGENCY_ADMIN" <% if role == 'SENIOR_AGENCY_ADMIN' %> selected<% end %>>Senior Agency Admin</option>
+                        <% end %>
                     </select>
 
                     <div class="row">
