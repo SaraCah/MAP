@@ -203,10 +203,11 @@ class MAPAPIClient
     PagedResults.from_json(get('/users', data), User)
   end
 
-  def users_candidates_for_location(location_id, q = nil, sort = nil, page = 0)
+  def users_candidates_for_location(location_id, q = nil, sort = nil, page = 0, page_size = 5)
     data = {
       location_id: location_id,
-      page: page
+      page: page,
+      page_size: page_size,
     }
 
     data[:q] = q unless q.nil? || q == ''

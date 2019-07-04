@@ -388,7 +388,6 @@ a#manageMenuTrigger:after {
 .manage-agency-modal {
     width: 95%;
     max-height: 90%;
-    height: 90%;
     top: 5% !important;
 }
 
@@ -419,7 +418,7 @@ a#manageMenuTrigger:after {
 }
 
 .assign-users-buttons .btn {
-    width: 19em;
+    min-width: 16em;
     text-align: left;
     margin: 0.25em 0;
 }

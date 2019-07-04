@@ -362,7 +362,7 @@ class Locations < BaseStorage
   end
 
   # FIXME: This is pretty similar to Users#page.  Do we need both still?
-  def self.candidates_for_location(permissions, location_id, q = nil, sort = nil, page = 0)
+  def self.candidates_for_location(permissions, location_id, q = nil, sort = nil, page = 0, page_size = 5)
     # Returns a page of users who are candidates for being added to a given location.
     #
     # The logic here is a little complicated, but here we go:
@@ -451,7 +451,6 @@ class Locations < BaseStorage
 
     dataset = dataset.select_all(:user).distinct(Sequel[:user][:id])
 
-    page_size = AppConfig[:page_size]
     max_page = (dataset.count / page_size.to_f).ceil
 
     dataset = dataset.limit(page_size, page * page_size)

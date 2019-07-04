@@ -207,6 +207,7 @@ class MAPTheApp < Sinatra::Base
     .param(:location_id, Integer, "The location in question")
     .param(:q, String, "Search string", optional: true)
     .param(:sort, String, "Sort string", optional: true)
+    .param(:page_size, Integer, "Number of users per page")
     .param(:page, Integer, "Page to return") do
 
     [
@@ -215,7 +216,8 @@ class MAPTheApp < Sinatra::Base
       Ctx.client.users_candidates_for_location(params[:location_id],
                                                params[:q],
                                                params[:sort],
-                                               params[:page]).to_json
+                                               params[:page],
+                                               params[:page_size]).to_json
     ]
   end
 

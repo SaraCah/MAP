@@ -74,13 +74,15 @@ class MAPTheAPI < Sinatra::Base
     .param(:location_id, Integer, "The location in question")
     .param(:q, String, "Search string", optional: true)
     .param(:sort, String, "Sort string", optional: true)
+    .param(:page_size, Integer, "Users to return per page")
     .param(:page, Integer, "Page to return") do
 
     json_response(Locations.candidates_for_location(Ctx.get.permissions,
                                                     params[:location_id],
                                                     params[:q],
                                                     params[:sort],
-                                                    params[:page]))
+                                                    params[:page],
+                                                    params[:page_size]))
   end
 
   Endpoint.post('/users/update')
