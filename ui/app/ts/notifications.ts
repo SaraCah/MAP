@@ -11,6 +11,7 @@ declare var M: any; // Materialize on the window context
 interface Notification {
     record_type: string;
     record_id: string;
+    agency_ref?: string;
     message: string;
     identifier: string;
     level: string;
@@ -42,7 +43,7 @@ Vue.component('notifications', {
                         <td>{{notification.message}}</td>
                         <td>{{formatTimestamp(notification.timestamp)}}</td>
                         <td>
-                            <a class="btn btn-small" :href="urlFor(notification.record_type, notification.record_id)" v-if="urlFor(notification.record_type, notification.record_id) != null">View</a>
+                            <a class="btn btn-small" :href="urlFor(notification)" v-if="urlFor(notification) != null">View</a>
                         </td>
                     </tr>
                 </tbody>
@@ -77,21 +78,21 @@ Vue.component('notifications', {
                 this.loading = false;
             });
         },
-        urlFor: function(recordType: string, recordId: string) {
-            if (recordType === 'file_issue') {
-                return "/file-issues/" + recordId;
-            } else if (recordType === 'file_issue_request') {
-                return "/file-issue-requests/" + recordId;
-            } else if (recordType === 'transfer') {
-                return "/transfers/" + recordId;
-            } else if (recordType === 'transfer_proposal') {
-                return "/transfer-proposals/" + recordId;
-            } else if (recordType === 'user') {
-                return "/users/edit?username=" + recordId;
-            } else if (recordType === 'location') {
-                return "/locations/" + recordId;
-            } else if (recordType === 'search_request') {
-                return "/search-requests/" + recordId;
+        urlFor: function(notification: Notification) {
+            if (notification.record_type === 'file_issue') {
+                return "/file-issues/" + notification.record_id;
+            } else if (notification.record_type === 'file_issue_request') {
+                return "/file-issue-requests/" + notification.record_id;
+            } else if (notification.record_type === 'transfer') {
+                return "/transfers/" + notification.record_id;
+            } else if (notification.record_type === 'transfer_proposal') {
+                return "/transfer-proposals/" + notification.record_id;
+            } else if (notification.record_type === 'location') {
+                return "/agencies/" + notification.agency_ref;
+            } else if (notification.record_type === 'role') {
+                return "/agencies/" + notification.agency_ref;
+            } else if (notification.record_type === 'search_request') {
+                return "/search-requests/" + notification.record_id;
             }
             return null;
         },

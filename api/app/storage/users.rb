@@ -258,7 +258,7 @@ class Users < BaseStorage
       .each do |row|
       notifications << Notification.new(:user,
                                         row[:username],
-                                        row[:username],
+                                        "User",
                                         "User created by %s" % [row[:created_by]],
                                         'info',
                                         row[:create_time])
@@ -274,7 +274,7 @@ class Users < BaseStorage
       .each do |row|
       notifications << Notification.new(:user,
                                         row[:username],
-                                        row[:username],
+                                        "User",
                                         "User updated by %s" % [row[:modified_by]],
                                         'info',
                                         row[:modified_time])

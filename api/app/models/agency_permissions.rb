@@ -24,6 +24,10 @@ AgencyPermissions = Struct.new(:is_admin, :agency_roles) do
     to_h.to_json
   end
 
+  def can_manage_agencies?
+    is_admin? || agency_roles.any?{|role| role.is_agency_admin?}
+  end
+
   def can_manage_locations?(agency_ref)
     is_admin? || agency_roles.any?{|role| role.agency_ref == agency_ref && role.is_agency_admin?}
   end

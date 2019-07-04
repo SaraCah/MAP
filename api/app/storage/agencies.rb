@@ -198,4 +198,55 @@ class Agencies < BaseStorage
 
     result
   end
+
+
+  def self.get_notifications
+    aspace_agency_id_to_updates = {}
+
+    dataset = db[:agency_user]
+                .join(:user, Sequel[:user][:id] => Sequel[:agency_user][:user_id])
+                .join(:agency, Sequel[:agency][:id] => Sequel[:agency_user][:agency_id])
+                .join(:agency_location, Sequel[:agency_location][:id] => Sequel[:agency_user][:agency_location_id])
+                .filter(Sequel[:agency_user][:modified_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
+
+    unless Ctx.get.permissions.is_admin?
+      admin_aspace_agency_ids = Ctx.get.permissions.agency_roles.select{|agency_role| agency_role.is_agency_admin?}.collect{|agency_role| agency_role.aspace_agency_id}
+      dataset = dataset
+                  .filter(Sequel[:agency][:aspace_agency_id] => admin_aspace_agency_ids)
+    end
+
+    dataset
+      .select(Sequel[:user][:username],
+              Sequel[:agency][:aspace_agency_id],
+              Sequel.as(Sequel[:agency_location][:name], :location_name),
+              Sequel[:agency_user][:modified_time])
+      .each do |row|
+      aspace_agency_id_to_updates[row[:aspace_agency_id]] ||= []
+      aspace_agency_id_to_updates[row[:aspace_agency_id]] << row
+    end
+
+    AspaceDB.open do |aspace_db|
+      aspace_db[:agent_corporate_entity]
+        .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
+        .filter(Sequel[:name_corporate_entity][:authorized] => 1)
+        .filter(Sequel[:agent_corporate_entity][:id] => aspace_agency_id_to_updates.keys)
+        .select(Sequel[:agent_corporate_entity][:id],
+                Sequel[:name_corporate_entity][:sort_name]).each do |row|
+        aspace_agency_id_to_updates.fetch(row[:id]).each do |notification_data|
+          notification_data[:agency_label] = row[:sort_name]
+          notification_data[:agency_ref] = "agent_corporate_entity:#{row[:id]}"
+        end
+      end
+    end
+
+    aspace_agency_id_to_updates.values.flatten.map do |notification_data|
+      Notification.new('role',
+                       notification_data.fetch(:username),
+                       'Role',
+                       '%s permissions updated for %s - %s' % [notification_data.fetch(:username), notification_data.fetch(:agency_label), notification_data.fetch(:location_name)],
+                       'info',
+                       notification_data.fetch(:modified_time),
+                       notification_data.fetch(:agency_ref))
+    end
+  end
 end

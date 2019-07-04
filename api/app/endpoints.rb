@@ -743,6 +743,7 @@ class MAPTheAPI < Sinatra::Base
       if Ctx.get.permissions.is_admin?
         notifications += Users.get_notifications
         notifications += Locations.get_notifications(false)
+        notifications += Agencies.get_notifications
       else
         can_manage_file_issues = Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
         can_manage_transfers = Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
@@ -753,6 +754,10 @@ class MAPTheAPI < Sinatra::Base
 
         if can_manage_transfers
           notifications += Transfers.get_notifications
+        end
+
+        if Ctx.get.permissions.can_manage_agencies?
+          notifications += Agencies.get_notifications
         end
 
         notifications += Conversations.get_notifications(can_manage_file_issues, can_manage_transfers)

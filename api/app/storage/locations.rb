@@ -336,21 +336,25 @@ class Locations < BaseStorage
       end
     end
 
-    locations_by_aspace_agency.values.flatten.each do |notification_data|
-      if notification_data.include?(:create_time)
-        notifications << Notification.new('location',
-                                          notification_data.fetch(:id),
-                                          'Location',
-                                          '%s created by %s' % [notification_data.fetch(:name), notification_data.fetch(:created_by)],
-                                          'info',
-                                          notification_data.fetch(:create_time))
-      else
-        notifications << Notification.new('location',
-                                          notification_data.fetch(:id),
-                                          'Location',
-                                          '%s updated by %s' % [notification_data.fetch(:name), notification_data.fetch(:modified_by)],
-                                          'info',
-                                          notification_data.fetch(:modified_time))
+    locations_by_aspace_agency.each do |aspace_agency_id, raw_notifications|
+      raw_notifications.each do |notification_data|
+        if notification_data.include?(:create_time)
+          notifications << Notification.new('location',
+                                            notification_data.fetch(:id),
+                                            'Location',
+                                            '%s created by %s' % [notification_data.fetch(:name), notification_data.fetch(:created_by)],
+                                            'info',
+                                            notification_data.fetch(:create_time),
+                                            "agent_corporate_entity:#{aspace_agency_id}")
+        else
+          notifications << Notification.new('location',
+                                            notification_data.fetch(:id),
+                                            'Location',
+                                            '%s updated by %s' % [notification_data.fetch(:name), notification_data.fetch(:modified_by)],
+                                            'info',
+                                            notification_data.fetch(:modified_time),
+                                            "agent_corporate_entity:#{aspace_agency_id}")
+        end
       end
     end
 
