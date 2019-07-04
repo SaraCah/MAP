@@ -8,6 +8,7 @@ class AgencyForEdit
 
     define_field(:username, String)
     define_field(:name, String)
+    define_field(:email, String)
     define_field(:role, String)
     define_field(:permissions, [String])
     define_field(:is_user_editable, Boolean, default: false)

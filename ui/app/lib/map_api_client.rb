@@ -25,14 +25,15 @@ class MAPAPIClient
     end
   end
 
-  AgencyRole = Struct.new(:agency_id, :agency_label, :aspace_agency_id, :agency_location_id, :role, :permissions) do
+  AgencyRole = Struct.new(:agency_id, :agency_label, :aspace_agency_id, :agency_location_id, :role, :permissions, :position) do
     def self.from_json(json)
       new(json.fetch('agency_id'),
           json.fetch('agency_label'),
           json.fetch('aspace_agency_id'),
           json.fetch('agency_location_id'),
           json.fetch('role'),
-          json.fetch('permissions'))
+          json.fetch('permissions'),
+          json.fetch('position'))
     end
 
     def is_senior_agency_admin?
@@ -646,11 +647,12 @@ class MAPAPIClient
            role: role)
   end
 
-  def set_membership_permissions(location_id, user_id, permissions, role)
+  def set_membership_permissions(location_id, user_id, permissions, role, position)
     post('/location-membership/set-permissions',
          'location_id' => location_id,
          'user_id' => user_id,
          'role' => role,
+         'position' => position,
          'permissions[]' => permissions)
   end
 

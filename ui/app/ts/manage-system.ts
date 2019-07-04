@@ -18,6 +18,7 @@ interface State {
 interface Administrator {
     username: string;
     name: string;
+    email: string;
     inactive: string;
 }
 
@@ -39,6 +40,7 @@ Vue.component('manage-system', {
                 <tr>
                   <th>Username</th>
                   <th>Name</th>
+                  <th>Email</th>
                   <th></th>
                 </tr>
               </thead>
@@ -46,6 +48,7 @@ Vue.component('manage-system', {
                 <tr v-for="admin in administrators" :class="admin.is_inactive ? 'grey-text' : ''">
                   <td>{{admin.username}}</td>
                   <td>{{admin.name}}</td>
+                  <td>{{admin.email}}</td>
                   <td>
                     <button class="btn btn-small right" @click.prevent.default="editUser(admin.username)">Edit User</button>
                   </td>

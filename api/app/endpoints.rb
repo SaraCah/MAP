@@ -245,8 +245,9 @@ class MAPTheAPI < Sinatra::Base
     .param(:user_id, Integer, "User ID")
     .param(:location_id, Integer, "Location ID")
     .param(:role, String, "Role")
+    .param(:position, String, "Position")
     .param(:permissions, [String], "Permissions to set", :optional => true) do
-    membership = Permissions.set_membership_permissions(params[:user_id], params[:location_id], Array(params[:permissions]), params[:role])
+    membership = Permissions.set_membership_permissions(params[:user_id], params[:location_id], Array(params[:permissions]), params[:role], params[:position])
 
     json_response({})
   end

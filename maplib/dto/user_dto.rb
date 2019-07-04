@@ -4,6 +4,7 @@ class UserDTO
   define_field(:id, Integer, required: false)
   define_field(:username, String)
   define_field(:name, String, validator: proc {|s| (s.nil? || s.empty?) ? "Name can't be blank" : nil})
+  define_field(:email, String, validator: proc {|s| UserDTO.validate_email(s)})
   define_field(:password, String, required: false, validator: proc {|s, user| user.new? && s.empty? ? "Password can't be blank" : nil})
   define_field(:is_admin, Boolean, default: false)
   define_field(:is_inactive, Boolean, default: false)
@@ -15,6 +16,7 @@ class UserDTO
     new(id: row[:id],
         username: row[:username],
         name: row[:name],
+        email: row[:email],
         is_admin: (row[:admin] == 1),
         is_inactive: (row[:inactive] == 1),
         agency_roles: agency_roles.map{|agency_permission| AgencyRoleDTO.from_agency_role(agency_permission)},
@@ -36,5 +38,15 @@ class UserDTO
     return false if current_user?
 
     roles.empty?
+  end
+
+  def self.validate_email(email)
+    if email.nil? || email.empty?
+      "Email can't be blank"
+    elsif (email =~ URI::MailTo::EMAIL_REGEXP).nil?
+      "Email must be a valid email address"
+    else
+      nil
+    end
   end
 end

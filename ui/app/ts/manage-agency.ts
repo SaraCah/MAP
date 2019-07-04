@@ -31,7 +31,9 @@ interface Member {
     user_id: number;
     username: string;
     name: string;
+    email: string,
     role: string;
+    position: string;
     is_membership_editable?: boolean;
     is_user_editable?: boolean;
 }
@@ -71,6 +73,7 @@ Vue.component('manage-agency', {
                   <thead>
                     <th>Username</th>
                     <th>Name</th>
+                    <th>Position</th>
                     <th>Role</th>
                     <th>Permissions</th>
                     <th></th>
@@ -79,6 +82,7 @@ Vue.component('manage-agency', {
                     <tr v-for="member in location.members">
                       <td>{{member.username}}</td>
                       <td>{{member.name}}</td>
+                      <td>{{member.position}}</td>
                       <td>{{member.role}}</td>
                       <td>
                         <ul>
@@ -114,6 +118,7 @@ Vue.component('manage-agency', {
                 <tr>
                   <th>Username</th>
                   <th>Name</th>
+                  <th>Email</th>
                   <th>Role(s)</th>
                   <th></th>
                 </tr>
@@ -122,6 +127,7 @@ Vue.component('manage-agency', {
                 <tr v-for="user in this.mergedUsers">
                   <td>{{user.username}}</td>
                   <td>{{user.name}}</td>
+                  <td>{{user.email}}</td>
                   <td>
                     <ul>
                       <li v-for="role in user.roles">{{role}}</li>
@@ -213,6 +219,7 @@ Vue.component('manage-agency', {
                     user_id: member.user_id,
                     username: member.username,
                     role: member.role,
+                    position: member.position,
                 },
                 successCallback: () => {
                     this.refreshAgency();
@@ -259,6 +266,7 @@ Vue.component('manage-agency', {
             interface AggregatedMember {
                 username: string;
                 name: string;
+                email: string;
                 roles: string[];
                 is_user_editable: boolean;
             }
@@ -277,6 +285,7 @@ Vue.component('manage-agency', {
                         users[member.username] = {
                             username: member.username,
                             name: member.name,
+                            email: member.email,
                             roles: [],
                             is_user_editable: false,
                         };

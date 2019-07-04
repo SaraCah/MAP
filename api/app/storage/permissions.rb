@@ -47,19 +47,20 @@ class Permissions < BaseStorage
   end
 
 
-  def self.add_agency_senior_admin(user_id, agency_id)
+  def self.add_agency_senior_admin(user_id, agency_id, position)
     top_level_location = db[:agency_location][:agency_id => agency_id, :top_level_location => 1]
 
     db[:agency_user].insert(user_id: user_id,
                            agency_id: agency_id, 
                            agency_location_id: top_level_location[:id],
                            role: 'SENIOR_AGENCY_ADMIN',
+                           position: position,
                            create_time: java.lang.System.currentTimeMillis,
                            modified_time: java.lang.System.currentTimeMillis)
   end
 
 
-  def self.add_agency_admin(user_id, agency_id, location_id, permissions)
+  def self.add_agency_admin(user_id, agency_id, location_id, position, permissions)
     if location_id.nil?
       location_id = db[:agency_location][:agency_id => agency_id, :top_level_location => 1][:id]
     end
@@ -69,6 +70,7 @@ class Permissions < BaseStorage
       agency_id: agency_id,
       agency_location_id: location_id,
       role: 'AGENCY_ADMIN',
+      position: position,
       allow_transfers: 1, # default permission
       allow_file_issue: 1, # default permission
       create_time: java.lang.System.currentTimeMillis,
@@ -83,7 +85,7 @@ class Permissions < BaseStorage
   end
 
 
-  def self.add_agency_contact(user_id, agency_id, location_id, permissions)
+  def self.add_agency_contact(user_id, agency_id, location_id, position, permissions)
     if location_id.nil?
       location_id = db[:agency_location][:agency_id => agency_id, :top_level_location => 1][:id]
     end
@@ -93,6 +95,7 @@ class Permissions < BaseStorage
       agency_id: agency_id,
       agency_location_id: location_id,
       role: 'AGENCY_CONTACT',
+      position: position,
       create_time: java.lang.System.currentTimeMillis,
       modified_time: java.lang.System.currentTimeMillis
     }
@@ -125,18 +128,18 @@ class Permissions < BaseStorage
     AVAILABLE_PERMISSIONS.select{|permission| current_role[permission] == 1}.map(&:to_s)
   end
 
-  def self.assign_to_location(user_id, location_id, role)
+  def self.assign_to_location(user_id, location_id, role, position = 'Not yet provided')
     errors = []
 
     agency_id = db[:agency_location].filter(:id => location_id).get(:agency_id)
 
     if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_agency_admin?(agency_id, location_id)
       if role == 'AGENCY_ADMIN'
-        self.add_agency_admin(user_id, agency_id, location_id, [])
+        self.add_agency_admin(user_id, agency_id, location_id, position, [])
       elsif role == 'AGENCY_CONTACT'
-        self.add_agency_contact(user_id, agency_id, location_id, [])
+        self.add_agency_contact(user_id, agency_id, location_id, position, [])
       elsif role == 'SENIOR_AGENCY_ADMIN' && Ctx.get.permissions.is_admin?
-        self.add_agency_senior_admin(user_id, agency_id)
+        self.add_agency_senior_admin(user_id, agency_id, position)
       else
         errors << ["Invalid role given"]
       end
@@ -166,7 +169,7 @@ class Permissions < BaseStorage
     end
   end
 
-  def self.set_membership_permissions(user_id, location_id, permissions, role)
+  def self.set_membership_permissions(user_id, location_id, permissions, role, position)
     # Permissions being set must be a subset of the permissions available to the
     # user doing the setting.  If `user_id` has other permissions outside of
     # that set, we want to leave them untouched.
@@ -204,6 +207,8 @@ class Permissions < BaseStorage
       if role
         updates[:role] = role
       end
+
+      updates[:position] = position
 
       db[:agency_user]
         .filter(:user_id => user_id, :agency_location_id => location_id)

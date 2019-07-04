@@ -26,7 +26,7 @@ Templates.define(:users, [:paged_users, :q?, :agency_ref?, :agency_label?, :role
 Templates.define(:user_edit, [:user, :errors?], "views/user_form.erb.html")
 Templates.define(:locations, [:paged_results, :q?, :agency_ref?, :agency_label?, :sort?, :params], "views/locations.erb.html")
 Templates.define(:location_edit, [:location, :errors?], "views/location_form.erb.html")
-Templates.define(:location_add_user, [:location, :user, :mode, :role?, :errors?], "views/location_add_user_form.erb.html")
+Templates.define(:location_add_user, [:location, :user, :mode, :role?, :position?, :errors?], "views/location_add_user_form.erb.html")
 Templates.define(:flash_message, [:message], "views/_message.erb.html")
 Templates.define(:header, [:title, [:context]], "views/header.erb.html")
 
@@ -54,5 +54,5 @@ Templates.define(:manage_agency, [:agency_ref], "views/manage_agency.erb.html")
 Templates.define(:manage_system, [], "views/manage_system.erb.html")
 
 Templates.define(:location_edit_user_permissions,
-                 [:user_id, :location_id, :is_top_level, :username, :role, [:existing_permissions], [:available_permissions], :errors?],
+                 [:user_id, :location_id, :is_top_level, :username, :role, :position?, [:existing_permissions], [:available_permissions], :errors?],
                  "views/location_edit_user_permissions.erb.html")
