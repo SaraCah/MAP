@@ -342,7 +342,7 @@ class Locations < BaseStorage
           notifications << Notification.new('location',
                                             notification_data.fetch(:id),
                                             'Location',
-                                            '%s created by %s' % [notification_data.fetch(:name), notification_data.fetch(:created_by)],
+                                            '%s - %s created by %s' % [notification_data.fetch(:agency_label), notification_data.fetch(:name), notification_data.fetch(:created_by)],
                                             'info',
                                             notification_data.fetch(:create_time),
                                             "agent_corporate_entity:#{aspace_agency_id}")
@@ -350,7 +350,7 @@ class Locations < BaseStorage
           notifications << Notification.new('location',
                                             notification_data.fetch(:id),
                                             'Location',
-                                            '%s updated by %s' % [notification_data.fetch(:name), notification_data.fetch(:modified_by)],
+                                            '%s - %s updated by %s' % [notification_data.fetch(:agency_label), notification_data.fetch(:name), notification_data.fetch(:modified_by)],
                                             'info',
                                             notification_data.fetch(:modified_time),
                                             "agent_corporate_entity:#{aspace_agency_id}")
