@@ -275,7 +275,7 @@ class Users < BaseStorage
       notifications << Notification.new(:user,
                                         row[:username],
                                         "User",
-                                        "User updated by %s" % [row[:modified_by]],
+                                        "%s updated by %s" % [row[:username], row[:modified_by]],
                                         'info',
                                         row[:modified_time])
     end
