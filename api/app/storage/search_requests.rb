@@ -39,17 +39,21 @@ class SearchRequests < BaseStorage
   def self.create_from_dto(search_request)
     errors = []
 
-    status = if search_request.fetch('draft')
-               SearchRequest::INACTIVE
-             else
-               SearchRequest::SUBMITTED
-             end
+    status, lodged_by = if search_request.fetch('draft')
+                          [SearchRequest::INACTIVE, nil] 
+                        else
+                          username = Users.name_for(Ctx.username)
+                          position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+
+                          [SearchRequest::SUBMITTED, "%s (%s)" % [username, position]]
+                        end
 
     search_request_id = db[:search_request].insert(details: search_request.fetch('details'),
                                                    date_details: search_request.fetch('date_details', nil),
                                                    purpose: search_request.fetch('purpose', nil),
                                                    draft: search_request.fetch('draft') ? 1 : 0,
                                                    status: status,
+                                                   lodged_by: lodged_by,
                                                    agency_id: Ctx.get.current_location.agency_id,
                                                    agency_location_id: Ctx.get.current_location.id,
                                                    created_by: Ctx.username,
@@ -87,27 +91,37 @@ class SearchRequests < BaseStorage
     status = existing_search_request[:status]
 
     is_draft = search_request.fetch('draft')
+    lodged_by = existing_search_request[:lodged_by]
 
     if existing_search_request[:draft] == 1
       if !is_draft
         status = SearchRequest::SUBMITTED
+
+        username = Users.name_for(Ctx.username)
+        position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+        lodged_by = "%s (%s)" % [username, position]
       end
     else
       is_draft = false
     end
 
+    update_data = {
+      details: search_request.fetch('details'),
+      date_details: search_request.fetch('date_details', nil),
+      purpose: search_request.fetch('purpose', nil),
+      draft: is_draft ? 1 : 0,
+      status: status,
+      lodged_by: lodged_by,
+      lock_version: search_request.fetch('lock_version') + 1,
+      modified_by: Ctx.username,
+      modified_time: java.lang.System.currentTimeMillis,
+      system_mtime: Time.now
+    }
+
     updated = db[:search_request]
                 .filter(id: search_request_id)
                 .filter(lock_version: search_request.fetch('lock_version'))
-                .update(details: search_request.fetch('details'),
-                        date_details: search_request.fetch('date_details', nil),
-                        purpose: search_request.fetch('purpose', nil),
-                        draft: is_draft ? 1 : 0,
-                        status: status,
-                        lock_version: search_request.fetch('lock_version') + 1,
-                        modified_by: Ctx.username,
-                        modified_time: java.lang.System.currentTimeMillis,
-                        system_mtime: Time.now)
+                .update(update_data)
 
     raise StaleRecordException.new if updated == 0
 

@@ -28,6 +28,7 @@ class TransferProposal
   define_field(:agency_id, Integer, required: false)
   define_field(:agency_location_id, Integer, required: false)
   define_field(:transfer_id, Integer, required: false)
+  define_field(:lodged_by, String, required: false)
 
   def self.from_row(row, handle = nil, file_rows = [], series_rows = [], transfer_id = nil)
     new(id: row[:id],
@@ -42,6 +43,7 @@ class TransferProposal
         created_by: row[:created_by],
         create_time: row[:create_time],
         lock_version: row[:lock_version],
+        lodged_by: row[:lodged_by],
 
         handle_id: handle,
         transfer_id: transfer_id)

@@ -39,6 +39,8 @@ class FileIssueRequest
   define_field(:digital_file_issue_id, Integer, required: false)
   define_field(:physical_file_issue_id, Integer, required: false)
 
+  define_field(:lodged_by, String, required: false)
+
   def self.from_hash(hash)
     if hash['urgent'] == 'yes'
       hash['urgent'] = true
@@ -82,6 +84,7 @@ class FileIssueRequest
         aspace_digital_quote_id: row[:aspace_digital_quote_id],
         aspace_physical_quote_id: row[:aspace_physical_quote_id],
         handle_id: handle_id,
+        lodged_by: row[:lodged_by],
         digital_file_issue_id: digital_file_issue_id,
         physical_file_issue_id: physical_file_issue_id)
   end

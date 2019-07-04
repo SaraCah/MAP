@@ -133,6 +133,10 @@ class Users < BaseStorage
     db[:user][:username => username][:id]
   end
 
+  def self.name_for(username)
+    db[:user][:username => username][:name]
+  end
+
   def self.update_from_dto(user)
       updated = db[:user]
                   .filter(id: user.fetch('id'))

@@ -82,6 +82,13 @@ class FileIssues < BaseStorage
       end
     end
 
+    lodged_by = nil
+    unless file_issue_request.fetch('draft')
+      username = Users.name_for(Ctx.username)
+      position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+      lodged_by = "%s (%s)" % [username, position]
+    end
+
     file_issue_request_id = db[:file_issue_request].insert(request_type: file_issue_request.fetch('request_type'),
                                                            urgent: file_issue_request.fetch('urgent') ? 1 : 0,
                                                            preapprove_quotes: file_issue_request.fetch('preapprove_quotes') ? 1 : 0,
@@ -93,6 +100,7 @@ class FileIssues < BaseStorage
                                                            physical_request_status: physical_request_status,
                                                            agency_id: Ctx.get.current_location.agency_id,
                                                            agency_location_id: Ctx.get.current_location.id,
+                                                           lodged_by: lodged_by,
                                                            created_by: Ctx.username,
                                                            create_time: java.lang.System.currentTimeMillis,
                                                            modified_by: Ctx.username,
@@ -171,23 +179,33 @@ class FileIssues < BaseStorage
       end
     end
 
+    update_data = {
+      request_type: file_issue_request.fetch('request_type'),
+      urgent: file_issue_request.fetch('urgent') ? 1 : 0,
+      preapprove_quotes: file_issue_request.fetch('preapprove_quotes') ? 1 : 0,
+      draft: file_issue_request.fetch('draft') ? 1 : 0,
+      digital_request_status: digital_request_status, # assume any change forces a quote redo
+      physical_request_status: physical_request_status, # assume any change forces a quote redo
+      delivery_location: file_issue_request.fetch('delivery_location'),
+      delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
+      request_notes: file_issue_request.fetch('request_notes', nil),
+      version: file_issue_request.fetch('version') + 1,
+      lock_version: file_issue_request.fetch('lock_version') + 1,
+      modified_by: Ctx.username,
+      modified_time: java.lang.System.currentTimeMillis,
+      system_mtime: Time.now
+    }
+
+    unless file_issue_request.fetch('draft') && db[:file_issue_request][id: file_issue_request_id][:draft] == 1
+      username = Users.name_for(Ctx.username)
+      position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+      update_data[:lodged_by] = "%s (%s)" % [username, position]
+    end
+      
     updated = db[:file_issue_request]
                 .filter(id: file_issue_request_id)
                 .filter(lock_version: file_issue_request.fetch('lock_version'))
-                .update(request_type: file_issue_request.fetch('request_type'),
-                        urgent: file_issue_request.fetch('urgent') ? 1 : 0,
-                        preapprove_quotes: file_issue_request.fetch('preapprove_quotes') ? 1 : 0,
-                        draft: file_issue_request.fetch('draft') ? 1 : 0,
-                        digital_request_status: digital_request_status, # assume any change forces a quote redo
-                        physical_request_status: physical_request_status, # assume any change forces a quote redo
-                        delivery_location: file_issue_request.fetch('delivery_location'),
-                        delivery_authorizer: file_issue_request.fetch('delivery_authorizer', nil),
-                        request_notes: file_issue_request.fetch('request_notes', nil),
-                        version: file_issue_request.fetch('version') + 1,
-                        lock_version: file_issue_request.fetch('lock_version') + 1,
-                        modified_by: Ctx.username,
-                        modified_time: java.lang.System.currentTimeMillis,
-                        system_mtime: Time.now)
+                .update(update_data)
 
     raise StaleRecordException.new if updated == 0
 

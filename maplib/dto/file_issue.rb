@@ -33,6 +33,7 @@ class FileIssue
   define_field(:agency_id, Integer, required: false)
   define_field(:agency_location_id, Integer, required: false)
   define_field(:handle_id, Integer, required: false)
+  define_field(:lodged_by, String, required: false)
 
   def self.from_row(row, handle_id = nil, item_rows = [])
     new(id: row[:id],
@@ -52,6 +53,7 @@ class FileIssue
         create_time: row[:create_time],
         lock_version: row[:lock_version],
         items: item_rows.map{|item_row| FileIssueItem.from_row(item_row)},
+        lodged_by: row[:lodged_by],
         handle_id: handle_id)
   end
 

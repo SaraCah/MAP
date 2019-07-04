@@ -56,12 +56,21 @@ class Transfers < BaseStorage
 
     raise "FIXME admin user" if Ctx.get.permissions.is_admin?
 
+    lodged_by = nil
+
+    if transfer.fetch('status') == TransferProposal::STATUS_ACTIVE
+      username = Users.name_for(Ctx.username)
+      position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+      lodged_by = "%s (%s)" % [username, position]
+    end
+
     transfer_proposal_id = db[:transfer_proposal].insert(title: transfer.fetch('title'),
                                                          description: transfer.fetch('description', nil),
                                                          status: transfer.fetch('status'),
                                                          estimated_quantity: transfer.fetch('estimated_quantity', nil),
                                                          agency_id: Ctx.get.current_location.agency_id,
                                                          agency_location_id: Ctx.get.current_location.id,
+                                                         lodged_by: lodged_by,
                                                          created_by: Ctx.username,
                                                          create_time: java.lang.System.currentTimeMillis,
                                                          modified_by: Ctx.username,
@@ -107,17 +116,27 @@ class Transfers < BaseStorage
     transfer_proposal_id = transfer.fetch('id')
     handle = db[:handle][transfer_proposal_id: transfer_proposal_id][:id]
 
+    update_data = {
+      title: transfer.fetch('title'),
+      description: transfer.fetch('description', nil),
+      estimated_quantity: transfer.fetch('estimated_quantity', nil),
+      status: transfer.fetch('status'),
+      lock_version: transfer.fetch('lock_version') + 1,
+      modified_by: Ctx.username,
+      modified_time: java.lang.System.currentTimeMillis,
+      system_mtime: Time.now
+    }
+
+    if transfer.fetch('status') == TransferProposal::STATUS_ACTIVE && db[:transfer_proposal][id: transfer_proposal_id][:status] == TransferProposal::STATUS_INACTIVE
+      username = Users.name_for(Ctx.username)
+      position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+      update_data[:lodged_by] = "%s (%s)" % [username, position]
+    end
+
     updated = db[:transfer_proposal]
                 .filter(id: transfer_proposal_id)
                 .filter(lock_version: transfer.fetch('lock_version'))
-                .update(title: transfer.fetch('title'),
-                        description: transfer.fetch('description', nil),
-                        estimated_quantity: transfer.fetch('estimated_quantity', nil),
-                        status: transfer.fetch('status'),
-                        lock_version: transfer.fetch('lock_version') + 1,
-                        modified_by: Ctx.username,
-                        modified_time: java.lang.System.currentTimeMillis,
-                        system_mtime: Time.now)
+                .update(update_data)
 
     raise StaleRecordException.new if updated == 0
 

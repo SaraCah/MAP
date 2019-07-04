@@ -9,6 +9,7 @@ class Permissions < BaseStorage
                     .filter(Sequel[:agency_user][:user_id] => user_id)
                     .select(Sequel.as(Sequel[:agency_user][:id], :agency_user_id),
                             Sequel.as(Sequel[:agency_user][:role], :role),
+                            Sequel.as(Sequel[:agency_user][:position], :position),
                             Sequel.as(Sequel[:agency][:id], :agency_id),
                             Sequel.as(Sequel[:agency][:aspace_agency_id], :aspace_agency_id),
                             Sequel.as(Sequel[:agency_location][:id], :agency_location_id),

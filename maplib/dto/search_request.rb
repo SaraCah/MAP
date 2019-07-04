@@ -29,6 +29,7 @@ class SearchRequest
   define_field(:version, Integer, required: false)
   define_field(:aspace_quote_id, Integer, required: false)
   define_field(:files, [SearchRequestFile], default: [])
+  define_field(:lodged_by, String, required: false)
 
 
   def self.from_row(row, handle_id = nil, file_rows = [])
@@ -46,6 +47,7 @@ class SearchRequest
         lock_version: row[:lock_version],
         version: row[:version],
         files: file_rows.map{|file_row| SearchRequestFile.from_row(file_row)},
+        lodged_by: row[:lodged_by],
         handle_id: handle_id)
   end
 
