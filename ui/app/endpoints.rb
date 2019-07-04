@@ -425,6 +425,26 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  Endpoint.get('/locations/:id/delete-check')
+    .param(:id, Integer, "ID of agency location") do
+    if response = Ctx.client.location_delete_check(params[:id])
+      Templates.emit(:location_delete_confirmation,
+                     {
+                       location: response['location'],
+                       users_who_would_become_unlinked: response['users_who_would_become_unlinked'],
+                     })
+    else
+      [404]
+    end
+  end
+
+  Endpoint.post('/locations/:id/delete')
+    .param(:id, Integer, "ID of agency location") do
+    Ctx.client.location_delete(params[:id])
+
+    [202]
+  end
+
   Endpoint.get('/locations/:id')
     .param(:id, Integer, "ID of agency location") do
     location = Ctx.client.location_for_edit(params[:id])

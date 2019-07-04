@@ -262,6 +262,14 @@ class MAPAPIClient
     response['errors'] || []
   end
 
+  def location_delete_check(location_id)
+    get("/locations/#{location_id}/delete-check")
+  end
+
+  def location_delete(location_id)
+    post("/locations/#{location_id}/delete")
+  end
+
   def location_for_edit(agency_location_id)
     json = get("/locations/#{agency_location_id}")
 

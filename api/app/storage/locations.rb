@@ -75,6 +75,46 @@ class Locations < BaseStorage
                      max_page)
   end
 
+  # List the users whose only link to a location is `location_id`.
+  def self.list_exclusively_linked_users(location_id)
+    db[:agency_user]
+      .left_join(Sequel.as(:agency_user, :users_with_second_location),
+                 Sequel.&(Sequel.~(Sequel[:agency_user][:agency_location_id] => Sequel[:users_with_second_location][:agency_location_id]),
+                          Sequel[:agency_user][:user_id] => Sequel[:users_with_second_location][:user_id]))
+      .join(:user, Sequel[:user][:id] => Sequel[:agency_user][:user_id])
+      .filter(Sequel[:agency_user][:agency_location_id] => location_id)
+      .filter(Sequel[:users_with_second_location][:user_id] => nil)
+      .select_all(:user)
+      .map {|row| UserDTO.from_row(row)}
+  end
+
+  def self.delete(location_id)
+    # Avoid orphaning users by linking them to the top-level location
+    users_to_rescue = list_exclusively_linked_users(location_id)
+
+    agency_id = db[:agency_location][id: location_id][:agency_id]
+    top_level_location_id = db[:agency_location][agency_id: agency_id, top_level_Location: 1][:id]
+
+    db[:agency_user]
+      .filter(:agency_location_id => location_id,
+              :user_id => users_to_rescue.map {|user| user.fetch('id')})
+      .select(:user_id,
+              :agency_id,
+              :position)
+      .each do |row|
+      Permissions.add_agency_contact(row[:user_id],
+                                     row[:agency_id],
+                                     top_level_location_id,
+                                     row[:position],
+                                     [])
+    end
+
+    # Delete the location and its users
+    db[:agency_user].filter(agency_location_id: location_id).delete
+    db[:agency_location].filter(id: location_id).delete
+  end
+
+
   def self.locations_for_user
     return [] if Ctx.get.permissions.is_admin?
 

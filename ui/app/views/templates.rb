@@ -56,3 +56,7 @@ Templates.define(:manage_system, [], "views/manage_system.erb.html")
 Templates.define(:location_edit_user_permissions,
                  [:user_id, :location_id, :is_top_level, :username, :role, :position?, [:existing_permissions], [:available_permissions], :errors?],
                  "views/location_edit_user_permissions.erb.html")
+
+Templates.define(:location_delete_confirmation,
+                 [:location, :users_who_would_become_unlinked],
+                 "views/location_delete_confirmation.erb.html")

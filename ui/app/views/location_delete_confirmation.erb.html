@@ -1,0 +1,39 @@
+<div class="row">
+    <h4>Deleting location: <%= location.fetch('name') %></h4>
+
+    <form class="col s12" action='/locations/<%= location.fetch('id') %>/delete' method="post">
+        <%== FormHelper.hidden_authenticity_token %>
+
+        <p>You are about to delete the location "<emph><%= location.fetch('name') %></emph>".  <b>This action cannot be reversed</b>.</p>
+
+        <% unless users_who_would_become_unlinked.empty? %>
+            <p>The following users are not attached to any other location.  Once this location is deleted, they will be attached as contacts to the default location for this agency.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users_who_would_become_unlinked.each do |user| %>
+                        <tr>
+                            <td><%= user.fetch('username') %></td>
+                            <td><%= user.fetch('name') %></td>
+                            <td><%= user.fetch('email') %></td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        </ul>
+        <% end %>
+
+        <p>To confirm that this location should be deleted, click the button below.</p>
+
+        <div class="col s12">
+            <button type="submit" class="btn red">Delete location</button>
+        </div>
+    </form>
+</div>

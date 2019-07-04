@@ -197,6 +197,29 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.get('/locations/:id/delete-check')
+    .param(:id, Integer, "The location ID to check") do
+    location = Locations.dto_for(params[:id])
+
+    if Ctx.get.permissions.can_manage_locations?(location.fetch('agency_ref'))
+      json_response("location" => location,
+                    "users_who_would_become_unlinked" => Locations.list_exclusively_linked_users(params[:id]))
+    else
+      [404]
+    end
+  end
+
+  Endpoint.post('/locations/:id/delete')
+    .param(:id, Integer, "The location ID to check") do
+    location = Locations.dto_for(params[:id])
+
+    if Ctx.get.permissions.can_manage_locations?(location.fetch('agency_ref'))
+      Locations.delete(params[:id])
+      json_response("status" => "deleted")
+    else
+      [404]
+    end
+  end
 
   Endpoint.get('/locations/:id')
     .param(:id, Integer, "ID of agency location") do

@@ -67,6 +67,7 @@ Vue.component('manage-agency', {
                 <div class="right">
                   <button v-if="location.is_location_editable" @click.prevent.default="addUserToLocation(location.location)" class="btn btn-small">Add user to location</button>
                   <button v-if="location.is_location_editable" @click.prevent.default="editLocation(location.location)" class="btn btn-small">Edit location</button>
+                  <button v-if="location.is_location_editable && !location.location.is_top_level" @click.prevent.default="deleteLocation(location.location)" class="btn btn-small red">Delete location</button>
                 </div>
                 <h5>{{location.location.name}}</h5>
                 <table class="highlight" v-if="location.members.length > 0">
@@ -211,6 +212,14 @@ Vue.component('manage-agency', {
                 },
             });
         },
+        deleteLocation: function(location: Location) {
+            this.ajaxFormModal('/locations/' + location.id + '/delete-check', {
+                params: {},
+                successCallback: () => {
+                    this.refreshAgency();
+                },
+            });
+        },
         editPermissions: function(location: Location, member: Member) {
             this.ajaxFormModal('/permissions/edit', {
                 params: {
@@ -246,9 +255,8 @@ Vue.component('manage-agency', {
                     });
                 });
             }, () => {
-                // failed
+                UI.genericModal("A system error has occurred");
             });
-
         },
         editUser: function(username: string) {
             this.ajaxFormModal('/users/edit', {
