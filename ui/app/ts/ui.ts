@@ -30,6 +30,10 @@ export default class UI {
             node = content;
         }
 
+        if (!opts) {
+            opts = {};
+        }
+
         // Clear any previous modals
         document.querySelectorAll('.modal-generated-elt').forEach(function(elt) {
             if (elt.parentNode) {
