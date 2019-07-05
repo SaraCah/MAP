@@ -18,7 +18,9 @@ export default class UI {
         M.Modal.init(modal).open();
     }
 
-    public static genericHTMLModal(content: HTMLElement | string, modalClasses?: string[]): [any, HTMLElement] {
+    public static genericHTMLModal(content: HTMLElement | string,
+                                   modalClasses?: string[],
+                                   opts?: any) {
         let node: HTMLElement | null = null;
 
         if (typeof(content) === 'string') {
@@ -69,9 +71,15 @@ export default class UI {
 
         document.body.appendChild(modal);
 
-        const modalObj = M.Modal.init(modal);
-        modalObj.open();
+        const modalOptions: any = {};
 
-        return [modalObj, contentContainer];
+        if (opts.onReady) {
+            modalOptions.onOpenEnd = function () {
+                opts.onReady(modalObj, contentContainer);
+            }
+        }
+
+        const modalObj = M.Modal.init(modal, modalOptions);
+        modalObj.open();
     }
 }

@@ -22,20 +22,19 @@ Vue.component('manage-current-user', {
                 method: 'GET',
                 params: opts.params || {},
             }).then((response: any) => {
-                const modalAndContentObj = UI.genericHTMLModal(response.body, ['manage-agency-modal']);
+                UI.genericHTMLModal(response.body,
+                                    ['manage-agency-modal'],
+                                    {
+                                        onReady: function (modal: any, contentPane: HTMLElement) {
+                                            new AjaxForm(contentPane, () => {
+                                                modal.close();
 
-                const modal = modalAndContentObj[0];
-                const contentPane = modalAndContentObj[1];
-
-                setTimeout(function () {
-                    new AjaxForm(contentPane, () => {
-                        modal.close();
-
-                        if (opts.successCallback) {
-                            opts.successCallback();
-                        }
-                    });
-                });
+                                                if (opts.successCallback) {
+                                                    opts.successCallback();
+                                                }
+                                            });
+                                        }
+                                    });
             }, () => {
                 // failed
             });
