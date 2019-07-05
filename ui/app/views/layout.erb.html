@@ -44,6 +44,7 @@
          require.config({
              baseUrl: "/js",
              urlArgs: "<%= URLHelper.cb %>",
+             waitSeconds: <%= MAPTheApp.development? ? 10 : 0 %>,
              bundles: <%== JSBundle.requirejs_bundle_defs %>
          });
 
