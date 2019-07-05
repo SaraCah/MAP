@@ -28,27 +28,6 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.get('/users')
-    .param(:q, String, "Search string", optional: true)
-    .param(:agency_ref, String, "Search agency ref", optional: true)
-    .param(:role, String, "Search role", optional: true)
-    .param(:sort, String, "Sort string", optional: true)
-    .param(:page, Integer, "Page to return") do
-    if Ctx.user_logged_in?
-      if Ctx.get.permissions.is_admin?
-        json_response(Users.all(params[:page], AppConfig[:page_size], params[:q], params[:agency_ref], params[:role], params[:sort]))
-      elsif Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)
-        json_response(Users.for_agency(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id, params[:q], params[:role], params[:sort]))
-      elsif Ctx.get.permissions.is_agency_admin?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-        json_response(Users.for_agency_location(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id, Ctx.get.current_location.id, params[:q], params[:role], params[:sort]))
-      else
-        [404]
-      end
-    else
-      [404]
-    end
-  end
-
   Endpoint.post('/users/create')
     .param(:user, UserDTO, "User") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_create_users?(Ctx.get.current_location ? Ctx.get.current_location.agency_ref : nil)
@@ -107,20 +86,6 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.get('/search/agencies')
-    .param(:q, String, "Search string") do
-    # FIXME: Users.permissions_for_user -> Ctx.get.permissions?
-    permissions = Users.permissions_for_user(Ctx.username)
-    json_response(Search.agency_typeahead(params[:q], permissions))
-  end
-
-  Endpoint.get('/search/representations')
-    .param(:q, String, "Search string") do
-    # FIXME: Users.permissions_for_user -> Ctx.get.permissions?
-    permissions = Users.permissions_for_user(Ctx.username)
-    json_response(Search.representation_typeahead(params[:q], permissions))
-  end
-
   Endpoint.get('/search/get_record')
     .param(:record_ref, String, "Record reference (SOLR doc id)") do
     # FIXME: Users.permissions_for_user -> Ctx.get.permissions?
@@ -139,40 +104,6 @@ class MAPTheAPI < Sinatra::Base
       json_response(Users.permissions_for_user(Ctx.username))
     else
       json_response([])
-    end
-  end
-
-  Endpoint.get('/locations')
-    .param(:q, String, "Search string", optional: true)
-    .param(:agency_ref, String, "Search agency id", optional: true)
-    .param(:sort, String, "Sort string", optional: true)
-    .param(:page, Integer, "Page to return") do
-    if Ctx.user_logged_in?
-      if Ctx.get.permissions.is_admin?
-        json_response(Locations.all(params[:page], AppConfig[:page_size], params[:q], params[:agency_ref], params[:sort]))
-      elsif Ctx.get.permissions.is_senior_agency_admin?(Ctx.get.current_location.agency_id)
-        json_response(Locations.for_agency(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id, params[:q], params[:sort]))
-      elsif Ctx.get.permissions.is_agency_admin?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-        json_response(Locations.for_agency_location(params[:page], AppConfig[:page_size], Ctx.get.current_location.agency_id, Ctx.get.current_location.id, params[:q], params[:sort]))
-      else
-        [404]
-      end
-    else
-      [404]
-    end
-  end
-
-  Endpoint.get('/locations_for_agency')
-    .param(:agency_ref, String, "Agency Ref") do
-    if Ctx.user_logged_in?
-      (_, aspace_agency_id) =  params[:agency_ref].split(':')
-      if Ctx.get.permissions.is_admin? || Ctx.get.permissions.agency_roles.any?{|role| role.aspace_agency_id == Integer(aspace_agency_id)}
-        json_response(Locations.locations_for_agency(aspace_agency_id))
-      else
-        [404]
-      end
-    else
-      [404]
     end
   end
 
@@ -311,18 +242,6 @@ class MAPTheAPI < Sinatra::Base
       json_response({})
     end
   end
-
-  Endpoint.get('/agency')
-    .param(:agency_ref, String, "Agency Ref") do
-    if Ctx.user_logged_in? && Ctx.get.permissions.is_admin?
-      (_, aspace_agency_id) =  params[:agency_ref].split(':')
-      agencies = Agencies.aspace_agencies([aspace_agency_id.to_i])
-      json_response(agencies.fetch(aspace_agency_id.to_i))
-    else
-      [403]
-    end
-  end
-
   Endpoint.get('/agencies-for-current-user')
     .param(:q, String, "Query string", :optional => true)
     .param(:page, Integer, "Page to fetch (zero-indexed)") do

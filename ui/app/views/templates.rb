@@ -22,9 +22,7 @@ Templates.define(:login, [:username?, :message?], "views/login.erb.html")
 
 Templates.define(:records, [:agency?, :location?], "views/records.erb.html")
 
-Templates.define(:users, [:paged_users, :q?, :agency_ref?, :agency_label?, :role?, :sort?, :params], "views/users.erb.html")
 Templates.define(:user_edit, [:user, :errors?], "views/user_form.erb.html")
-Templates.define(:locations, [:paged_results, :q?, :agency_ref?, :agency_label?, :sort?, :params], "views/locations.erb.html")
 Templates.define(:location_edit, [:location, :errors?], "views/location_form.erb.html")
 Templates.define(:location_add_user, [:location, :user, :mode, :role?, :position?, :errors?], "views/location_add_user_form.erb.html")
 Templates.define(:flash_message, [:message], "views/_message.erb.html")

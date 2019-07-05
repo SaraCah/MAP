@@ -11,8 +11,6 @@ import 'file-issue-form';
 import 'file-issue-requests-search';
 import 'file-issues-search';
 import 'file-uploader';
-import 'linker';
-import 'locations-search';
 import 'manage-agency';
 import 'manage-current-user';
 import 'manage-system';
@@ -24,7 +22,6 @@ import 'service-quote';
 import 'transfer-proposal-series';
 import 'transfers-search';
 import 'user-for-location-picker';
-import 'users-search';
 
 declare var M: any; // Materialize on the window context
 

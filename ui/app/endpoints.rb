@@ -97,30 +97,6 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
-  Endpoint.get('/users')
-    .param(:q, String, "Search string", optional: true)
-    .param(:agency_ref, String, "Search agency id", optional: true)
-    .param(:role, String, "Search role", optional: true)
-    .param(:sort, String, "Sort string", optional: true)
-    .param(:page, Integer, "Page to return", optional: true) do
-
-      agency_label = if params[:agency_ref] && params[:agency_ref] != '' && Ctx.permissions.is_admin?
-                        agency = Ctx.client.agency(params[:agency_ref])
-                        agency.label if agency
-                     end
-
-      Templates.emit_with_layout(:users, {
-                                   paged_users: Ctx.client.users(params[:page] || 0, params[:q], params[:agency_ref], params[:role], params[:sort]),
-                                   q: params[:q],
-                                   agency_ref: params[:agency_ref],
-                                   agency_label: agency_label,
-                                   role: params[:role],
-                                   sort: params[:sort],
-                                   params: params,
-                                 },
-                                 :layout, title: "Users", context: ['users'])
-  end
-
   Endpoint.get('/users/new-admin') do
     if Ctx.permissions.is_admin?
       user = UserDTO.new
@@ -331,15 +307,6 @@ class MAPTheApp < Sinatra::Base
     redirect '/'
   end
 
-  Endpoint.get('/search/agencies')
-    .param(:q, String, "Search string") do
-    [
-      200,
-      {'Content-type' => 'text/json'},
-      Ctx.client.agency_typeahead(params[:q]).to_json
-    ]
-  end
-
   Endpoint.get('/agencies')
     .param(:q, String, "Search string", optional: true)
     .param(:page, Integer, "Page to return", optional: true) do
@@ -375,32 +342,6 @@ class MAPTheApp < Sinatra::Base
         {'Content-Type' => 'text/json'},
         Ctx.client.agency_for_edit(params[:agency_ref]).to_json
       ]
-    else
-      [404]
-    end
-  end
-
-  Endpoint.get('/locations')
-    .param(:q, String, "Search string", optional: true)
-    .param(:agency_ref, String, "Search agency id", optional: true)
-    .param(:sort, String, "Sort string", optional: true)
-    .param(:page, Integer, "Page to return", optional: true) do
-
-    if Ctx.permissions.allow_manage_locations?
-      agency_label = if params[:agency_ref] && params[:agency_ref] != '' && Ctx.permissions.is_admin?
-                       agency = Ctx.client.agency(params[:agency_ref])
-                       agency.label if agency
-                     end
-
-      Templates.emit_with_layout(:locations, {
-                                   paged_results: Ctx.client.locations(params[:page] || 0, params[:q], params[:agency_ref], params[:sort]),
-                                   q: params[:q],
-                                   agency_ref: params[:agency_ref],
-                                   agency_label: agency_label,
-                                   sort: params[:sort],
-                                   params: params,
-                                 },
-                                 :layout, title: "Locations", context: ['locations'])
     else
       [404]
     end
@@ -496,23 +437,6 @@ class MAPTheApp < Sinatra::Base
       [202]                     # AJAX form success 
     else
       Templates.emit(:location_edit, {location: params[:location], errors: errors})
-    end
-  end
-
-  Endpoint.get('/linker_data_for_agency')
-    .param(:agency_ref, String, "Agency Ref") do
-    if Ctx.permissions.is_admin?
-      [
-        200,
-        {'Content-type' => 'text/json'},
-        {
-          'location_options' => Ctx.client.locations_for_agency(params[:agency_ref]).map(&:to_search_result),
-          # FIXME some shared lib?
-          'permission_options' => Ctx.client.permission_options
-        }.to_json
-      ]
-    else
-      [404]
     end
   end
 
@@ -886,15 +810,6 @@ class MAPTheApp < Sinatra::Base
                                          params[:request_type])
 
     redirect "/file-issue-requests/#{params[:id]}"
-  end
-
-  Endpoint.get('/search/representations')
-    .param(:q, String, "Search string") do
-    [
-      200,
-      {'Content-type' => 'text/json'},
-      Ctx.client.representation_typeahead(params[:q]).to_json
-    ]
   end
 
   Endpoint.get('/resolve/representations')

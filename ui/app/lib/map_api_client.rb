@@ -189,20 +189,6 @@ class MAPAPIClient
     end
   end
 
-
-  def users(page = 0, q = nil, agency_ref = nil, role = nil, sort = nil)
-    data = {
-      page: page
-    }
-
-    data[:q] = q unless q.nil? || q == ''
-    data[:agency_ref] = agency_ref unless agency_ref.nil? || agency_ref == ''
-    data[:role] = role unless role.nil? || role == ''
-    data[:sort] = sort unless sort.nil? || sort == ''
-
-    PagedResults.from_json(get('/users', data), User)
-  end
-
   def users_candidates_for_location(location_id, q = nil, sort = nil, page = 0, page_size = 5)
     data = {
       location_id: location_id,
@@ -283,15 +269,6 @@ class MAPAPIClient
     response['errors'] || []
   end
 
-  def agency_typeahead(q)
-    get('/search/agencies', q: q)
-  end
-
-
-  def representation_typeahead(q)
-    get('/search/representations', q: q)
-  end
-
   def find_record(record_ref)
     get('/search/get_record', record_ref: record_ref)
   end
@@ -300,12 +277,6 @@ class MAPAPIClient
     return nil if Ctx.get.permissions.is_admin?
     Agency.from_json(get('/my-agency', {}))
   end
-
-  def agency(agency_ref)
-    return nil unless Ctx.get.permissions.is_admin?
-    Agency.from_json(get('/agency', agency_ref: agency_ref))
-  end
-
   def get_controlled_records(q, filters, sort, start_date, end_date, page, page_size)
     return { results: [], facets: {}} if Ctx.get.permissions.is_admin?
 
@@ -338,27 +309,6 @@ class MAPAPIClient
 
     def to_json(*args)
       to_h.to_json
-    end
-  end
-
-  def locations(page = 0, q = nil , agency_ref = nil, sort = nil)
-    data = {
-      page: page
-    }
-
-    data[:q] = q unless q.nil? || q == ''
-    data[:agency_ref] = agency_ref unless agency_ref.nil? || agency_ref == ''
-    data[:sort] = sort unless sort.nil? || sort == ''
-
-
-    PagedResults.from_json(get('/locations', data), AgencyLocation)
-  end
-
-  def locations_for_agency(agency_ref)
-    get('/locations_for_agency', {
-      'agency_ref' => agency_ref,
-    }).map do |json|
-      AgencyLocation.from_json(json)
     end
   end
 
