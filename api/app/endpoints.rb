@@ -266,6 +266,14 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.post('/remove-membership')
+    .param(:user_id, Integer, "User ID")
+    .param(:location_id, Integer, "Location ID") do
+
+    Permissions.remove_membership(params[:user_id], params[:location_id])
+    json_response({})
+  end
+
   Endpoint.post('/location-membership/set-permissions')
     .param(:user_id, Integer, "User ID")
     .param(:location_id, Integer, "Location ID")

@@ -161,10 +161,27 @@ class Permissions < BaseStorage
 
       permissions = AVAILABLE_PERMISSIONS.select {|permission| row[permission] == 1}
 
+      # A membership can be removed if it's not the only link this user has
+      is_removable = db[:agency_user]
+                       .filter(:user_id => user_id)
+                       .filter(Sequel.~(:agency_location_id => location_id))
+                       .count > 0
+
       Membership.new(user_id: user_id,
                      agency_id: agency_id,
                      location_id: location_id,
-                     permissions: permissions)
+                     permissions: permissions,
+                     removable: is_removable)
+    else
+      nil
+    end
+  end
+
+  def self.remove_membership(user_id, location_id)
+    agency_id = db[:agency_location].filter(:id => location_id).get(:agency_id)
+
+    if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_agency_admin?(agency_id, location_id)
+      db[:agency_user].filter(user_id: user_id, agency_location_id: location_id).delete
     else
       nil
     end
@@ -195,7 +212,6 @@ class Permissions < BaseStorage
         # Unknown role
         role = nil
       end
-      
 
       row = db[:agency_user][:user_id => user_id, :agency_location_id => location_id]
 

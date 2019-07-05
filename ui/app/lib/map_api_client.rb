@@ -395,6 +395,12 @@ class MAPAPIClient
     Membership.from_hash(json)
   end
 
+  def remove_membership(location_id, user_id)
+    post('/remove-membership',
+         location_id: location_id,
+         user_id: user_id)
+  end
+
   def transfer_proposals(page = 0, status = nil, sort = nil)
     data = {
       page: page

@@ -46,6 +46,8 @@ window.MAP = {
 
         M.ScrollSpy.init(document.querySelectorAll('.scrollspy'));
         M.Dropdown.init(document.querySelectorAll('.menu-dropdown'), {constrainWidth: false, coverTrigger: false});
+        M.Tooltip.init(document.querySelectorAll('.tooltipped'));
+
 
         document.querySelectorAll('.tabs').forEach(function (elt: Element) {
             M.Tabs.init(elt, {});

@@ -5,5 +5,6 @@ class Membership
   define_field(:agency_id, Integer)
   define_field(:location_id, Integer)
   define_field(:permissions, [String], default: [])
+  define_field(:removable, Boolean)
 end
 

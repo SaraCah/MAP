@@ -264,6 +264,15 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  Endpoint.post('/permissions/remove')
+    .param(:user_id, Integer, "User ID")
+    .param(:location_id, Integer, "Location ID") do
+    Ctx.client.remove_membership(params[:location_id], params[:user_id])
+
+    [202]
+  end
+
+
   Endpoint.get('/permissions/edit')
     .param(:user_id, Integer, "User ID")
     .param(:location_id, Integer, "Location ID")
@@ -296,6 +305,7 @@ class MAPTheApp < Sinatra::Base
                          username: params[:username],
                          role: params[:role],
                          position: params[:position],
+                         removable_from_location: membership.fetch('removable'),
                        })
       end
     end
