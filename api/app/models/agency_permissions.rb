@@ -9,7 +9,9 @@ AgencyPermissions = Struct.new(:is_admin, :agency_roles) do
   end
 
   def position_for(agency_ref, location_id)
-    agency_role = self.agency_roles.detect{|agency_role| agency_role.agency_ref == agency_ref && agency_role.agency_location_id == location_id}
+    agency_role = self.agency_roles.detect{|agency_role| agency_role.agency_ref == agency_ref &&
+                                           (agency_role.agency_location_id == location_id ||
+                                            agency_role.role == 'SENIOR_AGENCY_ADMIN')}
     agency_role.position
   end
 
