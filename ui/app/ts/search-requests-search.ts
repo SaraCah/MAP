@@ -1,6 +1,5 @@
 /// <amd-module name='search-requests-search'/>
 
-
 import Vue from "vue";
 import VueResource from "vue-resource";
 Vue.use(VueResource);
@@ -37,7 +36,7 @@ Vue.component('search-requests-search', {
                         </div>
                     </div>
                 </div>
-               <div class="row">
+                <div class="row">
                     <div class="col s12">
                         <button class="btn btn-small">Search Requests</button>
                         <a href="/search-requests" class="btn btn-small">Reset</a>

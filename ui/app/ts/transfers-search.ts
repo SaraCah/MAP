@@ -1,6 +1,5 @@
 /// <amd-module name='transfers-search'/>
 
-
 import Vue from "vue";
 import VueResource from "vue-resource";
 Vue.use(VueResource);
@@ -39,7 +38,7 @@ Vue.component('transfers-search', {
                         </div>
                     </div>
                 </div>
-               <div class="row">
+                <div class="row">
                     <div class="col s12">
                         <button class="btn btn-small">Search Transfers</button>
                         <a :href="path" class="btn btn-small">Reset</a>

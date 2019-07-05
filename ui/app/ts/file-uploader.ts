@@ -86,18 +86,18 @@ Vue.component('file-uploader', {
                             <td>{{file.created_by}}</td>
                             <td>{{formatTime(file.create_time)}}</td>
                             <td>
-                              <template v-if="file.role !== 'IMPORT'">
-                                  N/A
-                              </template>
-                              <template v-else-if="is_valid(file.key)">
-                                Validated
-                              </template>
-                              <template v-else-if="is_not_yet_validated(file.key)">
-                                Pending
-                              </template>
-                              <template v-else>
-                                <a href="#" @click.prevent="showErrors(file.key)">Contains Errors</a>
-                              </template>
+                                <template v-if="file.role !== 'IMPORT'">
+                                    N/A
+                                </template>
+                                <template v-else-if="is_valid(file.key)">
+                                    Validated
+                                </template>
+                                <template v-else-if="is_not_yet_validated(file.key)">
+                                    Pending
+                                </template>
+                                <template v-else>
+                                    <a href="#" @click.prevent="showErrors(file.key)">Contains Errors</a>
+                                </template>
                             </td>
                             <td>
                                 <a class="btn" target="_blank" :href="'/file-download?key=' + encodeURIComponent(file.key) + '&filename=' + encodeURIComponent(file.filename) + '&mime_type=' + encodeURIComponent(file.mime_type)">Download</a>

@@ -4,10 +4,7 @@
 import Vue from "vue";
 import VueResource from "vue-resource";
 import Utils from "./utils";
-// import UI from "./ui";
 Vue.use(VueResource);
-// import Utils from "./utils";
-// import UI from "./ui";
 
 interface SeriesMetadata {
     series_title?: string;

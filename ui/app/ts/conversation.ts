@@ -35,16 +35,16 @@ Vue.component('conversation', {
 </div>
 `,
     data: function():
-        {
-            messages: Message[],
-            busy: boolean,
-            message: string,
-        } {
-            return {
-                messages: [],
-                busy: false,
-                message: '',
-            };
+    {
+        messages: Message[],
+        busy: boolean,
+        message: string,
+    } {
+        return {
+            messages: [],
+            busy: false,
+            message: '',
+        };
     },
     props: {
         handle_id: String,

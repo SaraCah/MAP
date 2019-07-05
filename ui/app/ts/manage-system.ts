@@ -26,47 +26,47 @@ interface Administrator {
 Vue.component('manage-system', {
     template: `
 <div>
-  <div class="row">
-    <div class="col s12 m9 l10">
-      <section id="administrators" class="scrollspy section">
-        <div class="card">
-          <div class="card-content">
-            <button @click.prevent.default="addAdmin()" class="btn right">Add new administrator</button>
+    <div class="row">
+        <div class="col s12 m9 l10">
+            <section id="administrators" class="scrollspy section">
+                <div class="card">
+                    <div class="card-content">
+                        <button @click.prevent.default="addAdmin()" class="btn right">Add new administrator</button>
 
-            <h4>Administrators</h4>
+                        <h4>Administrators</h4>
 
-            <table>
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="admin in administrators" :class="admin.is_inactive ? 'grey-text' : ''">
-                  <td>{{admin.username}}</td>
-                  <td>{{admin.name}}</td>
-                  <td>{{admin.email}}</td>
-                  <td>
-                    <button class="btn btn-small right" @click.prevent.default="editUser(admin.username)">Edit User</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="admin in administrators" :class="admin.is_inactive ? 'grey-text' : ''">
+                                    <td>{{admin.username}}</td>
+                                    <td>{{admin.name}}</td>
+                                    <td>{{admin.email}}</td>
+                                    <td>
+                                        <button class="btn btn-small right" @click.prevent.default="editUser(admin.username)">Edit User</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <pre>{{this.agency}}</pre>
         </div>
-      </section>
-
-      <pre>{{this.agency}}</pre>
+        <div class="col hide-on-small-only m3 l2">
+            <ul class="section table-of-contents">
+                <li><a href="#administrators">Administrators</a></li>
+            </ul>
+        </div>
     </div>
-    <div class="col hide-on-small-only m3 l2">
-      <ul class="section table-of-contents">
-        <li><a href="#administrators">Administrators</a></li>
-      </ul>
-    </div>
-  </div>
 </div>
 `,
     data: function(): State {

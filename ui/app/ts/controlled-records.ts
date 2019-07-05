@@ -56,148 +56,148 @@ interface SearchState {
 Vue.component('controlled-records', {
     template: `
 <div class="record-search">
-  <div class="card" v-if="!initialised">
-  </div>
-  <div class="card" v-else-if="records.length === 0 && browseMode">
-    <div class="card-content">
-      <span class="card-title">No controlled records</span>
-      <p>Your agency does not currently control any records.</p>
+    <div class="card" v-if="!initialised">
     </div>
-  </div>
-  <div class="card" v-else>
-    <div class="card-content">
-      <div class="row">
-        <span class="card-title">{{title}}</span>
-
-        <div class="search-box">
-          <form v-on:submit.stop.prevent="search()">
-            <section class="row" v-if="this.selectedSeriesId && this.selectedSeriesLabel">
-                <div class="col s12">
-                    <blockquote>Searching within series: {{selectedSeriesLabel}} [<a href="javascript:void(0);" @click="reset({clearSeries: true})">reset</a>]</blockquote>
-                </div>
-            </section>
-
-            <section class="row">
-                <div class="col s12 m12 l6">
-                    <div class="input-field">
-                        <label for="q">Search for keywords/identifiers</label>
-                        <input type="text" id="q" name="q"></input>
-                    </div>
-                </div>
-                <div class="col s12 m12 l6">
-                  <span class="map-hide-on-phone" style="padding-right: 1em;">between</span>
-                  <div class="input-field inline">
-                    <label for="start_date">Start date</label>
-                    <input type="text" size="10" id="start_date" name="start_date"></input>
-                    <span class="helper-text">YYYY-MM-DD</span>
-                  </div>
-                  <div class="input-field inline">
-                    <label for="end_date">End date</label>
-                    <input type="text" size="10" id="end_date" name="end_date"></input>
-                    <span class="helper-text">YYYY-MM-DD</span>
-                  </div>
-                </div>
-            </section>
-
+    <div class="card" v-else-if="records.length === 0 && browseMode">
+        <div class="card-content">
+            <span class="card-title">No controlled records</span>
+            <p>Your agency does not currently control any records.</p>
+        </div>
+    </div>
+    <div class="card" v-else>
+        <div class="card-content">
             <div class="row">
-                <div class="col s12">
-                    <button class="btn">Search</button>
-                    <button class="btn" v-on:click.stop.prevent="reset()">Reset</button>
+                <span class="card-title">{{title}}</span>
+
+                <div class="search-box">
+                    <form v-on:submit.stop.prevent="search()">
+                        <section class="row" v-if="this.selectedSeriesId && this.selectedSeriesLabel">
+                            <div class="col s12">
+                                <blockquote>Searching within series: {{selectedSeriesLabel}} [<a href="javascript:void(0);" @click="reset({clearSeries: true})">reset</a>]</blockquote>
+                            </div>
+                        </section>
+
+                        <section class="row">
+                            <div class="col s12 m12 l6">
+                                <div class="input-field">
+                                    <label for="q">Search for keywords/identifiers</label>
+                                    <input type="text" id="q" name="q"></input>
+                                </div>
+                            </div>
+                            <div class="col s12 m12 l6">
+                                <span class="map-hide-on-phone" style="padding-right: 1em;">between</span>
+                                <div class="input-field inline">
+                                    <label for="start_date">Start date</label>
+                                    <input type="text" size="10" id="start_date" name="start_date"></input>
+                                    <span class="helper-text">YYYY-MM-DD</span>
+                                </div>
+                                <div class="input-field inline">
+                                    <label for="end_date">End date</label>
+                                    <input type="text" size="10" id="end_date" name="end_date"></input>
+                                    <span class="helper-text">YYYY-MM-DD</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <div class="row">
+                            <div class="col s12">
+                                <button class="btn">Search</button>
+                                <button class="btn" v-on:click.stop.prevent="reset()">Reset</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <template v-if="records.length === 0">
+                    <div class="no-results">
+                        <span class="card-title">No results found</span>
+                        <p>Your search did not match any results.</p>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="row">
+                        <div class="col s12 m12 l2 search-tools">
+                            <section class="sort-selector">
+                                <p>Sort by</p>
+                                <select id="select_sort" v-model='selectedSort' class="browser-default">
+                                    <option value="relevance">Relevance</option>
+                                    <option value="title_asc">Title A-Z</option>
+                                    <option value="title_desc">Title Z-A</option>
+                                    <option value="agency_asc">Agency Identifier A-Z</option>
+                                    <option value="agency_desc">Agency Identifier Z-A</option>
+                                    <option value="qsaid_asc">QSA Identifier A-Z</option>
+                                    <option value="qsaid_desc">QSA Identifier Z-A</option>
+                                </select>
+                            </section>
+
+                            <div class="row">
+                                <template v-for="filter in this.availableFilters">
+                                    <div class="col s4 m4 l12 facet-section" v-if="facets[filter.field] && facets[filter.field].length > 0">
+                                        <span class="facet-title">{{filter.title}}</span>
+                                        <table class="facets-table">
+                                            <tr v-for="(facet, idx) in facets[filter.field]">
+                                                <td v-if="isFilterApplied(facet) || facets[filter.field].length === 1" class="facet-value">
+                                                    {{facet.label}}
+                                                </td>
+                                                <td v-else class="facet-value">
+                                                    <a href="javascript:void(0);" @click.prevent.default="addFilter(facet)">{{facet.label}}</a>
+                                                </td>
+                                                <td class="facet-count" v-if="isFilterApplied(facet)"><a href="javascript:void(0)" @click.prevent.default="removeFilter(facet)"><i class="fa fa-times"></i></a></td>
+                                                <td v-else class="facet-count">{{facet.count}}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </template>
+                            </div>
+
+                        </div>
+                        <div class="col s12 m12 l9 search-results">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Title</th>
+                                        <th></th>
+                                        <th>Agency Identifier</th>
+                                        <th>QSA Identifier</th>
+                                        <th>Representations</th>
+                                        <th style="width: 18em"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="record in records">
+                                        <td>{{record.type}}</td>
+                                        <td>{{record.title}}</td>
+                                        <td><span class="badge" v-if="record.under_movement">under movement</span></td>
+                                        <td>{{record.agency_assigned_id}}</td>
+                                        <td>{{record.type}} {{record.qsa_id}}</td>
+                                        <td>
+                                            <span v-if="record.types.indexOf('representation') < 0">
+                                                {{record.physical_representations_count}} physical; {{record.digital_representations_count}} digital
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0);" @click="searchWithinSeries(record)" v-if="record.primary_type === 'resource' && !selectedSeriesId">Search&nbsp;within&nbsp;series</a>
+                                            <slot name="record_actions" v-bind:record="record"></slot>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <div class="row">
+                <div class="col s12 center-align">
+                    <a :style="showPrevPage ? 'visibility: visible' : 'visibility: hidden'" href="javascript:void(0)" v-on:click.stop.prevent="prevPage()"><i class="fa fa-chevron-left"></i> Previous</a>
+                    <a :style="showNextPage ? 'visibility: visible' : 'visibility: hidden'" href="javascript:void(0)" v-on:click.stop.prevent="nextPage()">Next <i class="fa fa-chevron-right"></i></a>
                 </div>
             </div>
-          </form>
         </div>
-
-        <template v-if="records.length === 0">
-          <div class="no-results">
-          <span class="card-title">No results found</span>
-          <p>Your search did not match any results.</p>
-          </div>
-        </template>
-        <template v-else>
-          <div class="row">
-            <div class="col s12 m12 l2 search-tools">
-              <section class="sort-selector">
-                <p>Sort by</p>
-                <select id="select_sort" v-model='selectedSort' class="browser-default">
-                  <option value="relevance">Relevance</option>
-                  <option value="title_asc">Title A-Z</option>
-                  <option value="title_desc">Title Z-A</option>
-                  <option value="agency_asc">Agency Identifier A-Z</option>
-                  <option value="agency_desc">Agency Identifier Z-A</option>
-                  <option value="qsaid_asc">QSA Identifier A-Z</option>
-                  <option value="qsaid_desc">QSA Identifier Z-A</option>
-                </select>
-              </section>
-
-              <div class="row">
-                <template v-for="filter in this.availableFilters">
-                  <div class="col s4 m4 l12 facet-section" v-if="facets[filter.field] && facets[filter.field].length > 0">
-                    <span class="facet-title">{{filter.title}}</span>
-                    <table class="facets-table">
-                      <tr v-for="(facet, idx) in facets[filter.field]">
-                        <td v-if="isFilterApplied(facet) || facets[filter.field].length === 1" class="facet-value">
-                          {{facet.label}}
-                        </td>
-                        <td v-else class="facet-value">
-                          <a href="javascript:void(0);" @click.prevent.default="addFilter(facet)">{{facet.label}}</a>
-                        </td>
-                        <td class="facet-count" v-if="isFilterApplied(facet)"><a href="javascript:void(0)" @click.prevent.default="removeFilter(facet)"><i class="fa fa-times"></i></a></td>
-                        <td v-else class="facet-count">{{facet.count}}</td>
-                      </tr>
-                    </table>
-                  </div>
-                </template>
-              </div>
-
-            </div>
-            <div class="col s12 m12 l9 search-results">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Type</th>
-                    <th>Title</th>
-                    <th></th>
-                    <th>Agency Identifier</th>
-                    <th>QSA Identifier</th>
-                    <th>Representations</th>
-                    <th style="width: 18em"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="record in records">
-                    <td>{{record.type}}</td>
-                    <td>{{record.title}}</td>
-                    <td><span class="badge" v-if="record.under_movement">under movement</span></td>
-                    <td>{{record.agency_assigned_id}}</td>
-                    <td>{{record.type}} {{record.qsa_id}}</td>
-                    <td>
-                      <span v-if="record.types.indexOf('representation') < 0">
-                        {{record.physical_representations_count}} physical; {{record.digital_representations_count}} digital
-                      </span>
-                    </td>
-                    <td>
-                        <a href="javascript:void(0);" @click="searchWithinSeries(record)" v-if="record.primary_type === 'resource' && !selectedSeriesId">Search&nbsp;within&nbsp;series</a>
-                        <slot name="record_actions" v-bind:record="record"></slot>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </template>
-      </div>
-      <div class="row">
-        <div class="col s12 center-align">
-          <a :style="showPrevPage ? 'visibility: visible' : 'visibility: hidden'" href="javascript:void(0)" v-on:click.stop.prevent="prevPage()"><i class="fa fa-chevron-left"></i> Previous</a>
-          <a :style="showNextPage ? 'visibility: visible' : 'visibility: hidden'" href="javascript:void(0)" v-on:click.stop.prevent="nextPage()">Next <i class="fa fa-chevron-right"></i></a>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 `,
-  data: function(): SearchState {
+    data: function(): SearchState {
         return {
             initialised: false,
             searchActive: false,
@@ -403,7 +403,7 @@ Vue.component('controlled-records', {
 
             this.$el.querySelectorAll('label').forEach((elt) => {
                 if ((elt.control as HTMLInputElement).value) {
-                  elt.classList.add('active');
+                    elt.classList.add('active');
                 }
             });
         }

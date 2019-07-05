@@ -19,7 +19,7 @@ interface State {
 
 
 Vue.component('user-for-location-picker', {
-template: `
+    template: `
 <div>
     <div class="card">
         <div class="card-content">
@@ -195,16 +195,16 @@ template: `
         },
     },
     mounted: function() {
-      this.fireSearch();
+        this.fireSearch();
 
-      M.FormSelect.init(this.$el.querySelectorAll('select'));
+        M.FormSelect.init(this.$el.querySelectorAll('select'));
 
-      this.$el.querySelectorAll('input,textarea,select').forEach(function(el) {
-        if ((el as HTMLFormElement).value !== "") {
-          if (el.nextElementSibling) {
-            el.nextElementSibling.classList.add('active');
-          }
-        }
-      });
+        this.$el.querySelectorAll('input,textarea,select').forEach(function(el) {
+            if ((el as HTMLFormElement).value !== "") {
+                if (el.nextElementSibling) {
+                    el.nextElementSibling.classList.add('active');
+                }
+            }
+        });
     },
 });

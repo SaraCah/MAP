@@ -68,15 +68,15 @@ Vue.component('notifications', {
     methods: {
         fetchNotifications: function() {
             this.$http.get('/notifications')
-            .then((response: any) => {
-                return response.json();
-            }, () => {
-                this.notifications = [];
-                this.loading = false;
-            }).then((json: any) => {
-                this.notifications = json;
-                this.loading = false;
-            });
+                .then((response: any) => {
+                    return response.json();
+                }, () => {
+                    this.notifications = [];
+                    this.loading = false;
+                }).then((json: any) => {
+                    this.notifications = json;
+                    this.loading = false;
+                });
         },
         urlFor: function(notification: Notification) {
             if (notification.record_type === 'file_issue') {

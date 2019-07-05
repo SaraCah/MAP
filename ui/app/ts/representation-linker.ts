@@ -1,11 +1,8 @@
 /// <amd-module name='representation-linker'/>
 
-
 import Vue from "vue";
 import VueResource from "vue-resource";
 import Utils from "./utils";
-// import Utils from "./utils";
-// import UI from "./ui";
 Vue.use(VueResource);
 
 import Record from "./controlled-records";

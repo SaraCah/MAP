@@ -50,7 +50,7 @@ Vue.component('file-issue-requests-search', {
                         </div>
                     </div>
                 </div>
-               <div class="row">
+                <div class="row">
                     <div class="col s12">
                         <button class="btn btn-small">Search Requests</button>
                         <a href="/file-issue-requests" class="btn btn-small">Reset</a>

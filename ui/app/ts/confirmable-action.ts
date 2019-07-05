@@ -3,11 +3,7 @@
 
 import Vue from "vue";
 import VueResource from "vue-resource";
-// import Utils from "./utils";
-// import UI from "./ui";
 Vue.use(VueResource);
-// import Utils from "./utils";
-// import UI from "./ui";
 
 declare var M: any; // Materialize on the window context
 
@@ -62,8 +58,8 @@ Vue.component('confirmable-action', {
             if (this.action !== undefined) {
                 (this.$refs.spinner as Element).classList.remove('hide');
                 this.$http.post(this.action,
-                    {authenticity_token: this.csrf_token},
-                    {emulateJSON: true})
+                                {authenticity_token: this.csrf_token},
+                                {emulateJSON: true})
                     .then(() => {
                         location.reload();
                     });

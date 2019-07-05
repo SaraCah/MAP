@@ -1,6 +1,5 @@
 /// <amd-module name='select-with-other-option'/>
 
-
 import Vue from "vue";
 import VueResource from "vue-resource";
 Vue.use(VueResource);
@@ -20,11 +19,11 @@ Vue.component('select-with-other-option', {
 </div>
 `,
     data: function(): {
-            otherText: string,
-            options: string[],
-            selectedValue: string,
-            readonly: boolean,
-        } {
+        otherText: string,
+        options: string[],
+        selectedValue: string,
+        readonly: boolean,
+    } {
 
         const parsedOptions: string[] = JSON.parse(this.options_json);
 

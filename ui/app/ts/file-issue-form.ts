@@ -1,6 +1,5 @@
 /// <amd-module name='file-issue-form'/>
 
-
 import Vue from "vue";
 import VueResource from "vue-resource";
 import Utils from "./utils";
@@ -289,21 +288,21 @@ Vue.component('requested-items-table', {
                 </template>
             </td>
             <td>
-              <input type="hidden" :name="buildPath('record_ref')" v-bind:value="representation.id"/>
-              <input type="hidden" :name="buildPath('record_label')" v-bind:value="representation.label"/>
+                <input type="hidden" :name="buildPath('record_ref')" v-bind:value="representation.id"/>
+                <input type="hidden" :name="buildPath('record_label')" v-bind:value="representation.label"/>
 
-              <div class="identifier">Series:&nbsp;<span class="id">{{representation.metadata.series_id}}</span></div>
-              <div class="identifier">Record:&nbsp;<span class="id">{{representation.metadata.record_id}}</span></div>
+                <div class="identifier">Series:&nbsp;<span class="id">{{representation.metadata.series_id}}</span></div>
+                <div class="identifier">Record:&nbsp;<span class="id">{{representation.metadata.record_id}}</span></div>
 
-              <div class="identifier" v-if="representation.metadata.agency_assigned_id">
-                Control&nbsp;Number:&nbsp;<span class="id">{{representation.metadata.agency_assigned_id}}</span>
-              </div>
-              <div class="identifier" v-if="representation.metadata.previous_system_id">
-                Previous&nbsp;System:&nbsp;<span class="id">{{representation.metadata.previous_system_id}}</span>
-              </div>
-              <div class="identifier" v-if="representation.metadata.representation_id">
-                Representation:&nbsp;<span class="id">{{representation.metadata.representation_id}}</span>
-              </div>
+                <div class="identifier" v-if="representation.metadata.agency_assigned_id">
+                    Control&nbsp;Number:&nbsp;<span class="id">{{representation.metadata.agency_assigned_id}}</span>
+                </div>
+                <div class="identifier" v-if="representation.metadata.previous_system_id">
+                    Previous&nbsp;System:&nbsp;<span class="id">{{representation.metadata.previous_system_id}}</span>
+                </div>
+                <div class="identifier" v-if="representation.metadata.representation_id">
+                    Representation:&nbsp;<span class="id">{{representation.metadata.representation_id}}</span>
+                </div>
 
             <td>{{representation.metadata.title}}</td>
 
@@ -312,20 +311,20 @@ Vue.component('requested-items-table', {
             <td>{{representation.metadata.format}}</td>
 
             <td>
-              <section class="extra-info" v-if="representation.metadata.intended_use">
-                <h2>Intended Use</h2>
-                <p>{{representation.metadata.intended_use}}</p>
-              </section>
+                <section class="extra-info" v-if="representation.metadata.intended_use">
+                    <h2>Intended Use</h2>
+                    <p>{{representation.metadata.intended_use}}</p>
+                </section>
 
-              <section class="extra-info" v-if="representation.metadata.other_restrictions">
-                <h2>Other Restrictions</h2>
-                <p>{{representation.metadata.other_restrictions}}</p>
-              </section>
+                <section class="extra-info" v-if="representation.metadata.other_restrictions">
+                    <h2>Other Restrictions</h2>
+                    <p>{{representation.metadata.other_restrictions}}</p>
+                </section>
 
-              <section class="extra-info" v-if="representation.metadata.processing_handling_notes">
-                <h2>Processing/Handling Notes</h2>
-                <p>{{representation.metadata.processing_handling_notes}}</p>
-              </section>
+                <section class="extra-info" v-if="representation.metadata.processing_handling_notes">
+                    <h2>Processing/Handling Notes</h2>
+                    <p>{{representation.metadata.processing_handling_notes}}</p>
+                </section>
             </td>
             <td v-if="!readonly">
                 <div class="right-align">
