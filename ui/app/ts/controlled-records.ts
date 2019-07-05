@@ -161,7 +161,7 @@ Vue.component('controlled-records', {
                     <th>Agency Identifier</th>
                     <th>QSA Identifier</th>
                     <th>Representations</th>
-                    <th style="width: 180px"></th>
+                    <th style="width: 18em"></th>
                   </tr>
                 </thead>
                 <tbody>
