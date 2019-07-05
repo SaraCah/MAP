@@ -1,6 +1,6 @@
 /// <amd-module name='ajax-form'/>
 
-class AjaxForm {
+export default class AjaxForm {
     successCallback: () => void;
 
     rootElement: HTMLElement;

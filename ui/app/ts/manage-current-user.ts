@@ -4,7 +4,7 @@
 import Vue from "vue";
 import VueResource from "vue-resource";
 import UI from "./ui";
-// import Utils from "./utils";
+import AjaxForm from "./ajax-form";
 
 
 Vue.use(VueResource);
