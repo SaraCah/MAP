@@ -32,7 +32,7 @@ declare global {
 window.MAP = {
     // Called when the page first loads, plus any time we load AJAX content that
     // might contain components that need to be initialised.
-    init: function () {
+    init: function() {
         document.querySelectorAll('.vue-enabled').forEach(function(elt: Element) {
             /* tslint:disable:no-unused-expression */
             if (!elt.classList.contains('vue-map-initialised')) {
@@ -46,7 +46,7 @@ window.MAP = {
         M.Tooltip.init(document.querySelectorAll('.tooltipped'));
 
 
-        document.querySelectorAll('.tabs').forEach(function (elt: Element) {
+        document.querySelectorAll('.tabs').forEach(function(elt: Element) {
             M.Tabs.init(elt, {});
         });
     },

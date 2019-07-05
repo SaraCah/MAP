@@ -78,9 +78,9 @@ export default class UI {
         const modalOptions: any = {};
 
         if (opts.onReady) {
-            modalOptions.onOpenEnd = function () {
+            modalOptions.onOpenEnd = function() {
                 opts.onReady(modalObj, contentContainer);
-            }
+            };
         }
 
         const modalObj = M.Modal.init(modal, modalOptions);

@@ -3,8 +3,8 @@
 
 import Vue from "vue";
 import VueResource from "vue-resource";
-import UI from "./ui";
 import AjaxForm from "./ajax-form";
+import UI from "./ui";
 
 
 Vue.use(VueResource);
@@ -101,7 +101,7 @@ Vue.component('manage-system', {
                 },
             });
         },
-        ajaxFormModal: function (url: string, opts: any) {
+        ajaxFormModal: function(url: string, opts: any) {
             this.$http.get(url, {
                 method: 'GET',
                 params: opts.params || {},
@@ -116,7 +116,7 @@ Vue.component('manage-system', {
                                                 if (opts.successCallback) {
                                                     opts.successCallback();
                                                 }
-                                            });
+                                            }).setup();
                                         },
                                     });
             }, () => {
@@ -132,7 +132,7 @@ Vue.component('manage-system', {
                     this.refresh();
                 },
             });
-        }
+        },
     },
     mounted: function() {
         this.refresh();

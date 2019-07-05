@@ -8,13 +8,13 @@ Vue.use(VueResource);
 declare var M: any; // Materialize on the window context
 
 interface State {
-    page: number,
-    maxPage: number,
-    showNext: boolean,
-    records: any[],
-    initialised: boolean,
-    query: string,
-    selectedSort?: string,
+    page: number;
+    maxPage: number;
+    showNext: boolean;
+    records: any[];
+    initialised: boolean;
+    query: string;
+    selectedSort?: string;
 }
 
 
@@ -132,7 +132,7 @@ template: `
             }, {
                 emulateJSON: true,
             }).then(
-                (_response: any) => {
+                () => {
                     (this.$el.querySelector('form.ajax-form-success') as HTMLFormElement).dispatchEvent(new Event('ajax-success'));
                 },
                 () => {
@@ -140,8 +140,8 @@ template: `
                 });
         },
         searchUsers: function() {
-            this.query = (this.$el.querySelector('input[name="q"]') as HTMLInputElement).value
-            this.selectedSort = (this.$el.querySelector('select[name="sort"]') as HTMLInputElement).value
+            this.query = (this.$el.querySelector('input[name="q"]') as HTMLInputElement).value;
+            this.selectedSort = (this.$el.querySelector('select[name="sort"]') as HTMLInputElement).value;
             this.page = 0;
 
             this.fireSearch();

@@ -1,10 +1,10 @@
 /// <amd-module name='ajax-form'/>
 
 export default class AjaxForm {
-    successCallback: () => void;
+    private successCallback: () => void;
 
-    rootElement: HTMLElement;
-    formElements: NodeListOf<HTMLFormElement>;
+    private rootElement: HTMLElement;
+    private formElements: NodeListOf<HTMLFormElement>;
 
     constructor(rootElement: HTMLElement, successCallback: () => void) {
         window.MAP.init();
@@ -13,11 +13,9 @@ export default class AjaxForm {
 
         this.rootElement = rootElement;
         this.formElements = rootElement.querySelectorAll('form');
-
-        this.setup();
     }
 
-    setup() {
+    public setup() {
         for (const form of this.formElements) {
             // Can be fired to indicate success without needing a form submission
             //
@@ -31,13 +29,11 @@ export default class AjaxForm {
             });
 
             form.addEventListener('submit', (e) => {
-                const form = e.target as HTMLFormElement;
-
                 fetch(form.action, {
                     method: form.method,
                     body: new FormData(form),
                 }).then((response) => {
-                    if (response.status == 202) {
+                    if (response.status === 202) {
                         // Create/update was accepted
                         this.successCallback();
                         return Promise.resolve('');
@@ -47,7 +43,8 @@ export default class AjaxForm {
                     }
                 }).then((body) => {
                     this.rootElement.innerHTML = body;
-                    new AjaxForm(this.rootElement, this.successCallback);
+
+                    new AjaxForm(this.rootElement, this.successCallback).setup();
                 });
 
                 e.preventDefault();

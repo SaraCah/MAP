@@ -102,7 +102,7 @@ Vue.component('representation-browse', {
         },
         isNotOnShelf: function(record: Record) {
             return record.current_location && record.current_location !== 'HOME';
-        }
+        },
     },
 });
 

@@ -3,8 +3,8 @@
 
 import Vue from "vue";
 import VueResource from "vue-resource";
-import UI from "./ui";
 import AjaxForm from "./ajax-form";
+import UI from "./ui";
 
 
 Vue.use(VueResource);
@@ -17,7 +17,7 @@ Vue.component('manage-current-user', {
         username: String,
     },
     methods: {
-        ajaxFormModal: function (url: string, opts: any) {
+        ajaxFormModal: function(url: string, opts: any) {
             this.$http.get(url, {
                 method: 'GET',
                 params: opts.params || {},
@@ -25,15 +25,15 @@ Vue.component('manage-current-user', {
                 UI.genericHTMLModal(response.body,
                                     ['manage-agency-modal'],
                                     {
-                                        onReady: function (modal: any, contentPane: HTMLElement) {
+                                        onReady: function(modal: any, contentPane: HTMLElement) {
                                             new AjaxForm(contentPane, () => {
                                                 modal.close();
 
                                                 if (opts.successCallback) {
                                                     opts.successCallback();
                                                 }
-                                            });
-                                        }
+                                            }).setup();
+                                        },
                                     });
             }, () => {
                 // failed
@@ -49,7 +49,7 @@ Vue.component('manage-current-user', {
                     location.reload();
                 },
             });
-        }
+        },
     },
 });
 

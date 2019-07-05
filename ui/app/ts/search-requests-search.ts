@@ -48,7 +48,7 @@ Vue.component('search-requests-search', {
     </div>
 </div>
 `,
-    data: function(): {selectedSort: string, selectedStatus: string,} {
+    data: function(): {selectedSort: string, selectedStatus: string} {
         return {
             selectedSort: this.sort || 'id_desc',
             selectedStatus: this.status || undefined,
