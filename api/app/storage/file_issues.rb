@@ -533,6 +533,7 @@ class FileIssues < BaseStorage
 
     items.each do |item|
       unless controlled.include?(item.fetch('record_ref'))
+        Ctx.log_bad_access("verify_item_access!")
         $LOG.error("Requested item '%s' does not appear to be available to current agency" % item.fetch('record_ref'))
         raise StaleRecordException.new
       end

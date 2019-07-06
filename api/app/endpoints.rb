@@ -43,6 +43,7 @@ class MAPTheAPI < Sinatra::Base
         json_response(errors: errors) unless errors.empty?
       end
     else
+      Ctx.log_bad_access("attempted to create user")
       [404]
     end
   end
@@ -79,9 +80,11 @@ class MAPTheAPI < Sinatra::Base
           json_response(errors: errors) unless errors.empty?
         end
       else
+        Ctx.log_bad_access("attempted to update user #{params[:user]}")
         [404]
       end
     else
+      Ctx.log_bad_access("anonymous access attempted to update user #{params[:user]}")
       [404]
     end
   end
@@ -118,13 +121,14 @@ class MAPTheAPI < Sinatra::Base
             json_response(errors: errors)
           end
         else
+          Ctx.log_bad_access("user attempted to create location")
           json_response(errors: [{code: 'INSUFFICIENT_PRIVILEGES', field: 'agency_ref'}])
         end
       else
         json_response(errors: errors)
       end
     else
-      [404]
+      [403]
     end
   end
 
@@ -136,7 +140,8 @@ class MAPTheAPI < Sinatra::Base
       json_response("location" => location,
                     "users_who_would_become_unlinked" => Locations.list_exclusively_linked_users(params[:id]))
     else
-      [404]
+      Ctx.log_bad_access("user called delete-check on an agency they don't manage")
+      [403]
     end
   end
 
@@ -148,7 +153,8 @@ class MAPTheAPI < Sinatra::Base
       Locations.delete(params[:id])
       json_response("status" => "deleted")
     else
-      [404]
+      Ctx.log_bad_access("user attempted to delete agency")
+      [403]
     end
   end
 
@@ -159,9 +165,11 @@ class MAPTheAPI < Sinatra::Base
       if Ctx.get.permissions.can_manage_locations?(location.fetch('agency_ref'))
         json_response(location.to_hash)
       else
+        Ctx.log_bad_access("user tried to access location they don't have access to")
         [404]
       end
     else
+      Ctx.log_bad_access("anonymous user tried to access location they don't have access to")
       [404]
     end
   end
@@ -177,6 +185,7 @@ class MAPTheAPI < Sinatra::Base
           json_response(errors: errors)
         end
       else
+        Ctx.log_bad_access("user tried to update location they don't have access to")
         json_response(errors: [{code: 'INSUFFICIENT_PRIVILEGES', field: 'agency_ref'}])
       end
     else
@@ -213,7 +222,11 @@ class MAPTheAPI < Sinatra::Base
     .param(:permissions, [String], "Permissions to set", :optional => true) do
     membership = Permissions.set_membership_permissions(params[:user_id], params[:location_id], Array(params[:permissions]), params[:role], params[:position])
 
-    json_response({})
+    if membership
+      json_response({})
+    else
+      [403]
+    end
   end
 
   Endpoint.get('/my-location') do
@@ -254,6 +267,7 @@ class MAPTheAPI < Sinatra::Base
     if Ctx.get.permissions.can_manage_locations?(params[:agency_ref])
       json_response(Agencies.for_edit(params[:agency_ref]))
     else
+      Ctx.log_bad_access("user tried to fetch agency for edit without having access")
       [403]
     end
   end
@@ -289,6 +303,7 @@ class MAPTheAPI < Sinatra::Base
       Ctx.get.set_location(params[:agency_id], params[:location_id])
       json_response(status: 'ok')
     else
+      Ctx.log_bad_access("user tried to set a location they don't belong to")
       [403]
     end
   end
@@ -300,9 +315,11 @@ class MAPTheAPI < Sinatra::Base
       if user && Ctx.get.permissions.can_edit_user?(user)
         json_response(user.to_hash)
       else
+        Ctx.log_bad_access("user tried to edit user they don't have permission for (username: #{params[:username]})")
         [404]
       end
     else
+      Ctx.log_bad_access("anonymous user tried to edit user (username: #{params[:username]})")
       [404]
     end
   end
@@ -314,6 +331,7 @@ class MAPTheAPI < Sinatra::Base
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       json_response(Transfers.proposals(params[:page], AppConfig[:page_size], params[:status], params[:sort]))
     else
+      Ctx.log_bad_access("user tried to access transfer proposals without permission")
       [404]
     end
   end
@@ -325,6 +343,7 @@ class MAPTheAPI < Sinatra::Base
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       json_response(Transfers.transfers(params[:page], AppConfig[:page_size], params[:status], params[:sort]))
     else
+      Ctx.log_bad_access("user tried to access transfers without permission")
       json_response([])
     end
   end
@@ -342,6 +361,7 @@ class MAPTheAPI < Sinatra::Base
         json_response(errors: errors)
       end
     else
+      Ctx.log_bad_access("user tried to create transfer proposal without permission")
       [404]
     end
   end
@@ -351,6 +371,7 @@ class MAPTheAPI < Sinatra::Base
     if Ctx.user_logged_in?
       json_response(params[:file].map {|file| ByteStorage.get.store(file.tmp_file)})
     else
+      Ctx.log_bad_access("anonymous user tried to store file")
       [404]
     end
   end
@@ -362,6 +383,7 @@ class MAPTheAPI < Sinatra::Base
       if transfer && Ctx.get.permissions.can_manage_transfers?(transfer.fetch('agency_id'), transfer.fetch('agency_location_id'))
         json_response(transfer.to_hash)
       else
+        Ctx.log_bad_access("user tried to fetch transfer without permission")
         [404]
       end
     else
@@ -381,12 +403,14 @@ class MAPTheAPI < Sinatra::Base
             json_response(errors: errors)
           end
         else
+          Ctx.log_bad_access("user tried to update transfer proposal without permission for location")
           json_response(errors: [{code: 'INSUFFICIENT_PRIVILEGES', field: 'agency_location_id'}])
         end
       else
         json_response(errors: errors)
       end
     else
+      Ctx.log_bad_access("user tried to update transfer proposal without permission")
       [404]
     end
   end
@@ -409,12 +433,14 @@ class MAPTheAPI < Sinatra::Base
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       existing_transfer = Transfers.proposal_dto_for(params[:id])
       if existing_transfer && Ctx.get.permissions.can_manage_transfers?(existing_transfer.fetch('agency_id'), existing_transfer.fetch('agency_location_id'))
+        Ctx.log_bad_access("user tried to cancel transfer proposal in different location without permission")
         Transfers.cancel_proposal(params[:id])
         json_response(status: 'cancelled')
       else
         [404]
       end
     else
+      Ctx.log_bad_access("user tried to cancel transfer proposal without permission")
       [404]
     end
   end
@@ -424,6 +450,7 @@ class MAPTheAPI < Sinatra::Base
     if Ctx.user_logged_in? && Ctx.get.permissions.can_view_conversations?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id) 
       json_response(Conversations.messages_for(params[:handle_id]))
     else
+      Ctx.log_bad_access("user tried to view conversation without permission")
       json_response({})
     end
   end
@@ -435,6 +462,7 @@ class MAPTheAPI < Sinatra::Base
       Conversations.create(params[:handle_id], params[:message])
       json_response(status: 'created')
     else
+      Ctx.log_bad_access("user tried to post to conversation without permission")
       [404]
     end
   end
@@ -445,8 +473,12 @@ class MAPTheAPI < Sinatra::Base
       transfer = Transfers.transfer_dto_for(params[:id])
       if transfer && Ctx.get.permissions.can_manage_transfers?(transfer.fetch('agency_id'), transfer.fetch('agency_location_id'))
         json_response(transfer.to_hash)
+      else
+        Ctx.log_bad_access("user tried to get transfer without permission for location")
+        [404]
       end
     else
+      Ctx.log_bad_access("user tried to get transfer without permission")
       json_response({})
     end
   end
@@ -466,9 +498,11 @@ class MAPTheAPI < Sinatra::Base
           json_response(errors: errors)
         end
       else
+        Ctx.log_bad_access("user tried to update transfer without permission for location")
         [404]
       end
     else
+      Ctx.log_bad_access("user tried to update transfer without permission")
       [404]
     end
   end
@@ -521,6 +555,7 @@ class MAPTheAPI < Sinatra::Base
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       json_response(FileIssues.requests(params[:page], AppConfig[:page_size], params[:digital_request_status], params[:physical_request_status], params[:sort]))
     else
+      Ctx.log_bad_access("user tried to list file issue requests without permission")
       [404]
     end
   end
@@ -538,6 +573,7 @@ class MAPTheAPI < Sinatra::Base
         json_response(errors: errors)
       end
     else
+      Ctx.log_bad_access("user tried to create file issue request without permission")
       [404]
     end
   end
@@ -549,9 +585,11 @@ class MAPTheAPI < Sinatra::Base
       if file_issue_request && Ctx.get.permissions.can_manage_file_issues?(file_issue_request.fetch('agency_id'), file_issue_request.fetch('agency_location_id'))
         json_response(file_issue_request.to_hash)
       else
+        Ctx.log_bad_access("user tried to get file issue request without permission for location")
         [404]
       end
     else
+      Ctx.log_bad_access("user tried to get file issue request without permission")
       [404]
     end
   end
@@ -568,12 +606,14 @@ class MAPTheAPI < Sinatra::Base
             json_response(errors: errors)
           end
         else
+          Ctx.log_bad_access("user tried to update file issue request without permission for location")
           json_response(errors: [{code: 'INSUFFICIENT_PRIVILEGES', field: 'agency_location_id'}])
         end
       else
         json_response(errors: errors)
       end
     else
+      Ctx.log_bad_access("user tried to update file issue request without permission")
       [404]
     end
   end
@@ -600,9 +640,11 @@ class MAPTheAPI < Sinatra::Base
                                         params[:request_type])
         json_response(status: 'accepted')
       else
+        Ctx.log_bad_access("user tried to accept file issue request without permission for location")
         [404]
       end
     else
+      Ctx.log_bad_access("user tried to accept file issue request without permission")
       [404]
     end
   end
@@ -619,9 +661,11 @@ class MAPTheAPI < Sinatra::Base
                                   params[:request_type])
         json_response(status: 'cancelled')
       else
+        Ctx.log_bad_access("user tried to cancel file issue request without permission for location")
         [404]
       end
     else
+        Ctx.log_bad_access("user tried to cancel file issue request without permission")
       [404]
     end
   end
@@ -634,6 +678,7 @@ class MAPTheAPI < Sinatra::Base
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       json_response(FileIssues.file_issues(params[:page], AppConfig[:page_size], params[:issue_type], params[:status], params[:sort]))
     else
+      Ctx.log_bad_access("user tried to list file issues without permission")
       [404]
     end
   end
@@ -645,9 +690,11 @@ class MAPTheAPI < Sinatra::Base
       if file_issue && Ctx.get.permissions.can_manage_file_issues?(file_issue.fetch('agency_id'), file_issue.fetch('agency_location_id'))
         json_response(file_issue.to_hash)
       else
+        Ctx.log_bad_access("user tried to get file issue without permission for location")
         [404]
       end
     else
+      Ctx.log_bad_access("user tried to get file issue without permission")
       [404]
     end
   end
@@ -657,6 +704,7 @@ class MAPTheAPI < Sinatra::Base
       chargeable_services = ServiceQuotes.chargeable_services(['File Issue Physical', 'File Issue Digital'])
       json_response(chargeable_services)
     else
+      Ctx.log_bad_access("user tried to get fee schedule without permission")
       [404]
     end
   end
@@ -668,9 +716,11 @@ class MAPTheAPI < Sinatra::Base
       if file_issue_request && Ctx.get.permissions.can_manage_file_issues?(file_issue_request.fetch('agency_id'), file_issue_request.fetch('agency_location_id'))
         json_response(ServiceQuotes.get_quote(file_issue_request.fetch('aspace_digital_quote_id')))
       else
+        Ctx.log_bad_access("user tried to get digital quote without permission for location")
         [404]
       end
     else
+        Ctx.log_bad_access("user tried to get digital quote without permission")
       [404]
     end
   end
@@ -682,9 +732,11 @@ class MAPTheAPI < Sinatra::Base
       if file_issue_request && Ctx.get.permissions.can_manage_file_issues?(file_issue_request.fetch('agency_id'), file_issue_request.fetch('agency_location_id'))
         json_response(ServiceQuotes.get_quote(file_issue_request.fetch('aspace_physical_quote_id')))
       else
+        Ctx.log_bad_access("user tried to get physical quote without permission for location")
         [404]
       end
     else
+      Ctx.log_bad_access("user tried to get physical quote without permission")
       [404]
     end
   end
@@ -750,10 +802,13 @@ class MAPTheAPI < Sinatra::Base
     if result.fetch(:status) == :found
       [200, {"Content-Type" => result.fetch(:mime_type)}, result.fetch(:stream)]
     elsif result.fetch(:status) == :missing
+      $LOG.warn("File issue token was missing: #{params[:token]}")
       [404]
     elsif result.fetch(:status) == :expired
+      Ctx.log_bad_access("Attempt to access expired token: #{params[:token]}")
       [410]
     elsif result.fetch(:status) == :not_dispatched
+      Ctx.log_bad_access("Attempt to access file issue before it was dispatched: #{params[:token]}")
       [425]
     else
       raise "Unexpected status"
@@ -767,6 +822,7 @@ class MAPTheAPI < Sinatra::Base
     if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       json_response(SearchRequests.search_requests(params[:page], AppConfig[:page_size], params[:status], params[:sort]))
     else
+      Ctx.log_bad_access("Attempt to search requests without permission")
       [404]
     end
   end
@@ -784,6 +840,7 @@ class MAPTheAPI < Sinatra::Base
         json_response(errors: errors)
       end
     else
+      Ctx.log_bad_access("Attempt to create search request without permission")
       [404]
     end
   end
@@ -795,9 +852,11 @@ class MAPTheAPI < Sinatra::Base
       if search_request && Ctx.get.permissions.has_role_for_location?(search_request.fetch('agency_id'), search_request.fetch('agency_location_id'))
         json_response(search_request.to_hash)
       else
+        Ctx.log_bad_access("Attempt to get search request without permission for location")
         [404]
       end
     else
+        Ctx.log_bad_access("Attempt to get search request without permission")
       [404]
     end
   end
@@ -814,12 +873,14 @@ class MAPTheAPI < Sinatra::Base
             json_response(errors: errors)
           end
         else
+          Ctx.log_bad_access("Attempt to update search request without permission for location")
           json_response(errors: [{code: 'INSUFFICIENT_PRIVILEGES', field: 'agency_location_id'}])
         end
       else
         json_response(errors: errors)
       end
     else
+      Ctx.log_bad_access("Attempt to update search request without permission")
       [404]
     end
   end
@@ -836,9 +897,11 @@ class MAPTheAPI < Sinatra::Base
           json_response(errors: errors)
         end
       else
+        Ctx.log_bad_access("Attempt to cancel search request without permission for location")
         json_response(errors: [{code: 'INSUFFICIENT_PRIVILEGES', field: 'agency_location_id'}])
       end
     else
+      Ctx.log_bad_access("Attempt to cancel search request without permission")
       [404]
     end
   end
@@ -855,9 +918,11 @@ class MAPTheAPI < Sinatra::Base
           [404]
         end
       else
+        Ctx.log_bad_access("Attempt to get search request quote without permission for location")
         [404]
       end
     else
+      Ctx.log_bad_access("Attempt to get search request quote without permission")
       [404]
     end
   end
@@ -867,6 +932,7 @@ class MAPTheAPI < Sinatra::Base
       chargeable_services = ServiceQuotes.chargeable_services(['Search Request'])
       json_response(chargeable_services)
     else
+      Ctx.log_bad_access("Attempt to get search request fee schedule without permission")
       [404]
     end
   end
@@ -886,6 +952,7 @@ class MAPTheAPI < Sinatra::Base
     if Ctx.get.permissions.is_admin?
       json_response(Users.get_system_admins)
     else
+      Ctx.log_bad_access("Attempt to access system-administrators list")
       [403]
     end
   end

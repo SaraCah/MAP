@@ -443,7 +443,8 @@ class Locations < BaseStorage
 
     unless permissions.is_admin? || role_in_location
       # No permission
-      raise "Permission denied"
+      Ctx.log_bad_access("attempted to list users for addition to location #{location_id}")
+      return []
     end
 
     dataset = db[:user]

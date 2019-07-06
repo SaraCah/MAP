@@ -36,6 +36,16 @@ class Ctx
     ctx
   end
 
+  def self.log_bad_access(msg)
+    username_label = self.user_logged_in? ?
+                       "MAP user '#{self.username}'" :
+                       "anonymous user (not logged in)"
+
+    $LOG.warn("Access denied to #{username_label}.  Reason: #{msg}\n" +
+              "Backtrace: " +
+              caller.take(5).join("\n"))
+  end
+
   class Context
     attr_reader :db
     attr_accessor :session

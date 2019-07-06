@@ -145,6 +145,7 @@ class Permissions < BaseStorage
         errors << ["Invalid role given"]
       end
     else
+      Ctx.log_bad_access("permissions_for_agency_user user_id=#{user_id}; agency_id=#{agency_id}; location_id=#{location_id}")
       errors << ["Permission denied"]
     end
 
@@ -173,6 +174,7 @@ class Permissions < BaseStorage
                      permissions: permissions,
                      removable: is_removable)
     else
+      Ctx.log_bad_access("get_location_membership for user_id=#{user_id}; location_id=#{location_id}")
       nil
     end
   end
@@ -183,6 +185,7 @@ class Permissions < BaseStorage
     if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_agency_admin?(agency_id, location_id)
       db[:agency_user].filter(user_id: user_id, agency_location_id: location_id).delete
     else
+      Ctx.log_bad_access("remove_membership for user_id=#{user_id}; location_id=#{location_id}")
       nil
     end
   end
@@ -215,7 +218,10 @@ class Permissions < BaseStorage
 
       row = db[:agency_user][:user_id => user_id, :agency_location_id => location_id]
 
-      return nil unless row
+      unless row
+        $LOG.warn("No agency_user entry found for user_id=#{user_id}; agency_location_id=#{location_id}")
+        return nil
+      end
 
       updates = available_permissions.map {|permission|
         [permission.intern, permissions.include?(permission) ? 1 : 0]
@@ -230,7 +236,10 @@ class Permissions < BaseStorage
       db[:agency_user]
         .filter(:user_id => user_id, :agency_location_id => location_id)
         .update(updates)
+
+      true
     else
+      Ctx.log_bad_access("set_membership_permissions for user_id=#{user_id}; location_id=#{location_id}")
       nil
     end
   end
