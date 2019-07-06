@@ -621,7 +621,6 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.get('/resolve/representations')
     .param(:ref, [String], "Refs to resolve") do
     if Ctx.user_logged_in?
-      # FIXME permissions -- can only return representations controlled by the current agency context
       json_response(Representations.for(params[:ref]))
     else
       [404]

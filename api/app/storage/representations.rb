@@ -1,6 +1,8 @@
 class Representations
   def self.for(refs)
-    # FIXME need to filter those user cannot see (as per current agency context)
+    # Filter refs to those that this user should be allowed to see.
+    refs = Search.select_controlled_records(Ctx.get.permissions, refs)
+
     results = {}
     parsed_refs = parse_refs(refs)
 
