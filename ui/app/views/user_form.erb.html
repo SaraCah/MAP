@@ -31,10 +31,13 @@
                 <label class="active" for="password">Password</label>
             </div>
         </div>
+
+        <% readonly_email = !Ctx.get.permissions.allow_manage_agencies? %>
         <div class="row">
             <div class="input-field col s12 required">
-                <input id="email" name="user[email]" type="text" value="<%= user.fetch('email', '') %>">
+                <input id="email" name="user[email]" type="text" value="<%= user.fetch('email', '') %>" <% if readonly_email %>readonly<% end %>>
                 <label class="active" for="email">Email</label>
+                <% if readonly_email %><span class="helper-text">Please contact your agency administrator if your email is incorrect</span><% end %>
             </div>
         </div>
 

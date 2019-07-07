@@ -138,15 +138,23 @@ class Users < BaseStorage
   end
 
   def self.update_from_dto(user)
+
+      data_for_update = {
+        name: user.fetch('name'),
+        lock_version: user.fetch('lock_version') + 1,
+        inactive: user.fetch('is_inactive') ? 1 : 0,
+        modified_by: Ctx.username,
+        modified_time: java.lang.System.currentTimeMillis
+      }
+
+      if Ctx.get.permissions.can_manage_agencies?
+        data_for_update[:email] = user.fetch('email')
+      end
+
       updated = db[:user]
                   .filter(id: user.fetch('id'))
                   .filter(lock_version: user.fetch('lock_version'))
-                  .update(name: user.fetch('name'),
-                          email: user.fetch('email'),
-                          lock_version: user.fetch('lock_version') + 1,
-                          inactive: user.fetch('is_inactive') ? 1 : 0,
-                          modified_by: Ctx.username,
-                          modified_time: java.lang.System.currentTimeMillis)
+                  .update(data_for_update)
 
       raise StaleRecordException.new if updated == 0
 
