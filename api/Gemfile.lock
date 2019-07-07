@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/hudmol/map_validator.git
-  revision: 7dc1842ecccabc39c4338e11f58c676b4bf1d4ff
+  revision: 9787ea2799551e68816b2a8eb5cca1b2e4ebf84a
   branch: master
   specs:
     map_validator (0.0.1)
@@ -17,17 +17,17 @@ GEM
   remote: https://rubygems.org/
   specs:
     aws-eventstream (1.0.3)
-    aws-partitions (1.178.0)
-    aws-sdk-core (3.56.0)
+    aws-partitions (1.184.0)
+    aws-sdk-core (3.59.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.1)
       jmespath (~> 1.0)
-    aws-sdk-kms (1.22.0)
-      aws-sdk-core (~> 3, >= 3.56.0)
+    aws-sdk-kms (1.23.0)
+      aws-sdk-core (~> 3, >= 3.58.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.43.0)
-      aws-sdk-core (~> 3, >= 3.56.0)
+    aws-sdk-s3 (1.45.0)
+      aws-sdk-core (~> 3, >= 3.58.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.1)
     aws-sigv4 (1.1.0)
