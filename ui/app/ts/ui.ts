@@ -21,6 +21,15 @@ export default class UI {
     public static genericHTMLModal(content: HTMLElement | string,
                                    modalClasses?: string[],
                                    opts?: any) {
+        // Clear any modals from prior invocations.  They don't stack up reliably.
+        for (const existingModal of (this.modalObjs || [])) {
+            if (existingModal.isOpen) {
+                existingModal.close();
+            }
+        }
+
+        this.modalObjs = [];
+
         let node: HTMLElement | null = null;
 
         if (typeof(content) === 'string') {
@@ -85,5 +94,10 @@ export default class UI {
 
         const modalObj = M.Modal.init(modal, modalOptions);
         modalObj.open();
+
+        this.modalObjs.push(modalObj);
     }
+
+
+    private static modalObjs: any[];
 }
