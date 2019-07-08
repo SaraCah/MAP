@@ -488,6 +488,8 @@ class MAPTheApp < Sinatra::Base
     if errors.empty?
       redirect '/transfer-proposals'
     else
+      params[:transfer][:status] = TransferProposal::STATUS_INACTIVE
+
       Templates.emit_with_layout(:transfer_proposal_view, {transfer: params[:transfer], errors: errors, is_readonly: false},
                                  :layout, title: "New Transfer Proposal", context: ['transfers', 'transfer_proposals'])
     end
@@ -528,8 +530,6 @@ class MAPTheApp < Sinatra::Base
     .param(:save_transfer, Integer, "Set to 1 if the save button was clicked", :optional => true)
     .param(:submit_transfer, Integer, "Set to 1 if the submit button was clicked", :optional => true) do
 
-    # FIXME check permissions
-
     if params[:submit_transfer] == 1
       params[:transfer][:status] = TransferProposal::STATUS_ACTIVE
     end
@@ -539,6 +539,10 @@ class MAPTheApp < Sinatra::Base
     if errors.empty?
       redirect '/transfer-proposals'
     else
+      if params[:submit_transfer] == 1
+        params[:transfer][:status] = TransferProposal::STATUS_INACTIVE
+      end
+
       Templates.emit_with_layout(:transfer_proposal_view,
                                  {
                                    transfer: params[:transfer],
@@ -726,6 +730,10 @@ class MAPTheApp < Sinatra::Base
     if errors.empty?
       redirect '/file-issue-requests'
     else
+      if params[:submit_file_issue_request] == 1
+        params[:file_issue_request][:draft] = true
+      end
+
       resolved_representations = Ctx.client.resolve_representations(params[:file_issue_request].fetch('items').collect{|item| item.fetch('record_ref')})
       Templates.emit_with_layout(:file_issue_request_view, {request: params[:file_issue_request], resolved_representations: resolved_representations, errors: errors, is_readonly: false},
                                  :layout, title: "New Request", context: ['file_issues', 'file_issue_requests'])
