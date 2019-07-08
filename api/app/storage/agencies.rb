@@ -68,7 +68,7 @@ class Agencies < BaseStorage
     result
   end
 
-  def self.for_permissions(permissions, q: nil, page: 0, page_size: AppConfig[:page_size])
+  def self.manageable_for_permissions(permissions, q: nil, page: 0, page_size: AppConfig[:page_size])
     AspaceDB.open do |aspace_db|
       dataset = aspace_db[:agent_corporate_entity]
                   .join(:name_corporate_entity, Sequel[:agent_corporate_entity][:id] => Sequel[:name_corporate_entity][:agent_corporate_entity_id])
@@ -83,7 +83,13 @@ class Agencies < BaseStorage
       end
 
       unless permissions.is_admin?
-        dataset = dataset.filter(Sequel[:agent_corporate_entity][:id] => permissions.agency_roles.map(&:aspace_agency_id))
+        manageable_agency_ids = permissions.agency_roles.map {|agency_role|
+          if agency_role.is_senior_agency_admin? || agency_role.is_agency_admin?
+            agency_role.aspace_agency_id
+          end
+        }.compact
+
+        dataset = dataset.filter(Sequel[:agent_corporate_entity][:id] => manageable_agency_ids)
       end
 
       max_page = (dataset.count / page_size.to_f).ceil

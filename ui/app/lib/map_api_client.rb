@@ -203,14 +203,14 @@ class MAPAPIClient
   end
 
 
-  def agencies(page = 0, q = nil)
+  def manageable_agencies(page = 0, q = nil)
     data = {
       page: page
     }
 
     data[:q] = q unless q.nil? || q == ''
 
-    PagedResults.from_json(get('/agencies-for-current-user', data), Agency)
+    PagedResults.from_json(get('/agencies-manageable-by-current-user', data), Agency)
   end
 
   def agency_for_edit(agency_ref)

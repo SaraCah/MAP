@@ -255,10 +255,10 @@ class MAPTheAPI < Sinatra::Base
       json_response({})
     end
   end
-  Endpoint.get('/agencies-for-current-user')
+  Endpoint.get('/agencies-manageable-by-current-user')
     .param(:q, String, "Query string", :optional => true)
     .param(:page, Integer, "Page to fetch (zero-indexed)") do
-    json_response(Agencies.for_permissions(Ctx.get.permissions, q: params[:q], page: params[:page]))
+    json_response(Agencies.manageable_for_permissions(Ctx.get.permissions, q: params[:q], page: params[:page]))
   end
 
 

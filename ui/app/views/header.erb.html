@@ -76,7 +76,7 @@
 </nav>
 <% if Ctx.permissions.allow_manage_agencies? %>
 <ul id="manageMenu" class="dropdown-content grey darken-3 white-text">
-    <li><a href="/agencies" class="white-text">Manage Agencies</a></li>
+    <li><a href="/manageable-agencies" class="white-text">Manage Agencies</a></li>
     <% if Ctx.permissions.is_admin? %>
     <li><a href="/system" class="white-text">Manage System</a></li>
     <% end %>

@@ -307,11 +307,11 @@ class MAPTheApp < Sinatra::Base
     redirect '/'
   end
 
-  Endpoint.get('/agencies')
+  Endpoint.get('/manageable-agencies')
     .param(:q, String, "Search string", optional: true)
     .param(:page, Integer, "Page to return", optional: true) do
     Templates.emit_with_layout(:agencies, {
-                                   paged_agencies: Ctx.client.agencies(params[:page] || 0, params[:q]),
+                                   paged_agencies: Ctx.client.manageable_agencies(params[:page] || 0, params[:q]),
                                    q: params[:q],
                                    params: params,
                                  },
