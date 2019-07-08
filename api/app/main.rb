@@ -65,7 +65,6 @@ require 'lib/ctx'
 require 'lib/watch_dir_reloader'
 require 'lib/search'
 require 'lib/solr_indexer'
-require 'lib/clean_up_deleted_representations'
 
 require 'storage/base_storage'
 require 'storage/db_auth'
