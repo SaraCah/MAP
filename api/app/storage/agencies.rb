@@ -214,9 +214,20 @@ class Agencies < BaseStorage
                 .filter(Sequel[:agency_user][:modified_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
 
     unless Ctx.get.permissions.is_admin?
-      admin_aspace_agency_ids = Ctx.get.permissions.agency_roles.select{|agency_role| agency_role.is_agency_admin?}.collect{|agency_role| agency_role.aspace_agency_id}
-      dataset = dataset
-                  .filter(Sequel[:agency][:aspace_agency_id] => admin_aspace_agency_ids)
+      role_filters = []
+
+      Ctx.get.permissions.agency_roles.each do |agency_role|
+        if agency_role.is_senior_agency_admin?
+          role_filters << { Sequel[:agency][:aspace_agency_id] => agency_role.aspace_agency_id }
+        elsif agency_role.is_agency_admin?
+          role_filters << Sequel.&(Sequel[:agency][:aspace_agency_id] => agency_role.aspace_agency_id,
+                                   Sequel[:agency_location][:id] => agency_role.agency_location_id)
+        end
+      end
+
+      return [] if role_filters.empty?
+
+      dataset = dataset.filter(Sequel.|(*role_filters))
     end
 
     dataset
