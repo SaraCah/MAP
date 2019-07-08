@@ -90,6 +90,9 @@ class Templates
 
       begin
         Erubis::EscapedEruby.new(File.read(@erb_file)).result(EmptyBinding.for(parsed_args))
+      rescue MAPAPIClient::SessionGoneError
+        # Re-raise to log out the user
+        raise $!
       rescue
         $LOG.error("Original error: #{$@.join("\n")}")
         $LOG.error("Args were: #{args.pretty_inspect}")
