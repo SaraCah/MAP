@@ -73,36 +73,6 @@ class Search
   end
 
 
-  def self.agency_typeahead(q, permissions)
-    keyword_query = build_keyword_query(q)
-    solr_query = "keywords:(#{keyword_query})^3 OR ngrams:#{solr_escape(q)}^1 OR edge_ngrams:#{solr_escape(q)}^2"
-
-    solr_handle_search(q: solr_query, fq: build_agency_filter(permissions))
-      .fetch('response')
-      .fetch('docs')
-      .map {|hit| {'id' => hit.fetch('id'),
-                   'label' => hit.fetch('title')}}
-  end
-
-
-  def self.representation_typeahead(q, permissions)
-    keyword_query = build_keyword_query(q)
-
-    solr_query = "keywords:(#{keyword_query})^3 OR ngrams:#{solr_escape(q)}^1 OR edge_ngrams:#{solr_escape(q)}^2"
-
-    fq = [build_controlled_records_filter(permissions),
-          'types:representation',
-          'file_issue_allowed:true']
-
-    solr_handle_search(q: solr_query, fq: fq)
-      .fetch('response')
-      .fetch('docs')
-      .map {|hit| {'id' => hit.fetch('id'),
-                   'label' => hit.fetch('title')}}
-
-  end
-
-
   def self.record_hash(record)
     (_, aspace_agency_id) = Ctx.get.current_location.agency.fetch('id').split(':')
     this_agency_uri = "/agents/corporate_entities/#{aspace_agency_id}"
