@@ -425,12 +425,6 @@ class MAPTheApp < Sinatra::Base
   Endpoint.post('/locations/update')
     .param(:location, AgencyLocationDTO, "The location to update") do
 
-    return [404] unless Ctx.permissions.allow_manage_locations?
-
-    unless Ctx.permissions.is_admin?
-      params[:location]['agency_ref'] = Ctx.get.current_location.agency.id
-    end
-
     errors = Ctx.client.update_location(params[:location])
 
     if errors.empty?
