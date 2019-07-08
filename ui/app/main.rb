@@ -75,8 +75,19 @@ module Rack
       def drop_session(env)
         $LOG.warn("Dropping session: #{env}")
         $LOG.warn("Initiator: #{self}")
+
+        # Original code from lib/rack/protection/base.rb
         session(env).clear if session? env
       end
+
+      def deny(env)
+        $LOG.warn("Attack prevented: #{env}")
+        $LOG.warn("Initiator: #{self.class}")
+
+        # Original code from lib/rack/protection/base.rb
+        [options[:status], {'Content-Type' => 'text/plain'}, [options[:message]]]
+      end
+
     end
   end
 end
