@@ -149,27 +149,6 @@ class MAPTheAPI < Sinatra::Base
   # Validate config!
   ByteStorage.get
 
-  # FIXME: If there are any entries in our old file blob table, migrate them
-  # now.  In the long term we won't need this and this can be deleted and the
-  # FILE table dropped.
-  DB.open do |db|
-    if db.table_exists?(:file)
-      migrated = []
-      db[:file].map(:key).each do |key|
-        $LOG.info("Migrating file #{key}")
-        begin
-          ByteStorage.get.store(StringIO.new(db[:file][:key => key][:blob]), key)
-          migrated << key
-        rescue
-          $LOG.error("Failed to migrate #{key}: #{$!}")
-        end
-      end
-
-      db[:file].filter(:key => migrated).delete
-    end
-  end
-
-
   error do
     $LOG.info("*** Caught unexpected exception: #{$!}")
     $LOG.info($@.join("\n"))
