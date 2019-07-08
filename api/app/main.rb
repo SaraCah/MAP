@@ -120,13 +120,6 @@ class MAPTheAPI < Sinatra::Base
     DB.connect
     AspaceDB.connect
 
-    # FIXME REMOVE THIS POST RELEASE
-    # DO IT DO IT DO IT DO IT
-    # OR NOT... WHATEVS
-    #
-    # NO REALLY, REMOVE THIS
-    CleanUpdeletedRepresentations.do_it
-
     Ctx.open do
       # Bootstrap an admin user if we need one
       unless Users.user_exists?('admin')
