@@ -32,6 +32,7 @@ export default class AjaxForm {
                 fetch(form.action, {
                     method: form.method,
                     body: new FormData(form),
+                    credentials: "same-origin",
                 }).then((response) => {
                     if (response.status === 202) {
                         // Create/update was accepted
