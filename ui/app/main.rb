@@ -88,6 +88,7 @@ module Rack
         [options[:status], {'Content-Type' => 'text/plain'}, [options[:message]]]
       end
 
+      alias default_reaction deny
     end
   end
 end
