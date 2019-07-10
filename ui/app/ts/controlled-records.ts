@@ -402,8 +402,14 @@ Vue.component('controlled-records', {
             (this.$el.querySelector('input[name="end_date"]') as HTMLInputElement).value = this.endDate;
 
             this.$el.querySelectorAll('label').forEach((elt) => {
-                if ((elt.control as HTMLInputElement).value) {
-                    elt.classList.add('active');
+                const targetId:string|null = elt.getAttribute('for');
+                if (targetId) {
+                    const input:Element|null = document.getElementById(targetId);
+                    if (input) {
+                        if ((input as HTMLInputElement).value !== '') {
+                            elt.classList.add('active');
+                        }
+                    }
                 }
             });
         }
