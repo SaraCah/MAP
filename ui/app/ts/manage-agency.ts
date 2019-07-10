@@ -49,7 +49,7 @@ Vue.component('manage-agency', {
 <div v-if="initialised">
     <div class="row">
         <div class="col s12">
-            <h2>{{agency.label}}</h2>
+            <h2>{{this.agency.label}}</h2>
         </div>
     </div>
     <div class="row">
@@ -62,7 +62,7 @@ Vue.component('manage-agency', {
 
                         <h4>Locations</h4>
 
-                        <div class="card" v-for="location in agency.locations">
+                        <div class="card" v-for="location in this.agency.locations">
                             <div class="card-content">
                                 <div class="right">
                                     <button v-if="location.is_location_editable" @click.prevent.default="addUserToLocation(location.location)" class="btn btn-small">Add user to location</button>
@@ -125,7 +125,7 @@ Vue.component('manage-agency', {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="user in mergedUsers">
+                                <tr v-for="user in this.mergedUsers">
                                     <td>{{user.username}}</td>
                                     <td>{{user.name}}</td>
                                     <td>{{user.email}}</td>

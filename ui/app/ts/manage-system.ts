@@ -58,6 +58,8 @@ Vue.component('manage-system', {
                     </div>
                 </div>
             </section>
+
+            <pre>{{this.agency}}</pre>
         </div>
         <div class="col hide-on-small-only m3 l2">
             <ul class="section table-of-contents">

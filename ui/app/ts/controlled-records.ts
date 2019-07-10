@@ -71,7 +71,7 @@ Vue.component('controlled-records', {
 
                 <div class="search-box">
                     <form v-on:submit.stop.prevent="search()">
-                        <section class="row" v-if="selectedSeriesId && selectedSeriesLabel">
+                        <section class="row" v-if="this.selectedSeriesId && this.selectedSeriesLabel">
                             <div class="col s12">
                                 <blockquote>Searching within series: {{selectedSeriesLabel}} [<a href="javascript:void(0);" @click="reset({clearSeries: true})">reset</a>]</blockquote>
                             </div>
@@ -131,7 +131,7 @@ Vue.component('controlled-records', {
                             </section>
 
                             <div class="row">
-                                <template v-for="filter in availableFilters">
+                                <template v-for="filter in this.availableFilters">
                                     <div class="col s4 m4 l12 facet-section" v-if="facets[filter.field] && facets[filter.field].length > 0">
                                         <span class="facet-title">{{filter.title}}</span>
                                         <table class="facets-table">
