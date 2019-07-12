@@ -20,7 +20,7 @@ Vue.component('conversation', {
         <h4>{{title}}</h4>
         <div v-for="message in messages" class="card">
             <div class="card-content">
-                <div style="white-space: pre">{{message.message}}</div>
+                <div style="white-space: pre-wrap;">{{message.message}}</div>
                 <br>
                 <div>
                     <span class="grey-text">{{message.author}} - {{formatTimestamp(message.timestamp)}}</span>
