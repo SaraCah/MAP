@@ -522,6 +522,7 @@ class MAPTheApp < Sinatra::Base
   Endpoint.post('/transfer-proposals/update')
     .param(:transfer, TransferProposal, "The transfer to update")
     .param(:save_transfer, Integer, "Set to 1 if the save button was clicked", :optional => true)
+    .param(:delete_transfer, Integer, "Set to 1 if the delete button was clicked", :optional => true)
     .param(:submit_transfer, Integer, "Set to 1 if the submit button was clicked", :optional => true) do
 
     if params[:submit_transfer] == 1
@@ -553,6 +554,15 @@ class MAPTheApp < Sinatra::Base
     # FIXME check permissions
 
     Ctx.client.cancel_transfer_proposal(params[:id])
+
+    redirect '/transfer-proposals'
+  end
+
+  Endpoint.post('/transfer-proposals/:id/delete')
+    .param(:id, Integer, "ID of transfer proposal to delete") do
+
+    # FIXME check permissions or else
+    Ctx.client.delete_transfer_proposal(params[:id])
 
     redirect '/transfer-proposals'
   end
@@ -812,6 +822,15 @@ class MAPTheApp < Sinatra::Base
                                          params[:request_type])
 
     redirect "/file-issue-requests/#{params[:id]}"
+  end
+
+  Endpoint.post('/file-issue-requests/:id/delete')
+    .param(:id, Integer, "ID of file issue request to delete") do
+
+    # FIXME check permissions or else
+    Ctx.client.delete_file_issue_request(params[:id])
+
+    redirect '/file-issue-requests'
   end
 
   Endpoint.get('/resolve/representations')

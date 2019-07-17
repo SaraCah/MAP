@@ -429,18 +429,35 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.post('/transfer-proposals/cancel')
-    .param(:id, Integer, "Transfer Propposal ID to cancel") do
+    .param(:id, Integer, "Transfer Proposal ID to cancel") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       existing_transfer = Transfers.proposal_dto_for(params[:id])
       if existing_transfer && Ctx.get.permissions.can_manage_transfers?(existing_transfer.fetch('agency_id'), existing_transfer.fetch('agency_location_id'))
-        Ctx.log_bad_access("user tried to cancel transfer proposal in different location without permission")
         Transfers.cancel_proposal(params[:id])
         json_response(status: 'cancelled')
       else
+        Ctx.log_bad_access("user tried to cancel transfer proposal in different location without permission")
         [404]
       end
     else
       Ctx.log_bad_access("user tried to cancel transfer proposal without permission")
+      [404]
+    end
+  end
+
+  Endpoint.post('/transfer-proposals/delete')
+    .param(:id, Integer, "Transfer Proposal ID to delete") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      existing_transfer = Transfers.proposal_dto_for(params[:id])
+      if existing_transfer && Ctx.get.permissions.can_manage_transfers?(existing_transfer.fetch('agency_id'), existing_transfer.fetch('agency_location_id'))
+        Transfers.delete_proposal(params[:id])
+        json_response(status: 'deleted')
+      else
+        Ctx.log_bad_access("user tried to delete transfer proposal in different location without permission")
+        [404]
+      end
+    else
+      Ctx.log_bad_access("user tried to delete transfer proposal without permission")
       [404]
     end
   end
@@ -665,6 +682,23 @@ class MAPTheAPI < Sinatra::Base
       end
     else
         Ctx.log_bad_access("user tried to cancel file issue request without permission")
+      [404]
+    end
+  end
+
+  Endpoint.post('/file-issue-requests/delete')
+    .param(:id, Integer, "File Issue Request ID to delete") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      existing_file_issue_request = FileIssues.request_dto_for(params[:id])
+      if existing_file_issue_request && Ctx.get.permissions.can_manage_file_issues?(existing_file_issue_request.fetch('agency_id'), existing_file_issue_request.fetch('agency_location_id'))
+        FileIssues.delete_request(params[:id])
+        json_response(status: 'deleted')
+      else
+        Ctx.log_bad_access("user tried to delete file issue request without permission for location")
+        [404]
+      end
+    else
+      Ctx.log_bad_access("user tried to delete file issue request without permission")
       [404]
     end
   end

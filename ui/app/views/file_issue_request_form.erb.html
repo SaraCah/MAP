@@ -168,14 +168,24 @@
                                             message="<p>Please be aware saving this request will invalidate any provided quotes.</p><p>Are you sure you want to save this request?</p>">
                                     </confirmable-action>
                                 <% end %>
-                                <% unless request.new? || request.fetch('draft') %>
-                                    <confirmable-action
+                                <% unless request.new? %>
+                                    <% if request.fetch('draft') %>
+                                        <confirmable-action action="/file-issue-requests/<%= request.fetch('id') %>/delete"
+                                                            after_location="/file-issue-requests"
+                                                            csrf_token="<%= FormHelper.csrf_token %>"
+                                                            css="btn red lighten-2"
+                                                            label="Delete Request"
+                                                            message="Are you sure you want to delete this request? It will be permanently removed.">
+                                        </confirmable-action>
+                                    <% else %>
+                                        <confirmable-action
                                             action="/file-issue-requests/<%= request.fetch('id') %>/cancel?lock_version=<%= request.fetch('lock_version') %>"
                                             csrf_token="<%= FormHelper.csrf_token %>"
                                             css="btn red lighten-2"
                                             label="Cancel Request"
                                             message="Are you sure you want to cancel this request? ">
-                                    </confirmable-action>
+                                        </confirmable-action>
+                                    <% end %>
                                 <% end %>
                                 <% if request.fetch('draft') %>
                                     <button name="submit_file_issue_request" value="1" class="btn orange">Submit File Issue Request <i class="fa fa-paper-plane"></i></button>

@@ -406,6 +406,10 @@ class MAPAPIClient
     post('/transfer-proposals/cancel', id: transfer_proposal_id)
   end
 
+  def delete_transfer_proposal(transfer_proposal_id)
+    post('/transfer-proposals/delete', id: transfer_proposal_id)
+  end
+
   ConversationMessage = Struct.new(:message, :author, :timestamp) do
     def self.from_json(json)
       new(json.fetch('message'),
@@ -500,6 +504,10 @@ class MAPAPIClient
     data[:request_type] = request_type if request_type
 
     post('/file-issue-requests/cancel', data)
+  end
+
+  def delete_file_issue_request(file_issue_request_id)
+    post('/file-issue-requests/delete', id: file_issue_request_id)
   end
 
   def file_issues(page = 0, issue_type = nil, status = nil, sort = nil)

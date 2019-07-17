@@ -200,6 +200,21 @@ class Transfers < BaseStorage
   end
 
 
+  def self.delete_proposal(transfer_proposal_id)
+    db[:handle]
+      .filter(transfer_proposal_id: transfer_proposal_id)
+      .delete
+
+    db[:transfer_proposal_series]
+      .filter(transfer_proposal_id: transfer_proposal_id)
+      .delete
+
+    db[:transfer_proposal]
+      .filter(id: transfer_proposal_id)
+      .delete
+  end
+
+
   def self.transfers(page, page_size, status = nil, sort = nil)
     dataset = db[:transfer]
 

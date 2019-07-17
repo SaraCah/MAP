@@ -31,7 +31,7 @@ Vue.component('confirmable-action', {
         </div>
         <div class="modal-footer">
             <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
-            <a href="#!" class="waves-effect waves-green btn-flat" v-on:click="confirm()">Confirm</a>
+            <a href="#!" class="waves-effect waves-green btn-flat" v-on:click.stop.prevent="confirm()">Confirm</a>
         </div>
     </div>
 </span>
@@ -41,7 +41,7 @@ Vue.component('confirmable-action', {
             active: false,
         };
     },
-    props: ['action', 'css', 'label', 'message', 'csrf_token', 'target_form_id'],
+    props: ['action', 'css', 'label', 'message', 'csrf_token', 'target_form_id', 'after_location'],
     methods: {
         show: function() {
             const modal: any = M.Modal.init(this.$refs.modal, {
@@ -61,7 +61,11 @@ Vue.component('confirmable-action', {
                                 {authenticity_token: this.csrf_token},
                                 {emulateJSON: true})
                     .then(() => {
-                        location.reload();
+                        if (this.after_location !== undefined) {
+                            location.assign(this.after_location);
+                        } else {
+                            location.reload();
+                        }
                     });
             } else if (this.target_form_id !== undefined) {
                 const formEl: HTMLElement|null = document.getElementById(this.target_form_id);

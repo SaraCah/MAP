@@ -39,6 +39,25 @@
                 <td><%= Time.at(file_issue_request.fetch('create_time') / 1000)%></td>
                 <td>
                     <a class="btn" href="/file-issue-requests/<%= file_issue_request.fetch('id') %>">View</a>
+
+                    <% if file_issue_request.fetch('draft') %>
+                        <confirmable-action action="/file-issue-requests/<%= file_issue_request.fetch('id') %>/delete"
+                                            after_location="/file-issue-requests"
+                                            csrf_token="<%= FormHelper.csrf_token %>"
+                                            css="btn red lighten-2"
+                                            label="Delete"
+                                            message="Are you sure you want to delete this request? It will be permanently removed.">
+                        </confirmable-action>
+                    <% elsif !file_issue_request.fetch('digital_request_status').start_with?('CANCELLED') %>
+                        <confirmable-action
+                                            action="/file-issue-requests/<%= file_issue_request.fetch('id') %>/cancel?lock_version=<%= file_issue_request.fetch('lock_version') %>"
+                                            csrf_token="<%= FormHelper.csrf_token %>"
+                                            css="btn red lighten-2"
+                                            label="Cancel"
+                                            message="Are you sure you want to cancel this request? ">
+                        </confirmable-action>
+                    <% end %>
+
                 </td>
             </tr>
             <% end %>

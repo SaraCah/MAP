@@ -276,6 +276,16 @@ class FileIssues < BaseStorage
     raise StaleRecordException.new if updated == 0
   end
 
+  def self.delete_request(file_issue_request_id)
+    db[:handle]
+      .filter(file_issue_request_id: file_issue_request_id)
+      .delete
+
+    db[:file_issue_request]
+      .filter(id: file_issue_request_id)
+      .delete
+  end
+
   def self.file_issues(page, page_size, issue_type = nil, status = nil, sort = nil)
     dataset = db[:file_issue]
 

@@ -50,6 +50,15 @@
                                             message="Are you sure you want to cancel this transfer proposal?">
                         </confirmable-action>
                     <% end %>
+
+                    <% if transfer.fetch('status', 'INACTIVE') == 'INACTIVE' && !transfer.new? %>
+                        <confirmable-action action="/transfer-proposals/<%= transfer.fetch('id') %>/delete"
+                                            csrf_token="<%= FormHelper.csrf_token %>"
+                                            css="btn red lighten-2"
+                                            label="Delete"
+                                            message="Are you sure you want to delete this transfer proposal? It will be permanently removed.">
+                        </confirmable-action>
+                    <% end %>
                 </td>
             </tr>
             <% end %>
