@@ -281,6 +281,10 @@ class FileIssues < BaseStorage
       .filter(file_issue_request_id: file_issue_request_id)
       .delete
 
+    db[:file_issue_request_item]
+      .filter(file_issue_request_id: file_issue_request_id)
+      .delete
+
     db[:file_issue_request]
       .filter(id: file_issue_request_id)
       .delete
