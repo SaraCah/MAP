@@ -3,8 +3,8 @@
 JRUBY_VERSION="https://repo1.maven.org/maven2/org/jruby/jruby-complete/9.2.7.0/jruby-complete-9.2.7.0.jar"
 JRUBY_SHA256="a43125f921e707eef861713028d79f60d2f4b024ea6af71a992395ee9e697c22"
 
-SOLR_VERSION="http://apache.mirror.amaze.com.au/lucene/solr/8.1.1/solr-8.1.1.tgz"
-SOLR_SHA256="b515598c11f53fe28d682e3d71238642e9f34509194e3c4746e39bb7d7bb46a1"
+SOLR_VERSION="https://archive.apache.org/dist/lucene/solr/8.2.0/solr-8.2.0.tgz"
+SOLR_SHA256="bfa4b39b236e5d714f4233138b8b5cb7e1996ddc0aad60052ce83c4b7bf33449"
 
 function fail() {
     echo "ERROR: $*"
