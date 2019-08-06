@@ -22,6 +22,7 @@ import 'service-quote';
 import 'transfer-proposal-series';
 import 'transfers-search';
 import 'user-for-location-picker';
+import 'user-permissions-form';
 
 declare var M: any; // Materialize on the window context
 

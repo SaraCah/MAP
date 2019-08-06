@@ -120,6 +120,10 @@ class MAPAPIClient
     [:allow_transfers, :allow_file_issue, :allow_set_and_change_raps, :allow_restricted_access]
   end
 
+  def delegation?(permission)
+    ['allow_set_and_change_raps', 'allow_restricted_access'].include?(permission.to_s)
+  end
+
   def authenticate(username, password)
     response = post('/authenticate', username: username, password: password)
 
