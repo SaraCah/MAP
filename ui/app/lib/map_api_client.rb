@@ -117,7 +117,7 @@ class MAPAPIClient
   end
 
   def permission_options
-    [:allow_transfers, :allow_file_issue, :allow_set_raps, :allow_change_raps, :allow_restricted_access]
+    [:allow_transfers, :allow_file_issue, :allow_set_and_change_raps, :allow_restricted_access]
   end
 
   def authenticate(username, password)

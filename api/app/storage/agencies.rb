@@ -145,8 +145,7 @@ class Agencies < BaseStorage
               Sequel[:agency_user][:position],
               Sequel[:agency_user][:allow_transfers],
               Sequel[:agency_user][:allow_file_issue],
-              Sequel[:agency_user][:allow_set_raps],
-              Sequel[:agency_user][:allow_change_raps],
+              Sequel[:agency_user][:allow_set_and_change_raps],
               Sequel[:agency_user][:allow_restricted_access],)
       .each do |row|
 

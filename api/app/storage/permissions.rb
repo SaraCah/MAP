@@ -1,6 +1,6 @@
 class Permissions < BaseStorage
 
-  AVAILABLE_PERMISSIONS = [:allow_transfers, :allow_file_issue, :allow_set_raps, :allow_change_raps, :allow_restricted_access]
+  AVAILABLE_PERMISSIONS = [:allow_transfers, :allow_file_issue, :allow_set_and_change_raps, :allow_restricted_access]
 
   def self.agency_roles_for_user(user_id, with_labels: false)
     agency_roles = db[:agency_user]
@@ -16,8 +16,7 @@ class Permissions < BaseStorage
                             Sequel.as(Sequel[:agency_location][:name], :agency_location_label),
                             Sequel.as(Sequel[:agency_user][:allow_transfers], :allow_transfers),
                             Sequel.as(Sequel[:agency_user][:allow_file_issue], :allow_file_issue),
-                            Sequel.as(Sequel[:agency_user][:allow_set_raps], :allow_set_raps),
-                            Sequel.as(Sequel[:agency_user][:allow_change_raps], :allow_change_raps),
+                            Sequel.as(Sequel[:agency_user][:allow_set_and_change_raps], :allow_set_and_change_raps),
                             Sequel.as(Sequel[:agency_user][:allow_restricted_access], :allow_restricted_access))
                     .map do |row|
                       agency_role = AgencyRole.from_row(row)
