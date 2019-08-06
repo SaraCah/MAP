@@ -67,8 +67,7 @@ Vue.component('user-permissions-form', {
     data: function(): {
                         selectedRole: string,
                         selectedPermissions: string[],
-                      }
-    {
+                      } {
         return {
             selectedRole: this.role,
             selectedPermissions: this.existing_permissions,
@@ -76,10 +75,10 @@ Vue.component('user-permissions-form', {
     },
     props: ['role', 'position', 'is_senior_agency_available', 'existing_permissions', 'available_permissions', 'available_delegations'],
     computed: {
-        isDelegate: function():boolean {
+        isDelegate: function(): boolean {
             return Utils.filter(this.selectedPermissions, (permission: string) => {
-                return !!Utils.find(this.available_delegations, (delegation_permission: string) => {
-                    return delegation_permission === permission;
+                return !!Utils.find(this.available_delegations, (delegationPermission: string) => {
+                    return delegationPermission === permission;
                 });
             }).length > 0;
         },
@@ -91,8 +90,6 @@ Vue.component('user-permissions-form', {
             } else {
                 return label;
             }
-        }
-    },
-    mounted: function() {
+        },
     },
 });
