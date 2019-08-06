@@ -118,14 +118,14 @@ class Users < BaseStorage
                      :modified_time => java.lang.System.currentTimeMillis)
   end
 
-  def self.create_admin_user(username, name, email)
+  def self.create_admin_user(username, name, email, audit_user = nil)
     db[:user].insert(:username => username,
                      :name => name,
                      :email => email,
                      :admin => 1,
-                     :created_by => Ctx.username,
+                     :created_by => audit_user || Ctx.username,
                      :create_time => java.lang.System.currentTimeMillis,
-                     :modified_by => Ctx.username,
+                     :modified_by => audit_user || Ctx.username,
                      :modified_time => java.lang.System.currentTimeMillis)
   end
 

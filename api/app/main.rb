@@ -122,7 +122,7 @@ class MAPTheAPI < Sinatra::Base
     Ctx.open do
       # Bootstrap an admin user if we need one
       unless Users.user_exists?('admin')
-        admin_id = Users.create_admin_user('admin', 'Admin User', 'admin@example.com')
+        admin_id = Users.create_admin_user('admin', 'Admin User', 'admin@example.com', '__system_bootstrap')
         admin_password = SecureRandom.hex
         DBAuth.set_user_password(admin_id, admin_password)
 
