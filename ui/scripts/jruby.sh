@@ -6,4 +6,4 @@ cd "`dirname "$0"`/../"
 
 export GEM_HOME=$PWD/distlibs/gems
 
-java -Dapp=MAPUI -Djava.security.egd=file:/dev/./urandom ${JAVA_OPTS} -Xmx${JVM_HEAP_SIZE} -cp 'distlibs/*' org.jruby.Main ${1+"$@"}
+java -Dapp=MAPUI -Dfile.encoding=UTF-8 -Djava.security.egd=file:/dev/./urandom ${JAVA_OPTS} -Xmx${JVM_HEAP_SIZE} -cp 'distlibs/*' org.jruby.Main ${1+"$@"}
