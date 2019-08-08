@@ -48,7 +48,7 @@
                                             label="Delete"
                                             message="Are you sure you want to delete this request? It will be permanently removed.">
                         </confirmable-action>
-                    <% elsif !file_issue_request.fetch('digital_request_status').start_with?('CANCELLED') %>
+                    <% elsif file_issue_request.cancelable? %>
                         <confirmable-action
                                             action="/file-issue-requests/<%= file_issue_request.fetch('id') %>/cancel?lock_version=<%= file_issue_request.fetch('lock_version') %>"
                                             csrf_token="<%= FormHelper.csrf_token %>"

@@ -12,6 +12,10 @@ class FileIssueRequest
   CANCELLED_BY_QSA = 'CANCELLED_BY_QSA'
   CANCELLED_BY_AGENCY = 'CANCELLED_BY_AGENCY'
 
+  # If the request is in any of these states, it is allowed to be cancelled by
+  # the agency.
+  CANCELABLE_STATUSES = [NONE_REQUESTED, QUOTE_REQUESTED, QUOTE_PROVIDED, QUOTE_ACCEPTED]
+
   STATUS_OPTIONS = [
     NONE_REQUESTED, QUOTE_REQUESTED, QUOTE_PROVIDED, QUOTE_ACCEPTED,
     FILE_ISSUE_CREATED, CANCELLED_BY_QSA, CANCELLED_BY_AGENCY,
@@ -100,6 +104,11 @@ class FileIssueRequest
     return false if [CANCELLED_BY_QSA, CANCELLED_BY_AGENCY].include?(fetch('physical_request_status')) && fetch('digital_request_status') == NONE_REQUESTED
 
     true
+  end
+
+  def cancelable?
+    CANCELABLE_STATUSES.include?(fetch('physical_request_status')) &&
+      CANCELABLE_STATUSES.include?(fetch('digital_request_status'))
   end
 
   def show_digital_quote?

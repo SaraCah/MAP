@@ -152,7 +152,17 @@
                     </section>
                 </file-issue-form>
 
-                <% unless is_readonly %>
+                <% if is_readonly %>
+                    <% if request.cancelable? %>
+                        <confirmable-action
+                            action="/file-issue-requests/<%= request.fetch('id') %>/cancel?lock_version=<%= request.fetch('lock_version') %>"
+                            csrf_token="<%= FormHelper.csrf_token %>"
+                            css="btn red lighten-2"
+                            label="Cancel Request"
+                            message="Are you sure you want to cancel this request? ">
+                        </confirmable-action>
+                    <% end %>
+                <% else %>
                     <section id="actions" class="scrollspy section">
                         <div class="row">
                             <br>
