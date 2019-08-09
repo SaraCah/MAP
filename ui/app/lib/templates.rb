@@ -84,7 +84,6 @@ class Templates
       }.to_h
 
       unless (args.keys - @argspecs.keys).empty?
-        # Too annoying?  Maybe we just want to drop unknown stuff?
         raise "Unexpected arguments: #{(args.keys - @argspecs.keys).inspect}"
       end
 
@@ -92,6 +91,9 @@ class Templates
         Erubis::EscapedEruby.new(File.read(@erb_file)).result(EmptyBinding.for(parsed_args))
       rescue MAPAPIClient::SessionGoneError
         # Re-raise to log out the user
+        raise $!
+      rescue Sequel::DatabaseError
+        # Re-raise to allow DB retry logic
         raise $!
       rescue
         $LOG.error("Original error: #{$@.join("\n")}")
