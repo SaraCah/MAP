@@ -357,7 +357,7 @@ a#manageMenuTrigger:after {
 }
 
 .search-results tr.top.expanded td {
-    padding-bottom: 0;
+    padding-bottom: 5px;
 }
 
 .search-results tr.nested td {
