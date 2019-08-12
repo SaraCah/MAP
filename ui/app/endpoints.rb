@@ -956,6 +956,10 @@ class MAPTheApp < Sinatra::Base
     # Map types to their labels
     controlled_records.fetch('results', []).each do |result|
       result['type'] = label_for_field_value('primary_type', result.fetch('primary_type'), controlled_records)
+
+      Array(result['representations_json']).each do |representation|
+        representation['type'] = label_for_field_value('primary_type', representation.fetch('primary_type'), controlled_records)
+      end
     end
 
     # Turn facets from ['val1', count1, 'val2', count2, ...] into an array of maps

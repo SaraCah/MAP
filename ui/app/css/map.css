@@ -344,8 +344,34 @@ a#manageMenuTrigger:after {
     border-left: 2px solid #efefef;
 }
 
+.search-results tr {
+    border-bottom: none;
+}
+
+.search-results tr.top {
+    border-top: 1px solid rgba(0,0,0,0.12);
+}
+
 .search-tools section, .search-tools .facet-section {
     margin-bottom: 1em;
+}
+
+.search-results tr.top.expanded td {
+    padding-bottom: 0;
+}
+
+.search-results tr.nested td {
+    padding: 0 0 0 5px;
+}
+
+.search-results tr.nested td:first-child {
+    padding: 0;
+}
+
+.search-results tr.nested .indent-wrapper {
+    margin: 0 0 10px 10px;
+    padding: 5px 0 5px 10px;
+    border-left: 2px solid #efefef;
 }
 
 .search-tools .facet-title {

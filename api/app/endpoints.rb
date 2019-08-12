@@ -282,7 +282,6 @@ class MAPTheAPI < Sinatra::Base
     .param(:page, Integer, "Page to fetch (zero-indexed)")
     .param(:page_size, Integer, "Size of each page") do
     if Ctx.user_logged_in? && Ctx.get.current_location
-      # FIXME: Users.permissions_for_user -> Ctx.get.permissions?
       permissions = Users.permissions_for_user(Ctx.username)
       json_response(Search.controlled_records(permissions,
                                               params[:q],

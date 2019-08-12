@@ -172,6 +172,39 @@ class Search
     result
   end
 
+  def self.add_representations_to_results(formatted_results)
+    # Pull back the representations that are directly attached to any Archival
+    # Objects on this page and include them in the response payload.
+
+    representation_uris = formatted_results.map {|result|
+      if result.fetch('primary_type') == 'archival_object'
+        result.fetch('all_representations', [])
+      else
+        []
+      end
+    }.flatten.uniq
+
+    return if representation_uris.empty?
+
+    representations_by_uri =
+      solr_handle_search('q' => '*:*',
+                         'fq' => "{!terms f=uri}#{representation_uris.join(',')}",
+                         'rows' => representation_uris.length)
+        .fetch('response', {})
+        .fetch('docs', [])
+        .map {|doc| [doc.fetch('uri'), record_hash(doc)]}
+        .to_h
+
+
+    formatted_results.each do |result|
+      if result.fetch('all_representations', nil)
+        result['representations_json'] = result.fetch('all_representations').map {|uri|
+          representations_by_uri.fetch(uri, nil)
+        }.compact
+      end
+    end
+  end
+
   def self.controlled_records(permissions,
                               q,
                               filters,
@@ -194,10 +227,14 @@ class Search
                                 )
     facets = results.fetch('facet_counts', {}).fetch('facet_fields', {})
 
+    formatted_results = results.fetch('response').fetch('docs').map {|result|
+      record_hash(result)
+    }[0...page_size]
+
+    add_representations_to_results(formatted_results)
+
     {
-      :results => results.fetch('response').fetch('docs').map {|result|
-        record_hash(result)
-      }[0...page_size],
+      :results => formatted_results,
       :facets => facets,
       :agency_titles_by_ref => resolve_agency_names(facets),
       :has_next_page => results.fetch('response').fetch('docs').length > page_size,

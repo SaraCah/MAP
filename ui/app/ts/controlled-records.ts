@@ -21,6 +21,8 @@ export default interface Record {
     physical_representations_count: number;
     digital_representations_count: number;
     current_location: string|null;
+    representations_json: Record[];
+    nested: boolean;
 }
 
 interface Facet {
@@ -165,22 +167,28 @@ Vue.component('controlled-records', {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="record in records">
-                                        <td>{{record.type}}</td>
-                                        <td>{{record.title}}</td>
-                                        <td><span class="badge" v-if="record.under_movement">under movement</span></td>
-                                        <td>{{record.agency_assigned_id}}</td>
-                                        <td>{{record.type}} {{record.qsa_id}}</td>
-                                        <td>
-                                            <span v-if="record.types.indexOf('representation') < 0">
-                                                {{record.physical_representations_count}} physical; {{record.digital_representations_count}} digital
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <a href="javascript:void(0);" @click="searchWithinSeries(record)" v-if="record.primary_type === 'resource' && !selectedSeriesId">Search&nbsp;within&nbsp;series</a>
-                                            <slot name="record_actions" v-bind:record="record"></slot>
-                                        </td>
-                                    </tr>
+                                    <template v-for="record in flattenRecords(records)">
+                                        <tr v-bind:class="{ nested: record.nested, top: !record.nested }" v-show="!record.nested" :key="record.id + record.nested">
+                                            <td><div class="indent-wrapper">{{record.type}}</div></td>
+                                            <td>{{record.title}}</td>
+                                            <td><span class="badge" v-if="record.under_movement">under movement</span></td>
+                                            <td>{{record.agency_assigned_id}}</td>
+                                            <td>{{record.type}} {{record.qsa_id}}</td>
+                                            <td>
+                                                <span v-if="record.primary_type === 'resource' || ((record.physical_representations_count === 0) && (record.digital_representations_count === 0))">
+                                                    {{record.physical_representations_count}} physical; {{record.digital_representations_count}} digital
+                                                </span>
+                                                <span v-else-if="record.primary_type === 'archival_object'">
+                                                    <a href="javascript:void(0);" @click.stop.prevent="toggleRepresentations($event)">{{record.physical_representations_count}} physical; {{record.digital_representations_count}} digital</a>
+                                                </span>
+
+                                            </td>
+                                            <td>
+                                                <a href="javascript:void(0);" @click="searchWithinSeries(record)" v-if="record.primary_type === 'resource' && !selectedSeriesId">Search&nbsp;within&nbsp;series</a>
+                                                <slot name="record_actions" v-bind:record="record"></slot>
+                                            </td>
+                                        </tr>
+                                    </template>
                                 </tbody>
                             </table>
                         </div>
@@ -269,6 +277,15 @@ Vue.component('controlled-records', {
             });
             this.selectedSeriesId = record.uri;
             this.setHash();
+        },
+        toggleRepresentations: function(event: any) {
+            const topRow = event.target.closest('tr');
+            const showChildren = topRow.classList.toggle('expanded');
+
+            let row = topRow;
+            while ((row = row.nextSibling) != null && row.classList.contains('nested')) {
+                row.style.display = (showChildren ? 'table-row' : 'none');
+            }
         },
         addFilter: function(facet: Facet) {
             this.appliedFilters.push(facet);
@@ -367,6 +384,22 @@ Vue.component('controlled-records', {
                 this.records = json.results;
                 this.facets = json.facets;
             });
+        },
+        flattenRecords: function(records: Record[]) {
+            const result = []
+
+            for (const record of records) {
+                result.push(record);
+
+                if (record.representations_json) {
+                    for (let representation of record.representations_json) {
+                        representation.nested = true;
+                        result.push(representation);
+                    }
+                }
+            }
+
+            return result;
         },
         nextPage: function() {
             if (!this.searchActive) {
