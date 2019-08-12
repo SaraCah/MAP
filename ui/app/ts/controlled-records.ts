@@ -13,6 +13,8 @@ export default interface Record {
     type: string;
     title: string;
     under_movement: boolean;
+    start_date: string;
+    end_date: string;
     types: string[];
     file_issue_allowed: boolean;
     id: string;
@@ -163,6 +165,8 @@ Vue.component('controlled-records', {
                                         <th>Agency Identifier</th>
                                         <th>QSA Identifier</th>
                                         <th>Representations</th>
+                                        <th>Dates</th>
+                                        <th>Parent Series</th>
                                         <th style="width: 18em"></th>
                                     </tr>
                                 </thead>
@@ -183,6 +187,8 @@ Vue.component('controlled-records', {
                                                 </span>
 
                                             </td>
+                                            <td>{{ buildDates(record) }}</td>
+                                            <td>{{record.series}}</td>
                                             <td>
                                                 <a href="javascript:void(0);" @click="searchWithinSeries(record)" v-if="record.primary_type === 'resource' && !selectedSeriesId">Search&nbsp;within&nbsp;series</a>
                                                 <slot name="record_actions" v-bind:record="record"></slot>
@@ -286,6 +292,24 @@ Vue.component('controlled-records', {
             while ((row = row.nextSibling) != null && row.classList.contains('nested')) {
                 row.style.display = (showChildren ? 'table-row' : 'none');
             }
+        },
+        buildDates: function(record: Record) {
+            console.log(record.type);
+            if (record.type.indexOf("Representation") >= 0) {
+                // These don't have dates of their own
+                return "";
+            }
+
+            const startYear = record.start_date.substring(0, 4);
+            let endYear = record.end_date.substring(0, 4);
+
+            if (endYear === '9999') {
+                endYear = 'present';
+            } else if (endYear === startYear) {
+                return startYear;
+            }
+
+            return [startYear, endYear].join(' - ');
         },
         addFilter: function(facet: Facet) {
             this.appliedFilters.push(facet);
