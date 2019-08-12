@@ -19,10 +19,13 @@ Templates.define(:qgov_header, [], "views/qgov_header.erb.html")
 Templates.define(:qgov_footer, [], "views/qgov_footer.erb.html")
 
 Templates.define(:login, [:username?, :message?], "views/login.erb.html")
+Templates.define(:mfa, [:message?], "views/mfa.erb.html")
+Templates.define(:setup_mfa, [:secret?], "views/setup_mfa.erb.html")
 
 Templates.define(:records, [:agency?, :location?], "views/records.erb.html")
 
 Templates.define(:user_edit, [:user, :errors?], "views/user_form.erb.html")
+Templates.define(:setup_mfa, [:secret, :qr_code, :current_token], "views/setup_mfa.erb.html")
 Templates.define(:location_edit, [:location, :errors?], "views/location_form.erb.html")
 Templates.define(:location_add_user, [:location, :user, :mode, :role?, :position?, :errors?], "views/location_add_user_form.erb.html")
 Templates.define(:flash_message, [:message], "views/_message.erb.html")

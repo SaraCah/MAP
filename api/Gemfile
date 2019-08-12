@@ -11,6 +11,7 @@ gem "bcrypt", "3.1.12"
 gem "jdbc-mysql", "5.1.47"
 
 gem "aws-sdk-s3"
+gem "rotp", "5.1"
 
 if ENV['RELEASE_BRANCH'] == 'qa'
   gem "xlsx_streaming_reader", git: "https://github.com/hudmol/xlsx_streaming_reader.git", branch: "qa"

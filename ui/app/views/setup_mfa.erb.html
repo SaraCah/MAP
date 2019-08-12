@@ -1,0 +1,11 @@
+<div id="mfa">
+    <div class="container">
+        <div class="row">
+            <div class="row">
+                <div>Secret: <%= secret %></div>
+                <div >QR CODE: <%== qr_code.as_svg(module_size: 3) %></div>
+                <div>Current Token: <%= current_token %></div>
+            </div>
+        </div>
+    </div>
+</div>
