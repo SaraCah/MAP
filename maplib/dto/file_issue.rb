@@ -47,6 +47,7 @@ class FileIssue
         urgent: row[:urgent] == 1,
         delivery_location: row[:delivery_location],
         delivery_authorizer: row[:delivery_authorizer],
+        date_completed: row[:date_completed],
         agency_id: row[:agency_id],
         agency_location_id: row[:agency_location_id],
         created_by: row[:created_by],
