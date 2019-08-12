@@ -188,7 +188,7 @@ Vue.component('controlled-records', {
 
                                             </td>
                                             <td>{{ buildDates(record) }}</td>
-                                            <td>{{record.series}}</td>
+                                            <td><span v-if="!record.nested">{{record.series}}</span></td>
                                             <td>
                                                 <a href="javascript:void(0);" @click="searchWithinSeries(record)" v-if="record.primary_type === 'resource' && !selectedSeriesId">Search&nbsp;within&nbsp;series</a>
                                                 <slot name="record_actions" v-bind:record="record"></slot>
