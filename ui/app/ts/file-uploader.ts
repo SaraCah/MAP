@@ -178,6 +178,11 @@ Vue.component('file-uploader', {
             this.uploaded = Utils.filter(this.uploaded, (file: UploadedFile) => {
                 return fileToRemove.key !== file.key;
             });
+            this.reset();
+        },
+        reset() {
+            (this.$refs.upload as HTMLInputElement).value = '';
+            (document.getElementsByClassName('file-path')[0] as HTMLInputElement).value = '';
         },
         buildPath(field: string) {
             return this.input_path + "[" + field + "]";
