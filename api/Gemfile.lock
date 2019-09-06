@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/hudmol/map_validator.git
-  revision: 9787ea2799551e68816b2a8eb5cca1b2e4ebf84a
+  revision: ecea84859cbe5d8265992cb7efab2d18dd83b5fb
   branch: master
   specs:
     map_validator (0.0.1)
@@ -17,8 +17,8 @@ GEM
   remote: https://rubygems.org/
   specs:
     aws-eventstream (1.0.3)
-    aws-partitions (1.196.0)
-    aws-sdk-core (3.62.0)
+    aws-partitions (1.209.0)
+    aws-sdk-core (3.66.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.1)
@@ -26,7 +26,7 @@ GEM
     aws-sdk-kms (1.24.0)
       aws-sdk-core (~> 3, >= 3.61.1)
       aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.46.0)
+    aws-sdk-s3 (1.48.0)
       aws-sdk-core (~> 3, >= 3.61.1)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.1)
@@ -46,7 +46,7 @@ GEM
     rack (2.0.7)
     rack-protection (2.0.5)
       rack
-    rjack-jetty (9.4.14.0-java)
+    rjack-jetty (9.4.20.0-java)
     rjack-logback (1.9.0-java)
       rjack-slf4j (~> 1.7.16)
     rjack-slf4j (1.7.25.0-java)
