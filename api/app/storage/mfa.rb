@@ -16,4 +16,15 @@ class Mfa < BaseStorage
     db[:mfa_keys].filter(:user_id => user_id).get(:key)
   end
 
+  def self.save_key(user_id, key)
+    p key
+    if !key.nil? && !key.empty?
+      db[:mfa_keys].filter(:user_id => user_id).delete
+      db[:mfa_keys].insert(:user_id => user_id,
+                                  :key => key)
+    end
+
+    []
+  end
+
 end

@@ -146,8 +146,12 @@ class MAPAPIClient
 
   def mfa_get_key(username)
     response = post('/mfa-get-key', username: username)
-    p response
     response['key']
+  end
+
+  def mfa_new_key(username, key)
+    response = post('/mfa-new-key', username: username, key: key)
+    response['status']
   end
 
   User = Struct.new(:username, :name, :is_admin, :is_inactive, :create_time, :agency_roles) do

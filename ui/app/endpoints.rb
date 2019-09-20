@@ -267,17 +267,26 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/manage-mfa') do
     secret = Ctx.client.mfa_get_key(session[:username])
-    if !secret
-      secret = ROTP::Base32.random  # returns a 160 bit (32 character) base32 secret. Compatible with Google Authenticator
+    if secret.nil? || secret.empty?
+      Templates.emit_with_layout(:manage_mfa_no_key, {}, :layout, title: "Manage MFA")
+    else
+      totp = ROTP::TOTP.new(secret, issuer: "MAP MFA")
+      Templates.emit_with_layout(:manage_mfa, {
+          secret: secret,
+          regenerate: false,
+          qr_code: RQRCode::QRCode.new(totp.provisioning_uri(session[:username])),
+          current_token: totp.now
+      }, :layout, title: "Manage MFA")
     end
 
-    totp = ROTP::TOTP.new(secret, issuer: "MAP MFA")
-    Templates.emit_with_layout(:manage_mfa, {
-        secret: secret,
-        qr_code: RQRCode::QRCode.new(totp.provisioning_uri(session[:username])),
-        current_token: totp.now
-    }, :layout, title: "Manage MFA")
-    # TODO save the key to the database.
+  end
+
+  Endpoint.get('/mfa-new-key') do
+    # TODO verify current secret before saving new secret
+    # TODO confirm save new secret
+    key = ROTP::Base32.random  # returns a 160 bit (32 character) base32 secret. Compatible with Google Authenticator
+    Ctx.client.mfa_new_key(session[:username], key)
+    redirect '/manage-mfa'
   end
 
   Endpoint.post('/permissions/remove')

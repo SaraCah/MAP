@@ -56,6 +56,16 @@ class MAPTheAPI < Sinatra::Base
     json_response(key: key)
   end
 
+  Endpoint.post('/mfa-new-key')
+    .param(:username, String, "Username")
+    .param(:key, String, "Key") do
+      user_id = Users.id_for_username(params[:username])
+      # TODO error handling
+      Mfa.save_key(user_id, params[:key])
+      # TODO save the key to the database.
+      json_response(status: 'ok')
+    end
+
   Endpoint.post('/users/create')
     .param(:user, UserDTO, "User") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_create_users?(Ctx.get.current_location ? Ctx.get.current_location.agency_ref : nil)
