@@ -6,7 +6,6 @@ class Mfa < BaseStorage
   end
 
   def self.key_verified(user_id, authcode)
-    require 'rotp'
     secret = db[:mfa_keys].filter(:user_id => user_id).get(:key)
     return nil unless secret
     totp = ROTP::TOTP.new(secret)

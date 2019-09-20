@@ -265,10 +265,7 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
-  Endpoint.get('/manage-mfa')do
-    require 'rotp'
-    require 'rqrcode'
-
+  Endpoint.get('/manage-mfa') do
     secret = Ctx.client.mfa_get_key(session[:username])
     if !secret
       secret = ROTP::Base32.random  # returns a 160 bit (32 character) base32 secret. Compatible with Google Authenticator

@@ -94,6 +94,7 @@ require 'rack/map_logger'
 
 require 'map_validator'
 
+require 'rotp'
 
 class MAPTheAPI < Sinatra::Base
 
