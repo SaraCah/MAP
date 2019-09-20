@@ -28,6 +28,44 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.post('/has-mfa', needs_session: false)
+    .param(:username, String, "Username") do
+    user_id = Users.id_for_username(params[:username])
+    if Mfa.has_key?(user_id)
+      json_response(has_key: true)
+    else
+      json_response(has_key: false)
+    end
+  end
+
+  Endpoint.post('/mfa-validate', needs_session: false)
+    .param(:username, String, "Username")
+    .param(:authcode, String, "Authcode") do
+    user_id = Users.id_for_username(params[:username])
+    if Mfa.key_verified(user_id, params[:authcode]).nil?
+      json_response(validated: false)
+    else
+      json_response(validated: true)
+    end
+  end
+
+  Endpoint.post('/mfa-get-key', needs_session: false)
+      .param(:username, String, "Username") do
+    user_id = Users.id_for_username(params[:username])
+    key = Mfa.get_key(user_id)
+    json_response(key: key)
+  end
+
+  Endpoint.post('/mfa-new-key')
+    .param(:username, String, "Username")
+    .param(:key, String, "Key") do
+      user_id = Users.id_for_username(params[:username])
+      # TODO error handling
+      Mfa.save_key(user_id, params[:key])
+      # TODO save the key to the database.
+      json_response(status: 'ok')
+    end
+
   Endpoint.post('/users/create')
     .param(:user, UserDTO, "User") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_create_users?(Ctx.get.current_location ? Ctx.get.current_location.agency_ref : nil)

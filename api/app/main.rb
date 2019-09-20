@@ -73,6 +73,7 @@ require 'storage/sessions'
 require 'storage/permissions'
 require 'storage/agencies'
 require 'storage/locations'
+require 'storage/mfa'
 require 'storage/transfers'
 require 'storage/byte_storage'
 require 'storage/file_storage'
@@ -93,6 +94,7 @@ require 'rack/map_logger'
 
 require 'map_validator'
 
+require 'rotp'
 
 class MAPTheAPI < Sinatra::Base
 

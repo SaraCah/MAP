@@ -1,0 +1,33 @@
+<div id="mfa">
+    <div class="container">
+        <div class="row">
+            <div class="z-depth-3 y-depth-3 x-depth-3 grey green-text lighten-4 row">
+                <form action="mfa-validate" method="post">
+                    <%== FormHelper.hidden_authenticity_token %>
+                    <% if message %>
+                    <div class="row">
+                        <div class="red-text col s12">
+                            <%= message %>
+                        </div>
+                    </div>
+                    <% end %>
+                    <div class="row">
+                        Please Verify
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input type="authcode" name="authcode" id="authcode">
+                            <label for="authcode">Code</label>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col s12">
+                            <button type="submit" class="col s12 btn btn-large waves-effect">Validate</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

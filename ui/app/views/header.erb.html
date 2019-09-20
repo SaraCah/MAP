@@ -84,6 +84,7 @@
 <% end %>
 <ul id="userMenu" class="dropdown-content grey darken-3 white-text">
     <li class="vue-enabled"><manage-current-user username="<%= Ctx.username %>"></manage-current-user></li>
+    <li><a href="/manage-mfa" class="white-text">Manage MFA</a></li>
     <li><a href="/logout" class="white-text">Logout (<%= Ctx.username %>)</a></li>
 </ul>
 <div class="row">

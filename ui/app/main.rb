@@ -69,6 +69,9 @@ require 'endpoints'
 
 require 'rack/map_logger'
 
+require 'rotp'
+require 'rqrcode'
+
 module Rack
   module Protection
     class Base

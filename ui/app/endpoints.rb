@@ -80,21 +80,46 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  Endpoint.get('/mfa') do
+    Templates.emit_with_layout(:mfa, {},
+                              :layout_blank, title: "Please verify")
+  end
+
+  Endpoint.post('/mfa-validate')
+    .param(:authcode, String, "Auth Code") do
+    if Ctx.client.mfa_validate?(session[:username], params[:authcode])
+      session[:api_session_id] = session[:pending_validation_api_session_id]
+      redirect '/'
+    else
+      Templates.emit_with_layout(:mfa, {message: 'Invalid Token. Please try again'},
+                                 :layout_blank, title: "Please verify")
+    end
+
+  end
 
   Endpoint.post('/authenticate')
    .param(:username, String, "Username to authenticate")
-   .param(:password, String, "Password") do 
-    authentication = Ctx.client.authenticate(params[:username], params[:password])
+   .param(:password, String, "Password") do
 
-    if authentication.successful?
-      session[:api_session_id] = authentication.session_id or raise "WOOT"
-      session[:username] = params[:username]
+      authentication = Ctx.client.authenticate(params[:username], params[:password])
 
-      redirect '/'
-    else
-      Templates.emit_with_layout(:login, {username: params[:username], message: "Login failed"},
-                                 :layout_blank, title: "Please log in")
-    end
+     if authentication.successful?
+       session[:username] = params[:username]
+
+       p Ctx.client.has_mfa?(session[:username])
+       if Ctx.client.has_mfa?(session[:username])
+         session[:pending_validation_api_session_id] = authentication.session_id or raise "WOOT"
+         redirect '/mfa'
+       else
+         # TODO Enforce MFA setup?
+         session[:api_session_id] = authentication.session_id or raise "WOOT"
+         redirect '/'
+       end
+
+     else
+       Templates.emit_with_layout(:login, {username: params[:username], message: "Login failed"},
+                                  :layout_blank, title: "Please log in")
+     end
   end
 
   Endpoint.get('/users/new-admin') do
@@ -238,6 +263,30 @@ class MAPTheApp < Sinatra::Base
     else
       Templates.emit(:user_edit, {user: params[:user], errors: errors})
     end
+  end
+
+  Endpoint.get('/manage-mfa') do
+    secret = Ctx.client.mfa_get_key(session[:username])
+    if secret.nil? || secret.empty?
+      Templates.emit_with_layout(:manage_mfa_no_key, {}, :layout, title: "Manage MFA")
+    else
+      totp = ROTP::TOTP.new(secret, issuer: "MAP MFA")
+      Templates.emit_with_layout(:manage_mfa, {
+          secret: secret,
+          regenerate: false,
+          qr_code: RQRCode::QRCode.new(totp.provisioning_uri(session[:username])),
+          current_token: totp.now
+      }, :layout, title: "Manage MFA")
+    end
+
+  end
+
+  Endpoint.get('/mfa-new-key') do
+    # TODO verify current secret before saving new secret
+    # TODO confirm save new secret
+    key = ROTP::Base32.random  # returns a 160 bit (32 character) base32 secret. Compatible with Google Authenticator
+    Ctx.client.mfa_new_key(session[:username], key)
+    redirect '/manage-mfa'
   end
 
   Endpoint.post('/permissions/remove')

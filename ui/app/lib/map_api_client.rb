@@ -134,6 +134,26 @@ class MAPAPIClient
     end
   end
 
+  def has_mfa?(username)
+    response = post('/has-mfa', username: username)
+    !!response['has_key']
+  end
+
+  def mfa_validate?(username, authcode)
+    response = post('/mfa-validate', username: username, authcode: authcode)
+    response['validated']
+  end
+
+  def mfa_get_key(username)
+    response = post('/mfa-get-key', username: username)
+    response['key']
+  end
+
+  def mfa_new_key(username, key)
+    response = post('/mfa-new-key', username: username, key: key)
+    response['status']
+  end
+
   User = Struct.new(:username, :name, :is_admin, :is_inactive, :create_time, :agency_roles) do
     def self.from_json(json)
       User.new(json.fetch('username'),
