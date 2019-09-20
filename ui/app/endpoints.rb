@@ -265,7 +265,7 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
-  Endpoint.get('/setup-mfa')do
+  Endpoint.get('/manage-mfa')do
     require 'rotp'
     require 'rqrcode'
 
@@ -275,7 +275,11 @@ class MAPTheApp < Sinatra::Base
     end
 
     totp = ROTP::TOTP.new(secret, issuer: "MAP MFA")
-    Templates.emit(:setup_mfa, {secret: secret, qr_code: RQRCode::QRCode.new(totp.provisioning_uri("foo@gaiaresources.com.au")), current_token: totp.now})
+    Templates.emit_with_layout(:manage_mfa, {
+        secret: secret,
+        qr_code: RQRCode::QRCode.new(totp.provisioning_uri("foo@gaiaresources.com.au")),
+        current_token: totp.now
+    }, :layout, title: "Manage MFA")
     # TODO save the key to the database.
   end
 
