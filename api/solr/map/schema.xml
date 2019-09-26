@@ -261,7 +261,7 @@ http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters
       <!-- Optionally you may want to use this less aggressive stemmer instead of PorterStemFilterFactory:
            <filter class="solr.EnglishMinimalStemFilterFactory"/>
       -->
-      <filter class="solr.PorterStemFilterFactory"/>
+      <filter class="solr.SnowballPorterFilterFactory"/>
     </analyzer>
     <analyzer type="query">
       <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -276,7 +276,7 @@ http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters
       <!-- Optionally you may want to use this less aggressive stemmer instead of PorterStemFilterFactory:
            <filter class="solr.EnglishMinimalStemFilterFactory"/>
       -->
-      <filter class="solr.PorterStemFilterFactory"/>
+      <filter class="solr.SnowballPorterFilterFactory"/>
     </analyzer>
   </fieldType>
 
