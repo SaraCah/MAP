@@ -1,7 +1,10 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    addressable (2.7.0)
+      public_suffix (>= 2.0.2, < 5.0)
     backports (3.15.0)
+    chunky_png (1.3.11)
     connection_pool (2.2.2)
     erubis (2.7.0)
     fishwife (1.10.1-java)
@@ -13,6 +16,7 @@ GEM
     mustermann (1.0.3)
     net-http-persistent (3.0.1)
       connection_pool (~> 2.2)
+    public_suffix (4.0.1)
     rack (2.0.7)
     rack-protection (2.0.5)
       rack
@@ -20,6 +24,10 @@ GEM
     rjack-logback (1.9.0-java)
       rjack-slf4j (~> 1.7.16)
     rjack-slf4j (1.7.25.0-java)
+    rotp (5.1.0)
+      addressable (~> 2.5)
+    rqrcode (0.10.1)
+      chunky_png (~> 1.0)
     sinatra (2.0.5)
       mustermann (~> 1.0)
       rack (~> 2.0)
@@ -32,7 +40,7 @@ GEM
       rack-protection (= 2.0.5)
       sinatra (= 2.0.5)
       tilt (>= 1.3, < 3)
-    tilt (2.0.9)
+    tilt (2.0.10)
 
 PLATFORMS
   java
@@ -44,6 +52,8 @@ DEPENDENCIES
   net-http-persistent (= 3.0.1)
   rack-protection (= 2.0.5)
   rjack-logback (= 1.9.0)
+  rotp (= 5.1)
+  rqrcode (= 0.10.1)
   sinatra (= 2.0.5)
   sinatra-contrib (= 2.0.5)
 
