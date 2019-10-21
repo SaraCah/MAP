@@ -28,6 +28,7 @@ sub main {
           if ($current_output ne $output) {
                if ($fh) {
                     close($fh);
+                    unlink($output);
                }
 
                $current_output = $output;
