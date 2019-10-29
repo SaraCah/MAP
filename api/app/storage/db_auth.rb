@@ -59,7 +59,7 @@ class DBAuth < BaseStorage
                           Sequel[:dbauth][:rate_limit_expiry_time])
                   .first
 
-    return false if !user_auth
+    return AuthenticationResult.new(false, 0) if !user_auth
 
     now = java.lang.System.currentTimeMillis
     rate_limited, new_expiry_time, delay_seconds = apply_rate_limit(user_auth[:rate_limit_expiry_time], now)
