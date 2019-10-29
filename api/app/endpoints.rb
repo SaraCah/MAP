@@ -23,10 +23,11 @@ class MAPTheAPI < Sinatra::Base
     .param(:rate_limit_key, String, "Key to use for identifying this user for rate limiting") do
 
     limit = RateLimiter.apply_rate_limit(params[:rate_limit_key])
+    user_limit = RateLimiter.apply_rate_limit(params[:username])
 
-    if limit.rate_limited
+    if limit.rate_limited || user_limit.rate_limited
       json_response(authenticated: false,
-                    delay_seconds: limit.delay_seconds)
+                    delay_seconds: [limit.delay_seconds, user_limit.delay_seconds].max)
     elsif DBAuth.authenticate(params[:username], params[:password])
       json_response(authenticated: true,
                     session: Sessions.create_session(params[:username]))
