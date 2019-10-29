@@ -67,6 +67,7 @@ require 'lib/search'
 require 'lib/solr_indexer'
 
 require 'storage/base_storage'
+require 'storage/rate_limiter'
 require 'storage/db_auth'
 require 'storage/users'
 require 'storage/sessions'

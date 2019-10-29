@@ -19,15 +19,20 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/authenticate', needs_session: false)
     .param(:username, String, "Username to authenticate")
-    .param(:password, String, "Password") do
-    auth_result = DBAuth.authenticate(params[:username], params[:password])
+    .param(:password, String, "Password")
+    .param(:rate_limit_key, String, "Key to use for identifying this user for rate limiting") do
 
-    if auth_result.success?
+    limit = RateLimiter.apply_rate_limit(params[:rate_limit_key])
+
+    if limit.rate_limited
+      json_response(authenticated: false,
+                    delay_seconds: limit.delay_seconds)
+    elsif DBAuth.authenticate(params[:username], params[:password])
       json_response(authenticated: true,
                     session: Sessions.create_session(params[:username]))
     else
       json_response(authenticated: false,
-                    delay_seconds: auth_result.delay_seconds)
+                    delay_seconds: 0)
     end
   end
 

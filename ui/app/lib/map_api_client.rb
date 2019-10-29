@@ -124,8 +124,8 @@ class MAPAPIClient
     ['allow_set_and_change_raps', 'allow_restricted_access'].include?(permission.to_s)
   end
 
-  def authenticate(username, password)
-    response = post('/authenticate', username: username, password: password)
+  def authenticate(username, password, rate_limit_key)
+    response = post('/authenticate', username: username, password: password, rate_limit_key: rate_limit_key)
 
     if response['authenticated']
       Authentication.new(true, response['session'], response['permissions'], 0)

@@ -101,7 +101,9 @@ class MAPTheApp < Sinatra::Base
    .param(:username, String, "Username to authenticate")
    .param(:password, String, "Password") do
 
-    authentication = Ctx.client.authenticate(params[:username], params[:password])
+    rate_limit_key = request.ip || "unknown"
+
+    authentication = Ctx.client.authenticate(params[:username], params[:password], rate_limit_key)
 
     if authentication.successful?
       session[:username] = params[:username]
