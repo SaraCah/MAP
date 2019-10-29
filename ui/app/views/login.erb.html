@@ -6,9 +6,15 @@
                     <%== FormHelper.hidden_authenticity_token %>
                     <% if message %>
                         <div class="row">
-                            <div class="red-text col s12">
-                                <%= message %>
-                            </div>
+                            <% if delay_seconds && delay_seconds > 0 %>
+                                <div class="red-text col s12">
+                                    You have reached your maximum number of failed login attempts.  Please wait <%= delay_seconds %> seconds before trying again.
+                                </div>
+                            <% else %>
+                                <div class="red-text col s12">
+                                    <%= message %>
+                                </div>
+                            <% end %>
                         </div>
                     <% end %>
                     <div class="row">

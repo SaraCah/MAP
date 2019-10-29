@@ -19,7 +19,7 @@ class MAPAPIClient
     @session = session
   end
 
-  Authentication = Struct.new(:successful, :session_id, :permissions) do
+  Authentication = Struct.new(:successful, :session_id, :permissions, :delay_seconds) do
     def successful?
       self.successful
     end
@@ -128,9 +128,9 @@ class MAPAPIClient
     response = post('/authenticate', username: username, password: password)
 
     if response['authenticated']
-      Authentication.new(true, response['session'], response['permissions'])
+      Authentication.new(true, response['session'], response['permissions'], 0)
     else
-      Authentication.new(false)
+      Authentication.new(false, nil, nil, response['delay_seconds'])
     end
   end
 

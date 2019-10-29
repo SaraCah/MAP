@@ -13,6 +13,12 @@ AppConfig[:page_size] = 10
 
 AppConfig[:max_concurrent_xlsx_validations] = 10
 
+# As a long term average you can try one login every 10 seconds
+AppConfig[:dbauth_seconds_per_login] = 10
+
+# But you can try 10 in quick succession before we start limiting
+AppConfig[:dbauth_max_login_burst] = 10
+
 begin
   load File.join(File.dirname(__FILE__), "/config.local.rb")
 rescue LoadError

@@ -101,25 +101,24 @@ class MAPTheApp < Sinatra::Base
    .param(:username, String, "Username to authenticate")
    .param(:password, String, "Password") do
 
-      authentication = Ctx.client.authenticate(params[:username], params[:password])
+    authentication = Ctx.client.authenticate(params[:username], params[:password])
 
-     if authentication.successful?
-       session[:username] = params[:username]
+    if authentication.successful?
+      session[:username] = params[:username]
 
-       p Ctx.client.has_mfa?(session[:username])
-       if Ctx.client.has_mfa?(session[:username])
-         session[:pending_validation_api_session_id] = authentication.session_id or raise "WOOT"
-         redirect '/mfa'
-       else
-         # TODO Enforce MFA setup?
-         session[:api_session_id] = authentication.session_id or raise "WOOT"
-         redirect '/'
-       end
+      if Ctx.client.has_mfa?(session[:username])
+        session[:pending_validation_api_session_id] = authentication.session_id or raise "WOOT"
+        redirect '/mfa'
+      else
+        # TODO Enforce MFA setup?
+        session[:api_session_id] = authentication.session_id or raise "WOOT"
+        redirect '/'
+      end
 
-     else
-       Templates.emit_with_layout(:login, {username: params[:username], message: "Login failed"},
-                                  :layout_blank, title: "Please log in")
-     end
+    else
+      Templates.emit_with_layout(:login, {username: params[:username], message: "Login failed", delay_seconds: authentication.delay_seconds},
+                                 :layout_blank, title: "Please log in")
+    end
   end
 
   Endpoint.get('/users/new-admin') do
