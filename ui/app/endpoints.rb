@@ -349,6 +349,8 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/logout') do
+    Ctx.client.logout
+
     session[:api_session_id] = nil
     session[:username] = nil
 

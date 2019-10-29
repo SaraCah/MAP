@@ -653,6 +653,9 @@ class MAPAPIClient
          'permissions[]' => permissions)
   end
 
+  def logout
+    post('/logout')
+  end
 
   private
 
