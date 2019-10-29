@@ -5,7 +5,7 @@ class UserDTO
   define_field(:username, String)
   define_field(:name, String, validator: proc {|s| (s.nil? || s.empty?) ? "Name can't be blank" : nil})
   define_field(:email, String, validator: proc {|s| UserDTO.validate_email(s)})
-  define_field(:password, String, required: false, validator: proc {|s, user| user.new? && s.empty? ? "Password can't be blank" : nil})
+  define_field(:password, String, required: false, validator: proc {|s, user| validate_password(s, user)})
   define_field(:is_admin, Boolean, default: false)
   define_field(:is_inactive, Boolean, default: false)
   define_field(:agency_roles, [AgencyRoleDTO], default: [])
@@ -23,6 +23,20 @@ class UserDTO
         created_by: row[:created_by],
         create_time: row[:create_time],
         lock_version: row[:lock_version])
+  end
+
+  def self.validate_password(password, user)
+    if user.new?
+      return "Password can't be blank" if password.empty?
+    end
+
+    return nil if password.empty?
+
+    unless Users.valid_password?(password)
+      return 'Password must be at least 12 characters in length, contain both upper and lower case letters, and at least one non-letter (numeral, space or punctuation)'
+    end
+
+    nil
   end
 
   def is_admin?

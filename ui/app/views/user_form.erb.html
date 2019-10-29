@@ -29,6 +29,9 @@
             <div class="input-field col s12">
                 <input id="password" name="user[password]" type="password" <% if user.new? %>required<% else %>placeholder="************"<% end %> autocomplete="new-password">
                 <label class="active" for="password">Password</label>
+                <span class="helper-text">
+                    Must be at least 12 characters in length; Include both upper and lower case letters; Include at least one non-letter (numeral, space or punctuation)
+                </span>
             </div>
         </div>
 

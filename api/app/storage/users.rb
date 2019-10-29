@@ -165,6 +165,15 @@ class Users < BaseStorage
       []
   end
 
+  # Contain both upper and lower case characters e.g. a-z, A-Z
+  # Utilise numerals, spaces, and punctuation characters as well as letters e.g. 0-9, !@#$%^&()_+|~-=`{}[]:";'<>?,./
+  # Contain at least twelve (12) characters
+  PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9\W]).{12,}$/
+
+  def self.valid_password?(password)
+    password =~ PASSWORD_REGEX
+  end
+
   def self.create_from_dto(user)
     # check for uniqueness
     if db[:user][:username => user.fetch('username')].nil?
