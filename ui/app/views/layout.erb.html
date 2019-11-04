@@ -9,6 +9,8 @@
         <script>
             var AppConfig = {
                 page_size: <%= AppConfig[:page_size] %>,
+                file_upload_allowed_extensions: <%== AppConfig[:file_upload_allowed_extensions].to_json %>,
+                file_upload_allowed_mime_types: <%== AppConfig[:file_upload_allowed_mime_types].to_json %>,
             };
         </script>
     </head>

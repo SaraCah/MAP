@@ -1,5 +1,6 @@
 /// <amd-module name='file-uploader'/>
 
+declare var AppConfig: any;
 
 import Vue from "vue";
 import VueResource from "vue-resource";
@@ -39,7 +40,7 @@ Vue.component('file-uploader', {
         <div class="file-field input-field">
             <div class="btn">
                 <span>Upload File(s)</span>
-                <input type="file" ref="upload" multiple v-on:change="uploadFiles">
+                <input type="file" ref="upload" multiple v-bind:accept="buildAcceptString()" v-on:change="uploadFiles">
             </div>
             <div class="file-path-wrapper">
                 <input class="file-path" type="text">
@@ -170,6 +171,11 @@ Vue.component('file-uploader', {
                     this.enableFormSubmit();
                 });
             }
+        },
+        buildAcceptString(): string {
+            return (AppConfig.file_upload_allowed_extensions.map((ext: string) => `.${ext}`)
+                    .concat(AppConfig.file_upload_allowed_mime_types)
+                    .join(','));
         },
         is_deleteable(role: string) {
             return this.non_deleteable_roles.indexOf(role) < 0;
