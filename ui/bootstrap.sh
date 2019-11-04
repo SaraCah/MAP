@@ -3,6 +3,10 @@
 JRUBY_VERSION="https://repo1.maven.org/maven2/org/jruby/jruby-complete/9.2.7.0/jruby-complete-9.2.7.0.jar"
 JRUBY_SHA256="a43125f921e707eef861713028d79f60d2f4b024ea6af71a992395ee9e697c22"
 
+TIKA_VERSION="https://repo1.maven.org/maven2/org/apache/tika/tika-core/1.22/tika-core-1.22.jar"
+TIKA_SHA256="81a9e28c9fa9d6b00d1e5d85795403fb773d4c571175487b35b83a8c02599dd7"
+
+
 function fail() {
     echo "ERROR: $*"
     echo "Aborting"
@@ -24,6 +28,7 @@ cd "`dirname "$0"`"
 mkdir -p distlibs
 
 have_jruby=0
+have_tika=0
 
 if [ -e distlibs/jruby-complete.jar ]; then
     checksum="`openssl dgst -sha256 distlibs/jruby-complete.jar | awk '{print $2}'`"
@@ -40,6 +45,25 @@ if [ "$have_jruby" != "1" ]; then
 
     if [ "$checksum" != $JRUBY_SHA256 ]; then
         fail "JRuby checksum mismatch.  Freaking out."
+        exit 1
+    fi
+fi
+
+if [ -e distlibs/tika-core.jar ]; then
+    checksum="`openssl dgst -sha256 distlibs/tika-core.jar | awk '{print $2}'`"
+    if [ "$checksum" = $TIKA_SHA256 ]; then
+        have_tika=1
+    fi
+fi
+
+if [ "$have_tika" != "1" ]; then
+    echo
+    echo "Fetching Tika..."
+    curl -L -s "$TIKA_VERSION" > distlibs/tika-core.jar
+    checksum="`openssl dgst -sha256 distlibs/tika-core.jar | awk '{print $2}'`"
+
+    if [ "$checksum" != $TIKA_SHA256 ]; then
+        fail "Tika checksum mismatch.  Freaking out."
         exit 1
     fi
 fi

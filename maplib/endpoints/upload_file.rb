@@ -13,7 +13,6 @@ class UploadFile
   end
 
   def self.parse(param)
-    # FIXME check size limit (MediumBlob-esque)
     new(param['filename'], param['type'], param['tempfile'])
   end
 

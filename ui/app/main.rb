@@ -45,6 +45,7 @@ require 'lib/form_helper'
 require 'lib/typescript_helper'
 require 'lib/js_bundle'
 require 'lib/http_utils'
+require 'lib/file_type_checker'
 
 require 'dto/dto'
 require 'dto/agency_for_edit'

@@ -543,20 +543,32 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.post('/file-upload')
     .param(:file, [UploadFile], "Files to upload") do
-    files = []
-    Ctx.client.store_files(params[:file]).zip(params[:file]).map do |file_key, file|
-      files << {
-        'key' => file_key,
-        'mime_type' => HTTPUtils.sanitise_mime_type(file.mime_type),
-        'filename' => file.filename,
-      }
-    end
+    if (rejected_files = FileTypeChecker.check(params[:file])) && !rejected_files.empty?
+      $LOG.info("Rejecting the following uploaded files due to unrecognised file types: #{rejected_files}")
+      [
+        415,
+        {'Content-type' => 'text/json'},
+        {
+          'status' => 'REJECTED_FILE_TYPE',
+          'rejected_files' => rejected_files.map(&:filename),
+        }
+      ]
+    else
+      files = []
+      Ctx.client.store_files(params[:file]).zip(params[:file]).map do |file_key, file|
+        files << {
+          'key' => file_key,
+          'mime_type' => HTTPUtils.sanitise_mime_type(file.mime_type),
+          'filename' => file.filename,
+        }
+      end
 
-    [
-      200,
-      {'Content-type' => 'text/json'},
-      files.to_json
-    ]
+      [
+        200,
+        {'Content-type' => 'text/json'},
+        files.to_json
+      ]
+    end
   end
 
   Endpoint.get('/transfer-proposals/:id')
