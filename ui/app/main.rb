@@ -198,7 +198,7 @@ class MAPTheApp < Sinatra::Base
         "xr-spatial-tracking 'none'",
       ].join("; ")
 
-      response[1]['Referrer-Policy'] = 'no-referrer'
+      response[1]['Referrer-Policy'] = 'same-origin'
 
       response
     end
