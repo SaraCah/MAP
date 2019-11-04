@@ -156,6 +156,57 @@ class MAPTheApp < Sinatra::Base
   use CacheControl
 
 
+  class SecurityHeaders
+    def initialize(app)
+      @app = app
+    end
+
+    def call(env)
+      response = @app.call(env)
+
+      if MAPTheApp.development?
+        response[1]['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src *"
+      else
+        response[1]['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline'; img-src *"
+      end
+
+      response[1]['Feature-Policy'] = [
+        "ambient-light-sensor 'none'",
+        "autoplay 'none'",
+        "accelerometer 'none'",
+        "battery 'none'",
+        "camera 'none'",
+        "display-capture 'none'",
+        "document-domain 'none'",
+        "encrypted-media 'none'",
+        "execution-while-not-rendered 'none'",
+        "execution-while-out-of-viewport 'none'",
+        "fullscreen 'none'",
+        "geolocation 'none'",
+        "gyroscope 'none'",
+        "magnetometer 'none'",
+        "microphone 'none'",
+        "midi 'none'",
+        "payment 'none'",
+        "picture-in-picture 'none'",
+        "speaker 'none'",
+        "sync-xhr 'none'",
+        "usb 'none'",
+        "wake-lock 'none'",
+        "webauthn 'none'",
+        "vr 'none'",
+        "xr-spatial-tracking 'none'",
+      ].join("; ")
+
+      response[1]['Referrer-Policy'] = 'no-referrer'
+
+      response
+    end
+  end
+
+  use SecurityHeaders
+
+
   use Rack::Session::Cookie, :key => 'map.session',
 
       :path => '/',
