@@ -164,11 +164,7 @@ class MAPTheApp < Sinatra::Base
     def call(env)
       response = @app.call(env)
 
-      if MAPTheApp.development?
-        response[1]['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src *"
-      else
-        response[1]['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline'; img-src *"
-      end
+      response[1]['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src *"
 
       response[1]['Feature-Policy'] = [
         "ambient-light-sensor 'none'",
