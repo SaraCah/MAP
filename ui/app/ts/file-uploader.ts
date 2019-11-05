@@ -46,6 +46,7 @@ Vue.component('file-uploader', {
                 <input class="file-path" type="text">
             </div>
         </div>
+        <p><small>Supported file types: {{buildFileTypeDisplayString()}}</small></p>
     </template>
     <template v-if="uploaded.length > 0">
         <div class="card">
@@ -152,9 +153,29 @@ Vue.component('file-uploader', {
                     // emulateJSON: true,
                 }).then((response: any) => {
                     return response.json();
-                }, () => {
+                }, (response: any) => {
                     this.enableFormSubmit();
-                    UI.genericModal("File upload failed");
+
+                    if (response.status === 415) {
+                        // File type not accepted
+                        const failures = JSON.parse(response.bodyText);
+
+                        const errors = document.createElement('p');
+                        errors.appendChild(document.createTextNode("The following files are not supported types:"));
+
+                        const errorList = document.createElement('ul');
+
+                        for (const failed_file of failures.rejected_files) {
+                            const li = document.createElement('li');
+                            li.innerText = failed_file;
+                            errorList.appendChild(li);
+                        }
+
+                        errors.appendChild(errorList);
+                        UI.genericHTMLModal(errors);
+                    } else {
+                        UI.genericModal("File upload failed");
+                    }
                 }).then((json: UploadedFile[]) => {
                     for (const uploadedFile of json) {
                         if (uploadedFile.role == null) {
@@ -176,6 +197,9 @@ Vue.component('file-uploader', {
             return (AppConfig.file_upload_allowed_extensions.map((ext: string) => `.${ext}`)
                     .concat(AppConfig.file_upload_allowed_mime_types)
                     .join(','));
+        },
+        buildFileTypeDisplayString(): string {
+            return AppConfig.file_upload_allowed_extensions.join(', ');
         },
         is_deleteable(role: string) {
             return this.non_deleteable_roles.indexOf(role) < 0;

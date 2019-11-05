@@ -551,7 +551,7 @@ class MAPTheApp < Sinatra::Base
         {
           'status' => 'REJECTED_FILE_TYPE',
           'rejected_files' => rejected_files.map(&:filename),
-        }
+        }.to_json
       ]
     else
       files = []
