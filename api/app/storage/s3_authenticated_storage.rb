@@ -6,9 +6,6 @@
 # because it turns out that doing straight up PUTs ends up creating objects
 # owned by an "anonymous" user, and these can't be accessed through the AWS
 # console.
-#
-# We'll migrate to using this class exclusively and it'll probably end up
-# becoming s3_storage.rb over the next few weeks.
 
 require 'securerandom'
 require 'tempfile'
