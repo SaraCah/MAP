@@ -92,9 +92,6 @@ class Templates
       rescue MAPAPIClient::SessionGoneError
         # Re-raise to log out the user
         raise $!
-      rescue Sequel::DatabaseError
-        # Re-raise to allow DB retry logic
-        raise $!
       rescue
         $LOG.error("Original error: #{$@.join("\n")}")
         $LOG.error("Args were: #{args.pretty_inspect}")
