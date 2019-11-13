@@ -68,7 +68,7 @@ Vue.component('file-issue-form', {
 
         JSON.parse(this.representations).forEach((representationBlob: any) => {
             const rep: RepresentationRequest = new RepresentationRequest(representationBlob.record_ref, '', representationBlob.request_type);
-            rep.recordDetails = representationBlob.recordDetails;
+            rep.recordDetails = representationBlob.record_details;
             rep.metadata = Utils.find(resolved, (item: any) => {
                 return item.ref === representationBlob.record_ref;
             });
