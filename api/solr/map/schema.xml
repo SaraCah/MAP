@@ -10,6 +10,7 @@
   <field name="types" type="string" indexed="true" stored="true" required="true" multiValued="true" />
   <field name="title" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="qsa_id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  <field name="qsa_id_prefixed" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="agency_assigned_id" type="string" indexed="true" stored="true" multiValued="false" />
   <field name="agency_assigned_tokens" type="text_general" indexed="true" stored="true" multiValued="true" />
 

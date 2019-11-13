@@ -20,6 +20,7 @@ export default interface Record {
     id: string;
     uri: string;
     qsa_id: number;
+    qsa_id_prefixed: string;
     physical_representations_count: number;
     digital_representations_count: number;
     current_location: string|null;
@@ -177,7 +178,7 @@ Vue.component('controlled-records', {
                                             <td>{{record.title}}</td>
                                             <td><span class="badge" v-if="record.under_movement">under movement</span></td>
                                             <td>{{record.agency_assigned_id}}</td>
-                                            <td>{{record.type}} {{record.qsa_id}}</td>
+                                            <td>{{record.qsa_id_prefixed}}</td>
                                             <td>
                                                 <span v-if="record.primary_type === 'resource' || ((record.physical_representations_count === 0) && (record.digital_representations_count === 0))">
                                                     {{record.physical_representations_count}} physical; {{record.digital_representations_count}} digital
