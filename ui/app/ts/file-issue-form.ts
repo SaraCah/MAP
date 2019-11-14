@@ -291,8 +291,8 @@ Vue.component('requested-items-table', {
                 <input type="hidden" :name="buildPath('record_ref')" v-bind:value="representation.id"/>
                 <input type="hidden" :name="buildPath('record_label')" v-bind:value="representation.label"/>
 
-                <div class="identifier">Series:&nbsp;<span class="id">{{representation.metadata.series_id}}</span></div>
-                <div class="identifier">Record:&nbsp;<span class="id">{{representation.metadata.record_id}}</span></div>
+                <div class="identifier">Series:&nbsp;<span class="id">S{{representation.metadata.series_id}}</span></div>
+                <div class="identifier">Record:&nbsp;<span class="id">R{{representation.metadata.record_id}}</span></div>
 
                 <div class="identifier" v-if="representation.metadata.agency_assigned_id">
                     Control&nbsp;Number:&nbsp;<span class="id">{{representation.metadata.agency_assigned_id}}</span>
@@ -301,7 +301,7 @@ Vue.component('requested-items-table', {
                     Previous&nbsp;System:&nbsp;<span class="id">{{representation.metadata.previous_system_id}}</span>
                 </div>
                 <div class="identifier" v-if="representation.metadata.representation_id">
-                    Representation:&nbsp;<span class="id">{{representation.metadata.representation_id}}</span>
+                    Representation:&nbsp;<span class="id">{{representation.qsaIdPrefix()}}{{representation.metadata.representation_id}}</span>
                 </div>
 
             <td>{{representation.metadata.title}}</td>

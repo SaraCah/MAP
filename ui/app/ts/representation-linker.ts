@@ -27,6 +27,14 @@ export default class RepresentationRequest {
                 public requestType: string) {
         this.recordDetails = '';
     }
+
+    public qsaIdPrefix() {
+        if (this.id.startsWith('physical_representation')) {
+            return 'PR';
+        } else {
+            return 'DR'
+        }
+    }
 }
 
 Vue.component('representation-browse', {
