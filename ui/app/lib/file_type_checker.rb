@@ -34,8 +34,8 @@ class FileTypeChecker
       if mime_type != 'application/x-tika-ooxml' &&
          mime_type != 'text/plain' &&
          !AppConfig[:file_upload_allowed_mime_types].include?(mime_type)
-        $LOG.info("Tika rejecting file claiming MIME type '%s': detected as '%s'" %
-                  [file.mime_type, mime_type])
+        $LOG.info("Tika rejecting file '%s': detected as '%s'" %
+                  [path, mime_type])
         false
       else
         true
