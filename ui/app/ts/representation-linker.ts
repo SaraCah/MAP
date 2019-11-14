@@ -52,6 +52,7 @@ Vue.component('representation-browse', {
                 </div>
                 <controlled-records title="">
                     <template v-slot:record_actions="slotProps">
+                        <span class="new badge red" v-if="showFileIssueDisallowed(slotProps.record)" title="Currently not available for file issue, contact QSA for details." data-badge-caption="Not Available"></span>
                         <span class="new badge orange" v-if="isNotOnShelf(slotProps.record)" title="Currently not available, there may be delays if requested, contact QSA for details." data-badge-caption="Not On Shelf"></span>
                         <template v-if="isAlreadySelected(slotProps.record)">
                             <button class="btn btn-small red darken-1" @click="removeSelected(slotProps.record)"><i class="fa fa-minus-circle" style="font-size: 1em;"></i> Remove</button>
@@ -100,10 +101,16 @@ Vue.component('representation-browse', {
         addSelected: function(record: Record) {
             this.$emit('selected', new RepresentationRequest(record.id, record.title, 'DIGITAL'));
         },
-        isSelectable: function(record: Record) {
+        isRepresentation: function(record: Record) {
             return !!Utils.find(record.types, (type: string) => {
                 return type === 'representation';
             });
+        },
+        isSelectable: function(record: Record) {
+            return this.isRepresentation(record) && record.file_issue_allowed;
+        },
+        showFileIssueDisallowed: function(record: Record) {
+            return this.isRepresentation(record) && !record.file_issue_allowed;
         },
         isNotOnShelf: function(record: Record) {
             return record.current_location && record.current_location !== 'HOME';
