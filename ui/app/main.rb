@@ -69,6 +69,7 @@ require 'endpoints/upload_file'
 require 'endpoints'
 
 require 'rack/map_logger'
+require 'rack/tempfile_reaper'
 
 require 'rotp'
 require 'rqrcode'
@@ -214,4 +215,5 @@ class MAPTheApp < Sinatra::Base
 
   use Rack::Deflater
 
+  use Rack::TempfileReaper
 end

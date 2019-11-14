@@ -404,9 +404,18 @@ class MAPAPIClient
   end
 
   def store_files(files)
-    post('/store-files',
-         { "file[]" => files.map(&:to_io) },
-         :multipart_form_data)
+    upload_files = files.map(&:to_io)
+
+    begin
+      result = post('/store-files',
+                    { "file[]" => upload_files },
+                    :multipart_form_data)
+    ensure
+      upload_files.each(&:close)
+      upload_files.each(&:unlink)
+    end
+
+    result
   end
 
   def stream_file(key)

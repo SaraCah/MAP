@@ -91,6 +91,8 @@ require 'endpoints/date_string'
 require 'endpoints'
 
 require 'rack/map_logger'
+require 'rack/tempfile_reaper'
+
 
 require 'map_validator'
 
@@ -110,6 +112,9 @@ class MAPTheAPI < Sinatra::Base
 
   configure do
     use Rack::MAPLogger, $LOG
+
+    # Clean up multipart upload temp files
+    use Rack::TempfileReaper
   end
 
   configure do
