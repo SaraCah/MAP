@@ -40,7 +40,7 @@ Vue.component('user-permissions-form', {
     <template v-if="available_delegations.length > 0">
         <div class="row">
             <div class="col s12">
-                <strong>Public Records Act 2002 Delegations:</strong>
+                <strong>Public Service Act 2008 Delegations:</strong>
             </div>
         </div>
         <div v-for="permission in available_delegations" class="row">
@@ -52,7 +52,7 @@ Vue.component('user-permissions-form', {
 
     <template v-if="isDelegate">
         <div class="card-panel orange lighten-5">
-            In granting this permission, I warrant that the Chief Executive Officer of my agency has delegated this power to the person / position under the Public Records Act 2002 and I have sighted this delegation.
+            In granting this permission, I warrant that the Chief Executive Officer of my agency has delegated this power to the person / position under the Public Service Act 2008 and I have sighted this delegation.
         </div>
     </template>
 
