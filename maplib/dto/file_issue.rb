@@ -65,7 +65,7 @@ class FileIssue
   end
 
   def self.id_for_display(id, issue_type)
-    "FI#{issue_type[0]}#{id}"
+    "FI#{id}"
   end
 
   def all_links_expired?

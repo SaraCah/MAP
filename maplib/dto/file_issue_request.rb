@@ -126,7 +126,7 @@ class FileIssueRequest
   end
 
   def self.id_for_display(id)
-    "R#{id}"
+    "FIR#{id}"
   end
 
   def is_delivery_authorizer_required?
