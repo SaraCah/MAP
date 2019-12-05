@@ -75,61 +75,69 @@
                             </thead>
                             <% file_issue.fetch('items').each do |item| %>
                                 <% metadata = resolved_representations.find{|rep| rep['ref'] == item.fetch('record_ref')} %>
-                                <tbody class="<% if item.overdue? %>red lighten-5<% end %>">
-                                    <tr>
-                                        <% rep_id = [file_issue.id_for_display, metadata.fetch('representation_id')].join('-') %>
-                                        <% extension = "jpg" %>
-                                        <td><%= rep_id %></td>
-                                        <td><%= metadata.fetch('series_id') %></td>
-                                        <td><%= metadata.fetch('record_id') %></td>
-                                        <td><%= metadata.fetch('title') %></td>
-                                        <td><%= metadata.fetch('representation_id') %></td>
-                                        <td><%= metadata.fetch('format') %></td>
-                                        <td><%= metadata.fetch('processing_handling_notes', '') %></td>
-                                        <% if file_issue.fetch('issue_type') == 'DIGITAL' %>
-                                            <td><%= item.fetch('dispatch_date','') %></td>
-                                            <td>
-                                                <% if item.downloadable? %>
-                                                    <a target="_blank" href="/file-issue-delivery?token=<%= item.fetch('file_issue_token', nil) %>&filename=<%= URI.escape(rep_id + ".#{extension}") %>">Download</a>
-                                                <% end %>
-                                            </td>
-                                            <td><%= item.fetch('expiry_date', '') %></td>
-                                            <td></td>
-                                        <% else %>
-                                            <td><%= item.fetch('dispatch_date','') %></td>
-                                            <td><%= item.fetch('expiry_date','') %></td>
-                                            <td>
-                                                <% if item.fetch('not_returned') %>
-                                                    <span class="orange-text text-darken-3">Not Returned</span>
-                                                <% else %>
-                                                    <%= item.fetch('returned_date','') %>
-                                                <% end %>
-                                            </td>
-                                            <td>
-                                                <% if item.overdue? %><span aria-hidden="true" class="red-text text-darken-2"><i class="fa fa-exclamation-triangle"></i></span><% end %>
-                                                <%= item.overdue? ? 'Yes' : 'No' %>
-                                            </td>
-                                        <% end %>
-                                    </tr>
-                                    <% if !item.fetch('record_details','').empty? || !item.fetch('not_returned_note','').empty? %>
+                                <% if metadata %>
+                                    <tbody class="<% if item.overdue? %>red lighten-5<% end %>">
                                         <tr>
-                                            <td colspan="12">
-                                                <% if !item.fetch('record_details','').empty? %>
-                                                    <div class="input-field">
-                                                        <textarea type="text" class="materialize-textarea" disabled><%= item.fetch('record_details','') %></textarea>
-                                                        <label>Record Details</label>
-                                                    </div>
-                                                <% end %>
-                                                <% if !item.fetch('not_returned_note','').empty? %>
-                                                    <div class="input-field">
-                                                        <textarea type="text" class="materialize-textarea" disabled><%= item.fetch('not_returned_note','') %></textarea>
-                                                        <label>Not Returned Note</label>
-                                                    </div>
-                                                <% end %>
-                                            </td>
+                                            <% rep_id = [file_issue.id_for_display, metadata.fetch('representation_id')].join('-') %>
+                                            <% extension = "jpg" %>
+                                            <td><%= rep_id %></td>
+                                            <td><%= metadata.fetch('series_id') %></td>
+                                            <td><%= metadata.fetch('record_id') %></td>
+                                            <td><%= metadata.fetch('title') %></td>
+                                            <td><%= metadata.fetch('representation_id') %></td>
+                                            <td><%= metadata.fetch('format') %></td>
+                                            <td><%= metadata.fetch('processing_handling_notes', '') %></td>
+                                            <% if file_issue.fetch('issue_type') == 'DIGITAL' %>
+                                                <td><%= item.fetch('dispatch_date','') %></td>
+                                                <td>
+                                                    <% if item.downloadable? %>
+                                                        <a target="_blank" href="/file-issue-delivery?token=<%= item.fetch('file_issue_token', nil) %>&filename=<%= URI.escape(rep_id + ".#{extension}") %>">Download</a>
+                                                    <% end %>
+                                                </td>
+                                                <td><%= item.fetch('expiry_date', '') %></td>
+                                                <td></td>
+                                            <% else %>
+                                                <td><%= item.fetch('dispatch_date','') %></td>
+                                                <td><%= item.fetch('expiry_date','') %></td>
+                                                <td>
+                                                    <% if item.fetch('not_returned') %>
+                                                        <span class="orange-text text-darken-3">Not Returned</span>
+                                                    <% else %>
+                                                        <%= item.fetch('returned_date','') %>
+                                                    <% end %>
+                                                </td>
+                                                <td>
+                                                    <% if item.overdue? %><span aria-hidden="true" class="red-text text-darken-2"><i class="fa fa-exclamation-triangle"></i></span><% end %>
+                                                    <%= item.overdue? ? 'Yes' : 'No' %>
+                                                </td>
+                                            <% end %>
                                         </tr>
-                                    <% end %>
+                                        <% if !item.fetch('record_details','').empty? || !item.fetch('not_returned_note','').empty? %>
+                                            <tr>
+                                                <td colspan="12">
+                                                    <% if !item.fetch('record_details','').empty? %>
+                                                        <div class="input-field">
+                                                            <textarea type="text" class="materialize-textarea" disabled><%= item.fetch('record_details','') %></textarea>
+                                                            <label>Record Details</label>
+                                                        </div>
+                                                    <% end %>
+                                                    <% if !item.fetch('not_returned_note','').empty? %>
+                                                        <div class="input-field">
+                                                            <textarea type="text" class="materialize-textarea" disabled><%= item.fetch('not_returned_note','') %></textarea>
+                                                            <label>Not Returned Note</label>
+                                                        </div>
+                                                    <% end %>
+                                                </td>
+                                            </tr>
+                                        <% end %>
+                                    </tbody>
+                            <% else %>
+                                <tbody>
+                                <tr>
+                                    <td colspan="15" class="red-text">You no longer have access to this record.  Please contact QSA for more information.</td>
+                                </tr>
                                 </tbody>
+                                <% end %>
                             <% end %>
                         </table>
                     </div>

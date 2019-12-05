@@ -69,10 +69,17 @@ Vue.component('file-issue-form', {
         JSON.parse(this.representations).forEach((representationBlob: any) => {
             const rep: RepresentationRequest = new RepresentationRequest(representationBlob.record_ref, '', representationBlob.request_type);
             rep.recordDetails = representationBlob.record_details;
-            rep.metadata = Utils.find(resolved, (item: any) => {
+            const resolved_rep = Utils.find(resolved, (item: any) => {
                 return item.ref === representationBlob.record_ref;
             });
-            rep.label = rep.metadata.title;
+            if (resolved_rep) {
+                rep.metadata = resolved_rep;
+                rep.label = rep.metadata.title;
+            } else {
+                rep.metadata = false;
+                rep.label = "You no longer have access to this record.  Please contact QSA for more information."
+            }
+
             items.push(rep);
         });
 
@@ -274,7 +281,17 @@ Vue.component('requested-items-table', {
         </tr>
     </thead>
     <tbody v-for="representation in requested_items">
-        <tr>
+        <tr v-if="!representation.metadata">
+            <td>
+                <input type="hidden" :name="buildPath('request_type')" v-model="representation.requestType" readonly />
+                <input type="text" v-bind:value="representation.requestType === 'DIGITAL' ? 'Digitised copy' : 'Original'" readonly />
+            </td>
+            <td colspan="5">
+                <span class="red-text">{{representation.label}}</span>
+            </td>
+            <td v-if="!readonly"></td>
+        </tr>
+        <tr v-if="representation.metadata">
             <td>
                 <template v-if="readonly">
                     <input type="hidden" :name="buildPath('request_type')" v-model="representation.requestType" readonly />
