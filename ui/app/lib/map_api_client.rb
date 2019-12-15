@@ -481,6 +481,10 @@ class MAPAPIClient
     response['errors'] || []
   end
 
+  def cancel_transfer(transfer_id)
+    post('/transfers/cancel', id: transfer_id)
+  end
+
   def import_validate(key)
     get("/import-validate", :key => key)
   end

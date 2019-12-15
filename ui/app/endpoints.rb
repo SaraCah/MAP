@@ -702,7 +702,7 @@ class MAPTheApp < Sinatra::Base
       # return [404]
     end
 
-    Templates.emit_with_layout(:transfer_view, {transfer: transfer, is_readonly: (transfer.fetch('status') == 'COMPLETE')},
+    Templates.emit_with_layout(:transfer_view, {transfer: transfer, is_readonly: (!transfer.active?)},
                                :layout, title: "Transfer", context: ['transfers', 'initiated_transfers'])
   end
 
@@ -724,6 +724,16 @@ class MAPTheApp < Sinatra::Base
                                  },
                                  :layout, title: "Transfer", context: ['transfers', 'initiated_transfers'])
     end
+  end
+
+  Endpoint.post('/transfers/:id/cancel')
+    .param(:id, Integer, "The ID of the transfer to cancel") do
+
+    # FIXME check permissions
+
+    Ctx.client.cancel_transfer(params[:id])
+
+    redirect '/transfers'
   end
 
   Endpoint.get('/import-validate')

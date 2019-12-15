@@ -6,7 +6,7 @@
     </transfers-search>
 </div>
 
-<div class="row">
+<div class="row vue-enabled">
     <div class="col s12">
         <table class="highlight responsive-table">
             <thead>
@@ -29,6 +29,16 @@
                 <td><%= Time.at(transfer.fetch('create_time') / 1000)%></td>
                 <td>
                     <a class="btn" href="/transfers/<%= transfer.fetch('id') %>">View</a>
+
+                    <% if transfer.active? %>
+                        <confirmable-action action="/transfers/<%= transfer.fetch('id') %>/cancel"
+                                            csrf_token="<%= FormHelper.csrf_token %>"
+                                            css="btn red lighten-2"
+                                            label="Cancel"
+                                            message="Are you sure you want to cancel this transfer?">
+                        </confirmable-action>
+                    <% end %>
+
                 </td>
             </tr>
             <% end %>

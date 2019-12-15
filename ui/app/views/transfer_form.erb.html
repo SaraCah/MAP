@@ -27,6 +27,7 @@
                                 <li class="<% if transfer.fetch('checklist_transfer_received', false) %>checked<% end %>">Transfer Received</li>
                                 <li class="<% if transfer.fetch('checklist_metadata_imported', false) %>checked<% end %>">Metadata Imported</li>
                                 <li class="last <% if transfer.fetch('checklist_transfer_completed', false) %>checked<% end %>">Transfer Completed</li>
+                                <li class="stand-alone <% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled<br>By User</li>
                             </ul>
                         </div>
                     </div>
@@ -40,6 +41,7 @@
                                 <li class="<% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_IN_PROGRESS' %>current<% end %>">In Progress</li>
                                 <li class="empty"></li>
                                 <li class="last <% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_COMPLETE' %>current<% end %>">Complete</li>
+                                <li class="stand-alone <% if transfer.fetch('status', '') == 'TRANSFER_PROCESS_CANCELLED_BY_QSA' %>current<% end %>">Cancelled<br>By QSA</li>
                             </ul>
                         </div>
                     </div>
@@ -139,6 +141,17 @@
                             <br>
                             <div class="col s12">
                                 <button id="save_transfer_btn" class="btn">Save Transfer</button>
+
+                                <% if transfer.active? %>
+                                    <confirmable-action action="/transfers/<%= transfer.fetch('id') %>/cancel"
+                                                        after_location="/transfers"
+                                                        csrf_token="<%= FormHelper.csrf_token %>"
+                                                        css="btn red lighten-1"
+                                                        label="Cancel Transfer"
+                                                        message="Are you sure you want to cancel this transfer?">
+                                    </confirmable-action>
+                                <% end %>
+
                             </div>
                         </div>
                     </section>

@@ -570,6 +570,23 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.post('/transfers/cancel')
+    .param(:id, Integer, "Transfer ID to cancel") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      transfer = Transfers.transfer_dto_for(params[:id])
+      if transfer && Ctx.get.permissions.can_manage_transfers?(transfer.fetch('agency_id'), transfer.fetch('agency_location_id'))
+        Transfers.cancel_transfer(params[:id])
+        json_response(status: 'cancelled')
+      else
+        Ctx.log_bad_access("user tried to cancel transfer in different location without permission")
+        [404]
+      end
+    else
+      Ctx.log_bad_access("user tried to cancel transfer without permission")
+      [404]
+    end
+  end
+
   Endpoint.get('/import-validate')
     .param(:key, String, "The file key to validate") do
 

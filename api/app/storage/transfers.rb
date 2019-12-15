@@ -302,6 +302,16 @@ class Transfers < BaseStorage
   end
 
 
+  def self.cancel_transfer(transfer_id)
+    db[:transfer]
+      .filter(id: transfer_id)
+      .update(status: 'TRANSFER_PROCESS_CANCELLED_BY_AGENCY',
+              modified_by: Ctx.username,
+              modified_time: java.lang.System.currentTimeMillis,
+              system_mtime: Time.now)
+  end
+
+
   def self.get_notifications
     notifications = []
 
