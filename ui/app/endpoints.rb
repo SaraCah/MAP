@@ -1253,9 +1253,16 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/reading-room-requests/:id')
     .param(:id, Integer, "ID of request") do
     reading_room_request = Ctx.client.get_reading_room_request(params[:id])
-    resolved_representation = Ctx.client.resolve_representations([reading_room_request.fetch('item_id')]).fetch(0)
+    resolved_representations = Ctx.client.resolve_representations([reading_room_request.fetch('record_ref')])
+    requested_items = [{record_ref: reading_room_request.fetch('record_ref')}]
 
-    Templates.emit_with_layout(:reading_room_request_view, {reading_room_request: reading_room_request, resolved_representation: resolved_representation, is_readonly: true},
+    Templates.emit_with_layout(:reading_room_request_view,
+                               {
+                                 request: reading_room_request,
+                                 resolved_representations: resolved_representations,
+                                 requested_items: requested_items,
+                                 is_readonly: true
+                               },
                                :layout, title: "Reading Room Request", context: ['reading_room_requests'])
   end
 end

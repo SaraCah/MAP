@@ -14,7 +14,7 @@ Vue.component('reading-room-request-form', {
 <div>
     <slot></slot>
 
-    <template v-if="!readonly">
+    <template v-if="!is_readonly">
         <div class="row">
             <div class="col s12">
                 <representation-browse v-on:selected="addRequestedItem"
@@ -34,6 +34,7 @@ Vue.component('reading-room-request-form', {
                                         :csrf_token="csrf_token"
                                         :request_id="request_id"
                                         :lock_version="lock_version"
+                                        :is_readonly="is_readonly"
                                         @remove="removeRequestedItem">
             </reading-room-request-summary>
         </div>
@@ -44,9 +45,8 @@ Vue.component('reading-room-request-form', {
         const items: RepresentationRequest[] = [];
         const resolved: any = JSON.parse(this.resolved_representations);
 
-        JSON.parse(this.representations).forEach((representationBlob: any) => {
-            const rep: RepresentationRequest = new RepresentationRequest(representationBlob.record_ref, '', representationBlob.request_type);
-            rep.recordDetails = representationBlob.record_details;
+        JSON.parse(this.requested_items).forEach((representationBlob: any) => {
+            const rep: RepresentationRequest = new RepresentationRequest(representationBlob.record_ref, '', '');
             const resolved_rep = Utils.find(resolved, (item: any) => {
                 return item.ref === representationBlob.record_ref;
             });
@@ -66,7 +66,7 @@ Vue.component('reading-room-request-form', {
             readonly: this.is_readonly === 'true',
         };
     },
-    props: ['representations',
+    props: ['requested_items',
             'resolved_representations',
             'is_readonly',
             'csrf_token',

@@ -685,6 +685,14 @@ class MAPAPIClient
     response['errors'] || []
   end
 
+  def get_reading_room_request(reading_room_request_id)
+    json = get("/reading-room-requests/#{reading_room_request_id}")
+
+    return nil if json.nil?
+
+    ReadingRoomRequest.from_hash(json)
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

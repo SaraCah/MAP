@@ -32,7 +32,7 @@ class ReadingRoomRequest
   define_field(:agency_location_id, Integer, required: false)
   define_field(:handle_id, Integer, required: false)
 
-  def self.from_row(row, handle_id = nil, item_rows = [])
+  def self.from_row(row, handle_id = nil)
     new(id: row[:id],
         status: row[:status],
         date_required: row[:date_required],

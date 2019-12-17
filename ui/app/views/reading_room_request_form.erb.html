@@ -78,13 +78,13 @@
                                 class="browser-default"
                                 required
                                 <% if is_readonly %>disabled<% end %>>
-                                <option>Morning</option>
-                                <option>Afternoon</option>
+                                <option <% if request.fetch('time_required','') == 'Morning' %>selected<% end %>>Morning</option>
+                                <option <% if request.fetch('time_required','') == 'Afternoon' %>selected<% end %>>Afternoon</option>
                             </select>
                         </div>
                     </div>
                     <reading-room-request-form
-                        representations="<%= requested_items.to_json %>"
+                        requested_items="<%= requested_items.to_json %>"
                         resolved_representations="<%= resolved_representations.to_json %>"
                         request_id="<%= request.fetch('id', 'new') %>"
                         lock_version="<%= request.fetch('lock_version', 0) %>"

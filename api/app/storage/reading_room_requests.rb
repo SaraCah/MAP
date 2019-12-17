@@ -64,6 +64,18 @@ class ReadingRoomRequests < BaseStorage
     errors
   end
 
+  def self.request_dto_for(reading_room_request_id)
+    handle_row = db[:handle][reading_room_request_id: reading_room_request_id]
+
+    return nil unless handle_row
+
+    handle_id = handle_row[:id]
+    row = db[:reading_room_request][id: reading_room_request_id]
+
+    ReadingRoomRequest.from_row(row,
+                                handle_id)
+  end
+
   def self.get_notifications
     notifications = []
 
