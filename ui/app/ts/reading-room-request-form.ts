@@ -20,7 +20,8 @@ Vue.component('reading-room-request-form', {
                 <representation-browse v-on:selected="addRequestedItem"
                                        v-on:removed="removeRequestedItem"
                                        :readingRoomRequestsOnly="true"
-                                       :selected="requestedItems">
+                                       :selected="requestedItems"
+                                       closeButtonLabel="Return to Reading Room Requests">
                 </representation-browse>
             </div>
         </div>
@@ -68,15 +69,9 @@ Vue.component('reading-room-request-form', {
     props: ['representations',
             'resolved_representations',
             'is_readonly',
-            'digital_request_status',
-            'physical_request_status',
             'csrf_token',
             'request_id',
-            'lock_version',
-            'digital_request_quote',
-            'physical_request_quote',
-            'digital_file_issue_id',
-            'physical_file_issue_id'],
+            'lock_version'],
     methods: {
         addRequestedItem: function(representation: RepresentationRequest) {
             const selectedRepresentation: RepresentationRequest = RepresentationRequest.fromRepresentation(representation);
@@ -125,12 +120,9 @@ Vue.component('reading-room-request-summary', {
 `,
     props: ['requested_items',
             'status',
-            'request_type',
             'request_id',
             'lock_version',
-            'csrf_token',
-            'quote_blob',
-            'file_issue_id'],
+            'csrf_token'],
     computed: {
         readonly: function(): boolean {
             return (this.$parent as any).readonly;

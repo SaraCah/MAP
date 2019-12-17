@@ -63,4 +63,54 @@ class ReadingRoomRequests < BaseStorage
 
     errors
   end
+
+  def self.get_notifications
+    notifications = []
+
+    [[:reading_room_request, 'Reading Room Request', 'RR%s']]
+      .each do |record_type, label, identifier_format|
+      # created
+      dataset = db[record_type]
+                  .filter(Sequel[record_type][:agency_id] => Ctx.get.current_location.agency_id)
+                  .filter(Sequel[record_type][:agency_location_id] => Ctx.get.current_location.id)
+                  .filter(Sequel[record_type][:create_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
+                  .select(Sequel[record_type][:id],
+                          Sequel[record_type][:create_time],
+                          Sequel[record_type][:created_by])
+
+      dataset.each do |row|
+        identifier = identifier_format % [row[:id]]
+
+        notifications << Notification.new(record_type,
+                                          row[:id],
+                                          identifier,
+                                          "%s created by %s" % [label, row[:created_by]],
+                                          'info',
+                                          row[:create_time])
+      end
+
+      # modified
+      dataset = db[record_type]
+                  .filter(Sequel[record_type][:agency_id] => Ctx.get.current_location.agency_id)
+                  .filter(Sequel[record_type][:agency_location_id] => Ctx.get.current_location.id)
+                  .filter(Sequel[record_type][:modified_time] > Sequel[record_type][:create_time])
+                  .filter(Sequel[record_type][:modified_time] > (Date.today - Notifications::NOTIFICATION_WINDOW).to_time.to_i * 1000)
+                  .select(Sequel[record_type][:id],
+                          Sequel[record_type][:modified_time],
+                          Sequel[record_type][:modified_by])
+
+      dataset.each do |row|
+        identifier = identifier_format % [row[:id]]
+
+        notifications << Notification.new(record_type,
+                                          row[:id],
+                                          identifier,
+                                          "%s updated by %s" % [label, row[:modified_by]],
+                                          'info',
+                                          row[:modified_time])
+      end
+    end
+
+    notifications
+  end
 end

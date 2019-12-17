@@ -851,6 +851,7 @@ class MAPTheAPI < Sinatra::Base
 
         if can_manage_file_issues
           notifications += FileIssues.get_notifications
+          notifications += ReadingRoomRequests.get_notifications
         end
 
         if can_manage_transfers

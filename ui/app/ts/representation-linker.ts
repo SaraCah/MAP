@@ -66,7 +66,7 @@ Vue.component('representation-browse', {
             <div class="modal-footer">
                 <div class="row">
                     <div class="col s12">
-                        <a href="#!" class="btn btn-small modal-close waves-effect waves-green">Return to File Issue Request</a>
+                        <a href="#!" class="btn btn-small modal-close waves-effect waves-green">{{closeButtonLabel}}</a>
                     </div>
                 </div>
             </div>
@@ -79,7 +79,7 @@ Vue.component('representation-browse', {
             show_modal: false,
         };
     },
-    props: ['selected', 'readingRoomRequestsOnly'],
+    props: ['selected', 'readingRoomRequestsOnly', 'closeButtonLabel'],
     methods: {
         showModal: function() {
             this.show_modal = true;
