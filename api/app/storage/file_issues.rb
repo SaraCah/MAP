@@ -110,7 +110,7 @@ class FileIssues < BaseStorage
 
     db[:handle].insert(file_issue_request_id: file_issue_request_id)
 
-    verify_item_access!(file_issue_request.fetch('items', []))
+    Search.verify_item_access!(file_issue_request.fetch('items', []))
 
     file_issue_request.fetch('items').each do |item|
       (record_type, record_id) = item.fetch('record_ref').split(':')
@@ -217,7 +217,7 @@ class FileIssues < BaseStorage
     }
 
     # Identify newly added items and make sure access is OK.
-    verify_item_access!(file_issue_request.fetch('items', []).select {|item|
+    Search.verify_item_access!(file_issue_request.fetch('items', []).select {|item|
                           !existing_item_refs.include?(item.fetch('record_ref'))
                         })
 
@@ -533,23 +533,6 @@ class FileIssues < BaseStorage
       rescue => e
         $LOG.error("Failure while fetching token #{token}: #{e}")
         {status: :missing}
-      end
-    end
-  end
-
-  # If the user is choosing their items from the search results with no funny
-  # business, this should never happen.
-  #
-  # Just here to catch people monkeying with their requests.
-  #
-  def self.verify_item_access!(items)
-    controlled = Search.select_controlled_records(Ctx.get.permissions, items.map {|item| item.fetch('record_ref')})
-
-    items.each do |item|
-      unless controlled.include?(item.fetch('record_ref'))
-        Ctx.log_bad_access("verify_item_access!")
-        $LOG.error("Requested item '%s' does not appear to be available to current agency" % item.fetch('record_ref'))
-        raise StaleRecordException.new
       end
     end
   end

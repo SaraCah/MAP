@@ -66,7 +66,7 @@ Vue.component('representation-browse', {
             <div class="modal-footer">
                 <div class="row">
                     <div class="col s12">
-                        <a href="#!" class="btn btn-small modal-close waves-effect waves-green">Return to File Issue Request</a>
+                        <a href="#!" class="btn btn-small modal-close waves-effect waves-green">{{closeButtonLabel}}</a>
                     </div>
                 </div>
             </div>
@@ -79,7 +79,7 @@ Vue.component('representation-browse', {
             show_modal: false,
         };
     },
-    props: ['selected'],
+    props: ['selected', 'readingRoomRequestsOnly', 'closeButtonLabel'],
     methods: {
         showModal: function() {
             this.show_modal = true;
@@ -106,10 +106,26 @@ Vue.component('representation-browse', {
                 return type === 'representation';
             });
         },
+        isPhysicalRepresentation:  function(record: Record) {
+            return !!Utils.find(record.types, (type: string) => {
+                return type === 'physical_representation';
+            });
+        },
         isSelectable: function(record: Record) {
-            return this.isRepresentation(record) && record.file_issue_allowed;
+            if (!this.isRepresentation(record)) {
+                return false;
+            }
+            if (this.readingRoomRequestsOnly) {
+                return this.isPhysicalRepresentation(record);
+            }
+
+            return record.file_issue_allowed;
         },
         showFileIssueDisallowed: function(record: Record) {
+            if (this.readingRoomRequestsOnly) {
+                return false;
+            }
+
             return this.isRepresentation(record) && !record.file_issue_allowed;
         },
         isNotOnShelf: function(record: Record) {

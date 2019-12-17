@@ -19,7 +19,8 @@ Vue.component('file-issue-form', {
             <div class="col s12">
                 <representation-browse v-on:selected="addRequestedItem"
                                        v-on:removed="removeRequestedItem"
-                                       :selected="requestedItems">
+                                       :selected="requestedItems"
+                                       closeButtonLabel="Return to File Issue Request">
                 </representation-browse>
             </div>
         </div>

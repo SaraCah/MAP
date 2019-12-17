@@ -1198,4 +1198,82 @@ class MAPTheApp < Sinatra::Base
       [404]
     end
   end
+
+  Endpoint.get('/reading-room-requests')
+    .param(:sort, String, "Sort key", :optional => true)
+    .param(:status, String, "Status filter", :optional => true)
+    .param(:date_required, String, "Date required filter", :optional => true)
+    .param(:page, Integer, "Page to return", optional: true) do
+
+    results = Ctx.client.reading_room_requests(params[:page] || 0, params[:status], params[:date_required], params[:sort])
+    resolved_representations = {}
+    Ctx.client.resolve_representations(results.results.map{|result| result.fetch('record_ref')}).each do |representation|
+      resolved_representations[representation.fetch('ref')] = representation
+    end
+
+    Templates.emit_with_layout(:reading_room_requests, {
+        paged_results: results,
+        status: params[:status],
+        sort: params[:sort],
+        date_required: params[:date_required],
+        params: params,
+        resolved_representations: resolved_representations,
+      },
+      :layout, title: "Reading Room Requests", context: ['reading_room_requests'])
+  end
+
+  Endpoint.get('/reading-room-requests/new') do
+    request = ReadingRoomRequest.new
+
+    Templates.emit_with_layout(:reading_room_request_view, {request: request, requested_items: [], is_readonly: false},
+                               :layout, title: "New Reading Room Request", context: ['reading_room_requests'])
+  end
+
+  Endpoint.post('/reading-room-requests/create')
+    .param(:reading_room_request, ReadingRoomRequest, "The reading room request to create")
+    .param(:requested_item, [String], "Ids of the representations requested")
+    .param(:submit_reading_room_request, Integer, "Set to 1 if the submit button was clicked") do
+
+    errors = Ctx.client.create_reading_room_requests(params[:reading_room_request], params[:requested_item])
+
+    if errors.empty?
+      redirect '/reading-room-requests'
+    else
+      resolved_representations = Ctx.client.resolve_representations(params[:requested_item])
+      Templates.emit_with_layout(:reading_room_request_view,
+                                 {
+                                   request: params[:reading_room_request],
+                                   requested_items: params[:requested_item].map{|id| {record_ref: id}},
+                                   resolved_representations: resolved_representations,
+                                   errors: errors,
+                                   is_readonly: false
+                                 },
+                                 :layout, title: "New Reading Room Request", context: ['reading_room_requests'])
+    end
+  end
+
+  Endpoint.get('/reading-room-requests/:id')
+    .param(:id, Integer, "ID of request") do
+    reading_room_request = Ctx.client.get_reading_room_request(params[:id])
+    resolved_representations = Ctx.client.resolve_representations([reading_room_request.fetch('record_ref')])
+    requested_items = [{record_ref: reading_room_request.fetch('record_ref')}]
+
+    Templates.emit_with_layout(:reading_room_request_view,
+                               {
+                                 request: reading_room_request,
+                                 resolved_representations: resolved_representations,
+                                 requested_items: requested_items,
+                                 is_readonly: true
+                               },
+                               :layout, title: "Reading Room Request", context: ['reading_room_requests'])
+  end
+
+  Endpoint.post('/reading-room-requests/:id/cancel')
+    .param(:id, Integer, "ID of request")
+    .param(:lock_version, Integer, "Lock version of the request") do
+    Ctx.client.cancel_reading_room_request(params[:id],
+                                           params[:lock_version])
+
+    redirect "/reading-room-requests/#{params[:id]}"
+  end
 end
