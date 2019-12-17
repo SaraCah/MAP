@@ -125,4 +125,17 @@ class ReadingRoomRequests < BaseStorage
 
     notifications
   end
+
+  def self.cancel_request(reading_room_request_id, lock_version)
+    updated = db[:reading_room_request]
+                  .filter(id: reading_room_request_id)
+                  .filter(lock_version: lock_version)
+                  .update(status: ReadingRoomRequest::STATUS_CANCELLED_BY_AGENCY,
+                          lock_version: lock_version + 1,
+                          modified_by: Ctx.username,
+                          modified_time: java.lang.System.currentTimeMillis,
+                          system_mtime: Time.now)
+
+    raise StaleRecordException.new if updated == 0
+  end
 end

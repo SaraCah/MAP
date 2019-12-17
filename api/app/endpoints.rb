@@ -1100,4 +1100,23 @@ class MAPTheAPI < Sinatra::Base
       [404]
     end
   end
+
+  Endpoint.post('/reading-room-requests/cancel')
+    .param(:id, Integer, "ID of reading room request")
+    .param(:lock_version, Integer, "Lock version of the reading toom request") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      existing_reading_room_request = ReadingRoomRequests.request_dto_for(params[:id])
+      if existing_reading_room_request && Ctx.get.permissions.can_manage_file_issues?(existing_reading_room_request.fetch('agency_id'), existing_reading_room_request.fetch('agency_location_id'))
+        ReadingRoomRequests.cancel_request(params[:id],
+                                           params[:lock_version])
+        json_response(status: 'cancelled')
+      else
+        Ctx.log_bad_access("user tried to cancel reading room request without permission for location")
+        [404]
+      end
+    else
+      Ctx.log_bad_access("user tried to cancel reading room request without permission")
+      [404]
+    end
+  end
 end

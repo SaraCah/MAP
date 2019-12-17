@@ -21,7 +21,7 @@
                                         <li class="<% if request.fetch('status', '') == 'STATUS_DELIVERED_TO_ARCHIVIST' %>current<% end %>">Delivered to Archivist</li>
                                         <li class="<% if request.fetch('status', '') == 'STATUS_DELIVERED_TO_READING_ROOM' %>current<% end %>">Delivered to Reading Room</li>
                                         <li class="last <% if request.fetch('status', '') == 'STATUS_COMPLETE' %>current<% end %>">Complete</li>
-                                        <li class="stand-alone <% if request.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled by Agency</li>
+                                        <li class="stand-alone <% if request.fetch('status', '') == 'CANCELLED_BY_RESEARCHER' %>current<% end %>">Cancelled by Agency</li>
                                         <li class="stand-alone <% if request.fetch('status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled by QSA</li>
                                     </ul>
                                 </div>
@@ -93,7 +93,7 @@
                     </reading-room-request-form>
                 </section>
 
-                <% unless is_readonly %>
+                <% if !is_readonly || request.fetch('status', '') == 'PENDING' %>
                     <section id="actions" class="scrollspy section">
                         <div class="row">
                             <br>
@@ -102,7 +102,7 @@
                                 <% if request.new? %>
                                     <button name="submit_reading_room_request" value="1" class="btn orange">Submit Reading Room Request <i class="fa fa-paper-plane"></i></button>
                                 <% end %>
-                                <% unless request.new? %>
+                                <% if !request.new? && request.fetch('status', '') == 'PENDING' %>
                                     <confirmable-action
                                         action="/reading-room-requests/<%= request.fetch('id') %>/cancel?lock_version=<%= request.fetch('lock_version') %>"
                                         csrf_token="<%= FormHelper.csrf_token %>"

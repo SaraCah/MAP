@@ -693,6 +693,10 @@ class MAPAPIClient
     ReadingRoomRequest.from_hash(json)
   end
 
+  def cancel_reading_room_request(request_id, lock_version)
+    post('/reading-room-requests/cancel', id: request_id, lock_version: lock_version)
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

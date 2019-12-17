@@ -1265,4 +1265,13 @@ class MAPTheApp < Sinatra::Base
                                },
                                :layout, title: "Reading Room Request", context: ['reading_room_requests'])
   end
+
+  Endpoint.post('/reading-room-requests/:id/cancel')
+    .param(:id, Integer, "ID of request")
+    .param(:lock_version, Integer, "Lock version of the request") do
+    Ctx.client.cancel_reading_room_request(params[:id],
+                                           params[:lock_version])
+
+    redirect "/reading-room-requests/#{params[:id]}"
+  end
 end

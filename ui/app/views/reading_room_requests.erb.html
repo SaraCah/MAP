@@ -19,8 +19,15 @@
             </tr>
             </thead>
             <tbody>
-            <% paged_results.results.each do |reading_room_request| %>
-            <tr>
+            <% paged_results.results.each do |reading_room_request|
+                rowCSSClass = ""
+                if reading_room_request.fetch('status') == 'COMPLETE'
+                    rowCSSClass = "light-green lighten-5"
+                elsif reading_room_request.fetch('status').start_with?('CANCELLED')
+                    rowCSSClass = "red lighten-5"
+                end
+            %>
+            <tr class="<%= rowCSSClass %>">
                 <td><%= reading_room_request.id_for_display %></td>
                 <td>
                     <% representation = resolved_representations.fetch(reading_room_request.fetch('record_ref'), {}) %>
@@ -31,7 +38,14 @@
                         <span class="red">You no longer have access to this record.  Please contact QSA for more information.</span>
                     <% end %>
                 </td>
-                <td><%= reading_room_request.fetch('status') %></td>
+                <td>
+                    <% status = reading_room_request.fetch('status') %>
+                    <% if status == 'CANCELLED_BY_RESEARCHER' %>
+                        CANCELLED_BY_AGENCY
+                    <% else %>
+                        <%= status %>
+                    <% end %>
+                </td>
                 <td>
                     <%= reading_room_request.fetch('date_required') %><br>
                     <%= reading_room_request.fetch('time_required') %>
