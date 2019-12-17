@@ -4,6 +4,15 @@
     </div>
 </div>
 
+<div class="vue-enabled">
+    <reading-room-requests-search path="/reading-room-requests"
+                      status="<%= status %>"
+                      :status_options="<%= ReadingRoomRequest::STATUS_OPTIONS.to_json %>"
+                      sort="<%= sort %>"
+                      date_required="<%= date_required %>">
+    </reading-room-requests-search>
+</div>
+
 <div class="row vue-enabled">
     <div class="col s12">
         <table class="highlight responsive-table">

@@ -1056,10 +1056,11 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/reading-room-requests')
     .param(:status, String, "Status filter", :optional => true)
+    .param(:date_required, String, "Date required filter", :optional => true)
     .param(:sort, String, "Sort key", :optional => true)
     .param(:page, Integer, "Page to return") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
-      json_response(ReadingRoomRequests.requests(params[:page], AppConfig[:page_size], params[:status], params[:sort]))
+      json_response(ReadingRoomRequests.requests(params[:page], AppConfig[:page_size], params[:status], params[:date_required], params[:sort]))
     else
       Ctx.log_bad_access("user tried to list reading room requests without permission")
       [404]

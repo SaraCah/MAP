@@ -9,7 +9,7 @@ class ReadingRoomRequests < BaseStorage
     'created_desc' => Sequel.desc(Sequel[:reading_room_request][:create_time]),
   }
 
-  def self.requests(page, page_size, status = nil, sort = nil)
+  def self.requests(page, page_size, status = nil, date_required = nil, sort = nil)
     dataset = db[:reading_room_request]
 
     unless Ctx.get.permissions.is_admin?
@@ -21,6 +21,10 @@ class ReadingRoomRequests < BaseStorage
 
     if status && ReadingRoomRequest::STATUS_OPTIONS.include?(status)
       dataset = dataset.filter(Sequel[:reading_room_request][:status] => status)
+    end
+
+    if date_required
+      dataset = dataset.filter(Sequel[:reading_room_request][:date_required] => date_required)
     end
 
     max_page = (dataset.count / page_size.to_f).ceil

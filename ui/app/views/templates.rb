@@ -63,7 +63,7 @@ Templates.define(:location_delete_confirmation,
                  "views/location_delete_confirmation.erb.html")
 
 Templates.define(:reading_room_requests,
-                 [:paged_results, :resolved_representations, :sort?, :status?, :params],
+                 [:paged_results, :resolved_representations, :sort?, :status?, :date_required?, :params],
                  "views/reading_room_requests.erb.html")
 
 Templates.define(:reading_room_request_view,

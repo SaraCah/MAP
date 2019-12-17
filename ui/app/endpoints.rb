@@ -1202,9 +1202,10 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/reading-room-requests')
     .param(:sort, String, "Sort key", :optional => true)
     .param(:status, String, "Status filter", :optional => true)
+    .param(:date_required, String, "Date required filter", :optional => true)
     .param(:page, Integer, "Page to return", optional: true) do
 
-    results = Ctx.client.reading_room_requests(params[:page] || 0, params[:status], params[:sort])
+    results = Ctx.client.reading_room_requests(params[:page] || 0, params[:status], params[:date_required], params[:sort])
     resolved_representations = {}
     Ctx.client.resolve_representations(results.results.map{|result| result.fetch('record_ref')}).each do |representation|
       resolved_representations[representation.fetch('ref')] = representation
@@ -1214,6 +1215,7 @@ class MAPTheApp < Sinatra::Base
         paged_results: results,
         status: params[:status],
         sort: params[:sort],
+        date_required: params[:date_required],
         params: params,
         resolved_representations: resolved_representations,
       },

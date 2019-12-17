@@ -670,12 +670,13 @@ class MAPAPIClient
     post('/logout')
   end
 
-  def reading_room_requests(page = 0, status = nil, sort = nil)
+  def reading_room_requests(page = 0, status = nil, date_required = nil, sort = nil)
     data = {
       page: page
     }
     data[:status] = status unless status.nil? || status == ''
     data[:sort] = sort unless sort.nil? || sort == ''
+    data[:date_required] = date_required unless date_required.nil? || date_required == ''
 
     PagedResults.from_json(get('/reading-room-requests', data), ReadingRoomRequest)
   end
