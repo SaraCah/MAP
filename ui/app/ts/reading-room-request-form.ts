@@ -27,18 +27,13 @@ Vue.component('reading-room-request-form', {
         </div>
     </template>
 
-    <div class="card">
-        <div class="card-content">
-            <h4>Requested Items</h4>
-            <reading-room-request-summary :requested_items="requestedItems"
-                                        :csrf_token="csrf_token"
-                                        :request_id="request_id"
-                                        :lock_version="lock_version"
-                                        :is_readonly="is_readonly"
-                                        @remove="removeRequestedItem">
-            </reading-room-request-summary>
-        </div>
-    </div>
+    <reading-room-request-summary :requested_items="requestedItems"
+                                :csrf_token="csrf_token"
+                                :request_id="request_id"
+                                :lock_version="lock_version"
+                                :is_readonly="is_readonly"
+                                @remove="removeRequestedItem">
+    </reading-room-request-summary>
 </div>
 `,
     data: function(): {requestedItems: RepresentationRequest[], readonly: boolean} {
@@ -108,9 +103,11 @@ Vue.component('reading-room-request-summary', {
     <template v-else>
         <div class="card">
             <div class="card-content">
-                <span class="card-title">Items Requested</span>
+                <span class="card-title" v-if="!is_readonly">Items Requested</span>
+                <span class="card-title" v-if="is_readonly">Item Requested</span>
                 <requested-items-table :requested_items="requested_items"
                                        input_path="requested_item"
+                                       :is_readonly="is_readonly"
                                        @remove="removeItem">
                 </requested-items-table>
             </div>
@@ -122,7 +119,8 @@ Vue.component('reading-room-request-summary', {
             'status',
             'request_id',
             'lock_version',
-            'csrf_token'],
+            'csrf_token',
+            'is_readonly'],
     computed: {
         readonly: function(): boolean {
             return (this.$parent as any).readonly;
@@ -155,7 +153,7 @@ Vue.component('requested-items-table', {
             <th>Dates</th>
             <th style="width:80px;">Format</th>
             <th style="min-width: 200px;">Extra Information</th>
-            <th v-if="!readonly" style="width:40px;"></th>
+            <th v-if="!is_readonly" style="width:40px;"></th>
         </tr>
     </thead>
     <tbody v-for="representation in requested_items">
@@ -163,7 +161,7 @@ Vue.component('requested-items-table', {
             <td colspan="5">
                 <span class="red-text">{{representation.label}}</span>
             </td>
-            <td v-if="!readonly"></td>
+            <td v-if="!is_readonly"></td>
         </tr>
         <tr v-if="representation.metadata">
             <td>
@@ -204,7 +202,7 @@ Vue.component('requested-items-table', {
                     <p>{{representation.metadata.processing_handling_notes}}</p>
                 </section>
             </td>
-            <td v-if="!readonly">
+            <td v-if="!is_readonly">
                 <div class="right-align">
                     <a class="btn btn-small red darken-1" v-on:click="removeItem(representation)" title="Remove"><i class="fa fa-minus-circle" style="font-size: 1em;"></i></a>
                 </div>
@@ -213,12 +211,7 @@ Vue.component('requested-items-table', {
     </tbody>
 </table>
 `,
-    props: ['requested_items', 'input_path'],
-    computed: {
-        readonly: function(): boolean {
-            return (this.$parent as any).readonly;
-        },
-    },
+    props: ['requested_items', 'input_path', 'is_readonly'],
     methods: {
         buildPath(field: string) {
             return this.input_path + "[" + field + "]";
