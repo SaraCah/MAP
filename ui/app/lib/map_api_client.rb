@@ -670,6 +670,21 @@ class MAPAPIClient
     post('/logout')
   end
 
+  def reading_room_requests(page = 0, status = nil, sort = nil)
+    data = {
+      page: page
+    }
+    data[:status] = status unless status.nil? || status == ''
+    data[:sort] = sort unless sort.nil? || sort == ''
+
+    PagedResults.from_json(get('/reading-room-requests', data), ReadingRoomRequest)
+  end
+
+  def create_reading_room_requests(reading_room_request, requested_item_ids)
+    response = post('/reading-room-requests/create', reading_room_request: reading_room_request.to_json, 'requested_item_ids[]' => requested_item_ids)
+    response['errors'] || []
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

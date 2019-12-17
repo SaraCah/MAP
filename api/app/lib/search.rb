@@ -263,4 +263,37 @@ class Search
     end
   end
 
+  def self.uris_for(record_refs)
+    result = {}
+
+    return result if record_refs.empty?
+
+    response = solr_handle_search('q' => '*:*',
+                                  'fq' => 'id:(%s)' % record_refs.map {|record_ref| solr_escape(record_ref)}.join(" OR "),
+                                  'fl' => 'id,uri',
+                                  'rows' => record_refs.length,)
+
+    response.fetch('response', {}).fetch('docs', []).each do |doc|
+      result[doc.fetch('id')] = doc.fetch('uri')
+    end
+
+    result
+  end
+
+  # If the user is choosing their items from the search results with no funny
+  # business, this should never happen.
+  #
+  # Just here to catch people monkeying with their requests.
+  #
+  def self.verify_item_access!(items)
+    controlled = select_controlled_records(Ctx.get.permissions, items.map {|item| item.fetch('record_ref')})
+
+    items.each do |item|
+      unless controlled.include?(item.fetch('record_ref'))
+        Ctx.log_bad_access("verify_item_access!")
+        $LOG.error("Requested item '%s' does not appear to be available to current agency" % item.fetch('record_ref'))
+        raise StaleRecordException.new
+      end
+    end
+  end
 end

@@ -64,6 +64,7 @@ require 'dto/transfer_file'
 require 'dto/transfer_proposal'
 require 'dto/transfer_proposal_series'
 require 'dto/user_dto'
+require 'dto/reading_room_request'
 
 require 'endpoints/upload_file'
 require 'endpoints'

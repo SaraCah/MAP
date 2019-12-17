@@ -61,3 +61,11 @@ Templates.define(:location_edit_user_permissions,
 Templates.define(:location_delete_confirmation,
                  [:location, :users_who_would_become_unlinked],
                  "views/location_delete_confirmation.erb.html")
+
+Templates.define(:reading_room_requests,
+                 [:paged_results, :resolved_representations, :sort?, :status?, :params],
+                 "views/reading_room_requests.erb.html")
+
+Templates.define(:reading_room_request_view,
+                 [:request, :requested_items, :resolved_representations?, :errors?, :is_readonly?],
+                 "views/reading_room_request_form.erb.html")

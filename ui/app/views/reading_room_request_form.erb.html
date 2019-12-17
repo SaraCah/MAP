@@ -1,0 +1,135 @@
+<div class="row">
+    <div class="col s12 m9 l10">
+        <div class="row vue-enabled">
+            <% if errors %>
+            <section id="errors" class="scroll-spy">
+                <%== FormHelper.render_errors(errors) %>
+            </section>
+            <% end %>
+            <section id="status" class="scrollspy section">
+                <div class="col s12">
+                    <div class="row">
+                        <div class="col s12">
+                            <div class="card">
+                                <div class="card-content">
+                                    <span class="card-title">Request Status</span>
+                                    <ul class="status-infomatic">
+                                        <li class="first <% if request.new? || request.fetch('status', '') == '' %>current<% end %>">Add Request Details</li>
+                                        <li class="<% if request.fetch('status', '') == 'PENDING' %>current<% end %>">Pending</li>
+                                        <li class="<% if request.fetch('status', '') == 'BEING_RETRIEVED' %>current<% end %>">In Retrieval</li>
+                                        <li class="<% if request.fetch('status', '') == 'STATUS_DELIVERED_TO_CONSERVATION' %>current<% end %>">Delivered to Conservation</li>
+                                        <li class="<% if request.fetch('status', '') == 'STATUS_DELIVERED_TO_ARCHIVIST' %>current<% end %>">Delivered to Archivist</li>
+                                        <li class="<% if request.fetch('status', '') == 'STATUS_DELIVERED_TO_READING_ROOM' %>current<% end %>">Delivered to Reading Room</li>
+                                        <li class="last <% if request.fetch('status', '') == 'STATUS_COMPLETE' %>current<% end %>">Complete</li>
+                                        <li class="stand-alone <% if request.fetch('status', '') == 'CANCELLED_BY_AGENCY' %>current<% end %>">Cancelled by Agency</li>
+                                        <li class="stand-alone <% if request.fetch('status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled by QSA</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <form id="readingRoomRequestForm" class="col s12" <% if is_readonly %>disabled<% else %>action="<%= request.new? ? '/reading-room-requests/create' : '/reading-room-requests/update' %>" method="post"<% end %>>
+                <%== FormHelper.hidden_authenticity_token %>
+                <%== FormHelper.lock_version(request, 'reading_room_request') %>
+
+                <% unless request.new? %>
+                    <input type="hidden" name="reading_room_request[id]" value="<%= request.fetch('id') %>">
+                    <input type="hidden" name="reading_room_request[handle_id]" value="<%= request.fetch('handle_id') %>">
+                    <input type="hidden" name="reading_room_request[agency_id]" value="<%= request.fetch('agency_id') %>">
+                    <input type="hidden" name="reading_room_request[agency_location_id]" value="<%= request.fetch('agency_location_id') %>">
+                <% end %>
+
+                <section id="details" class="scrollspy section">
+                    <% unless request.new? %>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="request_id" type="text" value="<%= request.id_for_display %>" disabled>
+                            <label for="request_id">Request ID</label>
+                        </div>
+                    </div>
+                    <% end %>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="agency" type="text" value="<%= Ctx.get.current_location.agency.label %>" disabled>
+                            <label for="agency">Agency</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input
+                                id="date_required"
+                                type="date"
+                                name="reading_room_request[date_required]"
+                                value="<%= request.fetch('date_required', '') %>"
+                                placeholder="YYYY-MM-DD"
+                                required
+                                <% if is_readonly %>disabled<% end %>>
+                            <label for="date_required">Date Required</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <label for="time_required">Time Required</label>
+                            <select
+                                id="time_required"
+                                name="reading_room_request[time_required]"
+                                class="browser-default"
+                                required
+                                <% if is_readonly %>disabled<% end %>>
+                                <option>Morning</option>
+                                <option>Afternoon</option>
+                            </select>
+                        </div>
+                    </div>
+                    <reading-room-request-form
+                        representations="<%= requested_items.to_json %>"
+                        resolved_representations="<%= resolved_representations.to_json %>"
+                        request_id="<%= request.fetch('id', 'new') %>"
+                        lock_version="<%= request.fetch('lock_version', 0) %>"
+                        csrf_token="<%= FormHelper.csrf_token %>"
+                        is_readonly="<%= is_readonly %>">
+                    </reading-room-request-form>
+                </section>
+
+                <% unless is_readonly %>
+                    <section id="actions" class="scrollspy section">
+                        <div class="row">
+                            <br>
+                            <br>
+                            <div class="col s12">
+                                <% if request.new? %>
+                                    <button name="submit_reading_room_request" value="1" class="btn orange">Submit Reading Room Request <i class="fa fa-paper-plane"></i></button>
+                                <% end %>
+                                <% unless request.new? %>
+                                    <confirmable-action
+                                        action="/reading-room-requests/<%= request.fetch('id') %>/cancel?lock_version=<%= request.fetch('lock_version') %>"
+                                        csrf_token="<%= FormHelper.csrf_token %>"
+                                        css="btn red lighten-2"
+                                        label="Cancel Request"
+                                        message="Are you sure you want to cancel this request? ">
+                                    </confirmable-action>
+                                <% end %>
+                            </div>
+                        </div>
+                    </section>
+                <% end %>
+            </form>
+        </div>
+    </div>
+    <div class="col hide-on-small-only m3 l2">
+        <div class="toc-wrapper pinned">
+            <ul class="section table-of-contents">
+                <% if errors %>
+                <li><a href="#errors">Errors</a></li>
+                <% end %>
+                <li><a href="#status">Status</a></li>
+                <li><a href="#details">Details</a></li>
+                <% unless is_readonly %>
+                    <li><a href="#actions">Form Actions</a></li>
+                <% end %>
+            </ul>
+        </div>
+    </div>
+</div>

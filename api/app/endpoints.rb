@@ -1053,4 +1053,50 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.get('/reading-room-requests')
+    .param(:status, String, "Status filter", :optional => true)
+    .param(:sort, String, "Sort key", :optional => true)
+    .param(:page, Integer, "Page to return") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      json_response(ReadingRoomRequests.requests(params[:page], AppConfig[:page_size], params[:status], params[:sort]))
+    else
+      Ctx.log_bad_access("user tried to list reading room requests without permission")
+      [404]
+    end
+  end
+
+  Endpoint.post('/reading-room-requests/create')
+    .param(:reading_room_request, ReadingRoomRequest, "Reading Room Request to create")
+    .param(:requested_item_ids, [String], "Requested representation IDs") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      if (errors = params[:reading_room_request].validate).empty?
+        if (errors = ReadingRoomRequests.create_request_from_dto(params[:reading_room_request], params[:requested_item_ids])).empty?
+          json_response(status: 'created')
+        else
+          json_response(errors: errors)
+        end
+      else
+        json_response(errors: errors)
+      end
+    else
+      Ctx.log_bad_access("user tried to create reading room request without permission")
+      [404]
+    end
+  end
+
+  Endpoint.get('/reading-room-requests/:id')
+    .param(:id, Integer, "ID of request") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      reading_room_request = ReadingRoomRequests.request_dto_for(params[:id])
+      if reading_room_request && Ctx.get.permissions.can_manage_file_issues?(reading_room_request.fetch('agency_id'), reading_room_request.fetch('agency_location_id'))
+        json_response(reading_room_request.to_hash)
+      else
+        Ctx.log_bad_access("user tried to get reading room request without permission for location")
+        [404]
+      end
+    else
+      Ctx.log_bad_access("user tried to get reading room request without permission")
+      [404]
+    end
+  end
 end

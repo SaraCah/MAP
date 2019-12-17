@@ -15,6 +15,7 @@ import 'manage-agency';
 import 'manage-current-user';
 import 'manage-system';
 import 'notifications';
+import 'reading-room-request-form';
 import 'representation-linker';
 import 'search-requests-search';
 import 'select-with-other-option';
