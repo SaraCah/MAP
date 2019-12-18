@@ -29,8 +29,10 @@ class Conversations < BaseStorage
      [:transfer, :transfer_id, "T%s"],
      [:file_issue_request, :file_issue_request_id, "R%s"],
      [:file_issue, :file_issue_id, "FI%s%s"],
-     [:search_request, :search_request_id, "SR%s"]].each do |record_type, column, identifier_format|
+     [:search_request, :search_request_id, "SR%s"],
+     [:reading_room_request, :reading_room_request_id, "ARR%s"]].each do |record_type, column, identifier_format|
       next if record_type.to_s.start_with?('file_issue') && !can_manage_file_issues
+      next if record_type == :reading_room_request && !can_manage_file_issues
       next if record_type.to_s.start_with?('transfer') && !can_manage_transfers
 
       dataset = db[:conversation]

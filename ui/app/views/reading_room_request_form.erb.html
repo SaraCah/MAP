@@ -117,7 +117,20 @@
                 <% end %>
             </form>
         </div>
+        <% unless request.new? %>
+            <section id="conversation" class="scrollspy section">
+                <div class="row vue-enabled">
+                    <div class="col s12">
+                        <conversation handle_id="<%= request.fetch('handle_id') %>"
+                                      csrf_token="<%= FormHelper.csrf_token %>"
+                                      title="Comments/Discussion">
+                        </conversation>
+                    </div>
+                </div>
+            </section>
+        <% end %>
     </div>
+
     <div class="col hide-on-small-only m3 l2">
         <div class="toc-wrapper pinned">
             <ul class="section table-of-contents">
@@ -128,6 +141,9 @@
                 <li><a href="#details">Details</a></li>
                 <% unless is_readonly %>
                     <li><a href="#actions">Form Actions</a></li>
+                <% end %>
+                <% unless request.new? %>
+                <li><a href="#conversation">Comments/Discussion</a></li>
                 <% end %>
             </ul>
         </div>
