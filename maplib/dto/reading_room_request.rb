@@ -35,7 +35,7 @@ class ReadingRoomRequest
   def self.from_row(row, handle_id = nil)
     new(id: row[:id],
         status: row[:status],
-        date_required: row[:date_required],
+        date_required: Time.at(row[:date_required]/1000).to_date.iso8601,
         time_required: row[:time_required],
         agency_id: row[:agency_id],
         agency_location_id: row[:agency_location_id],

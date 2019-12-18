@@ -48,7 +48,7 @@ class ReadingRoomRequests < BaseStorage
     uri_for_id = Search.uris_for(requested_item_ids)
 
     uri_for_id.each do |item_id, item_uri|
-      reading_room_request_id = db[:reading_room_request].insert(date_required: reading_room_request.fetch('date_required'),
+      reading_room_request_id = db[:reading_room_request].insert(date_required: Date.parse(reading_room_request.fetch('date_required')).to_time.to_i * 1000,
                                                                  time_required: reading_room_request.fetch('time_required'),
                                                                  status: ReadingRoomRequest::STATUS_PENDING,
                                                                  item_id: item_id,

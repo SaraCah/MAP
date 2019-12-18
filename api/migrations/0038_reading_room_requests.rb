@@ -10,7 +10,7 @@ Sequel.migration do
       String :item_uri, null: false
 
       String :status, null: false
-      String :date_required
+      Bignum :date_required
       String :time_required
 
       String :created_by, null: false
