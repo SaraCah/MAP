@@ -94,7 +94,7 @@ Vue.component('notifications', {
             } else if (notification.record_type === 'search_request') {
                 return "/search-requests/" + notification.record_id;
             } else if (notification.record_type === 'reading_room_request') {
-                return "/reading_room_requests/" + notification.record_id;
+                return "/reading-room-requests/" + notification.record_id;
             }
             return null;
         },

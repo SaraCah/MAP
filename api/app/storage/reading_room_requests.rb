@@ -83,7 +83,7 @@ class ReadingRoomRequests < BaseStorage
   def self.get_notifications
     notifications = []
 
-    [[:reading_room_request, 'Reading Room Request', 'RR%s']]
+    [[:reading_room_request, 'Reading Room Request', 'ARR%s']]
       .each do |record_type, label, identifier_format|
       # created
       dataset = db[record_type]
