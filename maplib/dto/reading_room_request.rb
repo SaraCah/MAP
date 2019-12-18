@@ -55,6 +55,6 @@ class ReadingRoomRequest
   end
 
   def self.id_for_display(id)
-    "RR#{id}"
+    "ARR#{id}"
   end
 end
