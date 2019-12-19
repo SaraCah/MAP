@@ -228,10 +228,10 @@ Vue.component('file-issue-request-summary', {
         <div class="card">
             <div class="card-content">
                 <span class="card-title">Items Requested</span>
-                <requested-items-table :requested_items="requested_items"
+                <file-issue-requested-items-table :requested_items="requested_items"
                                        input_path="file_issue_request[items][]"
                                        @remove="removeItem">
-                </requested-items-table>
+                </file-issue-requested-items-table>
             </div>
         </div>
     </template>
@@ -267,9 +267,9 @@ Vue.component('file-issue-request-summary', {
 });
 
 
-Vue.component('requested-items-table', {
+Vue.component('file-issue-requested-items-table', {
     template: `
-<table class="file-issue-requested-items-table">
+<table class="file-issue-file-issue-requested-items-table">
     <thead>
         <tr>
             <th style="width:140px;">Issue Type</th>

@@ -100,7 +100,9 @@
                             <br>
                             <div class="col s12">
                                 <% if request.new? %>
-                                    <button name="submit_reading_room_request" value="1" class="btn orange">Submit Reading Room Request <i class="fa fa-paper-plane"></i></button>
+                                    <button name="submit_reading_room_request" value="1" class="btn orange">
+                                        Submit Reading Room Request(s) <i class="fa fa-paper-plane"></i>
+                                    </button>
                                 <% end %>
                                 <% if !request.new? && request.fetch('status', '') == 'PENDING' %>
                                     <confirmable-action

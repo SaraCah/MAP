@@ -105,11 +105,11 @@ Vue.component('reading-room-request-summary', {
             <div class="card-content">
                 <span class="card-title" v-if="!is_readonly">Items Requested</span>
                 <span class="card-title" v-if="is_readonly">Item Requested</span>
-                <requested-items-table :requested_items="requested_items"
+                <reading-room-requested-items-table :requested_items="requested_items"
                                        input_path="requested_item"
                                        :is_readonly="is_readonly"
                                        @remove="removeItem">
-                </requested-items-table>
+                </reading-room-requested-items-table>
             </div>
         </div>
     </template>
@@ -143,9 +143,9 @@ Vue.component('reading-room-request-summary', {
 });
 
 
-Vue.component('requested-items-table', {
+Vue.component('reading-room-requested-items-table', {
     template: `
-<table class="reading-room-request-requested-items-table">
+<table class="reading-room-request-reading-room-requested-items-table">
     <thead>
         <tr>
             <th style="width:160px">Identifiers</th>
