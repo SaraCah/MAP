@@ -17,10 +17,10 @@
                                         <li class="first <% if request.new? || request.fetch('status', '') == '' %>current<% end %>">Add Request Details</li>
                                         <li class="<% if request.fetch('status', '') == 'PENDING' %>current<% end %>">Pending</li>
                                         <li class="<% if request.fetch('status', '') == 'BEING_RETRIEVED' %>current<% end %>">In Retrieval</li>
-                                        <li class="<% if request.fetch('status', '') == 'STATUS_DELIVERED_TO_CONSERVATION' %>current<% end %>">Delivered to Conservation</li>
-                                        <li class="<% if request.fetch('status', '') == 'STATUS_DELIVERED_TO_ARCHIVIST' %>current<% end %>">Delivered to Archivist</li>
-                                        <li class="<% if request.fetch('status', '') == 'STATUS_DELIVERED_TO_READING_ROOM' %>current<% end %>">Delivered to Reading Room</li>
-                                        <li class="last <% if request.fetch('status', '') == 'STATUS_COMPLETE' %>current<% end %>">Complete</li>
+                                        <li class="<% if request.fetch('status', '') == 'DELIVERED_TO_CONSERVATION' %>current<% end %>">Delivered to Conservation</li>
+                                        <li class="<% if request.fetch('status', '') == 'DELIVERED_TO_ARCHIVIST' %>current<% end %>">Delivered to Archivist</li>
+                                        <li class="<% if request.fetch('status', '') == 'DELIVERED_TO_READING_ROOM' %>current<% end %>">Delivered to Reading Room</li>
+                                        <li class="last <% if request.fetch('status', '') == 'COMPLETE' %>current<% end %>">Complete</li>
                                         <li class="stand-alone <% if request.fetch('status', '') == 'CANCELLED_BY_RESEARCHER' %>current<% end %>">Cancelled by Agency</li>
                                         <li class="stand-alone <% if request.fetch('status', '') == 'CANCELLED_BY_QSA' %>current<% end %>">Cancelled by QSA</li>
                                     </ul>
