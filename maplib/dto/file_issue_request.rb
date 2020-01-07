@@ -130,7 +130,7 @@ class FileIssueRequest
   end
 
   def is_delivery_authorizer_required?
-    return false if ['READING_ROOM', 'AGENCY_ARRANGED_COURIER'].include?(fetch('delivery_location', nil))
+    return false if ['AGENCY_ARRANGED_COURIER'].include?(fetch('delivery_location', nil))
     return false unless fetch('items').any?{|item| item.fetch('request_type').downcase == 'physical'}
 
     s = fetch('delivery_authorizer', nil)

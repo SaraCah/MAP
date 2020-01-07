@@ -133,24 +133,6 @@ Vue.component('file-issue-form', {
                 return item.id !== itemToRemoveId;
             });
         },
-        handleReadingRoomSpecialCase: function() {
-            const $deliveryLocation = (this.$el as HTMLElement).querySelector('#delivery_location');
-            if ($deliveryLocation) {
-                $deliveryLocation.addEventListener('change', () => {
-                    const $note = (this.$el as HTMLElement).querySelector('#delivery_authorizer_reading_room_note');
-                    if ($note) {
-                        if (($deliveryLocation as HTMLFormElement).value === 'READING_ROOM') {
-                            $note.classList.remove('hide');
-                        } else {
-                            $note.classList.add('hide');
-                        }
-                    }
-                });
-            }
-        },
-    },
-    mounted: function() {
-        this.handleReadingRoomSpecialCase();
     },
 });
 

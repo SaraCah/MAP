@@ -129,7 +129,6 @@
                                 <label for="delivery_location">Delivery Location</label>
                                 <select id="delivery_location" name="file_issue_request[delivery_location]" class="browser-default" <% if is_readonly %>disabled<% end %> >
                                     <option value="AGENCY_LOCATION" <% if request.fetch('delivery_location', 'AGENCY_LOCATION') == 'AGENCY_LOCATION' %>selected<% end %>><%= Ctx.get.current_location.agency.label %>: <%= Ctx.get.current_location.name %></option>
-                                    <option value="READING_ROOM" <% if request.fetch('delivery_location', 'AGENCY_LOCATION') == 'READING_ROOM' %>selected<% end %>>Reading Room</option>
                                     <option value="AGENCY_ARRANGED_COURIER" <% if request.fetch('delivery_location', 'AGENCY_LOCATION') == 'AGENCY_ARRANGED_COURIER' %>selected<% end %>>Agency Arranged Courier</option>
                                 </select>
                             </div>
@@ -138,7 +137,6 @@
                             <div class="input-field col s12">
                                 <input id="delivery_authorizer" type="text" name="file_issue_request[delivery_authorizer]" value="<%= request.fetch('delivery_authorizer', '') %>" <% if is_readonly %>disabled<% end %> />
                                 <label for="delivery_authorizer">Person preferred to receive the File Issue</label>
-                                <span id="delivery_authorizer_reading_room_note" class="helper-text <% if request.fetch('delivery_location', 'AGENCY_LOCATION') != 'READING_ROOM' %>hide<% end %>">If nominating someone other than the requesting officer to access closed records in the reading room, they must have permission from your agency’s authorised officer</span>
                             </div>
                         </div>
                         <div class="row">
