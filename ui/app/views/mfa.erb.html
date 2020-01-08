@@ -16,8 +16,8 @@
                     </div>
                     <div class="row">
                         <div class="input-field col s12">
-                            <input type="authcode" name="authcode" id="authcode">
-                            <label for="authcode">Code</label>
+                            <label for="authcode">MFA Code</label>
+                            <input type="text" name="authcode" id="authcode">
                         </div>
                     </div>
                     <br>
@@ -31,3 +31,7 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('#authcode').forEach((elt) => { elt.focus() });
+</script>
