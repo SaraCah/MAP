@@ -716,9 +716,12 @@ class MAPTheApp < Sinatra::Base
     if errors.empty?
       redirect '/transfers'
     else
+      transfer = Ctx.client.get_transfer(params[:transfer].fetch('id'))
+      transfer['files'] = params[:transfer].fetch('files')
+
       Templates.emit_with_layout(:transfer_view,
                                  {
-                                   transfer: params[:transfer],
+                                   transfer: transfer,
                                    errors: errors,
                                    is_readonly: false,
                                  },

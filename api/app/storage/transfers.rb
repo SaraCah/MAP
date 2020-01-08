@@ -263,12 +263,12 @@ class Transfers < BaseStorage
     has_rap_now = transfer.fetch('files', []).any? {|file| file.fetch('role') == 'RAP'}
 
     if needs_metadata && !has_metadata
-      errors << ['files', "Cannot delete metadata file after it has been approved"]
+      errors << "Cannot delete metadata file after it has been approved"
     end
 
     if needs_rap && had_rap_before && !has_rap_now
       # No removing the RAP that's already been approved
-      errors << ['files', "Cannot delete RAP file after it has been approved"]
+      errors << "Cannot delete RAP file after it has been approved"
     end
 
     if needs_rap && !had_rap_before && has_rap_now

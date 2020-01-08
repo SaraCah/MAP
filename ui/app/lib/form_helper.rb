@@ -31,10 +31,16 @@ class FormHelper
     result << '<div class="form-errors card-panel red lighten-4">'
     result << '<ul>'
     result << errors.map {|error|
-      '<li class="error-item"><span class="error-field">%s</span> - <span class="error-text">%s</span></li>' % [
-        CGI::escapeHTML(error.fetch('field_label', error.fetch('field'))),
-        CGI::escapeHTML(error.fetch('validation_code', ERROR_LABELS_FOR_CODE[error.fetch('code')])),
-      ]
+        if error.is_a?(Hash)
+          '<li class="error-item"><span class="error-field">%s</span> - <span class="error-text">%s</span></li>' % [
+            CGI::escapeHTML(error.fetch('field_label', error.fetch('field'))),
+            CGI::escapeHTML(error.fetch('validation_code', ERROR_LABELS_FOR_CODE[error.fetch('code')]))
+          ]
+        elsif error.is_a?(String)
+          '<li class="error-item"><span class="error-text">%s</span></li>' % [error]
+        else
+          '<li class="error-item"><span class="error-text">%s</span></li>' % [error.inspect]
+        end
     }.join("\n")
     result << '</ul>'
     result << '</div>'
