@@ -259,14 +259,27 @@ class Transfers < BaseStorage
     has_metadata = transfer.fetch('files', []).any? {|file| file.fetch('role') == 'IMPORT'}
 
     needs_rap = original_transfer.fetch('checklist_rap_received', false)
-    has_rap = transfer.fetch('files', []).any? {|file| file.fetch('role') == 'RAP'}
+    had_rap_before = original_transfer.fetch('files', []).any? {|file| file.fetch('role') == 'RAP'}
+    has_rap_now = transfer.fetch('files', []).any? {|file| file.fetch('role') == 'RAP'}
 
     if needs_metadata && !has_metadata
       errors << ['files', "Cannot delete metadata file after it has been approved"]
     end
 
-    if needs_rap && !has_rap
+    if needs_rap && had_rap_before && !has_rap_now
+      # No removing the RAP that's already been approved
       errors << ['files', "Cannot delete RAP file after it has been approved"]
+    end
+
+    if needs_rap && !had_rap_before && has_rap_now
+      # You're adding a RAP to a record that doesn't need one.  If we let this
+      # go through with role = RAP, you're not going to be able to remove this
+      # file.  Switch it to "other".
+      transfer.fetch('files', []).each do |file|
+        if file.fetch('role') == 'RAP'
+          file['role'] = 'OTHER'
+        end
+      end
     end
 
     return errors if !errors.empty?
