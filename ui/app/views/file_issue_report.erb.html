@@ -1,0 +1,15 @@
+<div class="row">
+    <div class="col s12 m9 l10">
+        <form method="POST" action="/file-issue-report/download">
+            <%== FormHelper.hidden_authenticity_token %>
+
+            <label for="start_date">Report start date</label>
+            <input type="date" name="start_date" id="start_date" />
+
+            <label for="end_date">Report end date</label>
+            <input type="date" name="end_date" id="end_date" />
+
+            <input type="submit" value="BLAM" />
+        </form>
+    </div>
+</div>

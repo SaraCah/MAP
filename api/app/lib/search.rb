@@ -32,10 +32,16 @@ class Search
   end
 
 
-  def self.build_controlled_records_filter(permissions)
+  def self.build_controlled_records_filter(permissions, agency_ref = nil)
     return "*:*" if permissions.is_admin
 
-    (_, aspace_agency_id) = Ctx.get.current_location.agency.fetch('id').split(':')
+    aspace_agency_id = nil
+
+    if agency_ref.nil?
+      (_, aspace_agency_id) = Ctx.get.current_location.agency.fetch('id').split(':')
+    else
+      (_, aspace_agency_id) = agency_ref.split(':')
+    end
 
     return "responsible_agency:(\"%s\") OR recent_responsible_agency_filter:(\"%s\")" %
            [
@@ -73,8 +79,15 @@ class Search
   end
 
 
-  def self.record_hash(record)
-    (_, aspace_agency_id) = Ctx.get.current_location.agency.fetch('id').split(':')
+  def self.record_hash(record, agency_ref = nil)
+    aspace_agency_id = nil
+
+    if agency_ref.nil?
+      (_, aspace_agency_id) = Ctx.get.current_location.agency.fetch('id').split(':')
+    else
+      (_, aspace_agency_id) = agency_ref.split(':')
+    end
+
     this_agency_uri = "/agents/corporate_entities/#{aspace_agency_id}"
 
     record.merge({
@@ -251,6 +264,18 @@ class Search
 
     results.fetch('response').fetch('docs').map {|result|
       result.fetch('id')
+    }
+  end
+
+  def self.get_records(permissions, record_refs, agency_ref = nil)
+    results = solr_handle_search('q' => '*:*',
+                                 'fq' => ['{!terms f=id}%s' % record_refs.join(','),
+                                          build_controlled_records_filter(permissions, agency_ref)],
+                                 'rows' => record_refs.size,
+                                 'start' => 0)
+
+    results.fetch('response').fetch('docs').map {|result|
+      record_hash(result, agency_ref)
     }
   end
 

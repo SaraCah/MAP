@@ -837,6 +837,17 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.get('/file-issue-report/download')
+    .param(:start_date, String, "Start date")
+    .param(:end_date, String, "End date") \
+  do
+    [
+      200,
+      {"Content-Type" => "text/plain"},
+      FileIssueReport.new(params[:start_date], params[:end_date])
+    ]
+  end
+
   Endpoint.get('/notifications') do
     if Ctx.user_logged_in?
       notifications = []

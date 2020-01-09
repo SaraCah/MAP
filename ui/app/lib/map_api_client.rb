@@ -579,6 +579,16 @@ class MAPAPIClient
     get("/file-issue-requests/#{file_issue_request_id}/physical_quote")
   end
 
+  def stream_file_issue_report(start_date, end_date, suggested_filename)
+    stream_get('/file-issue-report/download',
+               suggested_filename,
+               {
+                 "start_date" => start_date,
+                 "end_date" => end_date
+               })
+  end
+
+
   def notifications
     get("/notifications")
   end

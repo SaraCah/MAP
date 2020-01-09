@@ -986,6 +986,23 @@ class MAPTheApp < Sinatra::Base
                                :layout, title: "Fee Schedule", context: ['file_issues', 'fee_schedule'])
   end
 
+  Endpoint.get('/file-issue-report') do
+    Templates.emit_with_layout(:file_issue_report, {},
+                               :layout, title: "File Issue Report", context: ['file_issues', 'file_issue_report'])
+  end
+
+  Endpoint.post('/file-issue-report/download')
+    .param(:start_date, String, "Report start date", :optional => true)
+    .param(:end_date, String, "Report end date", :optional => true) \
+  do
+    result = Ctx.client.stream_file_issue_report(params[:start_date], params[:start_date], "file_issue_report_#{Date.today.iso8601}.csv")
+
+    # FIXME
+    result[1]['Content-Disposition'] = 'inline'
+
+    result
+  end
+
   Endpoint.get('/notifications') do
     [
       200,

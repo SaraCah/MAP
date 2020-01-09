@@ -93,7 +93,7 @@ class Locations < BaseStorage
     users_to_rescue = list_exclusively_linked_users(location_id)
 
     agency_id = db[:agency_location][id: location_id][:agency_id]
-    top_level_location_id = db[:agency_location][agency_id: agency_id, top_level_Location: 1][:id]
+    top_level_location_id = db[:agency_location][agency_id: agency_id, top_level_location: 1][:id]
 
     db[:agency_user]
       .filter(:agency_location_id => location_id,

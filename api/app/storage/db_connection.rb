@@ -101,6 +101,8 @@ class DBConnection
                                test: true,
                                loggers: AppConfig[:enable_db_logging] ? $LOG : [])
 
+        @pool = @pool.extension(:pagination)
+
         self
       rescue
         $LOG.info("DB connection failed: #{$!}")
