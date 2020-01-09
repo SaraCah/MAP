@@ -312,17 +312,17 @@ Vue.component('file-issue-requested-items-table', {
 
             <td>
                 <section class="extra-info" v-if="representation.metadata.intended_use">
-                    <h2>Intended Use</h2>
+                    <label>Intended Use</label>
                     <p>{{representation.metadata.intended_use}}</p>
                 </section>
 
                 <section class="extra-info" v-if="representation.metadata.other_restrictions">
-                    <h2>Other Restrictions</h2>
+                    <label>Other Restrictions</label>
                     <p>{{representation.metadata.other_restrictions}}</p>
                 </section>
 
                 <section class="extra-info" v-if="representation.metadata.processing_handling_notes">
-                    <h2>Processing/Handling Notes</h2>
+                    <label>Processing/Handling Notes</label>
                     <p>{{representation.metadata.processing_handling_notes}}</p>
                 </section>
             </td>
