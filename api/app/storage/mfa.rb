@@ -9,7 +9,7 @@ class Mfa < BaseStorage
     secret = db[:mfa_keys].filter(:user_id => user_id).get(:key)
     return nil unless secret
     totp = ROTP::TOTP.new(secret)
-    totp.verify(authcode)
+    totp.verify(authcode, drift_ahead: 30, drift_behind: 30)
   end
 
   def self.get_key(user_id)
