@@ -68,6 +68,7 @@ require 'lib/ctx'
 require 'lib/watch_dir_reloader'
 require 'lib/search'
 require 'lib/solr_indexer'
+require 'lib/date_parse'
 
 require 'storage/base_storage'
 require 'storage/rate_limiter'

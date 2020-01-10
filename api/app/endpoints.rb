@@ -844,7 +844,7 @@ class MAPTheAPI < Sinatra::Base
     [
       200,
       {"Content-Type" => "text/plain"},
-      FileIssueReport.new(params[:start_date], params[:end_date])
+      FileIssueReport.new(DateParse.date_parse_down(params[:start_date]), DateParse.date_parse_up(params[:end_date]))
     ]
   end
 
