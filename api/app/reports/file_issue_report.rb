@@ -79,6 +79,8 @@ class FileIssueReport
             row[:title] = resolved.fetch('title')
             row[:agency_assigned_id] = resolved.fetch('agency_assigned_id', nil)
             row[:qsa_id_prefixed] = resolved.fetch('qsa_id_prefixed', nil)
+          else
+            row[:title] = 'You no longer have access to this record.  Please contact QSA for more information.'
           end
 
           yield CSV.generate_line([
