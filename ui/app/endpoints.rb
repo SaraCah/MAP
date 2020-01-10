@@ -995,12 +995,7 @@ class MAPTheApp < Sinatra::Base
     .param(:start_date, String, "Report start date", :optional => true)
     .param(:end_date, String, "Report end date", :optional => true) \
   do
-    result = Ctx.client.stream_file_issue_report(params[:start_date], params[:start_date], "file_issue_report_#{Date.today.iso8601}.csv")
-
-    # FIXME
-    result[1]['Content-Disposition'] = 'inline'
-
-    result
+    Ctx.client.stream_file_issue_report(params[:start_date], params[:end_date], "file_issue_report_#{Date.today.iso8601}.csv")
   end
 
   Endpoint.get('/notifications') do
