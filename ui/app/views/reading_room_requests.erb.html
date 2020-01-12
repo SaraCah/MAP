@@ -39,13 +39,13 @@
             <tr class="<%= rowCSSClass %>">
                 <td><%= reading_room_request.id_for_display %></td>
                 <td>
-                    <% representation = resolved_representations.fetch(reading_room_request.fetch('record_ref'), {}) %>
-                    <% if representation %>
-                        PR<%= representation.fetch('representation_id') %>
-                        <%= representation.fetch('title') %>
-                    <% else %>
-                        <span class="red">You no longer have access to this record.  Please contact QSA for more information.</span>
-                    <% end %>
+                  <% representation = resolved_representations.fetch(reading_room_request.fetch('record_ref'), {}) %>
+                  <% if representation.empty? %>
+                    <span class="red">You no longer have access to this record.  Please contact QSA for more information.</span>
+                  <% else %>
+                    PR<%= representation.fetch('representation_id') %>
+                    <%= representation.fetch('title') %>
+                  <% end %>
                 </td>
                 <td>
                     <% status = reading_room_request.fetch('status') %>
