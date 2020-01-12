@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/hudmol/map_validator.git
-  revision: 152bc1ab037ae275ef3e41bf71073a86f0e6ce4d
+  revision: 0a972b4f618a45e3fe77675d655bb00b169c15ae
   tag: master
   specs:
     map_validator (0.0.1)
@@ -19,8 +19,8 @@ GEM
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     aws-eventstream (1.0.3)
-    aws-partitions (1.262.0)
-    aws-sdk-core (3.87.0)
+    aws-partitions (1.263.0)
+    aws-sdk-core (3.88.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
       aws-sigv4 (~> 1.1)
