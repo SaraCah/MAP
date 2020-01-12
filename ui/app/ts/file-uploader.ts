@@ -274,7 +274,9 @@ Vue.component('file-uploader', {
                     this.$http.get('/import-validate', { params: {key: file.key} }).then((response: any) => {
                         return response.json();
                     }, () => {
-                        UI.genericModal("Validation failed.  Please retry.");
+                        return {
+                            errors: ["The file you uploaded could not be opened.  Please make sure you are working with a valid Transfer Metadata Template file."]
+                        };
                     }).then((validationResult: ValidationResult) => {
                         this.validation_status[file.key] = validationResult;
                         this.$forceUpdate();
