@@ -106,13 +106,13 @@ class Search
   end
 
 
+  # Round a date up, doing the right thing for shorter months, leap years, etc.
   def self.date_pad_end(s)
-    default = ['9999', '12', '31']
-    bits = s.split('-')
+    default = [9999, 12, -1]
+    bits = s.split('-').map {|s| s =~ /\A\d+\z/ ? s.to_i : nil}
+    bits = 3.times.map {|i| bits[i] || default[i]}
 
-    full_date = (0...3).map {|i| bits.fetch(i, default.fetch(i))}.join('-')
-
-    "#{full_date}T23:59:59Z"
+    "%sT23:59:59Z" % [Date.new(*bits).iso8601]
   end
 
 
