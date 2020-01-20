@@ -188,17 +188,17 @@ Vue.component('reading-room-requested-items-table', {
 
             <td>
                 <section class="extra-info" v-if="representation.metadata.intended_use">
-                    <h2>Intended Use</h2>
+                    <p><strong>Intended Use</strong></p>
                     <p>{{representation.metadata.intended_use}}</p>
                 </section>
 
                 <section class="extra-info" v-if="representation.metadata.other_restrictions">
-                    <h2>Other Restrictions</h2>
+                    <p><strong>Other Restrictions</strong></p>
                     <p>{{representation.metadata.other_restrictions}}</p>
                 </section>
 
                 <section class="extra-info" v-if="representation.metadata.processing_handling_notes">
-                    <h2>Processing/Handling Notes</h2>
+                    <p><strong>Processing/Handling Notes</strong></p>
                     <p>{{representation.metadata.processing_handling_notes}}</p>
                 </section>
             </td>
