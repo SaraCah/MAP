@@ -36,6 +36,7 @@ interface Member {
     position: string;
     is_membership_editable?: boolean;
     is_user_editable?: boolean;
+    is_inactive?: boolean;
 }
 
 interface LocationWithMembers {
@@ -80,7 +81,7 @@ Vue.component('manage-agency', {
                                         <th></th>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="member in location.members">
+                                        <tr v-for="member in location.members"  :class="member.is_inactive ? 'grey-text' : ''">
                                             <td>{{member.username}}</td>
                                             <td>{{member.name}}</td>
                                             <td>{{member.position}}</td>
@@ -125,7 +126,7 @@ Vue.component('manage-agency', {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="user in this.mergedUsers">
+                                <tr v-for="user in this.mergedUsers" :class="user.is_inactive ? 'grey-text' : ''">
                                     <td>{{user.username}}</td>
                                     <td>{{user.name}}</td>
                                     <td>{{user.email}}</td>
@@ -275,6 +276,7 @@ Vue.component('manage-agency', {
                 email: string;
                 roles: string[];
                 is_user_editable: boolean;
+                is_inactive: boolean;
             }
 
             const usernames: string[] = [];
@@ -294,6 +296,7 @@ Vue.component('manage-agency', {
                             email: member.email,
                             roles: [],
                             is_user_editable: false,
+                            is_inactive: !!member.is_inactive,
                         };
                     }
 

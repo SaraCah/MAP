@@ -44,7 +44,7 @@
             </div>
         </div>
 
-        <% if user.fetch('is_admin', false) && !user.new? && Ctx.username != user.fetch('username') %>
+        <% if !user.new? && Ctx.username != user.fetch('username') %>
             <div class="row">
                 <div class="input-field col s12">
                     <label>

@@ -139,6 +139,7 @@ class Agencies < BaseStorage
               Sequel[:user][:username],
               Sequel[:user][:name],
               Sequel[:user][:email],
+              Sequel[:user][:inactive],
               Sequel.as(Sequel[:agency][:id], :agency_id),
               Sequel[:agency_user][:agency_location_id],
               Sequel[:agency_user][:role],
@@ -167,7 +168,8 @@ class Agencies < BaseStorage
         :role => row[:role],
         :position => row[:position],
         :permissions => Permissions::AVAILABLE_PERMISSIONS.select {|perm| row[perm] == 1}.map(&:to_s),
-        :is_membership_editable => is_membership_editable
+        :is_membership_editable => is_membership_editable,
+        :is_inactive => row[:inactive] == 1,
       )
 
       can_edit_user_by_username[row[:username]] = false
