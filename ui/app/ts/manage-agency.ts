@@ -82,7 +82,10 @@ Vue.component('manage-agency', {
                                     </thead>
                                     <tbody>
                                         <tr v-for="member in location.members"  :class="member.is_inactive ? 'grey-text' : ''">
-                                            <td>{{member.username}}</td>
+                                            <td>
+                                                <span v-if="member.is_inactive" title="User has been deactivated" data-badge-caption="Deactivated" class="new badge grey"></span>
+                                                {{member.username}}
+                                            </td>
                                             <td>{{member.name}}</td>
                                             <td>{{member.position}}</td>
                                             <td>{{member.role}}</td>
@@ -127,7 +130,10 @@ Vue.component('manage-agency', {
                             </thead>
                             <tbody>
                                 <tr v-for="user in this.mergedUsers" :class="user.is_inactive ? 'grey-text' : ''">
-                                    <td>{{user.username}}</td>
+                                    <td>
+                                        <span v-if="user.is_inactive" title="User has been deactivated" data-badge-caption="Deactivated" class="new badge grey"></span>
+                                        {{user.username}}
+                                    </td>
                                     <td>{{user.name}}</td>
                                     <td>{{user.email}}</td>
                                     <td>

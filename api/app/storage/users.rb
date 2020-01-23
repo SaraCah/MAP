@@ -316,4 +316,9 @@ class Users < BaseStorage
         UserDTO.from_row(row)
       end
   end
+
+
+  def self.active?(username)
+    !!db[:user][:username => username, :inactive => 0]
+  end
 end

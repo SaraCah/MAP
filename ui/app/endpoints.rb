@@ -117,6 +117,9 @@ class MAPTheApp < Sinatra::Base
         redirect '/'
       end
 
+    elsif authentication.is_user_inactive?
+      Templates.emit_with_layout(:login, {username: params[:username], message: "There is an issue with your account please contact info@archives.qld.go.au", delay_seconds: authentication.delay_seconds},
+                                 :layout_blank, title: "Please log in")
     else
       Templates.emit_with_layout(:login, {username: params[:username], message: "Login failed", delay_seconds: authentication.delay_seconds},
                                  :layout_blank, title: "Please log in")

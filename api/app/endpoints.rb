@@ -29,8 +29,14 @@ class MAPTheAPI < Sinatra::Base
       json_response(authenticated: false,
                     delay_seconds: [limit.delay_seconds, user_limit.delay_seconds].max)
     elsif DBAuth.authenticate(params[:username], params[:password])
-      json_response(authenticated: true,
-                    session: Sessions.create_session(params[:username]))
+      if Users.active?(params[:username])
+        json_response(authenticated: true,
+                      session: Sessions.create_session(params[:username]))
+      else
+        json_response(authenticated: false,
+                      inactive: true,
+                      delay_seconds: 0)
+      end
     else
       json_response(authenticated: false,
                     delay_seconds: 0)

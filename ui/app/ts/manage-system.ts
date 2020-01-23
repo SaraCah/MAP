@@ -46,7 +46,10 @@ Vue.component('manage-system', {
                             </thead>
                             <tbody>
                                 <tr v-for="admin in administrators" :class="admin.is_inactive ? 'grey-text' : ''">
-                                    <td>{{admin.username}}</td>
+                                    <td>
+                                        <span v-if="admin.is_inactive" title="User has been deactivated" data-badge-caption="Deactivated" class="new badge grey"></span>
+                                        {{admin.username}}
+                                    </td>
                                     <td>{{admin.name}}</td>
                                     <td>{{admin.email}}</td>
                                     <td>
