@@ -1,5 +1,8 @@
 class Permissions < BaseStorage
 
+  # Senior Admins only
+  DELEGATED_PERMISSIONS = [:allow_set_and_change_raps, :allow_restricted_access]
+
   AVAILABLE_PERMISSIONS = [:allow_transfers, :allow_file_issue, :allow_set_and_change_raps, :allow_restricted_access]
 
   def self.agency_roles_for_user(user_id, with_labels: false)
@@ -198,9 +201,13 @@ class Permissions < BaseStorage
     available_permissions = if Ctx.get.permissions.is_senior_agency_admin?(agency_id) || Ctx.get.permissions.is_admin?
                               AVAILABLE_PERMISSIONS.map(&:to_s)
                             else
+                              permissions = self.permissions_for_agency_user(Users.id_for_username(Ctx.username),
+                                                                             agency_id,
+                                                                             location_id)
+
                               self.permissions_for_agency_user(Users.id_for_username(Ctx.username),
                                                                agency_id,
-                                                               location_id)
+                                                               location_id) - DELEGATED_PERMISSIONS.map(&:to_s)
                             end
 
     if Ctx.get.permissions.is_admin? || Ctx.get.permissions.is_agency_admin?(agency_id, location_id)

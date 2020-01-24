@@ -30,6 +30,12 @@
         <div class="vue-enabled">
             <% permissions_to_show = available_permissions.reject{|permission| Ctx.client.delegation?(permission)} %>
             <% delegations_to_show = available_permissions.select{|permission| Ctx.client.delegation?(permission)} %>
+
+            <%# Only senior admins can apply delegated permissions %>
+            <% unless Ctx.permissions.is_admin? || Ctx.get.permissions.is_senior_agency_admin? %>
+                <% delegations_to_show = [] %>
+            <% end %>
+
             <user-permissions-form role="<%= role %>"
                                   :is_senior_agency_available="<%= Ctx.permissions.is_admin? && is_top_level %>"
                                   position="<%= position %>"
