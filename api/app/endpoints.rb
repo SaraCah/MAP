@@ -536,6 +536,26 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.get('/transfers/:id/report', needs_session: false)
+      .param(:id, Integer, "ID of transfer") do
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+      transfer = Transfers.transfer_dto_for(params[:id])
+      if transfer && Ctx.get.permissions.can_manage_transfers?(transfer.fetch('agency_id'), transfer.fetch('agency_location_id'))
+        [
+            200,
+            {"Content-Type" => "text/csv"},
+            TransferReport.new(params[:id])
+        ]
+      else
+        Ctx.log_bad_access("user tried to get transfer report without permission for location")
+        [404]
+      end
+    else
+      Ctx.log_bad_access("user tried to get transfer report without permission")
+      json_response({})
+    end
+  end
+
   Endpoint.get('/transfers/:id')
     .param(:id, Integer, "ID of transfer") do
     if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_transfers?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)

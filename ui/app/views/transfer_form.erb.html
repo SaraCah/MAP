@@ -1,13 +1,15 @@
 <div class="row">
     <div class="col s12 m9 l10">
-        <% if transfer.fetch('transfer_proposal_id') %>
-            <div class="row">
-                <div class="input-field col s12">
+        <div class="row">
+            <div class="input-field col s12">
+                <% if transfer.fetch('transfer_proposal_id') %>
                     <a target="_blank" class="btn-small" href="/transfer-proposals/<%= transfer.fetch('transfer_proposal_id') %>">View Transfer Proposal</a>
-
-                </div>
+                <% end %>
+                <% if transfer.fetch('checklist_metadata_imported', false) %>
+                    <a target="_blank" class="btn-small" href="/transfers/<%= transfer.fetch('id') %>/report">Download Report</a>
+                <% end %>
             </div>
-        <% end %>
+        </div>
 
         <div class="row vue-enabled">
             <% if errors %>

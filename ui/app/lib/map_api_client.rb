@@ -600,6 +600,11 @@ class MAPAPIClient
                })
   end
 
+  def stream_transfer_report(transfer_id, suggested_filename)
+    stream_get("/transfers/#{transfer_id}/report",
+               suggested_filename,
+               {})
+  end
 
   def notifications
     get("/notifications")

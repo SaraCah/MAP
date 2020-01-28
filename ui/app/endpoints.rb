@@ -697,6 +697,11 @@ class MAPTheApp < Sinatra::Base
               :type => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   end
 
+  Endpoint.get('/transfers/:id/report')
+      .param(:id, Integer, "ID of transfer") do
+    Ctx.client.stream_transfer_report(params[:id], "transfer_report.T#{params[:id]}.#{Date.today.iso8601}.csv")
+  end
+
   Endpoint.get('/transfers/:id')
     .param(:id, Integer, "ID of transfer") do
     transfer = Ctx.client.get_transfer(params[:id])
