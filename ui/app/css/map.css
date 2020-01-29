@@ -383,6 +383,17 @@ a#manageMenuTrigger:after {
     border-left: 2px solid #efefef;
 }
 
+.search-results td, .search-results th {
+    vertical-align: top;
+}
+
+.search-results .inline-label-value-row .inline-label {
+    color: #777;
+    white-space: nowrap;
+    display: block;
+    font-size: 0.8em;
+}
+
 .search-tools .facet-title {
     font-weight: bold;
 }

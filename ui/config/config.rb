@@ -41,6 +41,8 @@ AppConfig[:file_upload_allowed_mime_types] = [
   'text/tab-separated-values',
 ]
 
+AppConfig[:public_url] = 'http://localhost:3009'
+
 begin
   load File.join(File.dirname(__FILE__), "config.local.rb")
 rescue LoadError

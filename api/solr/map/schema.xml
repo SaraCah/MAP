@@ -9,15 +9,18 @@
   <field name="primary_type" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="types" type="string" indexed="true" stored="true" required="true" multiValued="true" />
   <field name="title" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  <field name="description" type="string" indexed="true" stored="true" required="false" multiValued="false" />
   <field name="qsa_id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="qsa_id_prefixed" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="agency_assigned_id" type="string" indexed="true" stored="true" multiValued="false" />
+  <field name="previous_system_identifiers" type="string" indexed="true" stored="true" multiValued="false" />
   <field name="agency_assigned_tokens" type="text_general" indexed="true" stored="true" multiValued="true" />
 
   <field name="series" type="string" indexed="true" stored="true" required="false" multiValued="false" />
   <field name="series_id" type="string" indexed="true" stored="true" required="false" multiValued="false" />
   <field name="series_qsa_id" type="string" indexed="true" stored="true" required="false" multiValued="false" />
 
+  <field name="containing_record_qsa_id_prefixed" type="string" indexed="true" stored="true" multiValued="false" />
   <field name="responsible_agency" type="string" indexed="true" stored="true" multiValued="false" />
   <field name="recent_responsible_agencies" type="string" indexed="true" stored="true" multiValued="true" />
   <field name="other_responsible_agencies" type="string" indexed="true" stored="true" multiValued="true" />
@@ -40,6 +43,18 @@
 
   <field name="physical_representations_count" type="pint" stored="true" multiValued="false" />
   <field name="digital_representations_count" type="pint" stored="true" multiValued="false" />
+
+  <field name="top_container" type="string" indexed="true" stored="true" multiValued="false" />
+
+  <field name="rap_years" type="pint" indexed="true" stored="true" multiValued="false" />
+  <field name="rap_open_access_metadata" type="boolean" indexed="true" stored="true" multiValued="false" />
+  <field name="rap_access_category" type="string" indexed="true" stored="true" multiValued="false" />
+  <field name="rap_expiry_date" type="string" indexed="true" stored="true" multiValued="false" />
+  <field name="rap_expired" type="boolean" indexed="true" stored="true" multiValued="false" />
+  <field name="rap_expires" type="boolean" indexed="true" stored="true" multiValued="false" />
+  <field name="rap_access_status" type="string" indexed="true" stored="true" multiValued="false" />
+
+  <field name="published" type="boolean" indexed="true" stored="true" multiValued="false" />
 
   <!-- Sort fields -->
   <field name="title_sort" type="string" indexed="true" stored="false" multiValued="false" />

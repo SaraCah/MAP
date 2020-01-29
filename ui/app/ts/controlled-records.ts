@@ -11,6 +11,7 @@ declare var AppConfig: any;
 
 export default interface Record {
     type: string;
+    primary_type: string;
     title: string;
     under_movement: boolean;
     start_date: string;
@@ -26,6 +27,19 @@ export default interface Record {
     current_location: string|null;
     representations_json: Record[];
     nested: boolean;
+    previous_system_identifiers?: string;
+    top_container?: string;
+    rap_years?: number;
+    rap_open_access_metadata?: boolean;
+    rap_access_category?: boolean;
+    rap_expiry_date?: string;
+    rap_expired?: boolean;
+    rap_expires?: boolean;
+    rap_access_status?: string;
+    published: boolean;
+    containing_record_qsa_id_prefixed?: string;
+    series?: string;
+    series_qsa_id?: string;
 }
 
 interface Facet {
@@ -157,17 +171,17 @@ Vue.component('controlled-records', {
 
                         </div>
                         <div class="col s12 m12 l9 search-results">
-                            <table>
+                            <table class="highlight">
                                 <thead>
                                     <tr>
                                         <th>Type</th>
                                         <th>Title</th>
                                         <th></th>
-                                        <th>Agency Identifier</th>
-                                        <th>QSA Identifier</th>
+                                        <th>Identifiers</th>
                                         <th>Representations</th>
                                         <th>Dates</th>
-                                        <th>Parent Series</th>
+                                        <th>Series</th>
+                                        <th>RAP Info</th>
                                         <th style="width: 18em"></th>
                                     </tr>
                                 </thead>
@@ -175,22 +189,61 @@ Vue.component('controlled-records', {
                                     <template v-for="record in flattenRecords(records)">
                                         <tr v-bind:class="{ nested: record.nested, top: !record.nested }" v-show="!record.nested" :key="record.id + record.nested">
                                             <td><div class="indent-wrapper">{{record.type}}</div></td>
-                                            <td>{{record.title}}</td>
+                                            <td>
+                                                {{record.title}}
+                                                <div v-if="record.description" class="record-description-container">
+                                                    <div><small><a href="javascript:void(0);" @click.stop.prevent="toggleDescription($event)">Toggle Description</a></small></div>
+                                                    <div class="record-description" style="display: none;">
+                                                        {{record.description}}
+                                                    </div>
+                                                </div>
+                                            </td>
                                             <td><span class="badge" v-if="record.under_movement">under movement</span></td>
-                                            <td>{{record.agency_assigned_id}}</td>
-                                            <td>{{record.qsa_id_prefixed}}</td>
+                                            <td>
+                                                <div v-if="record.qsa_id_prefixed" class="inline-label-value-row">
+                                                    <span class="inline-label">QSA ID:</span> <span class="inline-value">{{record.qsa_id_prefixed}}</span></div>
+                                                <div v-if="record.agency_assigned_id" class="inline-label-value-row">
+                                                    <span class="inline-label">Agency ID:</span> <span class="inline-value">{{record.agency_assigned_id}}</span>
+                                                </div>
+                                                <div v-if="record.previous_system_identifiers" class="inline-label-value-row">
+                                                    <span class="inline-label">Previous System ID:</span> <span class="inline-value">{{record.previous_system_identifiers}}</span>
+                                                </div>
+                                                <div v-if="record.top_container" class="inline-label-value-row">
+                                                    <span class="inline-label">Container ID:</span> <span class="inline-value">{{record.top_container}}</span>
+                                                </div>
+                                            </td>
                                             <td>
                                                 <span v-if="record.primary_type === 'resource' || ((record.physical_representations_count === 0) && (record.digital_representations_count === 0))">
-                                                    {{record.physical_representations_count}} physical; {{record.digital_representations_count}} digital
+                                                    {{record.physical_representations_count}} physical<br>{{record.digital_representations_count}} digital
                                                 </span>
                                                 <span v-else-if="record.primary_type === 'archival_object'">
-                                                    <a href="javascript:void(0);" @click.stop.prevent="toggleRepresentations($event)">{{record.physical_representations_count}} physical; {{record.digital_representations_count}} digital</a>
+                                                    <a href="javascript:void(0);" @click.stop.prevent="toggleRepresentations($event)">{{record.physical_representations_count}} physical<br>{{record.digital_representations_count}} digital</a>
                                                 </span>
 
                                             </td>
                                             <td>{{ buildDates(record) }}</td>
-                                            <td><span v-if="!record.nested">{{record.series}}</span></td>
+                                            <td><span v-if="!record.nested">
+                                                {{record.series_qsa_id}} {{record.series}}</span>
+                                            </td>
                                             <td>
+                                                <div v-if="record.rap_years" class="inline-label-value-row">
+                                                    <span class="inline-label">Years:</span> <span class="inline-value">{{record.rap_years}}</span>
+                                                </div>
+                                                <div v-if="record.rap_expires" class="inline-label-value-row">
+                                                    <span class="inline-label" v-if="record.rap_expired">Expired:</span>
+                                                    <span class="inline-label" v-else="record.rap_expired">Expires:</span> <span class="inline-value">{{record.rap_expiry_date}}</span>
+                                                </div>
+                                                <div v-if="record.rap_expires === false" class="inline-label-value-row">
+                                                    <span class="inline-label">Expires:</span> <span class="inline-value">No expiry</span>
+                                                </div>
+                                                <div v-if="record.rap_open_access_metadata != null" class="inline-label-value-row">
+                                                    <span class="inline-label">Metadata Published?:</span> <span class="inline-value"><span v-if="record.rap_open_access_metadata">Yes</span><span v-else>No</span></span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <a :href="urlForPublicRecord(record)" v-if="record.published" target="_blank">
+                                                    View on Archives Search
+                                                </a>
                                                 <a href="javascript:void(0);" @click="searchWithinSeries(record)" v-if="record.primary_type === 'resource' && !selectedSeriesId">Search&nbsp;within&nbsp;series</a>
                                                 <slot name="record_actions" v-bind:record="record"></slot>
                                             </td>
@@ -293,6 +346,24 @@ Vue.component('controlled-records', {
             while ((row = row.nextSibling) != null && row.classList.contains('nested')) {
                 row.style.display = (showChildren ? 'table-row' : 'none');
             }
+        },
+        toggleDescription: function(event: any) {
+          const container = event.target.closest('.record-description-container');
+          const description = container.querySelector('.record-description');
+          description.style.display = (description.style.display === 'block' ? 'none' : 'block');
+        },
+        urlForPublicRecord: function(record: Record) {
+            let url = AppConfig.public_url || 'http://foo.com';
+            if (record.primary_type === 'resource') {
+                url += "/series/" + record.qsa_id_prefixed;
+            } else if (record.primary_type === 'archival_object') {
+                url += "/items/" + record.qsa_id_prefixed;
+            } else if (record.primary_type === 'physical_representation') {
+                url += "/items/" + record.containing_record_qsa_id_prefixed;
+            } else if (record.primary_type === 'digital_representation') {
+                url += "/items/" + record.containing_record_qsa_id_prefixed;
+            }
+            return url;
         },
         buildDates: function(record: Record) {
             if (record.type.indexOf("Representation") >= 0) {
