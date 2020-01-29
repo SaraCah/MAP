@@ -17,6 +17,7 @@ class Conversations < BaseStorage
     db[:conversation]
       .insert(handle_id: handle_id,
               message: message,
+              source_system: 'ARCHIVES_GATEWAY',
               created_by: Ctx.username,
               create_time: java.lang.System.currentTimeMillis)
   end
@@ -45,6 +46,7 @@ class Conversations < BaseStorage
         .select(Sequel[record_type][:id],
                 Sequel[:conversation][:message],
                 Sequel[:conversation][:created_by],
+                Sequel[:conversation][:source_system],
                 Sequel[:conversation][:create_time])
 
       if record_type == :file_issue
@@ -65,11 +67,15 @@ class Conversations < BaseStorage
                          identifier_format % [row[:id]]
                        end
 
+          created_by = row[:created_by]
+          if row[:source_system] == 'ARCHIVESSPACE'
+            created_by += ' (QSA)'
+          end
 
           notifications << Notification.new(record_type.to_s, 
                                             row[:id],
                                             identifier,
-                                            "New comment from #{row[:created_by]}: #{snippet}",
+                                            "New comment from #{created_by}: #{snippet}",
                                             'info',
                                             row[:create_time])
       end

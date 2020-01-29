@@ -11,6 +11,7 @@ interface Message {
     message: string;
     author: string;
     timestamp: number;
+    source_system: string;
 }
 
 Vue.component('conversation', {
@@ -23,7 +24,9 @@ Vue.component('conversation', {
                 <div style="white-space: pre-wrap;">{{message.message}}</div>
                 <br>
                 <div>
-                    <span class="grey-text">{{message.author}} - {{formatTimestamp(message.timestamp)}}</span>
+                    <span class="grey-text">
+                        {{message.author}} <span v-if="message.source_system ==='ARCHIVESSPACE'">(QSA)</span> - {{formatTimestamp(message.timestamp)}}
+                    </span>
                 </div>
             </div>
         </div>

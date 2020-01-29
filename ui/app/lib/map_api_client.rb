@@ -455,11 +455,12 @@ class MAPAPIClient
     post('/transfer-proposals/delete', id: transfer_proposal_id)
   end
 
-  ConversationMessage = Struct.new(:message, :author, :timestamp) do
+  ConversationMessage = Struct.new(:message, :author, :timestamp, :source_system) do
     def self.from_json(json)
       new(json.fetch('message'),
           json.fetch('author'),
-          json.fetch('timestamp'))
+          json.fetch('timestamp'),
+          json.fetch('source_system'))
     end
 
     def to_json(*args)
