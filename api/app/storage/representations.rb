@@ -16,11 +16,16 @@ class Representations
           .left_join(Sequel.as(:enumeration_value, :intended_use_enum_value),
                     Sequel.&(Sequel[:intended_use_enum][:id] => Sequel[:intended_use_enum_value][:enumeration_id],
                              Sequel[:intended_use_enum_value][:id] => Sequel[jsonmodel_type][:intended_use_id]))
+          .left_join(Sequel.as(:enumeration, :file_issue_allowed_enum), Sequel[:file_issue_allowed_enum][:name] => 'runcorn_file_issue_allowed')
+          .left_join(Sequel.as(:enumeration_value, :file_issue_allowed_enum_value),
+                     Sequel.&(Sequel[:file_issue_allowed_enum][:id] => Sequel[:file_issue_allowed_enum_value][:enumeration_id],
+                              Sequel[:file_issue_allowed_enum_value][:id] => Sequel[jsonmodel_type][:file_issue_allowed_id]))
           .select_all(Sequel[jsonmodel_type])
           .select_append(Sequel.as(Sequel[:archival_object][:qsa_id], :archival_object_qsa_id),
                          Sequel.as(Sequel[:archival_object][:id], :archival_object_id),
                          Sequel.as(Sequel[:resource][:qsa_id], :resource_qsa_id),
-                         Sequel.as(Sequel[:intended_use_enum_value][:value], :intended_use_enum_value))
+                         Sequel.as(Sequel[:intended_use_enum_value][:value], :intended_use_enum_value),
+                         Sequel.as(Sequel[:file_issue_allowed_enum_value][:value], :file_issue_allowed_enum_value))
 
         if jsonmodel_type === :physical_representation
           dataset = dataset
@@ -43,20 +48,20 @@ class Representations
 
         dataset
           .filter(Sequel[jsonmodel_type][:id] => ids).map do |row|
-            results[row[:id]] = Representation.new(parsed_refs.fetch(row[:id]).fetch(:ref), # ref
-                                                   row[:resource_qsa_id],                   # series_id
-                                                   row[:archival_object_qsa_id],            # record_id
-                                                   row[:title],                             # title
-                                                   nil,                                     # start_date (calculated below)
-                                                   nil,                                     # end_date (calculated below)
-                                                   row[:qsa_id],                            # representation_id
-                                                   row[:agency_assigned_id],                # agency_assigned_id
-                                                   nil,                                     # previous_system_id (calculated below)
-                                                   row[:format_enum_value],                 # format
-                                                   row[:file_issue_allowed] == 1,           # file_issue_allowed
-                                                   row[:intended_use_enum_value],           # intended_use
-                                                   row[:other_restrictions_notes],          # other_restrictions
-                                                   row[:processing_handling_notes])         # processing_handling_notes
+            results[row[:id]] = Representation.new(parsed_refs.fetch(row[:id]).fetch(:ref),   # ref
+                                                   row[:resource_qsa_id],                     # series_id
+                                                   row[:archival_object_qsa_id],              # record_id
+                                                   row[:title],                               # title
+                                                   nil,                                       # start_date (calculated below)
+                                                   nil,                                       # end_date (calculated below)
+                                                   row[:qsa_id],                              # representation_id
+                                                   row[:agency_assigned_id],                  # agency_assigned_id
+                                                   nil,                                       # previous_system_id (calculated below)
+                                                   row[:format_enum_value],                   # format
+                                                   row[:file_issue_allowed_enum_value],       # file_issue_allowed
+                                                   row[:intended_use_enum_value],             # intended_use
+                                                   row[:other_restrictions_notes],            # other_restrictions
+                                                   row[:processing_handling_notes])           # processing_handling_notes
 
             archival_object_to_representations[row[:archival_object_id]] ||= []
             archival_object_to_representations[row[:archival_object_id]] << results[row[:id]]

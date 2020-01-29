@@ -16,7 +16,7 @@ export default interface Record {
     start_date: string;
     end_date: string;
     types: string[];
-    file_issue_allowed: boolean;
+    file_issue_allowed: string;
     id: string;
     uri: string;
     qsa_id: number;
@@ -295,7 +295,6 @@ Vue.component('controlled-records', {
             }
         },
         buildDates: function(record: Record) {
-            console.log(record.type);
             if (record.type.indexOf("Representation") >= 0) {
                 // These don't have dates of their own
                 return "";

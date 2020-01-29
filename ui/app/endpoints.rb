@@ -797,7 +797,7 @@ class MAPTheApp < Sinatra::Base
       end
 
       Ctx.client.resolve_representations(representation_refs_for_record).map do |representation|
-        if representation.fetch('file_issue_allowed', false)
+        if representation.fetch('file_issue_allowed', nil) == 'allowed_true'
           request.fetch('items') << FileIssueRequestItem.from_solr_doc(representation)
           resolved_representations << representation
         end

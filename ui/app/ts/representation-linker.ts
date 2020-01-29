@@ -119,14 +119,14 @@ Vue.component('representation-browse', {
                 return this.isPhysicalRepresentation(record);
             }
 
-            return record.file_issue_allowed;
+            return record.file_issue_allowed === 'allowed_true';
         },
         showFileIssueDisallowed: function(record: Record) {
             if (this.readingRoomRequestsOnly) {
                 return false;
             }
 
-            return this.isRepresentation(record) && !record.file_issue_allowed;
+            return this.isRepresentation(record) && (record.file_issue_allowed !== 'allowed_true');
         },
         isNotOnShelf: function(record: Record) {
             return record.current_location && record.current_location !== 'HOME';

@@ -32,7 +32,7 @@
   <field name="physical_representations" type="string" indexed="true" stored="true" multiValued="true" />
   <field name="digital_representations" type="string" indexed="true" stored="true" multiValued="true" />
   <field name="all_representations" type="string" indexed="true" stored="true" multiValued="true" />
-  <field name="file_issue_allowed" type="boolean" indexed="true" stored="true" multiValued="false" />
+  <field name="file_issue_allowed" type="string" indexed="true" stored="true" multiValued="false" />
   <field name="current_location" type="string" indexed="true" stored="true" multiValued="false" />
 
   <field name="start_date" type="pdate" stored="true" multiValued="false" />
