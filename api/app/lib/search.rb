@@ -235,7 +235,7 @@ class Search
                                  'rows' => page_size + 1,
                                  'start' => (page * page_size),
                                  'facet' => 'true',
-                                 'facet.field' => ['primary_type', 'series', 'creating_agency'],
+                                 'facet.field' => ['primary_type', 'series', 'creating_agency', 'rap_access_status', 'format', 'subjects'],
                                  'facet.mincount' => 1,
                                 )
     facets = results.fetch('facet_counts', {}).fetch('facet_fields', {})

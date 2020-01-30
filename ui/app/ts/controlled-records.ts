@@ -279,7 +279,11 @@ Vue.component('controlled-records', {
             endDate: '',
             availableFilters: [{field: 'primary_type', title: 'Record Types'},
                                {field: 'series', title: 'Series'},
-                               {field: 'creating_agency', title: 'Creating Agency'}],
+                               {field: 'creating_agency', title: 'Creating Agency'},
+                               {field: 'rap_access_status', title: 'Access Status'},
+                               {field: 'format', title: 'Format'},
+                               {field: 'subjects', title: 'Subject'},
+                              ],
             appliedFilters: [],
             selectedSort: 'relevance',
 

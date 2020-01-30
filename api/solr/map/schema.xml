@@ -54,6 +54,9 @@
   <field name="rap_expires" type="boolean" indexed="true" stored="true" multiValued="false" />
   <field name="rap_access_status" type="string" indexed="true" stored="true" multiValued="false" />
 
+  <field name="format" type="string" indexed="true" stored="true" multiValued="false" />
+  <field name="subjects" type="string" indexed="true" stored="true" multiValued="true" />
+
   <field name="published" type="boolean" indexed="true" stored="true" multiValued="false" />
 
   <!-- Sort fields -->
