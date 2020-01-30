@@ -953,17 +953,17 @@ class MAPTheAPI < Sinatra::Base
     .param(:sort, String, "Sort key", :optional => true)
     .param(:status, String, "Status filter", :optional => true)
     .param(:page, Integer, "Page to return") do
-    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       json_response(SearchRequests.search_requests(params[:page], AppConfig[:page_size], params[:status], params[:sort]))
     else
-      Ctx.log_bad_access("Attempt to search requests without permission")
+      Ctx.log_bad_access("Attempt to access search requests without permission")
       [404]
     end
   end
 
   Endpoint.post('/search-requests/create')
     .param(:search_request, SearchRequest, "Search Request to create") do
-    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       if (errors = params[:search_request].validate).empty?
         if (errors = SearchRequests.create_from_dto(params[:search_request])).empty?
           json_response(status: 'created')
@@ -981,9 +981,9 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/search-requests/:id')
     .param(:id, Integer, "ID of search request") do
-    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       search_request = SearchRequests.dto_for(params[:id])
-      if search_request && Ctx.get.permissions.has_role_for_location?(search_request.fetch('agency_id'), search_request.fetch('agency_location_id'))
+      if search_request && Ctx.get.permissions.can_manage_file_issues?(search_request.fetch('agency_id'), search_request.fetch('agency_location_id'))
         json_response(search_request.to_hash)
       else
         Ctx.log_bad_access("Attempt to get search request without permission for location")
@@ -997,10 +997,10 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/search-requests/update')
     .param(:search_request, SearchRequest, "Search Request to create") do
-    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       if (errors = params[:search_request].validate).empty?
         existing_search_request = SearchRequests.dto_for(params[:search_request].fetch('id'))
-        if existing_search_request && Ctx.get.permissions.has_role_for_location?(existing_search_request.fetch('agency_id'), existing_search_request.fetch('agency_location_id'))
+        if existing_search_request && Ctx.get.permissions.can_manage_file_issues?(existing_search_request.fetch('agency_id'), existing_search_request.fetch('agency_location_id'))
           if (errors = SearchRequests.update_from_dto(params[:search_request])).empty?
             json_response(status: 'updated')
           else
@@ -1022,9 +1022,9 @@ class MAPTheAPI < Sinatra::Base
   Endpoint.post('/search-requests/cancel')
     .param(:id, Integer, "ID of search request")
     .param(:lock_version, Integer, "Lock version of search request") do
-    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       existing_search_request = SearchRequests.dto_for(params[:id])
-      if existing_search_request && Ctx.get.permissions.has_role_for_location?(existing_search_request.fetch('agency_id'), existing_search_request.fetch('agency_location_id'))
+      if existing_search_request && Ctx.get.permissions.can_manage_file_issues?(existing_search_request.fetch('agency_id'), existing_search_request.fetch('agency_location_id'))
         if (errors = SearchRequests.cancel(params[:id], params[:lock_version])).empty?
           json_response(status: 'updated')
         else
@@ -1043,9 +1043,9 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/search-requests/:id/quote')
     .param(:id, Integer, "Search Request ID")do
-    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       existing_search_request = SearchRequests.dto_for(params[:id])
-      if existing_search_request && Ctx.get.permissions.has_role_for_location?(existing_search_request.fetch('agency_id'), existing_search_request.fetch('agency_location_id'))
+      if existing_search_request && Ctx.get.permissions.can_manage_file_issues?(existing_search_request.fetch('agency_id'), existing_search_request.fetch('agency_location_id'))
         if existing_search_request.fetch('aspace_quote_id', false)
           json_response(ServiceQuotes.get_quote(existing_search_request.fetch('aspace_quote_id')))
         else
@@ -1062,7 +1062,7 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.get('/search-request-fee-schedule') do
-    if Ctx.user_logged_in? && Ctx.get.permissions.has_role_for_location?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
+    if Ctx.user_logged_in? && Ctx.get.permissions.can_manage_file_issues?(Ctx.get.current_location.agency_id, Ctx.get.current_location.id)
       chargeable_services = ServiceQuotes.chargeable_services(['Search Request'])
       json_response(chargeable_services)
     else
