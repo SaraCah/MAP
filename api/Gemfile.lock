@@ -1,25 +1,10 @@
-GIT
-  remote: https://github.com/hudmol/map_validator.git
-  revision: 885d79476b62b9ca7ccd8abf3699e927a1ba11d8
-  tag: master
-  specs:
-    map_validator (0.0.1)
-      xlsx_streaming_reader (= 0.0.1)
-
-GIT
-  remote: https://github.com/hudmol/xlsx_streaming_reader.git
-  revision: 9a279fd2fbb6173e9a6a2a6335b3d941ee610dbc
-  branch: master
-  specs:
-    xlsx_streaming_reader (0.0.1)
-
 GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     aws-eventstream (1.0.3)
-    aws-partitions (1.269.0)
+    aws-partitions (1.270.0)
     aws-sdk-core (3.89.1)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
@@ -81,11 +66,8 @@ DEPENDENCIES
   fishwife (= 1.10.1)
   jdbc-mysql (= 5.1.47)
   json (= 2.2.0)
-  map_validator!
   rjack-logback (= 1.9.0)
   rotp (= 5.1)
   sequel (= 5.19.0)
   sinatra (= 2.0.5)
   sinatra-contrib (= 2.0.5)
-  xlsx_streaming_reader!
-
