@@ -25,7 +25,7 @@
   <field name="recent_responsible_agencies" type="string" indexed="true" stored="true" multiValued="true" />
   <field name="other_responsible_agencies" type="string" indexed="true" stored="true" multiValued="true" />
   <field name="recent_responsible_agency_filter" type="string" indexed="true" stored="false" multiValued="true" />
-  <field name="creating_agency" type="string" indexed="true" stored="true" multiValued="false" />
+  <field name="creating_agency" type="string" indexed="true" stored="true" multiValued="true" />
 
   <field name="keywords" type="text_general" indexed="true" stored="false" multiValued="true"/>
   <field name="keywords_stemmed" type="text_en" indexed="true" stored="false" multiValued="true"/>
