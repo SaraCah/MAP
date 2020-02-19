@@ -333,12 +333,21 @@ a#manageMenuTrigger:after {
 .search-box {
     padding: 0 1em 1em 1em;
     border-bottom: 2px solid #efefef;
+    max-width: 1280px;
 }
 
 .search-box .sample-date-formats {
     color: #9e9e9e;
     font-size: 80%;
     padding-left: 1em;
+}
+
+.search-box .date-limit {
+    padding-right: 2em;
+}
+
+.search-box .date-to {
+    padding: 0 2em;
 }
 
 .search-box section {

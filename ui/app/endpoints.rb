@@ -1032,7 +1032,7 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.get('/controlled-records')
-    .param(:q, String, "Query string", :optional => true)
+    .param(:q, String, "Query clauses (json)", :optional => true)
     .param(:filters, String, "Filters to apply [[field1, val1], [field2, val2]]", :optional => true)
     .param(:start_date, String, "Start of date range", :optional => true)
     .param(:end_date, String, "End of date range", :optional => true)

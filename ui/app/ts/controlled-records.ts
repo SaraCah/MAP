@@ -29,6 +29,7 @@ export default interface Record {
     nested: boolean;
     previous_system_identifiers?: string;
     top_container?: string;
+    transfer_id?: string;
     rap_years?: number;
     rap_open_access_metadata?: boolean;
     rap_access_category?: boolean;
@@ -39,6 +40,7 @@ export default interface Record {
     published: boolean;
     containing_record_qsa_id_prefixed?: string;
     series?: string;
+    series_qsa_id_prefixed?: string;
     series_qsa_id?: string;
 }
 
@@ -54,6 +56,12 @@ interface Filter {
     value: string;
 }
 
+interface Clause {
+    op: string;
+    field: string;
+    query: string;
+}
+
 interface SearchState {
     currentPage: number;
     facets: object;
@@ -62,7 +70,8 @@ interface SearchState {
     searchActive: boolean;
     showNextPage: boolean;
     showPrevPage: boolean;
-    queryString: string;
+    lastSearchedQueryClauses: Clause[];
+    queryClauses: Clause[];
     startDate: string;
     endDate: string;
     availableFilters: object[];
@@ -96,19 +105,57 @@ Vue.component('controlled-records', {
                             </div>
                         </section>
 
-                        <section class="row">
-                            <div class="col s12 m12 l6">
-                                <div class="input-field">
-                                    <label for="q">Search for keywords/identifiers</label>
-                                    <input type="text" id="q" name="q"></input>
+                        <section class="row" v-for="(clause, idx) in this.queryClauses">
+                            <div class="col s2">
+                                <div class="input-field" v-if="idx > 0">
+                                    <select v-model="clause.op" class="browser-default">
+                                        <option value="AND">AND</option>
+                                        <option value="OR">OR</option>
+                                        <option value="NOT">NOT</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div class="col s12 m12 l6">
-                                <span class="map-hide-on-phone" style="padding-right: 1em;">between</span>
+
+                            <div class="col s5">
+                                <div class="input-field">
+                                    <label :for="'q_' + idx">Search for</label>
+                                    <input :id="'q_' + idx" type="text" v-model="clause.query"></input>
+                                </div>
+                            </div>
+
+                            <div class="col s3">
+                                <div class="input-field">
+                                    <select v-model="clause.field" class="browser-default">
+                                        <option value="keywords">All fields</option>
+                                        <option value="qsa_id">QSA ID</option>
+                                        <option value="agency_id">Agency ID</option>
+                                        <option value="title">Title</option>
+                                        <option value="transfer_id">Transfer ID</option>
+                                        <option value="series_number">Series Number</option>
+                                        <option value="box_number">Box Number</option>
+                                        <option value="previous_id">Previous System ID</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col s2">
+                                <div class="input-field">
+                                    <button type="button" style="width: 4em;" class="btn" v-on:click.stop.prevent="addClause()">+</button>
+                                    <button type="button" style="width: 4em;" class="btn" v-on:click.stop.prevent="removeClause(idx)">&mdash;</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="row">
+                            <div class="col s12">
+                                <div class="input-field inline date-limit">Limit to dates</div>
                                 <div class="input-field inline">
                                     <label for="start_date">Start date</label>
                                     <input type="text" size="10" id="start_date" name="start_date"></input>
                                     <span class="helper-text">YYYY-MM-DD</span>
+                                </div>
+                                <div class="input-field inline date-to">
+                                    to
                                 </div>
                                 <div class="input-field inline">
                                     <label for="end_date">End date</label>
@@ -117,6 +164,7 @@ Vue.component('controlled-records', {
                                 </div>
                             </div>
                         </section>
+
 
                         <div class="row">
                             <div class="col s12">
@@ -211,6 +259,9 @@ Vue.component('controlled-records', {
                                                 <div v-if="record.top_container" class="inline-label-value-row">
                                                     <span class="inline-label">Container ID:</span> <span class="inline-value">{{record.top_container}}</span>
                                                 </div>
+                                                <div v-if="record.transfer_id" class="inline-label-value-row">
+                                                    <span class="inline-label">Transfer ID:</span> <span class="inline-value">{{record.transfer_id}}</span>
+                                                </div>
                                             </td>
                                             <td>
                                                 <span v-if="record.primary_type === 'resource' || ((record.physical_representations_count === 0) && (record.digital_representations_count === 0))">
@@ -223,7 +274,7 @@ Vue.component('controlled-records', {
                                             </td>
                                             <td>{{ buildDates(record) }}</td>
                                             <td><span v-if="!record.nested">
-                                                {{record.series_qsa_id}} {{record.series}}</span>
+                                                {{record.series_qsa_id_prefixed}} {{record.series}}</span>
                                             </td>
                                             <td>
                                                 <div v-if="record.rap_years" class="inline-label-value-row">
@@ -274,7 +325,18 @@ Vue.component('controlled-records', {
             facets: [],
             showNextPage: false,
             showPrevPage: false,
-            queryString: '',
+
+            // The query that we last fired.  If the user adds filters, moves
+            // between pages, changes sorting, those actions are performed against
+            // this base query, not the contents of the search form on the page
+            // (which might have been changed).
+            lastSearchedQueryClauses: [],
+
+            // The query that exists in the search form (which may not have been
+            // submitted yet).  This becomes `lastSearchedQueryClauses` when the
+            // user fires the search.
+            queryClauses: [],
+
             startDate: '',
             endDate: '',
             availableFilters: [{field: 'primary_type', title: 'Record Types'},
@@ -297,7 +359,7 @@ Vue.component('controlled-records', {
     methods: {
         setHash: function() {
             const keyComponents = [
-                ['q', this.queryString],
+                ['q', this.queryClauses],
                 ['startDate', this.startDate],
                 ['endDate', this.endDate],
                 ['currentPage', this.currentPage],
@@ -324,7 +386,8 @@ Vue.component('controlled-records', {
                 }
             }
 
-            this.queryString = map.q || '';
+            this.queryClauses = map.q || [];
+            this.lastSearchedQueryClauses = JSON.parse(JSON.stringify(this.queryClauses));
             this.startDate = map.startDate || '';
             this.endDate = map.endDate || '';
             this.currentPage = map.currentPage ? Number(map.currentPage) : 0;
@@ -386,6 +449,17 @@ Vue.component('controlled-records', {
 
             return [startYear, endYear].join(' - ');
         },
+        addClause: function() {
+            this.queryClauses.push({
+                op: 'AND',
+                field: 'keywords',
+                query: '',
+            });
+        },
+        removeClause: function(idx: number) {
+            this.queryClauses = this.queryClauses.slice(0, idx).concat(this.queryClauses.slice(idx + 1));
+        },
+
         addFilter: function(facet: Facet) {
             this.appliedFilters.push(facet);
             this.currentPage = 0;
@@ -402,15 +476,6 @@ Vue.component('controlled-records', {
                                 (elt: Filter) => (elt.field === facet.field) && (elt.value === facet.value));
         },
         search: function() {
-
-            // We defer reading from the inputs (rather than binding them
-            // directly to model values) because the user's search isn't "locked
-            // in" until they fire the search.
-            //
-            // One place this matters is if you edit your search string but then
-            // click "next page" on your set of existing results.  You would
-            // expect your changes to the query to be discarded.
-            this.queryString = (this.$el.querySelector('input[name="q"]') as HTMLInputElement).value;
             this.startDate = (this.$el.querySelector('input[name="start_date"]') as HTMLInputElement).value;
             this.endDate = (this.$el.querySelector('input[name="end_date"]') as HTMLInputElement).value;
 
@@ -423,7 +488,8 @@ Vue.component('controlled-records', {
         reset: function(opts?: any) {
             opts = opts ? opts : {};
 
-            this.queryString = '';
+            this.queryClauses = [];
+            this.lastSearchedQueryClauses = [];
             this.startDate = '';
             this.endDate = '';
             this.currentPage = 0;
@@ -457,7 +523,7 @@ Vue.component('controlled-records', {
             this.$http.get('/controlled-records', {
                 method: 'GET',
                 params: {
-                    q: this.queryString,
+                    q: JSON.stringify(this.queryClauses),
                     filters: JSON.stringify(mergedFilters),
                     start_date: this.startDate,
                     end_date: this.endDate,
@@ -528,8 +594,11 @@ Vue.component('controlled-records', {
         },
     },
     updated: function() {
+        if (this.queryClauses.length === 0) {
+            this.addClause();
+        }
+
         if (this.$el.querySelector('.search-box') != null) {
-            (this.$el.querySelector('input[name="q"]') as HTMLInputElement).value = this.queryString;
             (this.$el.querySelector('input[name="start_date"]') as HTMLInputElement).value = this.startDate;
             (this.$el.querySelector('input[name="end_date"]') as HTMLInputElement).value = this.endDate;
 
@@ -563,7 +632,7 @@ Vue.component('controlled-records', {
                 if (this.selectedSeriesId) {
                     this.$http.get('/controlled-records', {
                         params: {
-                            q: '*:*',
+                            q: '[]',
                             filters: JSON.stringify([["uri", this.selectedSeriesId]]),
                             page: 0,
                             page_size: 1,
@@ -585,7 +654,9 @@ Vue.component('controlled-records', {
     },
     computed: {
         browseMode: function(): boolean {
-            return this.queryString === '' && this.startDate === '' && this.endDate === '' && !this.searchActive;
+            const emptyQuery = (this.lastSearchedQueryClauses.map((c) => c.query.length).reduce((t, n) => t + n, 0) === 0);
+
+            return emptyQuery && this.startDate === '' && this.endDate === '' && !this.searchActive;
         },
         serializedFilters: function(): string {
             return JSON.stringify(this.appliedFilters.map((filter) => [filter.field, filter.value]));

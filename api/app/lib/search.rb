@@ -219,16 +219,17 @@ class Search
   end
 
   def self.controlled_records(permissions,
-                              q,
+                              q_json,
                               filters,
                               sort,
                               start_date, end_date,
                               page, page_size)
 
-    results = solr_handle_search('q' => q.to_s.empty? ? '*:*' : q,
-                                 'defType' => 'edismax',
+    q = AdvancedSearchQuery.parse(q_json)
+
+    results = solr_handle_search('q' => q.empty? ? '*:*' : q.query_string,
+                                 'defType' => 'lucene',
                                  'sort' => parse_sort(sort),
-                                 'qf' => 'agency_assigned_id^100 agency_assigned_tokens^10 keywords^2 keywords_stemmed^1',
                                  'fq' => [build_controlled_records_filter(permissions),
                                           build_date_filter(start_date, end_date),
                                           build_supplied_filters(filters)],

@@ -313,6 +313,7 @@ class MAPAPIClient
     return nil if Ctx.get.permissions.is_admin?
     Agency.from_json(get('/my-agency', {}))
   end
+
   def get_controlled_records(q, filters, sort, start_date, end_date, page, page_size)
     return { results: [], facets: {}} if Ctx.get.permissions.is_admin?
 

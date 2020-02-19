@@ -16,8 +16,11 @@
   <field name="previous_system_identifiers" type="string" indexed="true" stored="true" multiValued="false" />
   <field name="agency_assigned_tokens" type="text_general" indexed="true" stored="true" multiValued="true" />
 
+  <field name="transfer_id" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+
   <field name="series" type="string" indexed="true" stored="true" required="false" multiValued="false" />
   <field name="series_id" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+  <field name="series_qsa_id_prefixed" type="string" indexed="true" stored="true" required="false" multiValued="false" />
   <field name="series_qsa_id" type="string" indexed="true" stored="true" required="false" multiValued="false" />
 
   <field name="containing_record_qsa_id_prefixed" type="string" indexed="true" stored="true" multiValued="false" />
@@ -29,8 +32,9 @@
 
   <field name="keywords" type="text_general" indexed="true" stored="false" multiValued="true"/>
   <field name="keywords_stemmed" type="text_en" indexed="true" stored="false" multiValued="true"/>
-  <field name="ngrams" type="ngrams" indexed="true" stored="false" multiValued="true"/>
-  <field name="edge_ngrams" type="edge_ngrams" indexed="true" stored="false" multiValued="true"/>
+
+  <field name="title_text" type="text_general" indexed="true" stored="false" multiValued="true"/>
+  <field name="title_text_stemmed" type="text_en" indexed="true" stored="false" multiValued="true"/>
 
   <field name="physical_representations" type="string" indexed="true" stored="true" multiValued="true" />
   <field name="digital_representations" type="string" indexed="true" stored="true" multiValued="true" />
@@ -71,16 +75,20 @@
   <field name="identifier" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <copyField source="qsa_id" dest="identifier" />
 
-  <copyField source="qsa_id" dest="keywords" />
   <copyField source="agency_assigned_id" dest="keywords" />
-
-  <copyField source="agency_assigned_id" dest="ngrams" />
-  <copyField source="agency_assigned_id" dest="edge_ngrams" />
-
+  <copyField source="previous_system_identifiers" dest="keywords" />
+  <copyField source="qsa_id" dest="keywords" />
+  <copyField source="qsa_id_prefixed" dest="keywords" />
+  <copyField source="series_qsa_id" dest="keywords" />
+  <copyField source="series_qsa_id_prefixed" dest="keywords" />
   <copyField source="title" dest="keywords" />
   <copyField source="title" dest="keywords_stemmed" />
-  <copyField source="title" dest="ngrams" />
-  <copyField source="title" dest="edge_ngrams" />
+  <copyField source="top_container" dest="keywords" />
+  <copyField source="transfer_id" dest="keywords" />
+
+  <copyField source="title" dest="title_text" />
+  <copyField source="title" dest="title_text_stemmed" />
+
 
   <uniqueKey>id</uniqueKey>
 
@@ -297,21 +305,6 @@ http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters
            <filter class="solr.EnglishMinimalStemFilterFactory"/>
       -->
       <filter class="solr.SnowballPorterFilterFactory"/>
-    </analyzer>
-  </fieldType>
-
-  <fieldType name="ngrams" class="solr.TextField" positionIncrementGap="100">
-    <analyzer>
-      <filter class="solr.LowerCaseFilterFactory"/>
-      <tokenizer class="solr.NGramTokenizerFactory" minGramSize="3" maxGramSize="5"/>
-    </analyzer>
-  </fieldType>
-
-  <fieldType name="edge_ngrams" class="solr.TextField" positionIncrementGap="100">
-    <analyzer>
-      <tokenizer class="solr.WhitespaceTokenizerFactory"/>
-      <filter class="solr.LowerCaseFilterFactory"/>
-      <filter class="solr.EdgeNGramFilterFactory" minGramSize="3" maxGramSize="5"/>
     </analyzer>
   </fieldType>
 

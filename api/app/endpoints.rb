@@ -327,7 +327,7 @@ class MAPTheAPI < Sinatra::Base
 
 
   Endpoint.get('/controlled-records')
-    .param(:q, String, "Query string", :optional => true)
+    .param(:q, String, "Query clauses (json)", :optional => true)
     .param(:filters, String, "Filters to apply [[field1, val1], [field2, val2]]", :optional => true)
     .param(:sort, String, "Sort key", :optional => true)
     .param(:start_date, DateString, "Start of date range", :optional => true)
