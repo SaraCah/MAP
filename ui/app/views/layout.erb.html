@@ -31,7 +31,7 @@
                     <% end %>
 
                     <% if message %>
-                        <%== Templates.emit(:flash_message, message: message) %>
+                        <%== Templates.emit(:flash_message, message: message, message_class: message_class) %>
                     <% end %>
 
                     <%== Templates.emit(template, template_args) %>

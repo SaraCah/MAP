@@ -1,5 +1,3 @@
-# THINKME: Want an agency ref type?  Type:ID sort of thing
-
 class Users < BaseStorage
 
   SORT_OPTIONS = {
@@ -137,6 +135,11 @@ class Users < BaseStorage
 
   def self.name_for(username)
     db[:user][:username => username][:name]
+  end
+
+  def self.has_mfa?(username)
+    user = db[:user][:username => username]
+    user && user[:mfa_method] != 'none' && user[:mfa_confirmed] == 1
   end
 
   def self.update_from_dto(user)
@@ -324,7 +327,4 @@ class Users < BaseStorage
     !!db[:user][:username => username, :inactive => 0]
   end
 
-  def self.get_position(username)
-    db[:user][:username => username][:position]
-  end
 end

@@ -9,26 +9,34 @@
 # Partials would work the same way--just <%== Templates.emit(:partial_name) %>
 #
 
-Templates.define(:hello, [:name], "views/hello.erb.html")
+Templates.define(:hello, [:name, :message_code?], "views/hello.erb.html")
 Templates.define(:example_partial, [], "views/_partial.erb.html")
 
-Templates.define(:layout, [:title, :template, :template_args, :message?, [:context]], "views/layout.erb.html")
+Templates.define(:layout, [:title, :template, :template_args, :message?, :message_class?, [:context]], "views/layout.erb.html")
 Templates.define(:layout_blank, [:title, :template, :template_args, :message?], "views/layout_blank.erb.html")
 
 Templates.define(:qgov_header, [], "views/qgov_header.erb.html")
 Templates.define(:qgov_footer, [], "views/qgov_footer.erb.html")
 
-Templates.define(:login, [:username?, :message?, :delay_seconds?], "views/login.erb.html")
-Templates.define(:mfa, [:message?], "views/mfa.erb.html")
+Templates.define(:login, [:username?, :message?, :message_code?, :delay_seconds?], "views/login.erb.html")
+
+Templates.define(:mfa, [:message?, :settings], "views/mfa.erb.html")
+Templates.define(:mfa_check, [:settings, :message_code?], "views/mfa_check.erb.html")
+
 
 Templates.define(:records, [:agency?, :location?], "views/records.erb.html")
 
 Templates.define(:user_edit, [:user, :errors?], "views/user_form.erb.html")
-Templates.define(:manage_mfa, [:secret, :regenerate, :qr_code, :current_token], "views/manage_mfa.erb.html")
-Templates.define(:manage_mfa_no_key, [], "views/manage_mfa_no_key.erb.html")
+Templates.define(:manage_mfa, [:settings, :message?], "views/manage_mfa.erb.html")
+
+Templates.define(:generic_messages, [:message_code?], "views/_generic_messages.erb.html")
+
+
 Templates.define(:location_edit, [:location, :errors?], "views/location_form.erb.html")
+
 Templates.define(:location_add_user, [:location, :user, :mode, :role?, :errors?], "views/location_add_user_form.erb.html")
-Templates.define(:flash_message, [:message], "views/_message.erb.html")
+Templates.define(:flash_message, [:message, :message_class?], "views/_message.erb.html")
+
 Templates.define(:header, [:title, [:context]], "views/header.erb.html")
 
 Templates.define(:transfer_proposals, [:paged_results, :sort?, :status?, :params], "views/transfer_proposals.erb.html")

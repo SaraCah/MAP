@@ -1,12 +1,150 @@
-<div id="mfa">
-    <div class="container">
-        <div class="row">
-            <div class="row">
-                <div>Secret: <%= secret %></div>
-                <div >QR CODE: <%== qr_code.as_svg(module_size: 3) %></div>
-                <div>Current Token: <%= current_token %></div>
-                <a href="/mfa-new-key">Generate new token</a>
-            </div>
-        </div>
+<div class="row">
+    <div class="col s12">
+        <p>
+            Multi-factor authentication (MFA) uses your smartphone to add an extra layer of security to your <%= AppConfig[:service_name] %> account.
+        </p>
+
+        <p>
+            With MFA enabled, logging in is a two step process:
+
+            <ol>
+                <li>Enter your username and password as normal</li>
+
+                <li>Receive a code on your smartphone, and enter it to confirm your access</li>
+            </ol>
+        </p>
+
+        <p><%= AppConfig[:service_name] %> supports two different MFA methods: <b>code via SMS</b>, or <b>Google Authenticator</b>.</p>
+
+        <form>
+            <ul>
+                <li>
+                    <label>
+                        <input type="radio" name="mfa_method" value="sms" <% if settings['method'] == 'sms' %>checked<% end %>>
+                        <span>Send a code via SMS</span>
+                    </label>
+                </li>
+
+                <li>
+                    <label>
+                        <input type="radio" name="mfa_method" value="totp" <% if settings['method'] == 'totp' %>checked<% end %>>
+                        <span>Use Google Authenticator</span>
+                    </label>
+                </li>
+
+                <li>
+                    <label>
+                        <input type="radio" name="mfa_method" value="none" <% if !['sms', 'totp'].include?(settings['method']) %>checked<% end %>>
+                        <span>Disable Multi-factor authentication</span>
+                    </label>
+                </li>
+            </ul>
+        </form>
+
     </div>
 </div>
+
+<div class="sms mfa_settings sms_settings" style="display: none">
+    <div class="col s12 m6">
+        <h3>Code via SMS</h3>
+
+        <p>Enter your phone number below and we will send you a secure code when you log in.</p>
+
+        <form action="/mfa-sms-save" method="POST">
+            <%== FormHelper.hidden_authenticity_token %>
+
+            <div class="row">
+                <label>
+                    <input type="text" name="phone_number" value="<%= settings.dig('sms', 'phone_number') %>" required>
+                    <span>Your mobile phone number (e.g. <b>0412 345 789</b>)</span>
+                </label>
+            </div>
+
+
+            <div class="row">
+                <label>
+                    <input type="text" name="phone_number_confirm" required>
+                    <span><b>Confirm:</b> Your mobile phone number (e.g. <b>0412 345 789</b>)</span>
+                </label>
+            </div>
+
+            <div class="row">
+                <button class="btn" type="submit">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="row mfa_settings totp_settings" style="display: none">
+    <div class="col s12 m6">
+        <h3>Google Authenticator</h3>
+
+        <% if totp = settings['totp'] %>
+            <p>You can enter your account details into Google Authenticator by scanning the following QR code:</p>
+
+            <div class="row">
+                <div class="col s12">
+                    <%== totp.fetch('qr_code').as_svg(module_size: 3) %>
+                </div>
+            </div>
+
+            <p>Alternatively, manually enter the following key:</p>
+
+            <pre><%= totp.fetch('secret') %></pre>
+
+            <p>Generate a new key if you have reason to think your key has been compromised (if you have lost your phone, for example).</p>
+        </form>
+
+
+        <% end %>
+
+
+        <form style="display: inline-block" action="mfa-totp-save" method="POST">
+            <%== FormHelper.hidden_authenticity_token %>
+            <button class="btn" type="submit">Save</button>
+        </form>
+        <form style="display: inline-block" action="/mfa-totp-new-key" method="POST">
+            <%== FormHelper.hidden_authenticity_token %>
+            <button class="btn" type="submit">Generate a new key</button>
+        </form>
+
+
+    </div>
+</div>
+
+<div class="row mfa_settings disabled_settings" style="display: none">
+    <div class="col s12 m6">
+        <form action="/mfa-disabled" method="POST">
+            <%== FormHelper.hidden_authenticity_token %>
+            <button class="btn" type="submit">Save</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+ const show_section = function () {
+     document.querySelectorAll('.mfa_settings').forEach((elt) => {
+         elt.style.display = 'none';
+     })
+
+     const selected = document.querySelector('input[name="mfa_method"]:checked').value;
+
+     if (selected === 'sms') {
+         document.querySelector('.sms_settings').style.display = 'block';
+     } else if (selected === 'totp') {
+         document.querySelector('.totp_settings').style.display = 'block';
+     } else {
+         document.querySelector('.disabled_settings').style.display = 'block';
+     }
+ }
+
+ document.querySelectorAll('input[name="mfa_method"]').forEach((elt) => {
+     elt.addEventListener('change', function () {
+         show_section();
+     })
+ });
+
+ show_section();
+</script>

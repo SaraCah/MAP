@@ -1,14 +1,19 @@
 class MAPTheApp < Sinatra::Base
 
-  Endpoint.get('/') do
+  Endpoint.get('/')
+    .param(:msg, String, "Flash message code to display", optional: true) do
     if Ctx.session[:username]
       # These tags get escaped...
       Templates.emit_with_layout(:hello, {
                                    :name => Ctx.session[:username],
+                                   :message_code => params[:msg],
                                  },
                                  :layout, title: "Welcome", context: ['home'])
     else
-      Templates.emit_with_layout(:login, {},
+      Templates.emit_with_layout(:login,
+                                 {
+                                   :message_code => params[:msg]
+                                 },
                                  :layout_blank, title: "Please log in")
     end
   end
@@ -80,19 +85,57 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
-  Endpoint.get('/mfa') do
-    Templates.emit_with_layout(:mfa, {},
-                              :layout_blank, title: "Please verify")
+  Endpoint.get('/mfa')
+    .param(:cb, String, "Cachebuster (ignored)", optional: true) do
+    mfa_settings = Ctx.client.mfa_settings_for_user(session[:username])
+    response = Ctx.client.mfa_issue_challenge(session[:username])
+
+    if response['status'] == 'too_many_requests'
+      redirect '/?msg=max_mfa_hit'
+    else
+      Templates.emit_with_layout(:mfa, {settings: mfa_settings},
+                                 :layout_blank, title: "Please verify")
+    end
   end
 
   Endpoint.post('/mfa-validate')
-    .param(:authcode, String, "Auth Code") do
-    if Ctx.client.mfa_validate?(session[:username], params[:authcode])
-      session[:api_session_id] = session[:pending_validation_api_session_id]
-      redirect '/'
+    .param(:verification_code, String, "Code to check") do
+    mfa_settings = Ctx.client.mfa_settings_for_user(session[:username])
+
+    mfa_response = Ctx.client.mfa_check(session[:username], params[:verification_code])
+
+    if mfa_response['validated']
+      if session[:pending_validation_api_session_id]
+        session[:api_session_id] = session[:pending_validation_api_session_id]
+        session[:pending_validation_api_session_id] = nil
+      end
+
+      if mfa_settings['confirmed']
+        redirect '/'
+      else
+        # Newly confirmed MFA settings
+        redirect '/?msg=mfa_confirmed'
+      end
     else
-      Templates.emit_with_layout(:mfa, {message: 'Invalid Token. Please try again'},
-                                 :layout_blank, title: "Please verify")
+      if mfa_settings['confirmed']
+        if mfa_response['gone']
+          # Out of retries
+          session[:username] = nil
+          redirect '/?msg=mfa_expired'
+        else
+          Templates.emit_with_layout(:mfa, {message: 'Invalid Token. Please try again', settings: mfa_settings},
+                                     :layout_blank, title: "Please verify")
+        end
+      else
+        Templates.emit_with_layout(:manage_mfa, {
+                                     settings: mfa_settings,
+                                   },
+                                   :layout,
+                                   title: "Manage Multi-Factor Authentication (MFA)",
+                                   message: 'Could not confirm your MFA settings',
+                                   message_class: 'card-panel red lighten-4',
+                                  )
+      end
     end
 
   end
@@ -109,11 +152,11 @@ class MAPTheApp < Sinatra::Base
       session[:username] = params[:username]
 
       if Ctx.client.has_mfa?(session[:username])
-        session[:pending_validation_api_session_id] = authentication.session_id or raise "WOOT"
+        session[:pending_validation_api_session_id] = authentication.session_id or raise
         redirect '/mfa'
       else
         # TODO Enforce MFA setup?
-        session[:api_session_id] = authentication.session_id or raise "WOOT"
+        session[:api_session_id] = authentication.session_id or raise
         redirect '/'
       end
 
@@ -227,10 +270,6 @@ class MAPTheApp < Sinatra::Base
 
   Endpoint.get('/users/edit')
     .param(:username, String, "Username") do
-    unless Ctx.permissions.is_admin?
-      # FIXME check permissions
-    end
-
     Templates.emit(:user_edit,
                    user: Ctx.client.user_for_edit(params[:username]))
   end
@@ -252,12 +291,20 @@ class MAPTheApp < Sinatra::Base
       elsif Ctx.username == params[:user].fetch(:username)
         # Ok! Update your own things (permission changes are ignored in the API)
       else
-        # FIXME
         raise "Insufficient Privileges"
       end
     end
 
     errors = Ctx.client.update_user(params[:user])
+
+    if params[:user].fetch('reset_mfa')
+      # Disable Multi-Factor authentication on request
+      Ctx.client.mfa_update_settings(params[:user].fetch('username'),
+                                     {
+                                       method: 'none'
+                                     })
+    end
+
 
     if errors.empty?
       [202]
@@ -266,28 +313,115 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
-  Endpoint.get('/manage-mfa') do
-    secret = Ctx.client.mfa_get_key(session[:username])
-    if secret.nil? || secret.empty?
-      Templates.emit_with_layout(:manage_mfa_no_key, {}, :layout, title: "Manage MFA")
-    else
-      totp = ROTP::TOTP.new(secret, issuer: "MAP MFA")
-      Templates.emit_with_layout(:manage_mfa, {
-          secret: secret,
-          regenerate: false,
-          qr_code: RQRCode::QRCode.new(totp.provisioning_uri(session[:username])),
-          current_token: totp.now
-      }, :layout, title: "Manage MFA")
+  Endpoint.get('/manage-mfa')
+    .param(:method, String, "Optional method to select", optional: true) do
+    mfa_settings = Ctx.client.mfa_settings_for_user(session[:username])
+
+    if params[:method]
+      mfa_settings['method'] = params[:method]
     end
+
+    Templates.emit_with_layout(:manage_mfa,
+                               { settings: mfa_settings },
+                               :layout, title: "Manage Multi-Factor Authentication (MFA)")
+  end
+
+  Endpoint.get('/mfa-check')
+    .param(:cb, String, "Cachebuster (ignored)", optional: true) do
+    mfa_settings = Ctx.client.mfa_settings_for_user(session[:username])
+
+    response = Ctx.client.mfa_issue_challenge(session[:username])
+
+    message_code = if response['status'] == 'too_many_requests'
+                     'max_mfa_hit'
+                   else
+                     nil
+                   end
+
+    Templates.emit_with_layout(:mfa_check, {
+                                 settings: mfa_settings,
+                                 message_code: message_code,
+                               },
+                               :layout,
+                               title: "Test your new MFA settings")
 
   end
 
-  Endpoint.get('/mfa-new-key') do
-    # TODO verify current secret before saving new secret
-    # TODO confirm save new secret
-    key = ROTP::Base32.random  # returns a 160 bit (32 character) base32 secret. Compatible with Google Authenticator
-    Ctx.client.mfa_new_key(session[:username], key)
-    redirect '/manage-mfa'
+  Endpoint.post('/mfa-sms-save')
+    .param(:phone_number, String, "Australian mobile phone number")
+    .param(:phone_number_confirm, String, "Confirmation of phone number") do
+    phone_number = params[:phone_number].to_s.gsub(/[^0-9]/, '')
+    phone_number_confirm = params[:phone_number_confirm].to_s.gsub(/[^0-9]/, '')
+
+    error_msg = nil
+
+    if phone_number != phone_number_confirm
+      error_msg = "Confirmation phone number didn't match"
+    elsif phone_number.length != 10
+      error_msg = 'Phone number must be an Australian mobile number'
+    end
+
+    if error_msg
+      mfa_settings = Ctx.client.mfa_settings_for_user(session[:username])
+      mfa_settings['method'] = 'sms'
+      mfa_settings['sms'] = {'phone_number' => params[:phone_number]}
+
+      Templates.emit_with_layout(:manage_mfa, {
+                                   settings: mfa_settings,
+                                 },
+                                 :layout,
+                                 title: "Manage Multi-Factor Authentication (MFA)",
+                                 message: error_msg,
+                                 message_class: 'card-panel red lighten-4',
+                                )
+    else
+      Ctx.client.mfa_update_settings(session[:username],
+                                     {
+                                       method: 'sms',
+                                       phone_number: phone_number
+                                     })
+
+      mfa_settings = Ctx.client.mfa_settings_for_user(session[:username])
+
+      redirect '/mfa-check'
+    end
+  end
+
+  Endpoint.post('/mfa-totp-new-key') do
+    # Our subsequent manage-mfa request will regenerate the missing key
+    Ctx.client.mfa_totp_new_key(session[:username])
+
+    redirect '/manage-mfa?method=totp'
+  end
+
+  Endpoint.post('/mfa-disabled') do
+    Ctx.client.mfa_update_settings(session[:username],
+                                   {
+                                     method: 'none'
+                                   })
+
+    mfa_settings = Ctx.client.mfa_settings_for_user(session[:username])
+
+    Templates.emit_with_layout(:manage_mfa, {
+                                 settings: mfa_settings,
+                               },
+                               :layout,
+                               title: "Manage Multi-Factor Authentication (MFA)",
+                               message: 'Your MFA settings have been updated',
+                               message_class: 'card-panel green lighten-4',
+                              )
+  end
+
+  Endpoint.post('/mfa-totp-save') do
+    # Our subsequent manage-mfa request will regenerate the missing key
+    Ctx.client.mfa_update_settings(session[:username],
+                                  {
+                                    method: 'totp'
+                                  })
+
+    mfa_settings = Ctx.client.mfa_settings_for_user(session[:username])
+
+    redirect '/mfa-check'
   end
 
   Endpoint.post('/permissions/remove')

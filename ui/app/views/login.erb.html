@@ -1,9 +1,12 @@
 <div id="login">
     <div class="container">
         <div class="row">
-            <div class="z-depth-3 y-depth-3 x-depth-3 grey green-text lighten-4 row">
+            <div class="z-depth-3 y-depth-3 x-depth-3 grey lighten-4 row">
                 <form action="authenticate" method="post">
                     <%== FormHelper.hidden_authenticity_token %>
+
+                    <%== Templates.emit(:generic_messages, message_code: message_code) %>
+
                     <% if message %>
                         <div class="row">
                             <% if delay_seconds && delay_seconds > 0 %>

@@ -8,15 +8,32 @@ class RateLimiter < BaseStorage
 
   RateLimitResult = Struct.new(:rate_limited, :delay_seconds)
 
-  COST_MS = AppConfig[:dbauth_seconds_per_login] * 1000
-  MAX_COST_MS = AppConfig[:dbauth_max_login_burst] * COST_MS
+  def self.for_auth
+    cost_ms = AppConfig[:dbauth_seconds_per_login] * 1000
+    new(cost_ms, AppConfig[:dbauth_max_login_burst] * cost_ms)
+  end
 
-  def self.apply_rate_limit(key)
+  def self.for_mfa
+    cost_ms = AppConfig[:mfa_seconds_per_challenge] * 1000
+    new(cost_ms,
+        AppConfig[:mfa_max_challenge_burst] * cost_ms)
+  end
+
+  def initialize(cost_ms, max_cost_ms)
+    @cost_ms = cost_ms
+    @max_cost_ms = max_cost_ms
+  end
+
+  def db
+    self.class.db
+  end
+
+  def apply_rate_limit(key)
     now = java.lang.System.currentTimeMillis
 
     if rand < 0.1
       # Expire old entries while we're here
-      expire_cutoff = now - MAX_COST_MS
+      expire_cutoff = now - @max_cost_ms
       db[:rate_limit].where { rate_limit_expiry_time < expire_cutoff }.delete
     end
 
@@ -27,11 +44,11 @@ class RateLimiter < BaseStorage
       rate_limit_expiry_time = now
     end
 
-    new_rate_limit_expiry_time = rate_limit_expiry_time + COST_MS
+    new_rate_limit_expiry_time = rate_limit_expiry_time + @cost_ms
 
     # Rate limited.  Please wait!
-    if (new_rate_limit_expiry_time - now) > MAX_COST_MS
-      delay_seconds = ((new_rate_limit_expiry_time - now - MAX_COST_MS) / 1000.0).ceil
+    if (new_rate_limit_expiry_time - now) > @max_cost_ms
+      delay_seconds = ((new_rate_limit_expiry_time - now - @max_cost_ms) / 1000.0).ceil
       return RateLimitResult.new(true, delay_seconds)
     end
 

@@ -61,6 +61,18 @@
             </div>
         <% end %>
 
+        <% if !user.new? %>
+            <div class="row">
+                <div class="input-field col s12">
+                    <label>
+                        <input type="checkbox" name="user[reset_mfa]" value="true" />
+                        <span>Disable Multi-Factor Authentication?</span>
+                    </label>
+                </div>
+            </div>
+        <% end %>
+
+
         <div class="row">
             <br>
             <br>

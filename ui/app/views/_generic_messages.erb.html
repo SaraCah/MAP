@@ -1,0 +1,13 @@
+<% if message_code == 'max_mfa_hit' %>
+    <div class="red lighten-4 col s12">
+        <p>You have reached the maximum number of Multi-Factor Authentication attempts.  Please wait a few minutes and try again.</p> 
+    </div>
+<% elsif message_code == 'mfa_confirmed' %>
+    <div class="green lighten-4 col s12">
+        <p>Your Multi-Factor Authentication settings have now been confirmed.</p> 
+    </div>
+<% elsif message_code == 'mfa_expired' %>
+    <div class="red lighten-4 col s12">
+        <p>Your Multi-Factor challenge expired.  Please log in again to retry.</p> 
+    </div>
+<% end %>

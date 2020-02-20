@@ -1,0 +1,57 @@
+<div class="col s12">
+    <%== Templates.emit(:generic_messages, message_code: message_code) %>
+
+    <form method="POST" action="/mfa-validate">
+        <%== FormHelper.hidden_authenticity_token %>
+
+        <% if settings['method'] == 'sms' %>
+
+            <p>We have just delivered a notification to the phone number you provided.</p>
+
+            <p>Please check that your new settings are working by entering the code you received:</p>
+
+            <label>
+                <input type="text" id="verification_code" name="verification_code" required>
+                <span>Verification code</span>
+            </label>
+
+            <p>
+                Didn't get a message?&nbsp;
+                <a href="/mfa-check?cb=<%= SecureRandom.hex %>" class="btn">Send another code</a>
+            </p>
+
+        <% elsif settings['method'] == 'totp' %>
+
+            <p>You have configured your account to use Google Authenticator for MFA.  Please ensure you have imported the following secret into Google Authenticator:</p>
+
+            <div class="row">
+                <div class="col s12">
+                    <%== settings.fetch('totp').fetch('qr_code').as_svg(module_size: 3) %>
+                </div>
+            </div>
+
+            <p>Alternatively, manually enter the following key:</p>
+
+            <pre><%= settings.fetch('totp').fetch('secret') %></pre>
+
+
+            <p>Please check that your new settings are working by entering the code from the Google Authenticator app below:</p>
+
+            <label>
+                <input type="text" id="verification_code" name="verification_code" required>
+                <span>Verification code</span>
+            </label>
+
+        <% end %>
+
+        <div class="row">
+            <div class="col s12">
+                <button class="btn" type="submit">Verify</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+ document.querySelectorAll('#verification_code').forEach((elt) => { elt.focus() });
+</script>

@@ -22,8 +22,10 @@ class MAPTheAPI < Sinatra::Base
     .param(:password, String, "Password")
     .param(:rate_limit_key, String, "Key to use for identifying this user for rate limiting") do
 
-    limit = RateLimiter.apply_rate_limit(params[:rate_limit_key])
-    user_limit = RateLimiter.apply_rate_limit(params[:username])
+    limiter = RateLimiter.for_auth
+
+    limit = limiter.apply_rate_limit(params[:rate_limit_key])
+    user_limit = limiter.apply_rate_limit(params[:username])
 
     if limit.rate_limited || user_limit.rate_limited
       json_response(authenticated: false,
@@ -45,41 +47,57 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.post('/has-mfa', needs_session: false)
     .param(:username, String, "Username") do
-    user_id = Users.id_for_username(params[:username])
-    if Mfa.has_key?(user_id)
-      json_response(has_key: true)
-    else
-      json_response(has_key: false)
-    end
+    json_response(has_mfa: Users.has_mfa?(params[:username]))
   end
 
   Endpoint.post('/mfa-validate', needs_session: false)
     .param(:username, String, "Username")
-    .param(:authcode, String, "Authcode") do
+    .param(:verification_code, String, "Verification code") do
     user_id = Users.id_for_username(params[:username])
-    if Mfa.key_verified(user_id, params[:authcode]).nil?
-      json_response(validated: false)
-    else
-      json_response(validated: true)
-    end
+
+    json_response(Mfa.validate(user_id, params[:verification_code]))
   end
 
-  Endpoint.post('/mfa-get-key', needs_session: false)
+  Endpoint.get('/mfa-settings', needs_session: false)
       .param(:username, String, "Username") do
     user_id = Users.id_for_username(params[:username])
-    key = Mfa.get_key(user_id)
-    json_response(key: key)
+
+    json_response(Mfa.settings_for_user(user_id))
   end
 
-  Endpoint.post('/mfa-new-key')
+  Endpoint.post('/mfa-update-settings')
     .param(:username, String, "Username")
-    .param(:key, String, "Key") do
+    .param(:settings, String, "JSON settings") do
+    user_id = Users.id_for_username(params[:username])
+    settings = JSON.parse(params[:settings])
+    Mfa.apply_settings_for_user(user_id, settings)
+
+    json_response(status: 'ok')
+  end
+
+  Endpoint.post('/mfa-issue-challenge', needs_session: false)
+    .param(:username, String, "Username") do
+    user_limit = RateLimiter.for_mfa.apply_rate_limit("mfa::#{params[:username]}")
+
+    if user_limit.rate_limited
+      Ctx.log_bad_access("rate limit for MFA challenges was exceeded")
+      json_response(status: 'too_many_requests',
+                    delay_seconds: user_limit.delay_seconds)
+    else
       user_id = Users.id_for_username(params[:username])
-      # TODO error handling
-      Mfa.save_key(user_id, params[:key])
-      # TODO save the key to the database.
+      Mfa.issue_challenge(user_id)
       json_response(status: 'ok')
     end
+  end
+
+  Endpoint.post('/mfa-totp-clear-key')
+    .param(:username, String, "Username") do
+    user_id = Users.id_for_username(params[:username])
+    Mfa.delete_key(user_id)
+
+    json_response(status: 'ok')
+  end
+
 
   Endpoint.post('/users/create')
     .param(:user, UserDTO, "User") do

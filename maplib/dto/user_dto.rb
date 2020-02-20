@@ -9,6 +9,7 @@ class UserDTO
   define_field(:is_admin, Boolean, default: false)
   define_field(:is_inactive, Boolean, default: false)
   define_field(:position, String, validator: proc {|s| (s.nil? || s.empty?) ? "Position can't be blank" : nil})
+  define_field(:reset_mfa, Boolean, default: false)
   define_field(:agency_roles, [AgencyRoleDTO], default: [])
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)

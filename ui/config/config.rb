@@ -1,3 +1,5 @@
+AppConfig[:service_name] = "QSA Agency Gateway"
+
 #AppConfig[:session_secret] = 'randomly_generated_token'
 AppConfig[:map_api_url] = 'http://localhost:5678'
 AppConfig[:page_size] = 10

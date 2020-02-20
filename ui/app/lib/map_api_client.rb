@@ -147,22 +147,34 @@ class MAPAPIClient
 
   def has_mfa?(username)
     response = post('/has-mfa', username: username)
-    !!response['has_key']
+    response['has_mfa']
   end
 
-  def mfa_validate?(username, authcode)
-    response = post('/mfa-validate', username: username, authcode: authcode)
-    response['validated']
+  def mfa_check(username, verification_code)
+    post('/mfa-validate', username: username, verification_code: verification_code)
   end
 
-  def mfa_get_key(username)
-    response = post('/mfa-get-key', username: username)
-    response['key']
+  def mfa_settings_for_user(username)
+    mfa_settings = get('/mfa-settings', username: username)
+
+    if secret = mfa_settings.dig('totp', 'secret')
+      totp = ROTP::TOTP.new(secret, issuer: "#{AppConfig[:service_name]} MFA")
+      mfa_settings['totp']['qr_code'] = RQRCode::QRCode.new(totp.provisioning_uri(username))
+    end
+
+    mfa_settings
   end
 
-  def mfa_new_key(username, key)
-    response = post('/mfa-new-key', username: username, key: key)
-    response['status']
+  def mfa_update_settings(username, settings)
+    post('/mfa-update-settings', username: username, settings: settings.to_json)
+  end
+
+  def mfa_totp_new_key(username)
+    post('/mfa-totp-clear-key', username: username)
+  end
+
+  def mfa_issue_challenge(username)
+    post('/mfa-issue-challenge', username: username)
   end
 
   User = Struct.new(:username, :name, :is_admin, :is_inactive, :create_time, :position, :agency_roles) do

@@ -70,6 +70,7 @@ require 'lib/advanced_search_query'
 require 'lib/search'
 require 'lib/solr_indexer'
 require 'lib/date_parse'
+require 'lib/sms'
 
 require 'storage/base_storage'
 require 'storage/rate_limiter'

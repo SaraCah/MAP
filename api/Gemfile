@@ -61,3 +61,4 @@ gem "jdbc-mysql", "5.1.47"
 
 gem "aws-sdk-s3"
 gem "rotp", "5.1"
+gem "aws-sdk-sns"

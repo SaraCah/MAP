@@ -19,7 +19,23 @@ AppConfig[:dbauth_seconds_per_login] = 10
 # But you can try 10 in quick succession before we start limiting
 AppConfig[:dbauth_max_login_burst] = 10
 
+# You can trigger one SMS per minute on average
+AppConfig[:mfa_seconds_per_challenge] = 60
+
+# But we'll let you send 20 in quick succession
+AppConfig[:mfa_max_challenge_burst] = 20
+
+
+# You get 3 minutes and 3 retries on an MFA challenge
+AppConfig[:mfa_max_attempts] = 3
+AppConfig[:mfa_expire_seconds] = 180
+
+
 begin
   load File.join(File.dirname(__FILE__), "/config.local.rb")
 rescue LoadError
 end
+
+AppConfig[:service_name] = "QSA Agency Gateway"
+
+AppConfig[:international_phone_prefix] = "+61"

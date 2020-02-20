@@ -129,15 +129,6 @@ body {
     padding: 20px;
 }
 
-#mfa {
-    margin: 100px auto;
-    max-width: 400px;
-}
-
-#mfa form {
-    padding: 20px;
-}
-
 .user-role-table tbody tr:first-child,
 .file-issue-requested-items-table tbody tr:first-child {
     border-bottom: none;
