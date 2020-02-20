@@ -1,4 +1,4 @@
-AgencyRole = Struct.new(:id, :role, :agency_id, :aspace_agency_id, :agency_location_id, :permissions, :agency_label, :agency_location_label, :position) do
+AgencyRole = Struct.new(:id, :role, :agency_id, :aspace_agency_id, :agency_location_id, :permissions, :agency_label, :agency_location_label) do
   def self.from_row(row)
     permissions = if row[:role] == 'SENIOR_AGENCY_ADMIN'
                     Permissions::AVAILABLE_PERMISSIONS
@@ -12,8 +12,6 @@ AgencyRole = Struct.new(:id, :role, :agency_id, :aspace_agency_id, :agency_locat
                                  row[:aspace_agency_id],
                                  row[:agency_location_id],
                                  permissions)
-
-    agency_role.position = row[:position]
 
     agency_role
   end

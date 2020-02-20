@@ -77,6 +77,10 @@ class Ctx
     def permissions
       @permissions ||= Users.permissions_for_user(session.username)
     end
+
+    def user_position
+      @user_position ||= Users.get_position(session.username)
+    end
   end
 
 end

@@ -123,6 +123,7 @@ Vue.component('manage-agency', {
                                 <tr>
                                     <th>Username</th>
                                     <th>Name</th>
+                                    <th>Position</th>
                                     <th>Email</th>
                                     <th>Role(s)</th>
                                     <th></th>
@@ -135,6 +136,7 @@ Vue.component('manage-agency', {
                                         {{user.username}}
                                     </td>
                                     <td>{{user.name}}</td>
+                                    <td>{{user.position}}</td>
                                     <td>{{user.email}}</td>
                                     <td>
                                         <ul>
@@ -234,7 +236,6 @@ Vue.component('manage-agency', {
                     user_id: member.user_id,
                     username: member.username,
                     role: member.role,
-                    position: member.position,
                 },
                 successCallback: () => {
                     this.refreshAgency();
@@ -279,6 +280,7 @@ Vue.component('manage-agency', {
             interface AggregatedMember {
                 username: string;
                 name: string;
+                position: string;
                 email: string;
                 roles: string[];
                 is_user_editable: boolean;
@@ -299,6 +301,7 @@ Vue.component('manage-agency', {
                         users[member.username] = {
                             username: member.username,
                             name: member.name,
+                            position: member.position,
                             email: member.email,
                             roles: [],
                             is_user_editable: false,

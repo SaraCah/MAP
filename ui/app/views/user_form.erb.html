@@ -26,6 +26,12 @@
             </div>
         </div>
         <div class="row">
+            <div class="input-field col s12 required">
+                <input id="position" name="user[position]" type="text" value="<%= user.fetch('position', '') %>" autocomplete="off">
+                <label class="active" for="position">Position</label>
+            </div>
+        </div>
+        <div class="row">
             <div class="input-field col s12">
                 <input id="password" name="user[password]" type="password" <% if user.new? %>required<% else %>placeholder="************"<% end %> autocomplete="new-password">
                 <label class="active" for="password">Password</label>

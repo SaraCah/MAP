@@ -8,6 +8,7 @@ class UserDTO
   define_field(:password, String, required: false, validator: proc {|s, user| validate_password(s, user)})
   define_field(:is_admin, Boolean, default: false)
   define_field(:is_inactive, Boolean, default: false)
+  define_field(:position, String, validator: proc {|s| (s.nil? || s.empty?) ? "Position can't be blank" : nil})
   define_field(:agency_roles, [AgencyRoleDTO], default: [])
   define_field(:created_by, String, required: false)
   define_field(:create_time, Integer, required: false)
@@ -22,7 +23,8 @@ class UserDTO
         agency_roles: agency_roles.map{|agency_permission| AgencyRoleDTO.from_agency_role(agency_permission)},
         created_by: row[:created_by],
         create_time: row[:create_time],
-        lock_version: row[:lock_version])
+        lock_version: row[:lock_version],
+        position: row[:position])
   end
 
   def self.validate_password(password, user)

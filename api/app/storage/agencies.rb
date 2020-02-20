@@ -143,7 +143,7 @@ class Agencies < BaseStorage
               Sequel.as(Sequel[:agency][:id], :agency_id),
               Sequel[:agency_user][:agency_location_id],
               Sequel[:agency_user][:role],
-              Sequel[:agency_user][:position],
+              Sequel[:user][:position],
               Sequel[:agency_user][:allow_transfers],
               Sequel[:agency_user][:allow_file_issue],
               Sequel[:agency_user][:allow_set_and_change_raps],

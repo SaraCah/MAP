@@ -43,7 +43,7 @@ class SearchRequests < BaseStorage
                           [SearchRequest::INACTIVE, nil] 
                         else
                           username = Users.name_for(Ctx.username)
-                          position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+                          position = Ctx.get.user_position
 
                           [SearchRequest::SUBMITTED, "%s (%s)" % [username, position]]
                         end
@@ -98,7 +98,7 @@ class SearchRequests < BaseStorage
         status = SearchRequest::SUBMITTED
 
         username = Users.name_for(Ctx.username)
-        position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+        position = Ctx.get.user_position
         lodged_by = "%s (%s)" % [username, position]
       end
     else

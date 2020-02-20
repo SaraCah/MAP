@@ -4,7 +4,6 @@ class AgencyRoleDTO
   define_field(:agency_ref, String)
   define_field(:agency_label, String, required: false)
   define_field(:role, String)
-  define_field(:position, String, default: 'Not yet provided')
   define_field(:agency_location_id, Integer)
   define_field(:agency_location_label, String, required: false)
   define_field(:permissions, [String], default: [])

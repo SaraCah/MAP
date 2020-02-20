@@ -33,7 +33,7 @@
                     </select>
                     <div class="row">
                         <div class="input-field col s12 required">
-                            <input id="position" name="position" type="text" value="<%= position %>" required>
+                            <input id="position" name="user[position]" type="text" value="<%= user.fetch('position', '') %>" required>
                             <label for="position">Position</label>
                         </div>
                     </div>

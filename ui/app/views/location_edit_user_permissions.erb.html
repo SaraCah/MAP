@@ -38,7 +38,6 @@
 
             <user-permissions-form role="<%= role %>"
                                   :is_senior_agency_available="<%= Ctx.permissions.is_admin? && is_top_level %>"
-                                  position="<%= position %>"
                                   :available_permissions="<%= permissions_to_show.to_json %>"
                                   :available_delegations="<%= delegations_to_show.to_json %>"
                                   :existing_permissions="<%= existing_permissions.to_json %>"

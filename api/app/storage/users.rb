@@ -107,10 +107,11 @@ class Users < BaseStorage
   end
 
   # Returns ID of new user
-  def self.create_user(username, name, email)
+  def self.create_user(username, name, email, position)
     db[:user].insert(:username => username,
                      :name => name,
                      :email => email,
+                     :position => position,
                      :admin => 0,
                      :created_by => Ctx.username,
                      :create_time => java.lang.System.currentTimeMillis,
@@ -118,10 +119,11 @@ class Users < BaseStorage
                      :modified_time => java.lang.System.currentTimeMillis)
   end
 
-  def self.create_admin_user(username, name, email, audit_user = nil)
+  def self.create_admin_user(username, name, email, position, audit_user = nil)
     db[:user].insert(:username => username,
                      :name => name,
                      :email => email,
+                     :position => position,
                      :admin => 1,
                      :created_by => audit_user || Ctx.username,
                      :create_time => java.lang.System.currentTimeMillis,
@@ -143,6 +145,7 @@ class Users < BaseStorage
         name: user.fetch('name'),
         lock_version: user.fetch('lock_version') + 1,
         inactive: user.fetch('is_inactive') ? 1 : 0,
+        position: user.fetch('position'),
         modified_by: Ctx.username,
         modified_time: java.lang.System.currentTimeMillis
       }
@@ -178,9 +181,9 @@ class Users < BaseStorage
     # check for uniqueness
     if db[:user][:username => user.fetch('username')].nil?
       user_id = if Ctx.get.permissions.is_admin? && user.fetch('is_admin')
-                  self.create_admin_user(user.fetch('username'), user.fetch('name'), user.fetch('email'))
+                  self.create_admin_user(user.fetch('username'), user.fetch('name'), user.fetch('email'), user.fetch('position'))
                 else
-                  self.create_user(user.fetch('username'), user.fetch('username'), user.fetch('email'))
+                  self.create_user(user.fetch('username'), user.fetch('username'), user.fetch('email'), user.fetch('position'))
                 end
 
       unless user.fetch('is_admin')
@@ -189,7 +192,6 @@ class Users < BaseStorage
           role = agency_role.fetch('role')
           location_id = agency_role.fetch('agency_location_id', nil)
           permissions = agency_role.fetch('permissions')
-          position = agency_role.fetch('position')
 
           (_, aspace_agency_id) = agency_ref.split(':')
           agency_id = Agencies.get_or_create_for_aspace_agency_id(aspace_agency_id)
@@ -199,11 +201,11 @@ class Users < BaseStorage
           end
 
           if role == 'SENIOR_AGENCY_ADMIN'
-            Permissions.add_agency_senior_admin(user_id, agency_id, position)
+            Permissions.add_agency_senior_admin(user_id, agency_id)
           elsif role == 'AGENCY_ADMIN'
-            Permissions.add_agency_admin(user_id, agency_id, location_id, position, permissions)
+            Permissions.add_agency_admin(user_id, agency_id, location_id, permissions)
           elsif role == 'AGENCY_CONTACT'
-            Permissions.add_agency_contact(user_id, agency_id, location_id, position, permissions)
+            Permissions.add_agency_contact(user_id, agency_id, location_id, permissions)
           end
         end
       end
@@ -320,5 +322,9 @@ class Users < BaseStorage
 
   def self.active?(username)
     !!db[:user][:username => username, :inactive => 0]
+  end
+
+  def self.get_position(username)
+    db[:user][:username => username][:position]
   end
 end

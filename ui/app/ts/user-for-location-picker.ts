@@ -62,6 +62,7 @@ Vue.component('user-for-location-picker', {
                         <tr>
                             <th>Username</th>
                             <th>Name</th>
+                            <th>Position</th>
                             <th>Agency</th>
                             <th></th>
                         </tr>
@@ -70,6 +71,7 @@ Vue.component('user-for-location-picker', {
                         <tr v-for="record in records">
                             <td>{{record.username}}</td>
                             <td>{{record.name}}</td>
+                            <td>{{record.position}}</td>
                             <td>
                                 <ul>
                                     <li v-for="agency_label in new Set(record.agency_roles.map((role) => role[0].label))">

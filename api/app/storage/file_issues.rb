@@ -85,7 +85,7 @@ class FileIssues < BaseStorage
     lodged_by = nil
     unless file_issue_request.fetch('draft')
       username = Users.name_for(Ctx.username)
-      position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+      position = Ctx.get.user_position
       lodged_by = "%s (%s)" % [username, position]
     end
 
@@ -198,7 +198,7 @@ class FileIssues < BaseStorage
 
     unless file_issue_request.fetch('draft') && db[:file_issue_request][id: file_issue_request_id][:draft] == 1
       username = Users.name_for(Ctx.username)
-      position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+      position = Ctx.get.user_position
       update_data[:lodged_by] = "%s (%s)" % [username, position]
     end
       

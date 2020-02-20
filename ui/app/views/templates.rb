@@ -27,7 +27,7 @@ Templates.define(:user_edit, [:user, :errors?], "views/user_form.erb.html")
 Templates.define(:manage_mfa, [:secret, :regenerate, :qr_code, :current_token], "views/manage_mfa.erb.html")
 Templates.define(:manage_mfa_no_key, [], "views/manage_mfa_no_key.erb.html")
 Templates.define(:location_edit, [:location, :errors?], "views/location_form.erb.html")
-Templates.define(:location_add_user, [:location, :user, :mode, :role?, :position?, :errors?], "views/location_add_user_form.erb.html")
+Templates.define(:location_add_user, [:location, :user, :mode, :role?, :errors?], "views/location_add_user_form.erb.html")
 Templates.define(:flash_message, [:message], "views/_message.erb.html")
 Templates.define(:header, [:title, [:context]], "views/header.erb.html")
 
@@ -56,7 +56,7 @@ Templates.define(:manage_agency, [:agency_ref], "views/manage_agency.erb.html")
 Templates.define(:manage_system, [], "views/manage_system.erb.html")
 
 Templates.define(:location_edit_user_permissions,
-                 [:user_id, :location_id, :is_top_level, :username, :role, :removable_from_location, :position?, [:existing_permissions], [:available_permissions], :errors?],
+                 [:user_id, :location_id, :is_top_level, :username, :role, :removable_from_location, [:existing_permissions], [:available_permissions], :errors?],
                  "views/location_edit_user_permissions.erb.html")
 
 Templates.define(:location_delete_confirmation,

@@ -17,13 +17,6 @@ Vue.component('user-permissions-form', {
         <option v-if="is_senior_agency_available" value="SENIOR_AGENCY_ADMIN" >Senior Agency Admin</option>
     </select>
 
-    <div class="row">
-        <div class="input-field col s12 required">
-            <input id="position" name="position" type="text" v-bind:value="position" required>
-            <label class="active" for="position">Position</label>
-        </div>
-    </div>
-
     <template v-if="available_permissions.length > 0">
         <div class="row">
             <div class="col s12">
@@ -73,7 +66,7 @@ Vue.component('user-permissions-form', {
             selectedPermissions: this.existing_permissions,
         };
     },
-    props: ['role', 'position', 'is_senior_agency_available', 'existing_permissions', 'available_permissions', 'available_delegations'],
+    props: ['role', 'is_senior_agency_available', 'existing_permissions', 'available_permissions', 'available_delegations'],
     computed: {
         isDelegate: function(): boolean {
             return Utils.filter(this.selectedPermissions, (permission: string) => {

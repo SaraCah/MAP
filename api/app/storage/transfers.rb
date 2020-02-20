@@ -60,7 +60,7 @@ class Transfers < BaseStorage
 
     if transfer.fetch('status') == TransferProposal::STATUS_ACTIVE
       username = Users.name_for(Ctx.username)
-      position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+      position = Ctx.get.user_position
       lodged_by = "%s (%s)" % [username, position]
     end
 
@@ -129,7 +129,7 @@ class Transfers < BaseStorage
 
     if transfer.fetch('status') == TransferProposal::STATUS_ACTIVE && db[:transfer_proposal][id: transfer_proposal_id][:status] == TransferProposal::STATUS_INACTIVE
       username = Users.name_for(Ctx.username)
-      position = Ctx.get.permissions.position_for(Ctx.get.current_location.agency.fetch('id'), Ctx.get.current_location.id)
+      position = Ctx.get.user_position
       update_data[:lodged_by] = "%s (%s)" % [username, position]
     end
 

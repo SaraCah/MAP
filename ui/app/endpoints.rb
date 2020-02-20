@@ -167,7 +167,6 @@ class MAPTheApp < Sinatra::Base
   Endpoint.post('/users/create-for-location')
     .param(:user, UserDTO, "The user to create")
     .param(:role, String, "The role to assign")
-    .param(:position, String, "The position to assign")
     .param(:location_id, Integer, "The location to link our user to") do
 
     location = Ctx.client.location_for_edit(params[:location_id])
@@ -186,7 +185,6 @@ class MAPTheApp < Sinatra::Base
     params[:user]['agency_roles'] = [
       AgencyRoleDTO.new(:agency_ref => location.fetch('agency_ref'),
                         :role => params[:role],
-                        :position => params[:position],
                         :agency_location_id => location.fetch('id'))
     ]
 
@@ -198,7 +196,6 @@ class MAPTheApp < Sinatra::Base
       Templates.emit(:location_add_user, {
                        user: params[:user],
                        role: params[:role],
-                       position: params[:position],
                        location: location,
                        mode: 'new_user',
                        errors: errors
@@ -307,8 +304,7 @@ class MAPTheApp < Sinatra::Base
     .param(:location_id, Integer, "Location ID")
     .param(:is_top_level, Integer, "True if this is a top-level location")
     .param(:username, String, "Username")
-    .param(:role, String, "User current role")
-    .param(:position, String, "User current position") do
+    .param(:role, String, "User current role") do
 
     membership = Ctx.client.get_location_membership(params[:location_id], params[:user_id])
 
@@ -333,7 +329,6 @@ class MAPTheApp < Sinatra::Base
                          available_permissions: Ctx.permissions.is_admin? ? Ctx.client.permission_options.map(&:to_s) : matched_role.permissions,
                          username: params[:username],
                          role: params[:role],
-                         position: params[:position],
                          removable_from_location: membership.fetch('removable'),
                        })
       end
@@ -344,10 +339,9 @@ class MAPTheApp < Sinatra::Base
     .param(:user_id, Integer, "User ID")
     .param(:location_id, Integer, "Location ID")
     .param(:role, String, "Role")
-    .param(:position, String, "Position")
     .param(:permissions, [String], "Permissions to set", :optional => true) do
 
-    Ctx.client.set_membership_permissions(params[:location_id], params[:user_id], Array(params[:permissions]), params[:role], params[:position])
+    Ctx.client.set_membership_permissions(params[:location_id], params[:user_id], Array(params[:permissions]), params[:role])
 
     [202]
   end
