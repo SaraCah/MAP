@@ -82,6 +82,8 @@ class DBConnection
   end
 
   class DBPool
+    # If RDS fails over we're going to get a message like this.  Do our best to reconnect.
+    DATABASE_READ_ONLY_REGEX = /is read only|server is running with the --read-only option/
 
     attr_reader :pool
 
@@ -90,6 +92,8 @@ class DBConnection
       @pool_size = pool_size
       @opts = opts
       @pool = nil
+
+      @lock = Mutex.new
     end
 
     def connect
@@ -111,8 +115,65 @@ class DBConnection
     end
 
     def transaction(*args)
-      @pool.transaction(*args) do
-        yield(@pool)
+      retry_count = 0
+
+      begin
+        # @pool might be nil if we're in the middle of a reconnect.  Spin for a
+        # bit before giving up.
+        pool = nil
+
+        60.times do
+          pool = @pool
+          break if pool
+          sleep 1
+        end
+
+        if pool.nil?
+          $LOG.info("DB connection failed: unable to get a connection")
+          raise
+        end
+
+        pool.transaction(*args) do
+          yield(pool)
+        end
+      rescue Sequel::DatabaseError => e
+        $LOG.warn("DB connection failure: #{e}.  Retry count is #{retry_count}")
+
+        if retry_count > 6
+          # We give up
+          raise e
+        end
+
+        if e.to_s =~ DATABASE_READ_ONLY_REGEX
+          sleep rand * 10
+
+          # Reset the pool...
+          old_pool = @pool
+
+          @lock.synchronize do
+            if @pool == old_pool
+              # If we got the lock and nobody has reset the pool yet, it's time to do our thing.
+              @pool = nil
+
+              # We retry the connection indefinitely here.  The system isn't
+              # going to function until the pool is restored, so either return
+              # successful or don't return at all.
+              begin
+                connect
+              rescue
+                $LOG.warn("DB connection failure on reconnect: #{$!}.  Retrying indefinitely...")
+                sleep 1
+                retry
+              end
+            end
+          end
+
+          retry_count += 1
+          retry
+        else
+          raise e
+        end
+
       end
     end
   end
