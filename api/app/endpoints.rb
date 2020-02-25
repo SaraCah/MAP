@@ -1174,4 +1174,37 @@ class MAPTheAPI < Sinatra::Base
       [404]
     end
   end
+
+  Endpoint.post('/send-password-reset', needs_session: false)
+    .param(:username, String, "Username to send password reset to") do
+
+    DBAuth.issue_password_reset(params[:username])
+
+    json_response(status: 'ok')
+  end
+
+  Endpoint.get('/check-reset-token', needs_session: false)
+    .param(:token, String, "Reset token to check") do
+    ok = DBAuth.valid_reset_token?(params[:token])
+
+    json_response(status: ok ? 'ok' : 'not-found')
+  end
+
+  Endpoint.post('/set-new-password', needs_session: false)
+    .param(:token, String, "Reset token to check")
+    .param(:password, String, "New password") do
+
+    if user_id = DBAuth.valid_reset_token?(params[:token])
+      if Users.valid_password?(params[:password])
+        DBAuth.set_user_password(user_id, params[:password])
+        json_response(status: 'ok')
+      else
+        json_response(status: 'password-not-acceptable')
+      end
+    else
+      json_response(status: 'token-not-found')
+    end
+
+  end
+
 end

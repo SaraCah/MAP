@@ -20,9 +20,12 @@ Templates.define(:qgov_footer, [], "views/qgov_footer.erb.html")
 
 Templates.define(:login, [:username?, :message?, :message_code?, :delay_seconds?], "views/login.erb.html")
 
+Templates.define(:forgotten_password, [:msg?], "views/forgotten_password.erb.html")
+
+Templates.define(:set_new_password, [:msg?, :token], "views/set_new_password.erb.html")
+
 Templates.define(:mfa, [:message?, :settings], "views/mfa.erb.html")
 Templates.define(:mfa_check, [:settings, :message_code?], "views/mfa_check.erb.html")
-
 
 Templates.define(:records, [:agency?, :location?], "views/records.erb.html")
 

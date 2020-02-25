@@ -71,6 +71,7 @@ require 'lib/search'
 require 'lib/solr_indexer'
 require 'lib/date_parse'
 require 'lib/sms'
+require 'lib/password_reset_notification'
 
 require 'storage/base_storage'
 require 'storage/rate_limiter'
@@ -105,6 +106,7 @@ require 'rack/tempfile_reaper'
 require 'map_validator'
 
 require 'rotp'
+require 'mail'
 
 class MAPTheAPI < Sinatra::Base
 
@@ -124,6 +126,16 @@ class MAPTheAPI < Sinatra::Base
     # Clean up multipart upload temp files
     use Rack::TempfileReaper
   end
+
+
+  configure do
+    if AppConfig[:email_enabled]
+      Mail.defaults do
+        delivery_method :smtp, AppConfig[:email_smtp_settings]
+      end
+    end
+  end
+
 
   configure do
     Sequel.database_timezone = :utc

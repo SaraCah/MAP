@@ -738,6 +738,20 @@ class MAPAPIClient
     post('/reading-room-requests/cancel', id: request_id, lock_version: lock_version)
   end
 
+  def send_password_reset(username)
+    post('/send-password-reset', username: username)
+  end
+
+  def reset_token_ok?(token)
+    response = get('/check-reset-token', token: token)
+
+    response['status'] == 'ok'
+  end
+
+  def set_new_password(token, password)
+    post('/set-new-password', token: token, password: password)
+  end
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)

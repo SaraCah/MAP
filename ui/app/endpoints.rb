@@ -179,6 +179,55 @@ class MAPTheApp < Sinatra::Base
     end
   end
 
+  Endpoint.get('/forgotten-password')
+    .param(:msg, String, "Show confirmation message", optional: true) do
+    Templates.emit_with_layout(:forgotten_password, {msg: params[:msg]},
+                               :layout_blank, title: "Reset your password")
+  end
+
+  Endpoint.post('/send-password-reset')
+    .param(:username, String, "The username to send a password reset to") do
+    Ctx.client.send_password_reset(params[:username])
+
+    redirect '/forgotten-password?msg=sent'
+  end
+
+  Endpoint.get('/new-password')
+    .param(:token, String, "Reset token")
+    .param(:msg, String, "Flash message to show", optional: true) do
+    if Ctx.client.reset_token_ok?(params[:token])
+      Templates.emit_with_layout(:set_new_password,
+                                 {
+                                   token: params[:token],
+                                   msg: params[:msg],
+                                 },
+                                 :layout_blank, title: "Reset your password")
+    else
+      redirect '/forgotten-password?msg=expired'
+    end
+  end
+
+  Endpoint.post('/set-new-password')
+    .param(:token, String, "Reset token")
+    .param(:new_password, String, "Password")
+    .param(:new_password_confirm, String, "Password (confirmation)") do
+
+    if params[:new_password] != params[:new_password_confirm]
+      redirect "/new-password?msg=password_mismatch&token=#{params[:token]}"
+    end
+
+    response = Ctx.client.set_new_password(params[:token], params[:new_password])
+
+    if response['status'] == 'ok'
+      redirect '/?msg=password_reset'
+    elsif response['status'] == 'password-not-acceptable'
+      redirect "/new-password?msg=password_too_weak&token=#{params[:token]}"
+    elsif response['status'] == 'token-not-found'
+      redirect '/forgotten-password?msg=expired'
+    end
+  end
+
+
   Endpoint.post('/users/assign-to-location')
     .param(:username, String, "The username to assign")
     .param(:location_id, Integer, "The location to assign them to")

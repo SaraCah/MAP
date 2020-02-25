@@ -36,6 +36,19 @@ begin
 rescue LoadError
 end
 
-AppConfig[:service_name] = "QSA Agency Gateway"
+# The name of the service as it should appear in communications with end users
+AppConfig[:service_name] = "QSA ArchivesGateway"
+
+# The public URL of the service as used by end users.  Password reset links will
+# be relative to this URL.
+AppConfig[:service_url] = 'http://localhost:3456'
+
 
 AppConfig[:international_phone_prefix] = "+61"
+
+AppConfig[:password_reset_ttl_seconds] = 86400
+AppConfig[:password_reset_subject] = "#{AppConfig[:service_name]} Password Reset"
+
+AppConfig[:email_enabled] = false
+AppConfig[:email_override_recipient] = 'qsa-support@gaiaresources.com.au'
+AppConfig[:email_from_address] = 'qsa-support@gaiaresources.com.au'
