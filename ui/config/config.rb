@@ -4,7 +4,14 @@ AppConfig[:service_name] = "QSA Agency Gateway"
 AppConfig[:map_api_url] = 'http://localhost:5678'
 AppConfig[:page_size] = 10
 
-AppConfig[:file_issue_request_types] = ['Right to Information', 'National Redress Scheme']
+AppConfig[:file_issue_request_types] = [
+  'Right to Information',
+  'National Redress Scheme or related',
+  'Disability Royal Commission',
+  'Aged Care Royal Commission',
+  'Commission of Inquiry – other',
+]
+
 AppConfig[:search_request_purposes] = ['RTI', 'Redress']
 
 AppConfig[:file_upload_allowed_extensions] = [
