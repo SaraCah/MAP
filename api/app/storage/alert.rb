@@ -15,8 +15,8 @@ class Alert < BaseStorage
     #     db[:alert][:alert_name => alert_name][:id]
     # end
 
-    def self.get_message(message)
-        db[:alert][:message => message][:id]
-    end
+    # def self.get_message(message)
+    #     db[:alert][:message => message][:id]
+    # end
 
 end

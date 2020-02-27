@@ -1185,8 +1185,7 @@ class MAPTheAPI < Sinatra::Base
 
   Endpoint.get('/alerts/:alert_name', needs_session: false) 
     .param(:alert_name, String, "Identified for alert")  do 
-    message = Alert.get_alert(params[:alert_name])
-  json_response(message)
+      json_response('message' => Alert.get_alert(params[:alert_name]))
   end
 
 end
