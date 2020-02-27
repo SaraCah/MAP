@@ -494,11 +494,6 @@ class MAPAPIClient
                           message: message)
   end
 
-  def get_alert(alert_name)
-    json = get("/alerts/#{alert_name}")
-
-  end
-
   def get_transfer(transfer_id)
     json = get("/transfers/#{transfer_id}")
 
@@ -741,6 +736,10 @@ class MAPAPIClient
 
   def cancel_reading_room_request(request_id, lock_version)
     post('/reading-room-requests/cancel', id: request_id, lock_version: lock_version)
+  end
+
+  def get_alert(alert_name)
+    json = get("/alerts/#{alert_name}")
   end
 
   private
