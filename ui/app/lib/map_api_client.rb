@@ -494,6 +494,11 @@ class MAPAPIClient
                           message: message)
   end
 
+  def get_alert(alert_name)
+    json = get("/alerts/#{alert_name}")
+
+  end
+
   def get_transfer(transfer_id)
     json = get("/transfers/#{transfer_id}")
 

@@ -12,7 +12,8 @@ class MAPTheApp < Sinatra::Base
     else
       Templates.emit_with_layout(:login,
                                  {
-                                   :message_code => params[:msg]
+                                   :message_code => params[:msg],
+                                   :alert => Ctx.client.get_alert('login-alert')
                                  },
                                  :layout_blank, title: "Please log in")
     end
