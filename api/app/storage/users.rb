@@ -327,4 +327,9 @@ class Users < BaseStorage
     !!db[:user][:username => username, :inactive => 0]
   end
 
+
+  def self.get_position(username)
+    db[:user][:username => username][:position]
+  end
+
 end
