@@ -10,13 +10,14 @@ import Record from "./controlled-records";
 interface Representation {
     id: string;
     label: string;
+    fileIssueAllowed: string;
 }
 
 declare var M: any; // Materialize on the window context
 
 export default class RepresentationRequest {
     public static fromRepresentation(rep: Representation): RepresentationRequest {
-        return new RepresentationRequest(rep.id, rep.label, 'DIGITAL');
+        return new RepresentationRequest(rep.id, rep.label, 'DIGITAL', rep.fileIssueAllowed);
     }
 
     public recordDetails: string;
@@ -24,7 +25,8 @@ export default class RepresentationRequest {
 
     constructor(public id: string,
                 public label: string,
-                public requestType: string) {
+                public requestType: string,
+                public fileIssueAllowed: string) {
         this.recordDetails = '';
     }
 
@@ -99,7 +101,7 @@ Vue.component('representation-browse', {
             this.$emit('removed', record.id);
         },
         addSelected: function(record: Record) {
-            this.$emit('selected', new RepresentationRequest(record.id, record.title, 'DIGITAL'));
+            this.$emit('selected', new RepresentationRequest(record.id, record.title, 'DIGITAL', record.file_issue_allowed));
         },
         isRepresentation: function(record: Record) {
             return !!Utils.find(record.types, (type: string) => {
@@ -119,14 +121,20 @@ Vue.component('representation-browse', {
                 return this.isPhysicalRepresentation(record);
             }
 
-            return record.file_issue_allowed === 'allowed_true';
+            if (record.file_issue_allowed === 'allowed_true') {
+                return true;
+            } else if (record.file_issue_allowed === 'allowed_contact_qsa') {
+                return this.isPhysicalRepresentation(record);
+            } else {
+                return false;
+            }
         },
         showFileIssueDisallowed: function(record: Record) {
             if (this.readingRoomRequestsOnly) {
                 return false;
             }
 
-            return this.isRepresentation(record) && (record.file_issue_allowed !== 'allowed_true');
+            return this.isRepresentation(record) && (['allowed_true', 'allowed_contact_qsa'].indexOf(record.file_issue_allowed) < 0);
         },
         isNotOnShelf: function(record: Record) {
             return record.current_location && record.current_location !== 'HOME';

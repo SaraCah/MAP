@@ -41,7 +41,7 @@ Vue.component('reading-room-request-form', {
         const resolved: any = JSON.parse(this.resolved_representations);
 
         JSON.parse(this.requested_items).forEach((representationBlob: any) => {
-            const rep: RepresentationRequest = new RepresentationRequest(representationBlob.record_ref, '', '');
+            const rep: RepresentationRequest = new RepresentationRequest(representationBlob.record_ref, '', '', '');
             const resolved_rep = Utils.find(resolved, (item: any) => {
                 return item.ref === representationBlob.record_ref;
             });
@@ -96,7 +96,7 @@ Vue.component('reading-room-request-summary', {
     <template v-if="requested_items.length == 0">
         <div class="row">
             <div class="col s12 m12 l6">
-                <div class="card-panel blue lighten-5">No {{request_type}} items requested.</div>
+                <div class="card-panel blue lighten-5">No items requested.</div>
             </div>
         </div>
     </template>

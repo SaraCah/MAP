@@ -68,7 +68,7 @@ Vue.component('file-issue-form', {
         const resolved: any = JSON.parse(this.resolved_representations);
 
         JSON.parse(this.representations).forEach((representationBlob: any) => {
-            const rep: RepresentationRequest = new RepresentationRequest(representationBlob.record_ref, '', representationBlob.request_type);
+            const rep: RepresentationRequest = new RepresentationRequest(representationBlob.record_ref, '', representationBlob.request_type, representationBlob.file_issue_allowed);
             rep.recordDetails = representationBlob.record_details;
             const resolved_rep = Utils.find(resolved, (item: any) => {
                 return item.ref === representationBlob.record_ref;
@@ -283,7 +283,8 @@ Vue.component('file-issue-requested-items-table', {
                 <template v-else>
                     <select class="browser-default" :name="buildPath('request_type')" v-model="representation.requestType">
                         <option value="DIGITAL">Digitised copy</option>
-                        <option value="PHYSICAL">Original</option>
+                        <option value="PHYSICAL" v-if="isOriginalAllowed(representation)">Original</option>
+                        <option value="PHYSICAL" v-else disabled="disabled">Original - The original cannot be issued due to its format or condition. Please request a digitised copy or contact QSA</option>
                     </select>
                 </template>
             </td>
@@ -357,6 +358,9 @@ Vue.component('file-issue-requested-items-table', {
         },
         removeItem: function(record: Record) {
             this.$emit('remove', record.id);
+        },
+        isOriginalAllowed(representation: RepresentationRequest) {
+            return representation.fileIssueAllowed === 'allowed_true';
         },
     },
 });
