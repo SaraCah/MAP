@@ -899,4 +899,6 @@ class MAPAPIClient
     end
     uri
   end
+
+
 end
