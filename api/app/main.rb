@@ -75,6 +75,7 @@ require 'lib/password_reset_notification'
 
 require 'storage/base_storage'
 require 'storage/rate_limiter'
+require 'storage/alert'
 require 'storage/db_auth'
 require 'storage/users'
 require 'storage/sessions'

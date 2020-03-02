@@ -752,6 +752,20 @@ class MAPAPIClient
     post('/set-new-password', token: token, password: password)
   end
 
+
+  def get_alert(alert_name)
+    json = get("/alerts/#{alert_name}")   
+  end
+
+  def set_alert(alert_name, message)
+    response = post('/alerts', alert_name: alert_name, message: message)
+  end
+
+  def delete_alert(alert_name)
+    response = post('/alerts/delete', alert_name: alert_name)
+  end
+
+
   private
 
   def post(url, params = {}, encoding = :x_www_form_urlencoded)
@@ -909,4 +923,6 @@ class MAPAPIClient
     end
     uri
   end
+
+
 end

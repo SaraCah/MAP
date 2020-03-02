@@ -1205,6 +1205,30 @@ class MAPTheAPI < Sinatra::Base
       json_response(status: 'token-not-found')
     end
 
+  Endpoint.post('/alerts')
+    if Ctx.get.permissions.is_admin?
+    .param(:alert_name, String, "Identified for alert")
+    .param(:message, String, "The message displayed to users") do 
+    alert = Alert.set_alert(params[:alert_name], params[:message])
+    json_response(alert)
+     else
+    Ctx.log_bad_access("Attempt to access system-administrators list")
+    [403]
+    end
+    
+  end
+
+
+  Endpoint.post('/alerts/delete', needs_session: false)
+  .param(:alert_name, String, "Identified for alert") do 
+  Alert.delete_alert(params[:alert_name])
+  json_response("status")
+  end
+
+
+  Endpoint.get('/alerts/:alert_name', needs_session: false) 
+    .param(:alert_name, String, "Identified for alert")  do 
+      json_response('message' => Alert.get_alert(params[:alert_name]))
   end
 
 end
