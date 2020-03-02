@@ -1135,6 +1135,12 @@ class MAPTheApp < Sinatra::Base
     Ctx.client.stream_file_issue_report(params[:start_date], params[:end_date], "file_issue_report_#{Date.today.iso8601}.csv")
   end
 
+  Endpoint.post('/alerts')
+  .param(:alert_name, String, "Alert Name", :optional => true)
+  .param(:message, String, "Message") do
+    Ctx.client.set_alert(params[:alert_name], params[:message])
+  end 
+
   Endpoint.get('/notifications') do
     [
       200,
@@ -1331,7 +1337,7 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/system') do
     if Ctx.permissions.is_admin?
       Templates.emit_with_layout(:manage_system, {},
-                                 :layout, title: "Manage System", context: ['global', 'system'])
+                                 :layout, title: "Manage System", context: ['global', 'system'],)
     else
       [404]
     end
