@@ -2,13 +2,18 @@
     <manage-system></manage-system>
             <form method="POST" action="/alerts">
                 <%== FormHelper.hidden_authenticity_token %>
-                
-                <label for="alert_name">Alert Type</label>
-                <input type="text-area" name="alert_name" id="alert_name" value="" />
+            
+                <input type="hidden" name="alert_name" id="alert_name" value="login-alert" />
 
-                <label for="message">Alert Type</label>
+                <label for="message">Alert Message</label>
                 <input type="text-area" name="message" id="message" />
 
+                <input class="btn" type="submit"/>
+            </form>
+
+               <form method="POST" action="/alerts/delete">
+                <%== FormHelper.hidden_authenticity_token %>
+                <input type="hidden" name="alert_name" id="alert_name" value="login-alert" />
                 <input class="btn" type="submit"/>
             </form>
 </div>

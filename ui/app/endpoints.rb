@@ -1143,6 +1143,14 @@ class MAPTheApp < Sinatra::Base
       redirect '/system'
   end
 
+
+  Endpoint.post('/alerts/delete')
+  .param(:alert_name, String, "Alert Name") do
+
+    Ctx.client.delete_alert(params[:alert_name])
+      redirect '/system'
+  end
+
   Endpoint.get('/notifications') do
     [
       200,

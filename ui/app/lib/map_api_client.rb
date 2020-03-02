@@ -748,6 +748,10 @@ class MAPAPIClient
     response = post('/alerts', alert_name: alert_name, message: message)
   end
 
+  def delete_alert(alert_name)
+    response = post('/alerts/delete', alert_name: alert_name)
+  end
+
 
   private
 
