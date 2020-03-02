@@ -738,10 +738,9 @@ class MAPAPIClient
     post('/reading-room-requests/cancel', id: request_id, lock_version: lock_version)
   end
 
-  Alert = Struct.new(:alert_name, :message)
+
   def get_alert(alert_name)
-    json = get("/alerts/#{alert_name}")
-    
+    json = get("/alerts/#{alert_name}")   
   end
 
   def set_alert(alert_name, message)
