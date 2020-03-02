@@ -745,7 +745,7 @@ class MAPAPIClient
   end
 
   def set_alert(alert_name, message)
-    response = post('/alerts', alert_name: alert_name.to_json, message: message.to_json)
+    response = post('/alerts', alert_name: alert_name, message: message)
   end
 
 

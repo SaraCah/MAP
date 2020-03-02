@@ -1183,6 +1183,14 @@ class MAPTheAPI < Sinatra::Base
     
   end
 
+
+  Endpoint.post('/alerts/delete', needs_session: false)
+  .param(:alert_name, String, "Identified for alert") do 
+  Alert.delete_alert(params[:alert_name])
+  json_response("status")
+  end
+
+
   Endpoint.get('/alerts/:alert_name', needs_session: false) 
     .param(:alert_name, String, "Identified for alert")  do 
       json_response('message' => Alert.get_alert(params[:alert_name]))
