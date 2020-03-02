@@ -1176,10 +1176,12 @@ class MAPTheAPI < Sinatra::Base
   end
 
   Endpoint.post('/alerts', needs_session: false)
+    if Ctx.get.permissions.is_admin?
     .param(:alert_name, String, "Identified for alert")
     .param(:message, String, "The message displayed to users") do 
     alert = Alert.set_alert(params[:alert_name], params[:message])
     json_response(alert)
+    end
     
   end
 
