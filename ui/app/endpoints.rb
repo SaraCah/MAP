@@ -1136,10 +1136,12 @@ class MAPTheApp < Sinatra::Base
   end
 
   Endpoint.post('/alerts')
-  .param(:alert_name, String, "Alert Name", :optional => true)
+  .param(:alert_name, String, "Alert Name")
   .param(:message, String, "Message") do
+
     Ctx.client.set_alert(params[:alert_name], params[:message])
-  end 
+      redirect '/system'
+  end
 
   Endpoint.get('/notifications') do
     [

@@ -741,10 +741,11 @@ class MAPAPIClient
   Alert = Struct.new(:alert_name, :message)
   def get_alert(alert_name)
     json = get("/alerts/#{alert_name}")
+    
   end
 
   def set_alert(alert_name, message)
-    post('/alerts', alert_name: alert_name, message: message)
+    response = post('/alerts', alert_name: alert_name.to_json, message: message.to_json)
   end
 
 
