@@ -290,7 +290,8 @@ class Transfers < BaseStorage
     updated = db[:transfer]
                 .filter(id: transfer_id)
                 .filter(lock_version: transfer.fetch('lock_version'))
-                .update(lock_version: transfer.fetch('lock_version') + 1,
+                .update(description: transfer.fetch('description', nil),
+                        lock_version: transfer.fetch('lock_version') + 1,
                         modified_by: Ctx.username,
                         modified_time: java.lang.System.currentTimeMillis,
                         system_mtime: Time.now)
