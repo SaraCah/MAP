@@ -1396,7 +1396,7 @@ class MAPTheApp < Sinatra::Base
   Endpoint.get('/system') do
     if Ctx.permissions.is_admin?
       Templates.emit_with_layout(:manage_system, {},
-                                 :layout, title: "Manage System", context: ['global', 'system'],)
+                                 :layout, title: "Manage System", context: ['global', 'system'])
     else
       [404]
     end

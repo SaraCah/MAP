@@ -18,7 +18,7 @@ Templates.define(:layout_blank, [:title, :template, :template_args, :message?], 
 Templates.define(:qgov_header, [], "views/qgov_header.erb.html")
 Templates.define(:qgov_footer, [], "views/qgov_footer.erb.html")
 
-Templates.define(:login, [:alert, :username?, :message?, :message_code?, :delay_seconds?], "views/login.erb.html")
+Templates.define(:login, [:alert?, :username?, :message?, :message_code?, :delay_seconds?], "views/login.erb.html")
 
 Templates.define(:forgotten_password, [:msg?], "views/forgotten_password.erb.html")
 

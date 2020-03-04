@@ -1219,10 +1219,14 @@ class MAPTheAPI < Sinatra::Base
   end
 
 
-  Endpoint.post('/alerts/delete', needs_session: false)
+  Endpoint.post('/alerts/delete')
+  if Ctx.get.permissions.is_admin?
   .param(:alert_name, String, "Identified for alert") do 
   Alert.delete_alert(params[:alert_name])
   json_response("status")
+  else
+  Ctx.log_bad_access("Attempt to access system-administrators list")
+  [403]
   end
 
 
