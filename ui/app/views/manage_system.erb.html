@@ -2,24 +2,23 @@
     <manage-system></manage-system>
     <h4>Create a login alert</h4>
     <p>Eg. Update any users of future outages on login page</p>
-            <form method="POST" action="/alerts">
+            <form method="POST" action="/alerts" style="display: inline-block">
                 <%== FormHelper.hidden_authenticity_token %>
-            
                 <input type="hidden" name="alert_name" id="alert_name" value="login-alert" />
                 <div class="row">
                     <div class="input-field col s12">
-                <label for="message">Alert Message</label>
-                
-                <input type="text" name="message" id="message" />
-            </div>
-        </div>
-                <input class="btn" type="submit"/>
-                <form method="POST" action="/alerts/delete">
+                        <label for="message">Alert Message</label>
+                        <input type="text" name="message" id="message" placeholder="<%= alert ? alert['message'] : '' %>">
+                        <input class="btn" type="submit"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                    <form method="POST" action="/alerts/delete" style="display: inline-block">
                     <%== FormHelper.hidden_authenticity_token %>
-                    <input type="hidden" name="alert_name" id="alert_name" value="login-alert" />
-                    <button class="btn waves-effect waves-light" type="submit"> Delete Current Alert
-                      </button>
-                            
-                </form>
-            </form>
+                        <input type="hidden" name="alert_name" id="alert_name" value="login-alert" />
+                        <button class="btn waves-effect waves-light" type="submit"> Delete Current Alert</button>
+                    </form>
+                </div>  
+            </div>
 </div>
