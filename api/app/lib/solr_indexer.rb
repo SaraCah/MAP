@@ -38,7 +38,7 @@ class SolrIndexer
 
     DB.open do |db|
       # Handle updates
-      db[:index_feed].filter { id > last_indexed_id }.map(:id).sort.each_slice(RECORD_BATCH_SIZE) do |id_set|
+      db[:index_feed].filter { id > last_indexed_id }.select(:id).map(:id).sort.each_slice(RECORD_BATCH_SIZE) do |id_set|
         batch = []
 
         db[:index_feed].filter(:id => id_set).each do |row|
@@ -52,7 +52,7 @@ class SolrIndexer
       end
 
       # Handle deletes
-      db[:index_feed_deletes].filter { id > last_deleted_id }.map(:id).sort.each_slice(RECORD_BATCH_SIZE) do |id_set|
+      db[:index_feed_deletes].filter { id > last_deleted_id }.select(:id).map(:id).sort.each_slice(RECORD_BATCH_SIZE) do |id_set|
         record_uris = []
 
         db[:index_feed_deletes].filter(:id => id_set).each do |row|
