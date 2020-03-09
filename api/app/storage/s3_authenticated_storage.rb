@@ -6,6 +6,9 @@
 # because it turns out that doing straight up PUTs ends up creating objects
 # owned by an "anonymous" user, and these can't be accessed through the AWS
 # console.
+#
+# We'll migrate to using this class exclusively and it'll probably end up
+# becoming s3_storage.rb over the next few weeks.
 
 require 'securerandom'
 require 'tempfile'
@@ -18,6 +21,8 @@ class S3AuthenticatedStorage
     @region = region || AppConfig[:storage_s3_region]
     @access_key = access_key || AppConfig[:storage_s3_access_key]
     @secret_access_key = secret_access_key || AppConfig[:storage_s3_secret_access_key]
+
+    @fallback_ro_bucket = bucket || AppConfig[:storage_s3_bucket_fallback_ro]
   end
 
   def client
@@ -44,15 +49,58 @@ class S3AuthenticatedStorage
   end
 
   def get_stream(key, &block)
-    begin
-      client.get_object({
-                          :bucket => @bucket,
-                          :key => key
-                        },
-                        &block)
-    rescue
-      raise S3GetFailed.new($!)
+    candidate_keys = [key, key.downcase].uniq
+    candidate_buckets = [@bucket, @fallback_ro_bucket].compact.uniq
+
+    last_error = nil
+
+    catch (:mainloop) do
+      candidate_buckets.each do |bucket|
+        candidate_keys.each do |key|
+          begin
+            client.get_object({
+                                :bucket => bucket,
+                                :key => key
+                              },
+                              &block)
+            # Success!
+            return
+          rescue Aws::S3::Errors::NoSuchKey => e
+            # Try the next key/bucket combo
+            last_error = e
+          rescue
+            # Some other error.  Abort right away.
+            last_error = $!
+            throw :mainloop
+          end
+        end
+      end
     end
+
+    if last_error
+      raise S3GetFailed.new(last_error)
+    else
+      raise S3GetFailed.new("Unexpected failure")
+    end
+  end
+
+  def exists?(key)
+    candidate_buckets.each do |bucket|
+      candidate_keys.each do |key|
+        begin
+          client.head_object({
+                               :bucket => @bucket,
+                               :key => key
+                             })
+
+          return true
+        rescue
+          # Keep trying
+        end
+      end
+    end
+
+    return false
   end
 
   class S3StoreFailed < StandardError; end
