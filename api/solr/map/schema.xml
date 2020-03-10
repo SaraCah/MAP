@@ -9,6 +9,7 @@
   <field name="primary_type" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="types" type="string" indexed="true" stored="true" required="true" multiValued="true" />
   <field name="title" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+  <field name="base_title" type="string" indexed="true" stored="true" required="false" multiValued="false" />
   <field name="description" type="string" indexed="true" stored="true" required="false" multiValued="false" />
   <field name="qsa_id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="qsa_id_prefixed" type="string" indexed="true" stored="true" required="true" multiValued="false" />
@@ -43,10 +44,13 @@
   <field name="current_location" type="string" indexed="true" stored="true" multiValued="false" />
 
   <field name="start_date" type="pdate" stored="true" multiValued="false" />
+  <field name="raw_start_date" type="string" stored="true" multiValued="false" />
   <field name="end_date" type="pdate" stored="true" multiValued="false" />
+  <field name="raw_end_date" type="string" stored="true" multiValued="false" />
 
   <field name="physical_representations_count" type="pint" stored="true" multiValued="false" />
   <field name="digital_representations_count" type="pint" stored="true" multiValued="false" />
+  <field name="items_count" type="pint" stored="true" multiValued="false" />
 
   <field name="top_container" type="string" indexed="true" stored="true" multiValued="false" />
 

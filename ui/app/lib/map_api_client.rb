@@ -340,6 +340,21 @@ class MAPAPIClient
     get('/controlled-records', params)
   end
 
+  def stream_controlled_records_csv(q, filters, sort, start_date, end_date)
+    return { results: [], facets: {}} if Ctx.get.permissions.is_admin?
+
+    params = {}
+    params[:q] = q unless q.to_s.empty?
+    params[:filters] = JSON.dump(filters)
+    params[:sort] = sort
+    params[:start_date] = start_date unless start_date.to_s.empty?
+    params[:end_date] = end_date unless end_date.to_s.empty?
+
+    stream_get('/controlled-records.csv',
+               'controlled-records.csv',
+               params)
+  end
+
   AgencyLocation = Struct.new(:id, :name, :agency_id, :create_time, :agency) do
     def self.from_json(json)
       AgencyLocation.new(json.fetch('id'),

@@ -1257,6 +1257,18 @@ class MAPTheApp < Sinatra::Base
     ]
   end
 
+  Endpoint.get('/controlled-records.csv')
+    .param(:q, String, "Query clauses (json)", :optional => true)
+    .param(:filters, String, "Filters to apply [[field1, val1], [field2, val2]]", :optional => true)
+    .param(:start_date, String, "Start of date range", :optional => true)
+    .param(:end_date, String, "End of date range", :optional => true)
+    .param(:sort, String, "Sort key", :optional => true) do
+     Ctx.client.stream_controlled_records_csv(params[:q],
+                                              JSON.parse(params[:filters] || '[]'),
+                                              (params[:sort] || "relevance"),
+                                              params[:start_date], params[:end_date])
+  end
+
   Endpoint.get('/records') do
     Templates.emit_with_layout(
       :records, {
