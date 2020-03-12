@@ -1,8 +1,9 @@
 class ControlledRecordsReport
 
-  def initialize(search_results, current_agency_uri)
+  def initialize(search_results, current_agency_uri, suppress_headers = false)
     @results = search_results
     @current_agency_uri = current_agency_uri
+    @suppress_headers = suppress_headers
   end
 
   def find_creating_agency(agency_ref)
@@ -10,36 +11,35 @@ class ControlledRecordsReport
   end
 
   def each
-    yield CSV.generate_line([
-                              'Record Type',
-                              'Title',
-                              'QSA ID',
-                              'Agency Control No.',
-                              'Previous System ID',
-                              'Start Date',
-                              'End Date',
-                              'Transfer ID',
-                              'Container ID',
-                              'Series ID',
-                              'Series Name',
-                              'Access Status',
-                              'RAP Years',
-                              'RAP Expiry Date',
-                              'Metadata Published?',
-                              'Creating Agency',
-                              'Format',
-                              'Subjects',
-                              'No of Items',
-                              'No of Physical Representations',
-                              'No of Digital Representations',
-                              'Under Movement?',
-                              'ArchivesSearch link'
-                            ])
+    unless @suppress_headers
+      yield CSV.generate_line([
+                                'Record Type',
+                                'Title',
+                                'QSA ID',
+                                'Agency Control No.',
+                                'Previous System ID',
+                                'Start Date',
+                                'End Date',
+                                'Transfer ID',
+                                'Container ID',
+                                'Series ID',
+                                'Series Name',
+                                'Access Status',
+                                'RAP Years',
+                                'RAP Expiry Date',
+                                'Metadata Published?',
+                                'Creating Agency',
+                                'Format',
+                                'Subjects',
+                                'No of Items',
+                                'No of Physical Representations',
+                                'No of Digital Representations',
+                                'Under Movement?',
+                                'ArchivesSearch link'
+                              ])
+    end
 
     Array(@results[:results]).each do |record|
-      require 'pp'
-      pp record
-
       yield CSV.generate_line([
                                primary_type_for(record),
                                title_for(record),

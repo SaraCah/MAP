@@ -254,6 +254,7 @@ class Search
       :facets => facets,
       :agency_titles_by_ref => resolve_agency_names(facets),
       :has_next_page => results.fetch('response').fetch('docs').length > page_size,
+      :total_hits => results.dig('response', 'numFound') || 0,
     }
   end
 
@@ -266,16 +267,42 @@ class Search
     (_, aspace_agency_id) = Ctx.get.current_location.agency.fetch('id').split(':')
     current_agency_uri = "/agents/corporate_entities/#{aspace_agency_id}"
 
-    ControlledRecordsReport.new(controlled_records(permissions,
-                                                   q_json,
-                                                   filters,
-                                                   sort,
-                                                   start_date,
-                                                   end_date,
-                                                   0,
-                                                   9999999,
-                                                   ['creating_agency']),
-                                current_agency_uri)
+    page = 0
+    page_size = 100
+
+    current_context = Ctx.get
+    done = false
+
+    Enumerator.new do |y|
+      while(true) do
+        Ctx.open_with_ctx(current_context) do
+          results = controlled_records(permissions,
+                                       q_json,
+                                       filters,
+                                       sort,
+                                       start_date,
+                                       end_date,
+                                       page,
+                                       page_size - 1,
+                                       ['creating_agency'])
+
+          report = ControlledRecordsReport.new(results,
+                                               current_agency_uri,
+                                               page > 0)
+          report.each do |csv_row|
+            y << csv_row
+          end
+
+          if results[:has_next_page]
+            page += 1
+          else
+            done = true
+          end
+        end
+
+        break if done
+      end
+    end
   end
 
   def self.select_controlled_records(permissions, record_refs)
