@@ -1,4 +1,4 @@
-<% if alert %>
+<% if !alert['message'].empty? %>
 <div class="row">
       <div class="card-panel blue lighten-4"><%= alert['message'] %></div>
   </div>
