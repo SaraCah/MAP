@@ -79,6 +79,7 @@ interface SearchState {
     selectedSort: string;
     selectedSeriesId?: string;
     selectedSeriesLabel?: string;
+    totalHits: number;
 }
 
 Vue.component('controlled-records', {
@@ -170,7 +171,7 @@ Vue.component('controlled-records', {
                             <div class="col s12">
                                 <button class="btn">Search</button>
                                 <button class="btn" v-on:click.stop.prevent="reset()">Reset</button>
-                                <a class="btn btn-small right blue" target="_blank" :href="downloadCSVURL">Download CSV</a>
+                                <controlled-records-download :approximate_count="totalHits" :url="downloadCSVURL"></controlled-records-download>
                             </div>
                         </div>
                     </form>
@@ -326,6 +327,7 @@ Vue.component('controlled-records', {
             facets: [],
             showNextPage: false,
             showPrevPage: false,
+            totalHits: 0,
 
             // The query that we last fired.  If the user adds filters, moves
             // between pages, changes sorting, those actions are performed against
@@ -552,6 +554,7 @@ Vue.component('controlled-records', {
 
                 this.records = json.results;
                 this.facets = json.facets;
+                this.totalHits = json.total_hits;
             });
         },
         flattenRecords: function(records: Record[]) {

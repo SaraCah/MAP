@@ -14,6 +14,19 @@ class Ctx
     end
   end
 
+  def self.open_with_ctx(context, opts = {})
+    DB.open(opts) do |db|
+      context.db = db
+      Thread.current[:context] = context
+
+      begin
+        yield
+      ensure
+        Thread.current[:context] = nil
+      end
+    end
+  end
+
   def self.db
     get.db
   end
@@ -47,8 +60,7 @@ class Ctx
   end
 
   class Context
-    attr_reader :db
-    attr_accessor :session
+    attr_accessor :session, :db
 
     def initialize(db)
       @db = db

@@ -364,13 +364,14 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
-  Endpoint.get('/controlled-records.csv', needs_session: false)
+  Endpoint.get('/controlled-records.csv')
     .param(:q, String, "Query clauses (json)", :optional => true)
     .param(:filters, String, "Filters to apply [[field1, val1], [field2, val2]]", :optional => true)
     .param(:sort, String, "Sort key", :optional => true)
     .param(:start_date, DateString, "Start of date range", :optional => true)
     .param(:end_date, DateString, "End of date range", :optional => true) do
     if Ctx.user_logged_in? && Ctx.get.current_location
+      p ['***', Ctx.get.session]
       permissions = Users.permissions_for_user(Ctx.username)
 
       [

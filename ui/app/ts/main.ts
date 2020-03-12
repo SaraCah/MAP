@@ -5,6 +5,7 @@ import Vue from "vue";
 import 'ajax-form';
 import 'confirmable-action';
 import 'controlled-records';
+import 'controlled-records-download';
 import 'conversation';
 import 'current-location-selector';
 import 'file-issue-form';
