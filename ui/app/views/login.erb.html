@@ -1,7 +1,11 @@
 <% if !alert['message'].empty? %>
-<div class="row">
-      <div class="card-panel blue lighten-4"><%= alert['message'] %></div>
-  </div>
+    <div class="row">
+        <div class="card-panel blue lighten-4">
+            <div class="card-conten ">
+                <h6><%= alert['message'] %></h6>
+            </div>
+        </div>
+    </div>
 <% end %>
 
 <div id="login">
