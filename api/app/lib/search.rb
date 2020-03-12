@@ -1,3 +1,5 @@
+require 'csv'
+
 class Search
 
   SOLR_CHARS = '+-&|!(){}[]^"~*?:\\/ '
@@ -223,7 +225,7 @@ class Search
                               filters,
                               sort,
                               start_date, end_date,
-                              page, page_size)
+                              page, page_size, facet_fields = nil)
 
     q = AdvancedSearchQuery.parse(q_json)
 
@@ -235,8 +237,8 @@ class Search
                                           build_supplied_filters(filters)],
                                  'rows' => page_size + 1,
                                  'start' => (page * page_size),
-                                 'facet' => 'true',
-                                 'facet.field' => ['primary_type', 'series', 'creating_agency', 'rap_access_status', 'format', 'subjects'],
+                                 'facet' => true,
+                                 'facet.field' => facet_fields ? facet_fields : ['primary_type', 'series', 'creating_agency', 'rap_access_status', 'format', 'subjects'],
                                  'facet.mincount' => 1,
                                 )
     facets = results.fetch('facet_counts', {}).fetch('facet_fields', {})
@@ -253,6 +255,27 @@ class Search
       :agency_titles_by_ref => resolve_agency_names(facets),
       :has_next_page => results.fetch('response').fetch('docs').length > page_size,
     }
+  end
+
+  def self.controlled_records_csv(permissions,
+                                  q_json,
+                                  filters,
+                                  sort,
+                                  start_date, end_date)
+
+    (_, aspace_agency_id) = Ctx.get.current_location.agency.fetch('id').split(':')
+    current_agency_uri = "/agents/corporate_entities/#{aspace_agency_id}"
+
+    ControlledRecordsReport.new(controlled_records(permissions,
+                                                   q_json,
+                                                   filters,
+                                                   sort,
+                                                   start_date,
+                                                   end_date,
+                                                   0,
+                                                   9999999,
+                                                   ['creating_agency']),
+                                current_agency_uri)
   end
 
   def self.select_controlled_records(permissions, record_refs)

@@ -48,6 +48,10 @@ class Transfer
 
   define_field(:lodged_by, String, required: false)
 
+  define_field(:previous_system_identifiers, String, required: false)
+  define_field(:date_completed, String, required: false)
+  define_field(:description, String, required: false)
+
   def self.from_row(row, handle = nil, file_rows = [])
     new(id: row[:id],
         title: row[:title],
@@ -72,6 +76,10 @@ class Transfer
         lock_version: row[:lock_version],
 
         lodged_by: row[:lodged_by],
+
+        previous_system_identifiers: row[:previous_system_identifiers],
+        date_completed: (row[:date_completed] ? row[:date_completed].iso8601 : nil),
+        description: row[:description],
 
         handle_id: handle,
         transfer_proposal_id: row[:transfer_proposal_id],

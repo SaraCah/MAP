@@ -170,6 +170,7 @@ Vue.component('controlled-records', {
                             <div class="col s12">
                                 <button class="btn">Search</button>
                                 <button class="btn" v-on:click.stop.prevent="reset()">Reset</button>
+                                <a class="btn btn-small right blue" target="_blank" :href="downloadCSVURL">Download CSV</a>
                             </div>
                         </div>
                     </form>
@@ -512,25 +513,28 @@ Vue.component('controlled-records', {
                 }
             });
         },
-        getRecords: function() {
+        getSearchParams: function() {
             let mergedFilters = JSON.parse(this.serializedFilters);
             if (this.selectedSeriesId) {
                 mergedFilters = mergedFilters.concat([['series_id', this.selectedSeriesId]]);
             }
 
+            return {
+                q: JSON.stringify(this.queryClauses),
+                filters: JSON.stringify(mergedFilters),
+                start_date: this.startDate,
+                end_date: this.endDate,
+                page: this.currentPage,
+                page_size: AppConfig.page_size,
+                sort: this.selectedSort,
+            };
+        },
+        getRecords: function() {
             this.searchActive = true;
 
             this.$http.get('/controlled-records', {
                 method: 'GET',
-                params: {
-                    q: JSON.stringify(this.queryClauses),
-                    filters: JSON.stringify(mergedFilters),
-                    start_date: this.startDate,
-                    end_date: this.endDate,
-                    page: this.currentPage,
-                    page_size: AppConfig.page_size,
-                    sort: this.selectedSort,
-                },
+                params: this.getSearchParams(),
             }).then((response: any) => {
                 this.searchActive = false;
                 return response.json();
@@ -661,6 +665,11 @@ Vue.component('controlled-records', {
         serializedFilters: function(): string {
             return JSON.stringify(this.appliedFilters.map((filter) => [filter.field, filter.value]));
         },
+        downloadCSVURL: function(): string {
+            const searchParams: any = this.getSearchParams();
+            const queryString = Object.keys(searchParams).filter(key => ['page', 'page_size'].indexOf(key) < 0).map(key => key + '=' + searchParams[key]).join('&')
+            return window.location.origin +  '/controlled-records.csv' + '?' + queryString;
+        }
     },
     mounted: function() {
         // Hash changes drive the actual search, which gives us sensible back/forward button behaviour and bookmarkability.

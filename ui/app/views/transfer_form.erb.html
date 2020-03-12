@@ -106,7 +106,31 @@
                     <div class="row">
                         <div class="input-field col s12">
                             <input id="quantity_received" type="text" value="<%= transfer.fetch('quantity_received', '') %>" required disabled>
-                            <label for="quantity_received">Quantity Received</label>
+                            <label for="quantity_received">Quantity Received (Linear Metres)</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="date_completed" type="text" value="<%= transfer.fetch('date_completed', '') %>" disabled>
+                            <label for="date_completed">Date Completed</label>
+                        </div>
+                    </div>
+
+                    <% previous_system_identifiers = transfer.fetch('previous_system_identifiers', '') %>
+                    <% if !previous_system_identifiers.nil? && !previous_system_identifiers.empty? %>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="previous_system_identifiers" type="text" value="<%= previous_system_identifiers %>" disabled>
+                                <label for="previous_system_identifiers">Previous System Identifiers</label>
+                            </div>
+                        </div>
+                    <% end %>
+
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <textarea id="description" name="transfer[description]" class="materialize-textarea" <% if is_readonly %>disabled<% end%>><%= transfer.fetch('description', '') %></textarea>
+                            <label for="description">Description</label>
                         </div>
                     </div>
                 </section>

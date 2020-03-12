@@ -364,6 +364,30 @@ class MAPTheAPI < Sinatra::Base
     end
   end
 
+  Endpoint.get('/controlled-records.csv', needs_session: false)
+    .param(:q, String, "Query clauses (json)", :optional => true)
+    .param(:filters, String, "Filters to apply [[field1, val1], [field2, val2]]", :optional => true)
+    .param(:sort, String, "Sort key", :optional => true)
+    .param(:start_date, DateString, "Start of date range", :optional => true)
+    .param(:end_date, DateString, "End of date range", :optional => true) do
+    if Ctx.user_logged_in? && Ctx.get.current_location
+      permissions = Users.permissions_for_user(Ctx.username)
+
+      [
+        200,
+        {"Content-Type" => "text/csv"},
+        Search.controlled_records_csv(permissions,
+                                      params[:q],
+                                      JSON.parse(params[:filters] || '[]'),
+                                      (params[:sort] || "relevance"),
+                                      params[:start_date], params[:end_date])
+      ]
+    else
+      Ctx.log_bad_access("user tried to access controlled records CSV")
+      [404]
+    end
+  end
+
   Endpoint.post('/set-location')
     .param(:agency_id, Integer, "Agency Id")
     .param(:location_id, Integer, "Location Id") do

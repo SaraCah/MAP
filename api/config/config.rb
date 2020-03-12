@@ -52,3 +52,5 @@ AppConfig[:password_reset_subject] = "#{AppConfig[:service_name]} Password Reset
 AppConfig[:email_enabled] = false
 AppConfig[:email_override_recipient] = 'qsa-support@gaiaresources.com.au'
 AppConfig[:email_from_address] = 'qsa-support@gaiaresources.com.au'
+
+AppConfig[:public_url] = 'http://localhost:3009'
