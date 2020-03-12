@@ -4,7 +4,7 @@ Sequel.migration do
         create_table(:alert) do
             primary_key :id
 
-            String :message, null: false
+            String :message, text: true, null: false
             String :alert_name, null: false
         end
     end
