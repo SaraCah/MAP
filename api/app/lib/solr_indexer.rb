@@ -121,7 +121,11 @@ class SolrIndexer
       request['Content-Type'] = 'application/json'
       request.body = JSON.dump(batch)
 
-      Net::HTTP.start(uri.host, uri.port) do |http|
+      Net::HTTP.start(uri.host, uri.port, nil, nil, nil, nil,
+                      {
+                        read_timeout: 300,
+                        open_timeout: 300,
+                      }) do |http|
         response = http.request(request)
         raise "Indexing error: #{response.body}" unless response.code == '200'
       end
@@ -146,7 +150,11 @@ class SolrIndexer
       request['Content-Type'] = 'application/json'
       request.body = JSON.dump(deletes.map {|id| {"id" => id}})
 
-      Net::HTTP.start(uri.host, uri.port) do |http|
+      Net::HTTP.start(uri.host, uri.port, nil, nil, nil, nil,
+                      {
+                        read_timeout: 300,
+                        open_timeout: 300,
+                      }) do |http|
         response = http.request(request)
         raise "Indexing error: #{response.body}" unless response.code == '200'
       end
@@ -166,7 +174,11 @@ class SolrIndexer
     request['Content-Type'] = 'application/json'
     request.body = JSON.dump({:commit => {"softCommit" => false}})
 
-    Net::HTTP.start(uri.host, uri.port) do |http|
+    Net::HTTP.start(uri.host, uri.port, nil, nil, nil, nil,
+                    {
+                     read_timeout: 300,
+                     open_timeout: 300,
+                   }) do |http|
       response = http.request(request)
       raise "Commit failed: #{response.body}" unless response.code == '200'
     end
